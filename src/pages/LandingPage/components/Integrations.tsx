@@ -4,7 +4,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { buildHref } from 'utils/routes';
-import { FlexWrapper, Title, FlexDiv } from './styled-components';
+import { FlexDiv, FlexWrapper, Title } from './styled-components';
 
 const Integrations: React.FC = () => {
     const { t } = useTranslation();
@@ -18,9 +18,6 @@ const Integrations: React.FC = () => {
                 </SPAAnchor>
                 <SPAAnchor href={buildHref(ROUTES.Options.SpeedMarkets)}>
                     <SpeedMarkets className="icon-home icon-home--speed" />
-                </SPAAnchor>
-                <SPAAnchor href={buildHref(ROUTES.Options.Game)}>
-                    <ThalesGame className="icon-home icon-home--game" />
                 </SPAAnchor>
             </FlexDiv>
             <Title style={{ marginBottom: '1em' }}> {t('landing-page.integrations')}</Title>
@@ -126,22 +123,6 @@ const SpeedMarkets = styled(IconAbs)`
     @media (max-width: 450px) {
         padding: 0 10px;
         margin-bottom: -25px;
-    }
-`;
-const ThalesGame = styled(IconAbs)`
-    font-size: 16em;
-    @media (max-width: 650px) {
-        line-height: 0.6em;
-        margin-bottom: 90px;
-    }
-    @media (max-width: 600px) {
-        font-size: 10em;
-        line-height: 0.2em;
-        margin-bottom: 0px;
-    }
-    @media (max-width: 450px) {
-        margin-bottom: 90px;
-        padding: 0 10px;
     }
 `;
 

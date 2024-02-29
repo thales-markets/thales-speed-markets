@@ -73,12 +73,6 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
     const populateReferralLink = (referralPageId: Pages, reffererId: string) => {
         let link = ROUTES.Options.Home;
         switch (referralPageId) {
-            case Pages.Markets:
-                link = ROUTES.Options.Home;
-                break;
-            case Pages.RangeMarkets:
-                link = ROUTES.Options.RangeMarkets;
-                break;
             case Pages.SpeedMarkets:
                 link = ROUTES.Options.SpeedMarkets;
                 break;

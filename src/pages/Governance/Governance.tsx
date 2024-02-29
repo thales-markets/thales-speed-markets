@@ -1,21 +1,23 @@
-import React, { useMemo, useState, useEffect, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
-import { navigateToGovernance } from 'utils/routes';
-import { SNAPSHOT_GRAPHQL_URL } from 'constants/governance';
-import ProposalList from './ProposalList';
-import ProposalDetails from './ProposalDetails';
-import { Proposal } from 'types/governance';
-import CouncilMembers from './CouncilMembers';
-import { RouteComponentProps } from 'react-router-dom';
-import request, { gql } from 'graphql-request';
-import SidebarDetails from './ProposalDetails/SidebarDetails';
-import ThalesStakers from './ThalesStakers';
 import OpRewardsBanner from 'components/OpRewardsBanner';
-import { getIsOVM } from 'utils/network';
+import { SNAPSHOT_GRAPHQL_URL } from 'constants/governance';
+import { SpaceKey, StatusEnum } from 'enums/governance';
+import request, { gql } from 'graphql-request';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { RootState } from 'types/ui';
+import { RouteComponentProps } from 'react-router-dom';
+import { getIsMobile } from 'redux/modules/ui';
 import { getNetworkId } from 'redux/modules/wallet';
-import ElectionsBanner from 'components/ElectionsBanner';
+import { Proposal } from 'types/governance';
+import { RootState } from 'types/ui';
+import { getIsOVM } from 'utils/network';
+import { navigateToGovernance } from 'utils/routes';
+import CouncilMembers from './CouncilMembers';
+import ProposalDetails from './ProposalDetails';
+import SidebarDetails from './ProposalDetails/SidebarDetails';
+import ProposalList from './ProposalList';
+import ThalesStakers from './ThalesStakers';
+import Dropdown from './components/Dropdown';
 import {
     ArrowIcon,
     BackLink,
@@ -30,9 +32,6 @@ import {
     SidebarContainer,
     SidebarWrapper,
 } from './styled-components';
-import Dropdown from './components/Dropdown';
-import { getIsMobile } from 'redux/modules/ui';
-import { SpaceKey, StatusEnum } from 'enums/governance';
 
 type GovernancePageProps = RouteComponentProps<{
     space: string;
@@ -140,7 +139,6 @@ const GovernancePage: React.FC<GovernancePageProps> = (props) => {
     return (
         <>
             {showOPBanner && <OpRewardsBanner />}
-            <ElectionsBanner />
             <BackLinkWrapper isOverviewPage={isOverviewPage}>
                 {selectedProposal && (
                     <BackLink
