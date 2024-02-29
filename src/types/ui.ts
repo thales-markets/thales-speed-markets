@@ -17,15 +17,10 @@ export type UISliceState = {
     isMobile: boolean;
 };
 
-export type MarketWidgetsSliceState = {
-    isBuy: boolean;
-};
-
 export type RootState = {
     app: AppSliceState;
     wallet: WalletSliceState;
     ui: UISliceState;
-    marketWidgets: MarketWidgetsSliceState;
 };
 
 export type ThemeInterface = typeof theme;

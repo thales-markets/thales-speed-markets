@@ -8,7 +8,7 @@ export const resources = {
     cn: { translation: cnTranslation },
 };
 
-export enum SupportedLanguages {
+enum SupportedLanguages {
     ENGLISH = 'en',
     RUSSIAN = 'ru',
     CHINESE = 'cn',

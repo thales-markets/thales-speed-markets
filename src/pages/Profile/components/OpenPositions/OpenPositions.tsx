@@ -9,13 +9,12 @@ import { Positions } from 'enums/options';
 import { BigNumber } from 'ethers';
 import useInterval from 'hooks/useInterval';
 import { orderBy } from 'lodash';
-import MaturityDate from 'pages/AMMTrading/components/MaturityDate/MaturityDate';
+import MaturityDate from 'pages/AMMTrading/components/MaturityDate';
 import SharePositionModal from 'pages/Trade/components/AmmTrading/components/SharePositionModal';
 import { ShareIcon } from 'pages/Trade/components/OpenPosition/OpenPosition';
 import useUserActiveChainedSpeedMarketsDataQuery from 'queries/options/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
 import useUserActiveSpeedMarketsDataQuery from 'queries/options/speedMarkets/useUserActiveSpeedMarketsDataQuery';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
-import useOpenPositionsQuery from 'queries/profile/useOpenPositionsQuery';
 import useExchangeRatesQuery, { Rates } from 'queries/rates/useExchangeRatesQuery';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -83,15 +82,6 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
         exchangeRatesMarketDataQuery.isSuccess && exchangeRatesMarketDataQuery.data
             ? exchangeRatesMarketDataQuery.data
             : null;
-
-    const openPositionsQuery = useOpenPositionsQuery(networkId, searchAddress || walletAddress, {
-        enabled: isAppReady && isWalletConnected && !isOnlySpeedMarketsSupported(networkId),
-    });
-
-    const openPositions: UserPosition[] = useMemo(
-        () => (openPositionsQuery.isSuccess && openPositionsQuery.data ? openPositionsQuery.data : []),
-        [openPositionsQuery.isSuccess, openPositionsQuery.data]
-    );
 
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
         networkId,
@@ -226,11 +216,11 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
             });
 
         return orderBy(
-            openPositions.concat(speedMarketsOpenPositions).concat(chainedSpeedMarketsOpenPositions),
+            speedMarketsOpenPositions.concat(chainedSpeedMarketsOpenPositions),
             ['maturityDate', 'value'],
             ['asc', 'desc']
         );
-    }, [openPositions, userOpenSpeedMarketsData, userOpenChainedSpeedMarketsDataWithPrices]);
+    }, [userOpenSpeedMarketsData, userOpenChainedSpeedMarketsDataWithPrices]);
 
     const filteredData = useMemo(() => {
         if (searchText === '') return data;
@@ -366,9 +356,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
             <TileTable
                 rows={rows as any}
                 isLoading={
-                    openPositionsQuery.isLoading ||
-                    userActiveSpeedMarketsDataQuery.isLoading ||
-                    userActiveChainedSpeedMarketsDataQuery.isLoading
+                    userActiveSpeedMarketsDataQuery.isLoading || userActiveChainedSpeedMarketsDataQuery.isLoading
                 }
                 hideFlow
             />

@@ -200,9 +200,6 @@ const FIAT_CURRENCY_SIGN = {
 };
 export const USD_SIGN = FIAT_CURRENCY_SIGN[FIAT_CURRENCY_MAP.USD];
 
-export const THALES_CURRENCY = 'THALES';
-export const LP_TOKEN = 'LP Token';
-
 export const currencyKeyToAssetIconMap = {
     [SYNTHS_MAP.sBTC]: sBTCIcon,
     [SYNTHS_MAP.sETH]: sETHIcon,

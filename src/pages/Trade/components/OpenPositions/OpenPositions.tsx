@@ -10,19 +10,17 @@ import { CollateralSelectorContainer, InLabel } from 'pages/Profile/components/M
 import ChainedPosition from 'pages/SpeedMarkets/components/ChainedPosition';
 import useUserActiveChainedSpeedMarketsDataQuery from 'queries/options/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
 import useUserActiveSpeedMarketsDataQuery from 'queries/options/speedMarkets/useUserActiveSpeedMarketsDataQuery';
-import useUserLivePositionsQuery from 'queries/user/useUserLivePositionsQuery';
 import React, { CSSProperties, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
 import { getIsWalletConnected, getNetworkId, getWalletAddress } from 'redux/modules/wallet';
-import { RootState } from 'types/ui';
 import styled, { useTheme } from 'styled-components';
 import { FlexDivCentered, FlexDivRow, FlexDivRowCentered } from 'styles/common';
 import { formatCurrencyWithSign } from 'thales-utils';
 import { ChainedSpeedMarket, UserLivePositions } from 'types/options';
-import { ThemeInterface } from 'types/ui';
+import { RootState, ThemeInterface } from 'types/ui';
 import { getDefaultCollateral } from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
 import { resolveAllChainedMarkets, resolveAllSpeedPositions } from 'utils/speedAmm';
@@ -58,14 +56,6 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({
         { address: string; isClaimable: boolean }[]
     >([]);
     const [chainedWithClaimableStatus, setChainedWithClaimableStatus] = useState<ChainedSpeedMarket[]>([]);
-
-    const positionsQuery = useUserLivePositionsQuery(networkId, walletAddress ?? '', {
-        enabled: isAppReady && isWalletConnected && !isSpeedMarkets,
-    });
-
-    const livePositions = useMemo(() => (positionsQuery.isSuccess && positionsQuery.data ? positionsQuery.data : []), [
-        positionsQuery,
-    ]);
 
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(networkId, walletAddress, {
         enabled: isAppReady && isWalletConnected && !!isSpeedMarkets && !isChainedSpeedMarkets,
@@ -150,22 +140,12 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({
         chainedWithClaimableStatus.length ? chainedWithClaimableStatus : userOpenChainedSpeedMarketsData
     ) as ChainedSpeedMarket[];
 
-    const noPositions = isSpeedMarkets
-        ? isChainedSpeedMarkets
-            ? userOpenChainedSpeedMarketsData.length === 0
-            : userOpenSpeedMarketsData.length === 0
-        : livePositions.length === 0;
+    const noPositions = isChainedSpeedMarkets
+        ? userOpenChainedSpeedMarketsData.length === 0
+        : userOpenSpeedMarketsData.length === 0;
+    const positions = noPositions ? dummyPositions : sortedUserOpenSpeedMarketsData;
 
-    const positions = noPositions
-        ? dummyPositions
-        : isSpeedMarkets
-        ? sortedUserOpenSpeedMarketsData
-        : livePositions.sort((a, b) => a.maturityDate - b.maturityDate);
-
-    const isLoading =
-        positionsQuery.isLoading ||
-        userActiveSpeedMarketsDataQuery.isLoading ||
-        userChainedSpeedMarketsDataQuery.isLoading;
+    const isLoading = userActiveSpeedMarketsDataQuery.isLoading || userChainedSpeedMarketsDataQuery.isLoading;
 
     const claimableSpeedPositions = userOpenSpeedMarketsData.filter((p) => p.claimable);
     const claimableSpeedPositionsSum = claimableSpeedPositions.reduce((acc, pos) => acc + pos.value, 0);

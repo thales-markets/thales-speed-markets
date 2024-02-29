@@ -56,11 +56,6 @@ const walletDetailsSlice = createSlice({
 
 const getWalletState = (state: RootState) => state[sliceName];
 export const getNetworkId = (state: RootState) => getWalletState(state).networkId;
-const getNetworkName = (state: RootState) => getWalletState(state).networkName;
-export const getNetwork = (state: RootState) => ({
-    networkId: getNetworkId(state),
-    networkName: getNetworkName(state),
-});
 export const getSwitchToNetworkId = (state: RootState) => getWalletState(state).switchToNetworkId;
 export const getWalletAddress = (state: RootState) => getWalletState(state).walletAddress;
 export const getIsWalletConnected = createSelector(getWalletAddress, (walletAddress) => walletAddress != null);

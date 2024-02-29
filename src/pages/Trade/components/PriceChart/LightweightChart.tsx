@@ -11,19 +11,18 @@ import { Trans, useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getNetworkId } from 'redux/modules/wallet';
-import { RootState } from 'types/ui';
 import styled from 'styled-components';
 import { FlexDiv, FlexDivRowCentered, FlexDivSpaceBetween } from 'styles/common';
-import { bigNumberFormatter, bytesFormatter, formatCurrencyWithSign } from 'thales-utils';
+import { formatCurrencyWithSign } from 'thales-utils';
 import { Risk, RiskPerAsset, RiskPerAssetAndPosition } from 'types/options';
+import { RootState } from 'types/ui';
 
-import { calculatePercentageChange, formatPricePercentageGrowth } from 'utils/formatters/number';
-import snxJSConnector from 'utils/snxJSConnector';
-import CurrentPrice from './components/CurrentPrice';
-import Toggle from './components/DateToggle';
-import { ChartComponent } from './components/Chart/ChartContext';
 import SimpleLoader from 'components/SimpleLoader';
 import { hoursToSeconds, minutesToSeconds, subDays } from 'date-fns';
+import { calculatePercentageChange, formatPricePercentageGrowth } from 'utils/formatters/number';
+import { ChartComponent } from './components/Chart/ChartContext';
+import CurrentPrice from './components/CurrentPrice';
+import Toggle from './components/DateToggle';
 
 const now = new Date();
 
@@ -93,7 +92,6 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
 
     const [candleData, setCandleData] = useState<any>();
 
-    const [iv, setIV] = useState(0);
     const [currentDeltaTimeSec, setCurrentDeltaTimeSec] = useState(deltaTimeSec);
 
     const exchangeRatesMarketDataQuery = useExchangeRatesQuery(networkId, {
@@ -129,22 +127,6 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
             setCandleData(cloneData);
         }
     }, [currentPrice, candleStickData]);
-
-    useEffect(() => {
-        const { ammContract } = snxJSConnector;
-        const getImpliedVolatility = async () => {
-            try {
-                const impliedVolatility = await ammContract?.impliedVolatilityPerAsset(bytesFormatter(asset));
-                setIV(bigNumberFormatter(impliedVolatility));
-            } catch (e) {
-                console.log(e);
-            }
-        };
-
-        if (!isSpeedMarkets) {
-            getImpliedVolatility();
-        }
-    }, [asset, isSpeedMarkets]);
 
     const handleDateRangeChange = useCallback(
         (value: number) => {
@@ -223,15 +205,6 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
                             overlay={t('speed-markets.tooltips.current-price')}
                             customIconStyling={{ marginTop: '1px' }}
                         />
-                    )}
-                    {!!iv && (
-                        <FlexDiv>
-                            <Value margin="0 0 0 20px">{`IV ${iv}%`}</Value>
-                            <TooltipInfo
-                                overlay={t('markets.amm-trading.iv-tooltip')}
-                                customIconStyling={{ marginTop: '1px' }}
-                            />
-                        </FlexDiv>
                     )}
                 </FlexDivRowCentered>
                 {isSpeedMarkets ? (
