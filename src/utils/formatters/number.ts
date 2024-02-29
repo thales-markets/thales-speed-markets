@@ -1,5 +1,3 @@
-import { USD_SIGN } from 'constants/currency';
-import { Positions } from 'enums/options';
 import { formatCurrency, formatCurrencyWithPrecision } from 'thales-utils';
 
 export const formatNumberShort = (value: number, trim = true, negativeFactors = false) => {
@@ -17,40 +15,10 @@ export const formatNumberShort = (value: number, trim = true, negativeFactors = 
         : formatCurrencyWithPrecision(value, trim);
 };
 
-export const formatStrikePrice = (leftPrice: number, position: Positions, rightPrice?: number) => {
-    let strikePrice;
-    if (position === Positions.UP || position === Positions.DOWN) {
-        strikePrice = `${USD_SIGN} ${formatNumberShort(leftPrice, false)}`;
-    } else if (position === Positions.IN) {
-        strikePrice = `${USD_SIGN} ${formatNumberShort(leftPrice, false, true)} <-> ${USD_SIGN} ${formatNumberShort(
-            rightPrice as number,
-            false,
-            true
-        )}`;
-    } else {
-        strikePrice = `<- ${USD_SIGN} ${formatNumberShort(leftPrice, false)}  ${USD_SIGN} ${formatNumberShort(
-            rightPrice as number,
-            false,
-            true
-        )} ->`;
-    }
-    return strikePrice;
-};
-
 export const formatPricePercentageGrowth = (priceChange: number) => {
     return priceChange > 0 ? `+ ${Math.abs(priceChange).toFixed(2)}%` : `- ${Math.abs(priceChange).toFixed(2)}%`;
 };
 
 export const calculatePercentageChange = (lastPrice: number, firstPrice: number) => {
     return ((lastPrice - firstPrice) / lastPrice) * 100;
-};
-
-export const formatPricePercentageDifference = (targetPrice: number, currentPrice: number) => {
-    return ((currentPrice - targetPrice) / currentPrice) * 100;
-};
-
-export const calculateAndFormatPercentage = (first: number, second: number) => {
-    const greater = first > second ? first : second;
-    const smaller = first > second ? second : first;
-    return (greater - smaller) / smaller;
 };

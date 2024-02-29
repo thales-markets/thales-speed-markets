@@ -1,38 +1,6 @@
-import { Phase } from '../types/options';
-import { formatCurrency } from 'thales-utils';
-import { ThemeInterface } from 'types/ui';
 import { Positions } from 'enums/options';
+import { ThemeInterface } from 'types/ui';
 import { MARKET_DURATION_IN_DAYS } from '../constants/options';
-
-export const getPhaseAndEndDate = (
-    maturityDate: number,
-    expiryDate: number
-): { phase: Phase; timeRemaining: number } => {
-    const now = Date.now();
-
-    if (maturityDate > now) {
-        return {
-            phase: 'trading',
-            timeRemaining: maturityDate,
-        };
-    }
-
-    if (expiryDate > now) {
-        return {
-            phase: 'maturity',
-            timeRemaining: expiryDate,
-        };
-    }
-
-    return {
-        phase: 'expiry',
-        timeRemaining: expiryDate,
-    };
-};
-
-export const convertPriceImpactToBonus = (priceImpact: number): number => -((priceImpact / (1 + priceImpact)) * 100);
-
-export const getFormattedBonus = (bonus: number | undefined) => `+${formatCurrency(Number(bonus))}%`;
 
 export const getColorPerPosition = (position: Positions, theme: ThemeInterface) => {
     switch (position) {

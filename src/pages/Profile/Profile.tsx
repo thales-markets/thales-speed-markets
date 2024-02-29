@@ -1,4 +1,4 @@
-import SearchInput from 'components/SearchInput/SearchInput';
+import SearchInput from 'components/SearchInput';
 import { USD_SIGN } from 'constants/currency';
 import { millisecondsToSeconds } from 'date-fns';
 import { Positions } from 'enums/options';
@@ -29,7 +29,6 @@ import OpenPositions from './components/OpenPositions';
 import PositionHistory from './components/PositionHistory';
 import ProfileSection from './components/ProfileSection';
 import TransactionHistory from './components/TransactionHistory';
-import UserVaultsLp from './components/UserVaultsLp';
 import {
     Container,
     Header,
@@ -47,7 +46,6 @@ import {
 enum NavItems {
     MyPositions = 'my-positions',
     History = 'history',
-    VaultsLp = 'vaults-lp',
 }
 
 const Profile: React.FC = () => {
@@ -248,14 +246,6 @@ const Profile: React.FC = () => {
                         <NavItem onClick={() => onTabClickHandler(NavItems.History)} active={view === NavItems.History}>
                             {t('profile.tabs.history')}
                         </NavItem>
-                        {!isOnlySpeedMarketsSupported(networkId) && (
-                            <NavItem
-                                onClick={() => onTabClickHandler(NavItems.VaultsLp)}
-                                active={view === NavItems.VaultsLp}
-                            >
-                                {t('profile.tabs.vaults-lp')}
-                            </NavItem>
-                        )}
                     </Nav>
                     <>
                         {view === NavItems.MyPositions && (
@@ -298,11 +288,6 @@ const Profile: React.FC = () => {
                                         searchText={searchAddress ? '' : searchText}
                                     />
                                 </ProfileSection>
-                            </>
-                        )}
-                        {view === NavItems.VaultsLp && (
-                            <>
-                                <UserVaultsLp />
                             </>
                         )}
                     </>

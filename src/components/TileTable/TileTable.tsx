@@ -25,7 +25,7 @@ type Cell = {
     width?: string;
 };
 
-export type TileRow = {
+type TileRow = {
     asset?: AssetInfoProps;
     backgroundColor?: string;
     dotColor?: string;

@@ -4,9 +4,8 @@ import React, { useMemo, useState } from 'react';
 import OutsideClickHandler from 'react-outside-click-handler';
 import { useDispatch, useSelector } from 'react-redux';
 import { getNetworkId, switchToNetworkId } from 'redux/modules/wallet';
-import { RootState } from 'types/ui';
 import styled from 'styled-components';
-import { isLedgerDappBrowserProvider } from 'utils/ledger';
+import { RootState } from 'types/ui';
 import { SUPPORTED_NETWORK_IDS_MAP } from 'utils/network';
 import { useSwitchNetwork } from 'wagmi';
 
@@ -48,17 +47,12 @@ const NetworkSwitch: React.FC<NetworkSwitchProps> = ({
         [networkId, selectedNetworkId, filteredSupportedNetworks]
     );
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const isLedgerLive = isLedgerDappBrowserProvider();
 
     return (
         <NetworkInfoContainer>
             <OutsideClickHandler onOutsideClick={() => isDropdownOpen && setIsDropdownOpen(false)}>
-                <SelectedNetworkContainer cursor={isLedgerLive ? 'initial' : 'pointer'}>
-                    <NetworkItem
-                        selectedItem={true}
-                        onClick={() => setIsDropdownOpen(!isDropdownOpen && !isLedgerLive)}
-                        noHover
-                    >
+                <SelectedNetworkContainer cursor={'pointer'}>
+                    <NetworkItem selectedItem={true} onClick={() => setIsDropdownOpen(!isDropdownOpen)} noHover>
                         {React.createElement(selectedNetwork.icon, {
                             style: { marginRight: 5 },
                         })}

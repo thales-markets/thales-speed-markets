@@ -35,16 +35,3 @@ export type UserProfileData = {
 export type TradeWithMarket = Trade & {
     marketItem: HistoricalOptionsMarketInfo | RangedMarket | SpeedMarket;
 };
-
-export type VaultsAndLiquidityPoolUserTransaction = {
-    name: string;
-    hash: string;
-    timestamp: number;
-    blockNumber: number;
-    type: string;
-    account: string;
-    amount: number;
-    round: number;
-};
-
-export type VaultsAndLiquidityPoolUserTransactions = VaultsAndLiquidityPoolUserTransaction[];

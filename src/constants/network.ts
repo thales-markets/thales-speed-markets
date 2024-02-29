@@ -3,10 +3,6 @@ import { NetworkParams } from 'types/network';
 import { Chain } from 'wagmi';
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
-export const DEAD_ADDRESS = '0x000000000000000000000000000000000000dead';
-export const OP_SAFE_BOX_ADDRESS = '0x679C0174f6c288C4bcd5C95C9Ec99D50357C59E7';
-export const ARB_SAFE_BOX_ADDRESS = '0xE9F5E7579931a46e4beaC08Ca9ab52961AD66203';
-export const BASE_SAFE_BOX_ADDRESS = '0x860C4DD827DdDd98755e0843b89d909f5A0347Ff';
 
 export const SUPPORTED_NETWORKS: Record<Network, string> = {
     [Network.Mainnet]: 'MAINNET',
@@ -233,5 +229,3 @@ export const BlastSepolia = {
     },
     testnet: true,
 } as Chain;
-
-export const BRIDGE_SUPPORTED_NETWORKS = [Network.OptimismMainnet, Network.Arbitrum, Network.Base];

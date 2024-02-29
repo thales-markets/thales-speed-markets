@@ -371,9 +371,12 @@ const SpeedMarkets: React.FC = () => {
                         setSkewImpact={setSkew}
                         resetData={resetData}
                     />
-                    {getSupportedNetworksByRoute(ROUTES.Options.Home).includes(networkId) && (
-                        <PageLinkBanner rout={ROUTES.Options.Home} />
-                    )}
+                    {
+                        // TODO: set link to thales markets dApp
+                        getSupportedNetworksByRoute(ROUTES.Options.Home).includes(networkId) && (
+                            <PageLinkBanner rout={ROUTES.Options.Home} />
+                        )
+                    }
                     {isWalletConnected && (
                         <>
                             <OpenPositions

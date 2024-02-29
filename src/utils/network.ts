@@ -202,14 +202,5 @@ export const getSupportedNetworksByRoute = (route: string): Network[] => {
     }
 };
 
-export const getIsStakingSupported = (networkId: Network): boolean =>
-    [Network.OptimismMainnet, Network.OptimismGoerli, Network.Arbitrum, Network.Base].includes(networkId);
-
-export const getIsLpStakingSupported = (networkId: Network): boolean =>
-    [Network.OptimismMainnet, Network.OptimismGoerli].includes(networkId);
-
-export const getIsBridgeSupported = (networkId: Network): boolean =>
-    [Network.OptimismMainnet, Network.Arbitrum, Network.Base].includes(networkId);
-
 export const isOnlySpeedMarketsSupported = (networkId: Network): boolean =>
     [Network.ZkSync, Network.ZkSyncSepolia, Network.BlastSepolia].includes(networkId);
