@@ -1,4 +1,3 @@
-import SpeedLogoImg from 'assets/images/speed-markets/speed-markets-logo.svg';
 import arrowRightAnimation from 'assets/lotties/rigth-arrows.json';
 import SPAAnchor from 'components/SPAAnchor';
 import ROUTES from 'constants/routes';
@@ -21,12 +20,10 @@ const PageLinkBanner: React.FC<PageLinkBannerProps> = ({ rout }) => {
 
     let textKey = '';
     let tryMarketsValue = '';
-    let imageSrc = '';
     switch (rout) {
-        case ROUTES.Options.SpeedMarkets:
-            textKey = 'common.banner.page-link.speed-markets';
-            tryMarketsValue = isMobile ? 'speed-markets.title' : '';
-            imageSrc = SpeedLogoImg;
+        case ROUTES.Options.Home:
+            textKey = 'common.banner.page-link.thales-markets';
+            tryMarketsValue = 'markets.title';
             break;
     }
 
@@ -45,11 +42,6 @@ const PageLinkBanner: React.FC<PageLinkBannerProps> = ({ rout }) => {
                         />
                     </Text>
                 </Text>
-                {!isMobile && imageSrc && (
-                    <Text>
-                        <Image src={imageSrc} />
-                    </Text>
-                )}
                 {!isMobile && <Lottie animationData={arrowRightAnimation} style={arrowRightStyle} />}
             </Content>
         </SPAAnchor>
@@ -78,11 +70,6 @@ const Text = styled.span<{ noWrap?: boolean }>`
 
 const BoldText = styled(Text)`
     font-weight: 600;
-`;
-
-const Image = styled.img`
-    margin-bottom: -1px;
-    padding-left: 3px;
 `;
 
 const arrowRightStyle: CSSProperties = {

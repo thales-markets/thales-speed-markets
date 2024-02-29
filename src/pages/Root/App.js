@@ -1,5 +1,4 @@
 import { useMatomo } from '@datapunt/matomo-tracker-react';
-import { IFrameEthereumProvider } from '@ledgerhq/iframe-provider';
 import Loader from 'components/Loader';
 import UnsupportedNetwork from 'components/UnsupportedNetwork';
 import { SUPPORTED_NETWORKS_NAMES } from 'constants/network';
@@ -22,7 +21,6 @@ import {
 } from 'redux/modules/wallet';
 import { createGlobalStyle } from 'styled-components';
 import { isMobile } from 'utils/device';
-import { isLedgerDappBrowserProvider } from 'utils/ledger';
 import { getSupportedNetworksByRoute, isNetworkSupported } from 'utils/network';
 import queryConnector from 'utils/queryConnector';
 import { history } from 'utils/routes';
@@ -31,12 +29,6 @@ import { getDefaultTheme } from 'utils/style';
 import { useAccount, useDisconnect, useNetwork, useProvider, useSigner } from 'wagmi';
 
 const DappLayout = lazy(() => import(/* webpackChunkName: "DappLayout" */ 'layouts/DappLayout'));
-const MainLayout = lazy(() => import(/* webpackChunkName: "MainLayout" */ 'components/MainLayout'));
-
-const Home = lazy(() => import(/* webpackChunkName: "Home" */ '../LandingPage'));
-const Governance = lazy(() => import(/* webpackChunkName: "Governance" */ '../LandingPage/articles/Governance'));
-const Whitepaper = lazy(() => import(/* webpackChunkName: "Whitepaper" */ '../LandingPage/articles/Whitepaper'));
-const Token = lazy(() => import(/* webpackChunkName: "Token" */ '../LandingPage/articles/Token'));
 
 const SpeedMarkets = lazy(() => import(/* webpackChunkName: "SpeedMarkets" */ '../SpeedMarkets'));
 const SpeedMarketsOverview = lazy(() =>
@@ -49,8 +41,6 @@ const App = () => {
     const walletAddress = useSelector((state) => getWalletAddress(state));
     const networkId = useSelector((state) => getNetworkId(state));
     const switchedToNetworkId = useSelector((state) => getSwitchToNetworkId(state));
-
-    const isLedgerLive = isLedgerDappBrowserProvider();
 
     const { address } = useAccount();
     const provider = useProvider(!address && { chainId: switchedToNetworkId }); // when wallet not connected force chain
@@ -81,31 +71,14 @@ const App = () => {
 
     useEffect(() => {
         const init = async () => {
-            let ledgerProvider = null;
-            if (isLedgerLive) {
-                ledgerProvider = new IFrameEthereumProvider();
-                const accounts = await ledgerProvider.enable();
-                const account = accounts[0];
-                dispatch(updateWallet({ walletAddress: account }));
-                ledgerProvider.on('accountsChanged', (accounts) => {
-                    if (accounts.length > 0) {
-                        dispatch(updateWallet({ walletAddress: accounts[0] }));
-                    }
-                });
-            }
-
             try {
                 const chainIdFromProvider = (await provider.getNetwork()).chainId;
-                const providerNetworkId = isLedgerLive
-                    ? ledgerProvider
-                    : !!address
-                    ? chainIdFromProvider
-                    : switchedToNetworkId;
+                const providerNetworkId = !!address ? chainIdFromProvider : switchedToNetworkId;
 
                 snxJSConnector.setContractSettings({
                     networkId: providerNetworkId,
                     provider,
-                    signer: isLedgerLive ? ledgerProvider.getSigner() : signer,
+                    signer,
                 });
 
                 dispatch(
@@ -123,7 +96,7 @@ const App = () => {
             }
         };
         init();
-    }, [dispatch, provider, signer, switchedToNetworkId, address, isLedgerLive]);
+    }, [dispatch, provider, signer, switchedToNetworkId, address]);
 
     useEffect(() => {
         dispatch(updateWallet({ walletAddress: address }));
@@ -207,31 +180,9 @@ const App = () => {
 
                         <Route exact path={ROUTES.Home}>
                             <Suspense fallback={<Loader />}>
-                                <MainLayout>
-                                    <Home />
-                                </MainLayout>
-                            </Suspense>
-                        </Route>
-
-                        <Route exact path={ROUTES.Article.Token}>
-                            <Suspense fallback={<Loader />}>
-                                <MainLayout>
-                                    <Token />
-                                </MainLayout>
-                            </Suspense>
-                        </Route>
-                        <Route exact path={ROUTES.Article.Governance}>
-                            <Suspense fallback={<Loader />}>
-                                <MainLayout>
-                                    <Governance />
-                                </MainLayout>
-                            </Suspense>
-                        </Route>
-                        <Route exact path={ROUTES.Article.Whitepaper}>
-                            <Suspense fallback={<Loader />}>
-                                <MainLayout>
-                                    <Whitepaper />
-                                </MainLayout>
+                                <DappLayout>
+                                    <SpeedMarkets />
+                                </DappLayout>
                             </Suspense>
                         </Route>
 
@@ -274,7 +225,7 @@ const GlobalStyle = createGlobalStyle`
         scrollbar-color: ${(props) => props.theme.background.tertiary} transparent;
     }
     body {
-        background: ${(props) => props.theme.landingPage.background.primary};
+        background: ${(props) => props.theme.background.primary};
     }
     body #root {
         background: ${(props) => props.theme.background.primary};
