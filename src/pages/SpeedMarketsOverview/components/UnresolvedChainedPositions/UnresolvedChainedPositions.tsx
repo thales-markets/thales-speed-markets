@@ -15,8 +15,8 @@ import {
     getAdditionalButtonStyle,
     getDefaultButtonProps,
 } from 'pages/SpeedMarketsOverview/styled-components';
-import useActiveChainedSpeedMarketsDataQuery from 'queries/options/speedMarkets/useActiveChainedSpeedMarketsDataQuery';
-import useAmmChainedSpeedMarketsLimitsQuery from 'queries/options/speedMarkets/useAmmChainedSpeedMarketsLimitsQuery';
+import useActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useActiveChainedSpeedMarketsDataQuery';
+import useAmmChainedSpeedMarketsLimitsQuery from 'queries/speedMarkets/useAmmChainedSpeedMarketsLimitsQuery';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -25,7 +25,7 @@ import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
 import { getNetworkId, getWalletAddress } from 'redux/modules/wallet';
 import { RootState } from 'types/ui';
-import { ChainedSpeedMarket } from 'types/options';
+import { ChainedSpeedMarket } from 'types/market';
 import { getPriceId } from 'utils/pyth';
 import { refetchActiveSpeedMarkets, refetchPythPrice } from 'utils/queryConnector';
 import { resolveAllChainedMarkets } from 'utils/speedAmm';

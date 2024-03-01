@@ -135,18 +135,9 @@
             "resources": "Resources"
         },
         "sidebar": {
-            "markets": "Markets",
             "speed-markets": "Speed markets",
-            "leaderboard-label": "Leaderboard",
-            "earn-label": "Thales Token",
-            "governance-label": "Governance",
-            "game-label": "Tale of Thales",
             "profile-label": "Profile",
-            "sport-markets-label": "Overtime markets",
-            "wizard": "Onboarding Wizard",
-            "op-rewards": "OP Rewards",
-            "vaults-label": "Vaults",
-            "liquidity-pool-label": "Provide Liquidity"
+            "sport-markets-label": "Overtime markets"
         },
         "pagination": {
             "rows-per-page": "Rows per page:"
@@ -338,8 +329,6 @@
         "choose-referral": "Choose your Referral ID",
         "choose-referral-placeholder": "Enter Referral ID",
         "pages": {
-            "market-page": "Markets page",
-            "range-market-page": "Ranged markets page",
             "speed-market-page": "Speed markets page",
             "landing-page": "Landing page"
         },

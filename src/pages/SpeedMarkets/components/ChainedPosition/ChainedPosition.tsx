@@ -3,12 +3,14 @@ import { USD_SIGN } from 'constants/currency';
 import { millisecondsToSeconds } from 'date-fns';
 import { Positions } from 'enums/options';
 import { ScreenSizeBreakpoint } from 'enums/ui';
+import { ShareIcon } from 'pages/SpeedMarkets/components/OpenPosition/OpenPosition';
+import SharePositionModal from 'pages/SpeedMarkets/components/SharePositionModal';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { getIsMobile } from 'redux/modules/ui';
 import { getNetworkId } from 'redux/modules/wallet';
-import { RootState } from 'types/ui';
 import styled, { useTheme } from 'styled-components';
 import { FlexDivCentered, FlexDivColumn, FlexDivColumnCentered, FlexDivSpaceBetween } from 'styles/common';
 import {
@@ -17,17 +19,14 @@ import {
     formatShortDate,
     formatShortDateWithTime,
 } from 'thales-utils';
-import { ChainedSpeedMarket } from 'types/options';
-import { ThemeInterface } from 'types/ui';
-import { getPriceId } from 'utils/pyth';
-import { AssetIcon, Icon, PositionSymbolDown, PositionSymbolUp } from '../SelectPosition/styled-components';
+import { ChainedSpeedMarket } from 'types/market';
+import { RootState, ThemeInterface } from 'types/ui';
 import { formatNumberShort } from 'utils/formatters/number';
-import ChainedPositionAction from '../ChainedPositionAction';
+import { getPriceId } from 'utils/pyth';
 import { refetchPythPrice } from 'utils/queryConnector';
-import { getIsMobile } from 'redux/modules/ui';
-import { getColorPerPosition } from 'utils/options';
-import { ShareIcon } from 'pages/Trade/components/OpenPosition/OpenPosition';
-import SharePositionModal from 'pages/Trade/components/AmmTrading/components/SharePositionModal';
+import { getColorPerPosition } from 'utils/style';
+import ChainedPositionAction from '../ChainedPositionAction';
+import { AssetIcon, Icon, PositionSymbolDown, PositionSymbolUp } from '../SelectPosition/styled-components';
 
 type ChainedPositionProps = {
     position: ChainedSpeedMarket;

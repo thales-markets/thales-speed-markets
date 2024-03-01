@@ -5,15 +5,15 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
 import { formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
-import { UserLivePositions } from 'types/options';
+import { UserOpenPositions } from 'types/market';
 import { ThemeInterface } from 'types/ui';
 import { formatNumberShort } from 'utils/formatters/number';
-import { getColorPerPosition } from 'utils/options';
+import { getColorPerPosition } from 'utils/style';
 import OverviewPositionAction from '../OverviewPositionAction';
 import { Label, Separator } from '../OverviewPositionAction/OverviewPositionAction';
 
 type UnresolvedPositionProps = {
-    position: UserLivePositions;
+    position: UserOpenPositions;
     maxPriceDelayForResolvingSec: number;
     isAdmin: boolean;
     isSubmittingBatch: boolean;

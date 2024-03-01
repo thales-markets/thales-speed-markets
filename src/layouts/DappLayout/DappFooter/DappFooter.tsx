@@ -4,6 +4,7 @@ import { Trans } from 'react-i18next';
 import styled from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
 
+// TODO: check links
 const DappFooter: React.FC = () => {
     const year = new Date().getFullYear();
 

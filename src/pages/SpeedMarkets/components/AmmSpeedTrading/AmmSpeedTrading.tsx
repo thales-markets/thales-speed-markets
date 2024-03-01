@@ -26,8 +26,8 @@ import { ScreenSizeBreakpoint } from 'enums/ui';
 import { BigNumber, ethers } from 'ethers';
 import useDebouncedEffect from 'hooks/useDebouncedEffect';
 import useInterval from 'hooks/useInterval';
-import SharePositionModal from 'pages/Trade/components/AmmTrading/components/SharePositionModal';
-import TradingDetailsSentence from 'pages/Trade/components/AmmTrading/components/TradingDetailsSentence';
+import SharePositionModal from 'pages/SpeedMarkets/components/SharePositionModal';
+import TradingDetailsSentence from 'pages/SpeedMarkets/components/TradingDetailsSentence';
 import useExchangeRatesQuery, { Rates } from 'queries/rates/useExchangeRatesQuery';
 import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipleCollateralBalanceQuery';
 import useStableBalanceQuery from 'queries/walletBalances/useStableBalanceQuery';
@@ -52,9 +52,8 @@ import {
     roundNumberToDecimals,
     truncToDecimals,
 } from 'thales-utils';
-import { AmmChainedSpeedMarketsLimits, AmmSpeedMarketsLimits } from 'types/options';
+import { AmmChainedSpeedMarketsLimits, AmmSpeedMarketsLimits } from 'types/market';
 import { RootState } from 'types/ui';
-import { getCurrencyKeyStableBalance } from 'utils/balances';
 import erc20Contract from 'utils/contracts/erc20Contract';
 import { getCoinBalance, getCollateral, getCollaterals, getDefaultCollateral, isStableCurrency } from 'utils/currency';
 import { checkAllowance, getIsMultiCollateralSupported } from 'utils/network';
@@ -204,7 +203,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             ? multipleCollateralBalances.isSuccess
                 ? getCoinBalance(multipleCollateralBalances?.data, selectedCollateral)
                 : null
-            : getCurrencyKeyStableBalance(walletBalancesMap, defaultCollateral);
+            : walletBalancesMap[defaultCollateral]?.balance || 0;
     }, [
         multipleCollateralBalances,
         walletBalancesMap,
@@ -740,12 +739,10 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                         positionType: isChained ? undefined : positionType,
                         chainedPositions: isChained ? chainedPositions : undefined,
                     }}
-                    isRangedMarket={false}
                     isFetchingQuote={false}
                     priceProfit={(isChained ? chainedQuote : SPEED_MARKETS_QUOTE) - 1}
                     paidAmount={selectedStableBuyinAmount || convertToStable(Number(paidAmount))}
                     hasCollateralConversion={selectedCollateral !== defaultCollateral}
-                    breakFirstLine={false}
                 />
                 {!isChained && (
                     <ShareIcon
@@ -940,7 +937,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                             : roundNumberToDecimals(totalPaidAmount, COLLATERAL_DECIMALS[selectedCollateral])
                     }
                     tokenSymbol={selectedCollateral}
-                    isNonStable={false}
                     isAllowing={isAllowing}
                     onSubmit={handleAllowance}
                     onClose={() => setOpenApprovalModal(false)}

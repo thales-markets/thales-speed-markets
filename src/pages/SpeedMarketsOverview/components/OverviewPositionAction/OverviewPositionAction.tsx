@@ -21,14 +21,14 @@ import { getNetworkId } from 'redux/modules/wallet';
 import { RootState } from 'types/ui';
 import styled, { CSSProperties } from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
-import { UserLivePositions } from 'types/options';
+import { UserOpenPositions } from 'types/market';
 import { getPriceId, getPriceServiceEndpoint, priceParser } from 'utils/pyth';
 import { refetchActiveSpeedMarkets } from 'utils/queryConnector';
 import snxJSConnector from 'utils/snxJSConnector';
 import { delay } from 'utils/timer';
 
 type OverviewPositionActionProps = {
-    position: UserLivePositions;
+    position: UserOpenPositions;
     maxPriceDelayForResolvingSec: number;
     isAdmin: boolean;
     isSubmittingBatch: boolean;

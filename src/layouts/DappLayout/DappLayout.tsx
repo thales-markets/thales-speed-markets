@@ -1,5 +1,5 @@
 import axios from 'axios';
-import ElectionsBanner from 'components/ElectionsBannerV2';
+import ElectionsBanner from 'components/ElectionsBanner';
 import { generalConfig } from 'config/general';
 import useWidgetBotScript from 'hooks/useWidgetBotScript';
 import queryString from 'query-string';

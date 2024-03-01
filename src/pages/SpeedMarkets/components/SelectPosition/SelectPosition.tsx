@@ -4,7 +4,7 @@ import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { FlexDivColumnCentered } from 'styles/common';
 import { formatPercentage, roundNumberToDecimals } from 'thales-utils';
-import { AmmChainedSpeedMarketsLimits } from 'types/options';
+import { AmmChainedSpeedMarketsLimits } from 'types/market';
 import {
     Chain,
     ChainedHeader,

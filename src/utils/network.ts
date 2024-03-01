@@ -1,17 +1,10 @@
-import detectEthereumProvider from '@metamask/detect-provider';
 import { ReactComponent as ArbitrumLogo } from 'assets/images/arbitrum-circle-logo.svg';
 import { ReactComponent as BaseLogo } from 'assets/images/base-circle-logo.svg';
 import { ReactComponent as BlastSepoliaLogo } from 'assets/images/blast-sepolia-circle-logo.svg';
 import { ReactComponent as OpLogo } from 'assets/images/optimism-circle-logo.svg';
 import { ReactComponent as PolygonLogo } from 'assets/images/polygon-circle-logo.svg';
 import { ReactComponent as ZkSyncLogo } from 'assets/images/zksync-circle-logo.svg';
-import {
-    DEFAULT_NETWORK,
-    L1_TO_L2_NETWORK_MAPPER,
-    SUPPORTED_NETWORKS,
-    SUPPORTED_NETWORKS_NAMES,
-    SUPPORTED_NETWORKS_PARAMS,
-} from 'constants/network';
+import { L1_TO_L2_NETWORK_MAPPER, SUPPORTED_NETWORKS, SUPPORTED_NETWORKS_PARAMS } from 'constants/network';
 import ROUTES from 'constants/routes';
 import { BigNumber } from 'ethers';
 import { FunctionComponent, SVGProps } from 'react';
@@ -19,30 +12,7 @@ import { NetworkId } from 'thales-utils';
 import { NetworkParams, SupportedNetwork } from '../types/network';
 import { getCollaterals } from './currency';
 
-type EthereumProvider = {
-    isMetaMask: boolean;
-    networkVersion: string;
-};
-
 const hasEthereumInjected = () => !!window.ethereum;
-
-// Not in use anymore as detectEthereumProvider() doesn't always return value.
-// On page reload returns undefined and on hard reload returns good value from Metamask (e.g. 69)
-export async function getEthereumNetwork() {
-    try {
-        if (hasEthereumInjected()) {
-            const provider = (await detectEthereumProvider()) as EthereumProvider;
-            if (provider && provider.networkVersion != null) {
-                const networkId = Number(provider.networkVersion) as SupportedNetwork;
-                return { name: SUPPORTED_NETWORKS_NAMES[networkId], networkId };
-            }
-        }
-        return DEFAULT_NETWORK;
-    } catch (e) {
-        console.log(e);
-        return DEFAULT_NETWORK;
-    }
-}
 
 export const isNetworkSupported = (networkId: SupportedNetwork): boolean => {
     return !!SUPPORTED_NETWORKS[networkId];

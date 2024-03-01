@@ -43,7 +43,6 @@
         "recharts": "^2.5.0",
         "redux": "^4.0.5",
         "styled-components": "^5.2.3",
-        "thales-data": "^1.2.72",
         "thales-utils": "^0.4.0",
         "typescript": "^4.5.5",
         "universal-cookie": "^4.0.4",

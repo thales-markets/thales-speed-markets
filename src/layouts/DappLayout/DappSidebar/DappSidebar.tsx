@@ -70,15 +70,15 @@ const DappSidebar: React.FC = () => {
 
                     <Divider />
                     <DappHeaderItem
-                        href={LINKS.SportMarkets}
+                        href={LINKS.Markets.Thales}
                         iconName="overtime-markets"
                         label={t('common.sidebar.sport-markets-label')}
                         onClick={(event: any) => {
                             event.preventDefault();
                             if (isMobile) {
-                                window.location.replace(LINKS.SportMarkets);
+                                window.location.replace(LINKS.Markets.Sport);
                             } else {
-                                window.open(LINKS.SportMarkets);
+                                window.open(LINKS.Markets.Sport);
                             }
                         }}
                         simpleOnClick={true}

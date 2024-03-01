@@ -17,8 +17,8 @@ import {
     getAdditionalButtonStyle,
     getDefaultButtonProps,
 } from 'pages/SpeedMarketsOverview/styled-components';
-import useActiveSpeedMarketsDataQuery from 'queries/options/speedMarkets/useActiveSpeedMarketsDataQuery';
-import useAmmSpeedMarketsLimitsQuery from 'queries/options/speedMarkets/useAmmSpeedMarketsLimitsQuery';
+import useActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useActiveSpeedMarketsDataQuery';
+import useAmmSpeedMarketsLimitsQuery from 'queries/speedMarkets/useAmmSpeedMarketsLimitsQuery';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -28,7 +28,7 @@ import { getIsMobile } from 'redux/modules/ui';
 import { getNetworkId, getWalletAddress } from 'redux/modules/wallet';
 import { RootState } from 'types/ui';
 import { formatCurrencyWithSign } from 'thales-utils';
-import { UserLivePositions } from 'types/options';
+import { UserOpenPositions } from 'types/market';
 import { getCurrentPrices, getPriceId, getPriceServiceEndpoint } from 'utils/pyth';
 import { refetchActiveSpeedMarkets, refetchPythPrice } from 'utils/queryConnector';
 import { resolveAllSpeedPositions } from 'utils/speedAmm';
@@ -152,7 +152,7 @@ const UnresolvedPositions: React.FC = () => {
         setIsLoadingEnabled(true);
     }, [networkId]);
 
-    const handleResolveAll = async (positions: UserLivePositions[], isAdmin: boolean) => {
+    const handleResolveAll = async (positions: UserOpenPositions[], isAdmin: boolean) => {
         setIsSubmitting(true);
         await resolveAllSpeedPositions(positions, isAdmin, networkId);
         setIsSubmitting(false);
@@ -160,7 +160,7 @@ const UnresolvedPositions: React.FC = () => {
     };
 
     const getButton = (
-        positions: UserLivePositions[],
+        positions: UserOpenPositions[],
         sectionName: typeof SECTIONS[keyof typeof SECTIONS],
         isAdmin: boolean
     ) => {
@@ -186,7 +186,7 @@ const UnresolvedPositions: React.FC = () => {
         );
     };
 
-    const getSection = (section: typeof SECTIONS[keyof typeof SECTIONS], positions: UserLivePositions[]) => {
+    const getSection = (section: typeof SECTIONS[keyof typeof SECTIONS], positions: UserOpenPositions[]) => {
         let titleKey = '';
         switch (section) {
             case SECTIONS.userWinner:

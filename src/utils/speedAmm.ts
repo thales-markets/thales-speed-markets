@@ -15,7 +15,7 @@ import { BigNumber, ethers } from 'ethers';
 import i18n from 'i18n';
 import { toast } from 'react-toastify';
 import { SupportedNetwork } from 'types/network';
-import { ChainedSpeedMarket, UserLivePositions } from 'types/options';
+import { ChainedSpeedMarket, UserOpenPositions } from 'types/market';
 import { getPriceId, getPriceServiceEndpoint, priceParser } from 'utils/pyth';
 import { refetchActiveSpeedMarkets } from 'utils/queryConnector';
 import snxJSConnector from 'utils/snxJSConnector';
@@ -147,7 +147,7 @@ export const getUserLostAtSideIndex = (position: ChainedSpeedMarket) => {
 };
 
 export const resolveAllSpeedPositions = async (
-    positions: UserLivePositions[],
+    positions: UserOpenPositions[],
     isAdmin: boolean,
     networkId: SupportedNetwork
 ) => {

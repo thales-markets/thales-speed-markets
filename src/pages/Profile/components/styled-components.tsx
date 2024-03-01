@@ -3,17 +3,12 @@ import { TFunction } from 'i18next';
 import React from 'react';
 import styled from 'styled-components';
 import { ThemeInterface } from 'types/ui';
-import { getColorPerPosition } from 'utils/options';
+import { getColorPerPosition } from 'utils/style';
 
-export const getAmount = (
-    amount: number | string,
-    position: Positions,
-    theme: ThemeInterface,
-    isChainedSpeedMarket?: boolean
-) => (
+export const getAmount = (amount: number | string, position: Positions, theme: ThemeInterface, isChained?: boolean) => (
     <Value>
         {amount}
-        {!isChainedSpeedMarket && <Value color={getColorPerPosition(position, theme)}> {position}</Value>}
+        {!isChained && <Value color={getColorPerPosition(position, theme)}> {position}</Value>}
     </Value>
 );
 
@@ -33,14 +28,7 @@ const Value = styled.span<{ color?: string; fontSize?: string }>`
     color: ${(props) => props.color || props.theme.textColor.primary};
 `;
 
-export const TextLink = styled.span`
-    color: ${(props) => props.theme.link.textColor.primary};
-    &:hover {
-        text-decoration: underline;
-    }
-`;
-
-export const IconLink = styled.i<{ color?: string; fontSize?: string; marginTop?: string }>`
+const IconLink = styled.i<{ color?: string; fontSize?: string; marginTop?: string }>`
     font-size: ${(props) => props.fontSize || '20px'};
     color: ${(props) => props.color || props.theme.textColor.secondary};
     text-transform: none;

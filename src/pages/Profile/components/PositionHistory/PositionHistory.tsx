@@ -1,29 +1,20 @@
-import SPAAnchor from 'components/SPAAnchor/SPAAnchor';
 import TileTable from 'components/TileTable';
 import { USD_SIGN } from 'constants/currency';
 import { ZERO_ADDRESS } from 'constants/network';
 import { orderBy } from 'lodash';
-import useUserResolvedChainedSpeedMarketsDataQuery from 'queries/options/speedMarkets/useUserResolvedChainedSpeedMarketsDataQuery';
-import useUserResolvedSpeedMarketsDataQuery from 'queries/options/speedMarkets/useUserResolvedSpeedMarketsDataQuery';
+import useUserResolvedChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserResolvedChainedSpeedMarketsDataQuery';
+import useUserResolvedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserResolvedSpeedMarketsDataQuery';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
-import { getIsMobile } from 'redux/modules/ui';
 import { getIsWalletConnected, getNetworkId, getWalletAddress } from 'redux/modules/wallet';
 import { useTheme } from 'styled-components';
-import {
-    coinParser,
-    formatCurrency,
-    formatCurrencyWithSign,
-    formatShortDate,
-    formatShortDateWithTime,
-} from 'thales-utils';
+import { formatCurrency, formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
 import { UserPosition } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
-import { buildOptionsMarketLink } from 'utils/routes';
-import { IconLink, getAmount, getStatus } from '../styled-components';
+import { getAmount, getStatus } from '../styled-components';
 
 type PositionHistoryProps = {
     searchAddress: string;
@@ -33,7 +24,7 @@ type PositionHistoryProps = {
 const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, searchText }) => {
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
-    const isMobile = useSelector((state: RootState) => getIsMobile(state));
+
     const networkId = useSelector((state: RootState) => getNetworkId(state));
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
@@ -81,7 +72,6 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
                 rightPrice: 0,
                 finalPrice: marketData.finalPrice,
                 amount: marketData.amount,
-                amountBigNumber: marketData.amountBigNumber,
                 maturityDate: marketData.maturityDate,
                 expiryDate: marketData.maturityDate,
                 market: marketData.market,
@@ -90,8 +80,6 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
                 value: marketData.value,
                 claimable: false,
                 claimed: marketData.isUserWinner,
-                isRanged: false,
-                isSpeedMarket: true,
             };
         });
 
@@ -108,7 +96,6 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
                 rightPrice: 0,
                 finalPrice: marketData.finalPrices[lastPositivePriceIndex],
                 amount: marketData.amount,
-                amountBigNumber: coinParser(marketData.amount.toString(), networkId),
                 maturityDate: marketData.strikeTimes[lastPositivePriceIndex],
                 expiryDate: marketData.maturityDate,
                 market: marketData.address,
@@ -117,9 +104,7 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
                 value: marketData.amount,
                 claimable: false,
                 claimed: marketData.isUserWinner,
-                isRanged: false,
-                isSpeedMarket: true,
-                isChainedSpeedMarket: true,
+                isChained: true,
             };
         });
 
@@ -128,7 +113,7 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
             ['maturityDate'],
             ['desc']
         );
-    }, [closedSpeedMarketsData, closedChainedSpeedMarketsData, networkId]);
+    }, [closedSpeedMarketsData, closedChainedSpeedMarketsData]);
 
     const filteredData = useMemo(() => {
         if (searchText === '') return data;
@@ -155,33 +140,20 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
                         },
                         {
                             title: t('profile.leaderboard.trades.table.amount-col'),
-                            value: getAmount(formatCurrency(row.amount, 2), row.side, theme, row.isChainedSpeedMarket),
+                            value: getAmount(formatCurrency(row.amount, 2), row.side, theme, row.isChained),
                         },
                         {
                             title: t('profile.history.expired'),
-                            value: row.isSpeedMarket
-                                ? formatShortDateWithTime(row.maturityDate)
-                                : formatShortDate(row.maturityDate),
+                            value: formatShortDateWithTime(row.maturityDate),
                         },
                     ];
-
-                    if (!isMobile) {
-                        cells.push({
-                            value: !row.isSpeedMarket && (
-                                <SPAAnchor href={buildOptionsMarketLink(row.market, row.side)}>
-                                    <IconLink className="icon icon--right" />
-                                </SPAAnchor>
-                            ),
-                            width: '30px',
-                        });
-                    }
 
                     return {
                         asset: {
                             currencyKey: row.currencyKey,
                         },
                         cells: cells,
-                        link: isMobile ? buildOptionsMarketLink(row.market, row.side) : undefined,
+                        link: undefined,
                     };
                 });
             } catch (e) {
@@ -193,7 +165,7 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
             return generateRows(filteredData);
         }
         return [];
-    }, [filteredData, isMobile, t, theme]);
+    }, [filteredData, t, theme]);
 
     return (
         <TileTable

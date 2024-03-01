@@ -1,12 +1,11 @@
-import React from 'react';
-import styled from 'styled-components';
-import { ScreenSizeBreakpoint } from 'enums/ui';
-import { getSynthName } from 'utils/currency';
 import { Positions } from 'enums/options';
-import { ThemeInterface } from 'types/ui';
-import { useTheme } from 'styled-components';
-import { getColorPerPosition } from 'utils/options';
+import { ScreenSizeBreakpoint } from 'enums/ui';
 import { Chain, Icon } from 'pages/SpeedMarkets/components/SelectPosition/styled-components';
+import React from 'react';
+import styled, { useTheme } from 'styled-components';
+import { ThemeInterface } from 'types/ui';
+import { getSynthName } from 'utils/currency';
+import { getColorPerPosition } from 'utils/style';
 
 export type AssetInfoProps = {
     currencyKey: string;

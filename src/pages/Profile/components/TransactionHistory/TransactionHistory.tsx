@@ -1,12 +1,11 @@
 import TileTable from 'components/TileTable';
 import { SIDE_TO_POSITION_MAP } from 'constants/market';
-import useUserChainedSpeedMarketsTransactionsQuery from 'queries/options/speedMarkets/useUserChainedSpeedMarketsTransactionsQuery';
-import useUserSpeedMarketsTransactionsQuery from 'queries/options/speedMarkets/useUserSpeedMarketsTransactionsQuery';
+import useUserChainedSpeedMarketsTransactionsQuery from 'queries/speedMarkets/useUserChainedSpeedMarketsTransactionsQuery';
+import useUserSpeedMarketsTransactionsQuery from 'queries/speedMarkets/useUserSpeedMarketsTransactionsQuery';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
-import { getIsMobile } from 'redux/modules/ui';
 import { getIsWalletConnected, getNetworkId, getWalletAddress } from 'redux/modules/wallet';
 import { useTheme } from 'styled-components';
 import {
@@ -14,13 +13,12 @@ import {
     formatHoursAndMinutesFromTimestamp,
     formatShortDate,
     formatShortDateWithTime,
-    getEtherscanTxLink,
 } from 'thales-utils';
-import { HistoricalOptionsMarketInfo, SpeedMarket } from 'types/options';
+import { SpeedMarket } from 'types/market';
 import { TradeWithMarket } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
-import { ArrowLink, getAmount } from '../styled-components';
+import { getAmount } from '../styled-components';
 
 type TransactionHistoryProps = {
     searchAddress: string;
@@ -30,7 +28,7 @@ type TransactionHistoryProps = {
 const TransactionHistory: React.FC<TransactionHistoryProps> = ({ searchAddress, searchText }) => {
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
-    const isMobile = useSelector((state: RootState) => getIsMobile(state));
+
     const networkId = useSelector((state: RootState) => getNetworkId(state));
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
@@ -96,18 +94,17 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ searchAddress, 
                     if (typeof row === 'string') {
                         return row;
                     }
-                    const isSpeedMarket = (row.marketItem as SpeedMarket)?.isSpeedMarket;
+
                     const marketExpired = row.marketItem.result;
-                    const optionPrice =
-                        row.orderSide != 'sell' ? row.takerAmount / row.makerAmount : row.makerAmount / row.takerAmount;
-                    const paidAmount = row.orderSide == 'sell' ? row.makerAmount : row.takerAmount;
-                    const amount = row.orderSide == 'sell' ? row.takerAmount : row.makerAmount;
+                    const optionPrice = row.paid / row.payout;
+                    const paidAmount = row.paid;
+                    const amount = row.payout;
 
                     const cells: any = [
-                        { title: row.orderSide, value: formatHoursAndMinutesFromTimestamp(row.timestamp) },
+                        { title: 'buy', value: formatHoursAndMinutesFromTimestamp(row.timestamp) },
                         {
                             title: t('profile.history.strike'),
-                            value: `$${formatCurrency((row.marketItem as HistoricalOptionsMarketInfo).strikePrice)}`,
+                            value: `$${formatCurrency(row.marketItem.strikePrice)}`,
                         },
                         {
                             title: t('profile.history.price'),
@@ -117,38 +114,27 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ searchAddress, 
                             title: t('profile.history.amount'),
                             value: getAmount(
                                 formatCurrency(amount),
-                                SIDE_TO_POSITION_MAP[row.optionSide],
+                                SIDE_TO_POSITION_MAP[row.side],
                                 theme,
-                                (row.marketItem as SpeedMarket).isChainedSpeedMarket
+                                (row.marketItem as SpeedMarket).isChained
                             ),
                         },
                         {
-                            title: row.orderSide == 'sell' ? t('profile.history.received') : t('profile.history.paid'),
+                            title: t('profile.history.paid'),
                             value: `$${formatCurrency(paidAmount)}`,
                         },
                         {
                             title: marketExpired ? t('profile.history.expired') : t('profile.history.expires'),
-                            value: isSpeedMarket
-                                ? formatShortDateWithTime(row.marketItem.maturityDate)
-                                : formatShortDate(row.marketItem.maturityDate),
+                            value: formatShortDateWithTime(row.marketItem.maturityDate),
                         },
                     ];
-
-                    if (!isMobile) {
-                        cells.push({
-                            value: !isSpeedMarket && (
-                                <ArrowLink href={getEtherscanTxLink(networkId, row.transactionHash)} />
-                            ),
-                            width: '30px',
-                        });
-                    }
 
                     return {
                         asset: {
                             currencyKey: row.marketItem.currencyKey,
                         },
                         cells,
-                        link: isMobile ? getEtherscanTxLink(networkId, row.transactionHash) : undefined,
+                        link: undefined,
                     };
                 });
             } catch (e) {
@@ -160,7 +146,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ searchAddress, 
             return generateRows(filteredData);
         }
         return [];
-    }, [filteredData, isMobile, networkId, t, theme]);
+    }, [filteredData, t, theme]);
 
     return (
         <TileTable

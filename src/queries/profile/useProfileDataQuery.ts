@@ -2,7 +2,6 @@ import { BATCH_NUMBER_OF_SPEED_MARKETS, SPEED_MARKETS_QUOTE } from 'constants/ma
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
 import { UseQueryOptions, useQuery } from 'react-query';
-import thalesData from 'thales-data';
 import { NetworkId, bigNumberFormatter, coinFormatter, roundNumberToDecimals } from 'thales-utils';
 import { UserProfileData } from 'types/profile';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
@@ -24,50 +23,17 @@ const useProfileDataQuery = (
                 chainedSpeedMarketsAMMContract,
             } = snxJSConnector;
 
-            let userMarketTransactions = [],
-                userTrades = [],
-                speedAmmParams = [],
+            let speedAmmParams = [],
                 chainedAmmParams = [];
 
             if (isOnlySpeedMarketsSupported(networkId)) {
                 speedAmmParams = await speedMarketsDataContract?.getSpeedMarketsAMMParameters(walletAddress);
             } else {
-                [userMarketTransactions, userTrades, speedAmmParams, chainedAmmParams] = await Promise.all([
-                    thalesData.binaryOptions.optionTransactions({
-                        account: walletAddress,
-                        network: networkId,
-                    }),
-                    thalesData.binaryOptions.trades({
-                        taker: walletAddress,
-                        network: networkId,
-                    }),
+                [speedAmmParams, chainedAmmParams] = await Promise.all([
                     speedMarketsDataContract?.getSpeedMarketsAMMParameters(walletAddress),
                     speedMarketsDataContract?.getChainedSpeedMarketsAMMParameters(walletAddress),
                 ]);
             }
-
-            userMarketTransactions.map((tx: any) => {
-                if (tx.type === 'mint') {
-                    volume += tx.amount / 2;
-                    profit -= tx.amount / 2;
-                    investment += tx.amount / 2;
-                } else {
-                    profit += tx.amount;
-                }
-            });
-
-            userTrades.map((tx: any) => {
-                numberOfTrades += 1;
-
-                if (tx.orderSide === 'sell') {
-                    profit += tx.makerAmount;
-                    volume += tx.makerAmount;
-                } else {
-                    profit -= tx.takerAmount;
-                    investment += tx.takerAmount;
-                    volume += tx.takerAmount;
-                }
-            });
 
             if (speedMarketsAMMContract && speedMarketsDataContract) {
                 let activeSpeedMarkets = [],

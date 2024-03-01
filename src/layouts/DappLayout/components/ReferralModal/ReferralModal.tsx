@@ -13,11 +13,10 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { getIsWalletConnected, getNetworkId, getWalletAddress } from 'redux/modules/wallet';
-import { RootState } from 'types/ui';
+import { getIsWalletConnected, getWalletAddress } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { BoldText, FlexDivCentered, FlexDivColumnCentered, FlexDivRowCentered, FlexDivStart } from 'styles/common';
-import { isOnlySpeedMarketsSupported } from 'utils/network';
+import { RootState } from 'types/ui';
 import { buildReferrerLink } from 'utils/routes';
 import snxJSConnector from 'utils/snxJSConnector';
 
@@ -36,7 +35,6 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
     const { t } = useTranslation();
     const { openConnectModal } = useConnectModal();
 
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
     const walletAddress = useSelector((state: RootState) => getWalletAddress(state));
     const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
 
@@ -57,18 +55,6 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
             label: t('referral.pages.landing-page'),
         },
     ];
-
-    !isOnlySpeedMarketsSupported(networkId) &&
-        referralPageOptions.unshift(
-            {
-                value: Pages.Markets,
-                label: t('referral.pages.market-page'),
-            },
-            {
-                value: Pages.RangeMarkets,
-                label: t('referral.pages.range-market-page'),
-            }
-        );
 
     const populateReferralLink = (referralPageId: Pages, reffererId: string) => {
         let link = ROUTES.Markets.Home;

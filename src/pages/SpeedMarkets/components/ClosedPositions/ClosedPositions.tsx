@@ -1,18 +1,17 @@
 import SimpleLoader from 'components/SimpleLoader/SimpleLoader';
 import { Positions } from 'enums/options';
 import { ScreenSizeBreakpoint } from 'enums/ui';
-import { BigNumber } from 'ethers';
-import useUserResolvedChainedSpeedMarketsDataQuery from 'queries/options/speedMarkets/useUserResolvedChainedSpeedMarketsDataQuery';
-import useUserResolvedSpeedMarketsDataQuery from 'queries/options/speedMarkets/useUserResolvedSpeedMarketsDataQuery';
+import useUserResolvedChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserResolvedChainedSpeedMarketsDataQuery';
+import useUserResolvedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserResolvedSpeedMarketsDataQuery';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsWalletConnected, getNetworkId, getWalletAddress } from 'redux/modules/wallet';
-import { RootState } from 'types/ui';
 import styled from 'styled-components';
 import { FlexDivCentered, FlexDivRowCentered } from 'styles/common';
-import { UserClosedPositions } from 'types/options';
+import { UserClosedPositions } from 'types/market';
+import { RootState } from 'types/ui';
 import ChainedPosition from '../ChainedPosition';
 import ClosedPosition from '../ClosedPosition';
 
@@ -97,7 +96,6 @@ const dummyPositions: UserClosedPositions[] = [
         market: '0x1',
         currencyKey: 'BTC',
         amount: 15,
-        amountBigNumber: BigNumber.from('15'),
         paid: 100,
         maturityDate: 1684483200000,
         strikePrice: '$ 25,000.00',
@@ -111,7 +109,6 @@ const dummyPositions: UserClosedPositions[] = [
         market: '0x2',
         currencyKey: 'BTC',
         amount: 10,
-        amountBigNumber: BigNumber.from('10'),
         paid: 200,
         maturityDate: 1684483200000,
         strikePrice: '$ 35,000.00',

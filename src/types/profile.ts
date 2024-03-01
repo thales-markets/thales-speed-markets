@@ -1,16 +1,12 @@
 import { Positions } from 'enums/options';
-import { HistoricalOptionsMarketInfo, RangedMarket, SpeedMarket, Trade } from './options';
-import { BigNumber } from 'ethers';
+import { SpeedMarket } from './market';
 
 export type UserPosition = {
     positionAddress: string;
     currencyKey: string;
     strikePrice: number;
-    leftPrice: number;
-    rightPrice: number;
     finalPrice: number;
     amount: number;
-    amountBigNumber: BigNumber;
     maturityDate: number;
     expiryDate: number;
     market: string;
@@ -19,9 +15,7 @@ export type UserPosition = {
     value: number;
     claimable: boolean;
     claimed: boolean;
-    isRanged: boolean;
-    isSpeedMarket: boolean;
-    isChainedSpeedMarket?: boolean;
+    isChained?: boolean;
 };
 
 export type UserProfileData = {
@@ -32,6 +26,12 @@ export type UserProfileData = {
     investment: number;
 };
 
-export type TradeWithMarket = Trade & {
-    marketItem: HistoricalOptionsMarketInfo | RangedMarket | SpeedMarket;
+export type TradeWithMarket = {
+    timestamp: number;
+    user: string;
+    payout: number;
+    paid: number;
+    market: string;
+    side: number;
+    marketItem: SpeedMarket;
 };

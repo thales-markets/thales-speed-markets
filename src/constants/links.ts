@@ -1,6 +1,6 @@
 export const LINKS = {
-    SportMarkets: 'https://overtimemarkets.xyz/',
     Markets: {
+        Sport: 'https://overtimemarkets.xyz/',
         Thales: 'https://thalesmarket.io/markets',
         Speed: 'https://speedmarkets.xyz/speed-markets',
         ChainedSpeed: 'https://speedmarkets.xyz/speed-markets?isChained=true',

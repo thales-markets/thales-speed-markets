@@ -34,7 +34,7 @@ import { getIsWalletConnected, getNetworkId, getSelectedCollateralIndex, getWall
 import { useTheme } from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
 import { coinParser, formatCurrencyWithSign, roundNumberToDecimals } from 'thales-utils';
-import { ChainedSpeedMarket } from 'types/options';
+import { ChainedSpeedMarket } from 'types/market';
 import { RootState, ThemeInterface } from 'types/ui';
 import erc20Contract from 'utils/contracts/erc20Contract';
 import { getCollateral, getCollaterals, getDefaultCollateral } from 'utils/currency';
@@ -392,7 +392,6 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                     // add three percent to approval amount to take into account price changes
                     defaultAmount={roundNumberToDecimals(ONE_HUNDRED_AND_THREE_PERCENT * position.amount)}
                     tokenSymbol={defaultCollateral}
-                    isNonStable={false}
                     isAllowing={isAllowing}
                     onSubmit={handleAllowance}
                     onClose={() => setOpenApprovalModal(false)}

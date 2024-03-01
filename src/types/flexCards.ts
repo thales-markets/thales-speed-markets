@@ -1,12 +1,6 @@
 import { Positions } from 'enums/options';
 
-export type SharePositionType =
-    | 'potential'
-    | 'resolved'
-    | 'resolved-speed'
-    | 'potential-speed'
-    | 'chained-speed-won'
-    | 'chained-speed-lost';
+export type SharePositionType = 'resolved-speed' | 'potential-speed' | 'chained-speed-won' | 'chained-speed-lost';
 
 export type SharePositionData = {
     type: SharePositionType;

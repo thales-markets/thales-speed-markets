@@ -12,9 +12,9 @@ import { secondsToMilliseconds } from 'date-fns';
 import { Positions } from 'enums/options';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import useInterval from 'hooks/useInterval';
-import OpenPositions from 'pages/Trade/components/OpenPositions';
-import useAmmChainedSpeedMarketsLimitsQuery from 'queries/options/speedMarkets/useAmmChainedSpeedMarketsLimitsQuery';
-import useAmmSpeedMarketsLimitsQuery from 'queries/options/speedMarkets/useAmmSpeedMarketsLimitsQuery';
+import OpenPositions from 'pages/SpeedMarkets/components/OpenPositions';
+import useAmmChainedSpeedMarketsLimitsQuery from 'queries/speedMarkets/useAmmChainedSpeedMarketsLimitsQuery';
+import useAmmSpeedMarketsLimitsQuery from 'queries/speedMarkets/useAmmSpeedMarketsLimitsQuery';
 import queryString from 'query-string';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
@@ -38,7 +38,7 @@ import SelectBuyin from './components/SelectBuyin';
 import SelectPosition from './components/SelectPosition';
 import { SelectedPosition } from './components/SelectPosition/SelectPosition';
 import SelectTime from './components/SelectTime';
-import LightweightChart from 'pages/Trade/components/PriceChart/LightweightChart';
+import LightweightChart from 'pages/SpeedMarkets/components/PriceChart/LightweightChart';
 import { LINKS } from 'constants/links';
 
 const SpeedMarkets: React.FC = () => {

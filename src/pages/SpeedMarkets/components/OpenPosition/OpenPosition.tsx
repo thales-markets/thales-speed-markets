@@ -1,25 +1,56 @@
+import Tooltip from 'components/Tooltip';
 import { USD_SIGN } from 'constants/currency';
+import { secondsToMilliseconds } from 'date-fns';
 import { ScreenSizeBreakpoint } from 'enums/ui';
-import { ShareIcon } from 'pages/SpeedMarkets/components/OpenPosition/OpenPosition';
-import SharePositionModal from 'pages/SpeedMarkets/components/SharePositionModal';
+import useInterval from 'hooks/useInterval';
+import MyPositionAction from 'pages/Profile/components/MyPositionAction/MyPositionAction';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
+import { getNetworkId, getWalletAddress } from 'redux/modules/wallet';
 import styled, { useTheme } from 'styled-components';
 import { formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
-import { UserClosedPositions } from 'types/market';
-import { ThemeInterface } from 'types/ui';
+import { UserOpenPositions } from 'types/market';
+import { RootState, ThemeInterface } from 'types/ui';
 import { formatNumberShort } from 'utils/formatters/number';
+import { refetchUserSpeedMarkets } from 'utils/queryConnector';
 import { getColorPerPosition } from 'utils/style';
+import SharePositionModal from '../SharePositionModal';
 
-type ClosedPositionProps = {
-    position: UserClosedPositions;
+type OpenPositionProps = {
+    position: UserOpenPositions;
+    maxPriceDelayForResolvingSec?: number;
+    currentPrices?: { [key: string]: number };
+    isMultipleMarkets?: boolean;
 };
 
-const ClosedPosition: React.FC<ClosedPositionProps> = ({ position }) => {
+const OpenPosition: React.FC<OpenPositionProps> = ({
+    position,
+    maxPriceDelayForResolvingSec,
+    currentPrices,
+    isMultipleMarkets,
+}) => {
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 
+    const networkId = useSelector((state: RootState) => getNetworkId(state));
+    const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
+
     const [openTwitterShareModal, setOpenTwitterShareModal] = useState(false);
+    const [isSpeedMarketMatured, setIsSpeedMarketMatured] = useState(Date.now() > position.maturityDate);
+
+    useInterval(() => {
+        if (Date.now() > position.maturityDate) {
+            if (!isSpeedMarketMatured) {
+                setIsSpeedMarketMatured(true);
+            }
+            if (!position.finalPrice) {
+                refetchUserSpeedMarkets(false, networkId, walletAddress);
+            }
+        }
+    }, secondsToMilliseconds(10));
+
+    const displayShare = position.claimable || (!position.claimable && !position.finalPrice);
 
     return (
         <Position>
@@ -29,10 +60,24 @@ const ClosedPosition: React.FC<ClosedPositionProps> = ({ position }) => {
                     <Label>{position.currencyKey}</Label>
                     <Value>{position.strikePrice}</Value>
                 </FlexContainer>
+
                 <Separator />
                 <FlexContainer secondChildWidth="140px">
-                    <Label>{t('profile.final-price')}</Label>
-                    <Value>{formatCurrencyWithSign(USD_SIGN, position.finalPrice || 0)}</Value>
+                    <Label>{isSpeedMarketMatured ? t('profile.final-price') : t('profile.current-price')}</Label>
+                    <Value>
+                        {isSpeedMarketMatured ? (
+                            position.finalPrice ? (
+                                formatCurrencyWithSign(USD_SIGN, position.finalPrice)
+                            ) : (
+                                <>
+                                    {'. . .'}
+                                    <Tooltip overlay={t('speed-markets.tooltips.final-price-missing')} />
+                                </>
+                            )
+                        ) : (
+                            formatCurrencyWithSign(USD_SIGN, currentPrices ? currentPrices[position.currencyKey] : 0)
+                        )}
+                    </Value>
                 </FlexContainer>
                 <Separator />
                 <FlexContainer>
@@ -53,18 +98,14 @@ const ClosedPosition: React.FC<ClosedPositionProps> = ({ position }) => {
                     <Value>{formatCurrencyWithSign(USD_SIGN, position.paid, 2)}</Value>
                 </FlexContainer>
                 <Separator />
-                <FlexContainer>
-                    <Label>{t('common.result')}</Label>
-                    <Value
-                        isUpperCase
-                        color={position.isUserWinner ? theme.textColor.quaternary : theme.error.textColor.primary}
-                    >
-                        {position.isUserWinner ? t('common.won') : t('common.loss')}
-                    </Value>
-                </FlexContainer>
+                <MyPositionAction
+                    position={position}
+                    maxPriceDelayForResolvingSec={maxPriceDelayForResolvingSec}
+                    isMultipleContainerRows={isMultipleMarkets}
+                />
             </AlignedFlex>
             <ShareDiv>
-                {position.isUserWinner && (
+                {displayShare && (
                     <ShareIcon
                         className="icon-home icon-home--twitter-x"
                         disabled={false}
@@ -74,7 +115,7 @@ const ClosedPosition: React.FC<ClosedPositionProps> = ({ position }) => {
             </ShareDiv>
             {openTwitterShareModal && (
                 <SharePositionModal
-                    type={'resolved-speed'}
+                    type={position.claimable ? 'resolved-speed' : 'potential-speed'}
                     positions={[position.side]}
                     currencyKey={position.currencyKey}
                     strikeDate={position.maturityDate}
@@ -140,7 +181,6 @@ const FlexContainer = styled(AlignedFlex)<{ firstChildWidth?: string; secondChil
 
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         flex-direction: row;
-        gap: 4px;
     }
 `;
 
@@ -153,10 +193,9 @@ const Label = styled.span`
     white-space: nowrap;
 `;
 
-const Value = styled(Label)<{ color?: string; isUpperCase?: boolean }>`
+const Value = styled(Label)<{ color?: string }>`
     color: ${(props) => props.color || props.theme.textColor.primary};
     white-space: nowrap;
-    ${(props) => (props.isUpperCase ? 'text-transform: uppercase;' : '')}
 `;
 
 const Separator = styled.div`
@@ -171,8 +210,15 @@ const Separator = styled.div`
 `;
 
 const ShareDiv = styled.div`
-    width: 20px;
     height: 20px;
 `;
 
-export default ClosedPosition;
+export const ShareIcon = styled.i<{ disabled: boolean }>`
+    color: ${(props) => props.theme.textColor.secondary};
+    cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
+    opacity: ${(props) => (props.disabled ? '0.5' : '1')};
+    font-size: 20px;
+    text-transform: none;
+`;
+
+export default OpenPosition;

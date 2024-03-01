@@ -21,7 +21,7 @@ import { getIsWalletConnected } from 'redux/modules/wallet';
 import { RootState } from 'types/ui';
 import styled, { useTheme } from 'styled-components';
 import { FlexDivCentered, FlexDivColumnCentered, FlexDivRow } from 'styles/common';
-import { AmmSpeedMarketsLimits } from 'types/options';
+import { AmmSpeedMarketsLimits } from 'types/market';
 import { ThemeInterface } from 'types/ui';
 
 type SelectTimeProps = {
