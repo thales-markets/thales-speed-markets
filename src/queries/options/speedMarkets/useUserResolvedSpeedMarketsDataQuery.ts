@@ -21,7 +21,7 @@ const useUserResolvedSpeedMarketsDataQuery = (
     options?: UseQueryOptions<UserClosedPositions[]>
 ) => {
     return useQuery<UserClosedPositions[]>(
-        QUERY_KEYS.BinaryOptions.UserResolvedSpeedMarkets(networkId, walletAddress),
+        QUERY_KEYS.User.ResolvedSpeedMarkets(networkId, walletAddress),
         async () => {
             const userClosedSpeedMarketsData: UserClosedPositions[] = [];
             const { speedMarketsAMMContract, speedMarketsDataContract } = snxJSConnector;

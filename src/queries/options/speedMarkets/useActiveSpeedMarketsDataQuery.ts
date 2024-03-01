@@ -13,7 +13,7 @@ import { getFeesFromHistory } from 'utils/speedAmm';
 
 const useActiveSpeedMarketsDataQuery = (networkId: NetworkId, options?: UseQueryOptions<UserLivePositions[]>) => {
     return useQuery<UserLivePositions[]>(
-        QUERY_KEYS.BinaryOptions.ActiveSpeedMarkets(networkId),
+        QUERY_KEYS.Markets.ActiveSpeedMarkets(networkId),
         async () => {
             const activeSpeedMarketsData: UserLivePositions[] = [];
 

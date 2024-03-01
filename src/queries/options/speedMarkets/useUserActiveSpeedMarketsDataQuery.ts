@@ -20,7 +20,7 @@ const useUserActiveSpeedMarketsDataQuery = (
     options?: UseQueryOptions<UserLivePositions[]>
 ) => {
     return useQuery<UserLivePositions[]>(
-        QUERY_KEYS.BinaryOptions.UserSpeedMarkets(networkId, walletAddress),
+        QUERY_KEYS.User.SpeedMarkets(networkId, walletAddress),
         async () => {
             const userSpeedMarketsData: UserLivePositions[] = [];
 

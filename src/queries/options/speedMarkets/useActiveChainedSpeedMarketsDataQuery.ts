@@ -14,7 +14,7 @@ const useActiveChainedSpeedMarketsDataQuery = (
     options?: UseQueryOptions<ChainedSpeedMarket[]>
 ) => {
     return useQuery<ChainedSpeedMarket[]>(
-        QUERY_KEYS.BinaryOptions.ActiveChainedSpeedMarkets(networkId),
+        QUERY_KEYS.Markets.ActiveChainedSpeedMarkets(networkId),
         async () => {
             const chainedSpeedMarketsData: ChainedSpeedMarket[] = [];
 

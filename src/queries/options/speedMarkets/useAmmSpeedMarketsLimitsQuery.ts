@@ -16,7 +16,7 @@ const useAmmSpeedMarketsLimitsQuery = (
     options?: UseQueryOptions<AmmSpeedMarketsLimits>
 ) => {
     return useQuery<AmmSpeedMarketsLimits>(
-        QUERY_KEYS.BinaryOptions.SpeedMarketsLimits(networkId, walletAddress),
+        QUERY_KEYS.Markets.SpeedMarketsLimits(networkId, walletAddress),
         async () => {
             const ammSpeedMarketsLimits: AmmSpeedMarketsLimits = {
                 minBuyinAmount: 0,

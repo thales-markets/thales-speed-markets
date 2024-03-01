@@ -12,7 +12,7 @@ const useChainedAmmSpeedMarketsLimitsQuery = (
     options?: UseQueryOptions<AmmChainedSpeedMarketsLimits>
 ) => {
     return useQuery<AmmChainedSpeedMarketsLimits>(
-        QUERY_KEYS.BinaryOptions.ChainedSpeedMarketsLimits(networkId, walletAddress),
+        QUERY_KEYS.Markets.ChainedSpeedMarketsLimits(networkId, walletAddress),
         async () => {
             const ammChainedSpeedMarketsLimits: AmmChainedSpeedMarketsLimits = {
                 minChainedMarkets: 0,

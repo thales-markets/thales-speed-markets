@@ -19,7 +19,7 @@ const useUserSpeedMarketsTransactionsQuery = (
     options?: UseQueryOptions<TradeWithMarket[]>
 ) => {
     return useQuery<TradeWithMarket[]>(
-        QUERY_KEYS.BinaryOptions.UserSpeedMarketsTransactions(networkId, walletAddress),
+        QUERY_KEYS.User.SpeedMarketsTransactions(networkId, walletAddress),
         async () => {
             const userTransactions: TradeWithMarket[] = [];
 
