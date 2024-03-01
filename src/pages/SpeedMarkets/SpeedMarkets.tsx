@@ -39,6 +39,7 @@ import SelectPosition from './components/SelectPosition';
 import { SelectedPosition } from './components/SelectPosition/SelectPosition';
 import SelectTime from './components/SelectTime';
 import LightweightChart from 'pages/Trade/components/PriceChart/LightweightChart';
+import { LINKS } from 'constants/links';
 
 const SpeedMarkets: React.FC = () => {
     const { t } = useTranslation();
@@ -50,7 +51,7 @@ const SpeedMarkets: React.FC = () => {
     const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
-    const isChainedSupported = getSupportedNetworksByRoute(ROUTES.Options.ChainedSpeedMarkets).includes(networkId);
+    const isChainedSupported = getSupportedNetworksByRoute(ROUTES.Markets.ChainedSpeedMarkets).includes(networkId);
     const isChainedMarkets = isChainedSupported && queryString.parse(location.search).isChained === 'true';
 
     const [isChained, setIsChained] = useState(isChainedMarkets);
@@ -371,12 +372,7 @@ const SpeedMarkets: React.FC = () => {
                         setSkewImpact={setSkew}
                         resetData={resetData}
                     />
-                    {
-                        // TODO: set link to thales markets dApp
-                        getSupportedNetworksByRoute(ROUTES.Options.Home).includes(networkId) && (
-                            <PageLinkBanner rout={ROUTES.Options.Home} />
-                        )
-                    }
+                    <PageLinkBanner link={LINKS.Markets.Thales} />
                     {isWalletConnected && (
                         <>
                             <OpenPositions
@@ -389,7 +385,7 @@ const SpeedMarkets: React.FC = () => {
                         </>
                     )}
                     <OverviewLinkWrapper>
-                        <SPAAnchor href={buildHref(`${ROUTES.Options.SpeedMarketsOverview}?isChained=${isChained}`)}>
+                        <SPAAnchor href={buildHref(`${ROUTES.Markets.SpeedMarketsOverview}?isChained=${isChained}`)}>
                             <OverviewLinkText>
                                 {isChained
                                     ? t('speed-markets.overview.navigate-chained')

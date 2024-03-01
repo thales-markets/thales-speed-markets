@@ -29,7 +29,7 @@ import { UserPosition } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getCurrentPrices, getPriceId, getPriceServiceEndpoint } from 'utils/pyth';
-import { buildOptionsMarketLink, buildRangeMarketLink } from 'utils/routes';
+import { buildOptionsMarketLink } from 'utils/routes';
 import MyPositionAction from '../MyPositionAction/MyPositionAction';
 import { IconLink, TextLink, getAmount } from '../styled-components';
 
@@ -235,12 +235,8 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
                 return data.map((row: UserPosition) => {
                     const cells: any = [
                         {
-                            title: row.isRanged
-                                ? t('markets.market.ranged-markets.strike-range')
-                                : t(`profile.strike-price`),
-                            value: row.isRanged
-                                ? `$${formatCurrency(row.leftPrice)} - $${formatCurrency(row.rightPrice)}`
-                                : `$${formatCurrency(row.strikePrice)}`,
+                            title: t(`profile.strike-price`),
+                            value: `$${formatCurrency(row.strikePrice)}`,
                         },
                         {
                             title: (
@@ -297,13 +293,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
                         },
                         {
                             value: !row.isSpeedMarket && (
-                                <SPAAnchor
-                                    href={
-                                        row.isRanged
-                                            ? buildRangeMarketLink(row.market, row.side)
-                                            : buildOptionsMarketLink(row.market, row.side)
-                                    }
-                                >
+                                <SPAAnchor href={buildOptionsMarketLink(row.market, row.side)}>
                                     {isMobile ? (
                                         <TextLink>
                                             {t('profile.go-to-market')}{' '}

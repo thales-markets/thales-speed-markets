@@ -2,7 +2,6 @@ import SearchInput from 'components/SearchInput';
 import { USD_SIGN } from 'constants/currency';
 import { millisecondsToSeconds } from 'date-fns';
 import { Positions } from 'enums/options';
-import BannerCarousel from 'pages/Trade/components/BannerCarousel';
 import useUserActiveChainedSpeedMarketsDataQuery from 'queries/options/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
 import useUserActiveSpeedMarketsDataQuery from 'queries/options/speedMarkets/useUserActiveSpeedMarketsDataQuery';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
@@ -18,7 +17,6 @@ import { useTheme } from 'styled-components';
 import { formatCurrencyWithSign, formatPercentage } from 'thales-utils';
 import { UserProfileData } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
-import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getPriceId } from 'utils/pyth';
 import { history } from 'utils/routes';
 import { MARKET_DURATION_IN_DAYS } from '../../constants/market';
@@ -170,7 +168,6 @@ const Profile: React.FC = () => {
 
     return (
         <>
-            {!isOnlySpeedMarketsSupported(networkId) && <BannerCarousel />}
             <Container>
                 <Header>
                     <Title>{t('profile.title')}</Title>

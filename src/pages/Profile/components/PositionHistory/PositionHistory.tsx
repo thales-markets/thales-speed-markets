@@ -22,7 +22,7 @@ import {
 import { UserPosition } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
-import { buildOptionsMarketLink, buildRangeMarketLink } from 'utils/routes';
+import { buildOptionsMarketLink } from 'utils/routes';
 import { IconLink, getAmount, getStatus } from '../styled-components';
 
 type PositionHistoryProps = {
@@ -146,15 +146,8 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
                             value: getStatus(row.claimed, theme, t),
                         },
                         {
-                            title: row.isRanged
-                                ? t('markets.market.ranged-markets.strike-range')
-                                : t(`profile.strike-price`),
-                            value: row.isRanged
-                                ? `${formatCurrencyWithSign(USD_SIGN, row.leftPrice)} - ${formatCurrencyWithSign(
-                                      USD_SIGN,
-                                      row.rightPrice
-                                  )}`
-                                : `${formatCurrencyWithSign(USD_SIGN, row.strikePrice)}`,
+                            title: t(`profile.strike-price`),
+                            value: `${formatCurrencyWithSign(USD_SIGN, row.strikePrice)}`,
                         },
                         {
                             title: t('profile.final-price'),
@@ -175,13 +168,7 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
                     if (!isMobile) {
                         cells.push({
                             value: !row.isSpeedMarket && (
-                                <SPAAnchor
-                                    href={
-                                        row.isRanged
-                                            ? buildRangeMarketLink(row.market, row.side)
-                                            : buildOptionsMarketLink(row.market, row.side)
-                                    }
-                                >
+                                <SPAAnchor href={buildOptionsMarketLink(row.market, row.side)}>
                                     <IconLink className="icon icon--right" />
                                 </SPAAnchor>
                             ),
@@ -194,11 +181,7 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
                             currencyKey: row.currencyKey,
                         },
                         cells: cells,
-                        link: isMobile
-                            ? row.isRanged
-                                ? buildRangeMarketLink(row.market, row.side)
-                                : buildOptionsMarketLink(row.market, row.side)
-                            : undefined,
+                        link: isMobile ? buildOptionsMarketLink(row.market, row.side) : undefined,
                     };
                 });
             } catch (e) {

@@ -1,6 +1,5 @@
 import arrowRightAnimation from 'assets/lotties/rigth-arrows.json';
 import SPAAnchor from 'components/SPAAnchor';
-import ROUTES from 'constants/routes';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import Lottie from 'lottie-react';
 import React, { CSSProperties } from 'react';
@@ -10,34 +9,24 @@ import { getIsMobile } from 'redux/modules/ui';
 import styled from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
 import { RootState } from 'types/ui';
-import { buildHref } from 'utils/routes';
 
-type PageLinkBannerProps = { rout: string };
+type PageLinkBannerProps = { link: string };
 
-const PageLinkBanner: React.FC<PageLinkBannerProps> = ({ rout }) => {
+const PageLinkBanner: React.FC<PageLinkBannerProps> = ({ link }) => {
     const { t } = useTranslation();
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
-    let textKey = '';
-    let tryMarketsValue = '';
-    switch (rout) {
-        case ROUTES.Options.Home:
-            textKey = 'common.banner.page-link.thales-markets';
-            tryMarketsValue = 'markets.title';
-            break;
-    }
-
     return (
-        <SPAAnchor href={buildHref(rout)}>
+        <SPAAnchor href={link}>
             <Content>
                 <Text>
-                    {t(textKey)}{' '}
+                    {t('common.banner.page-link.thales-markets')}{' '}
                     <Text noWrap>
                         <Trans
                             i18nKey="common.banner.page-link.try"
                             components={{
                                 bold: <BoldText />,
-                                value: t(tryMarketsValue),
+                                value: t('markets.title'),
                             }}
                         />
                     </Text>

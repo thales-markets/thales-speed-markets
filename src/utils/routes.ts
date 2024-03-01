@@ -12,12 +12,7 @@ export const navigateTo = (path: string, replacePath = false, scrollToTop = fals
 };
 
 export const buildOptionsMarketLink = (marketAddress: string, position?: string) =>
-    `${ifIpfsDeployment ? '#' : ''}${ROUTES.Options.Home}/${marketAddress}${position ? `?position=${position}` : ''}`;
-
-export const buildRangeMarketLink = (marketAddress: string, position?: string) =>
-    `${ifIpfsDeployment ? '#' : ''}${ROUTES.Options.RangeMarkets}/${marketAddress}${
-        position ? `?position=${position}` : ''
-    }`;
+    `${ifIpfsDeployment ? '#' : ''}${ROUTES.Markets.Home}/${marketAddress}${position ? `?position=${position}` : ''}`;
 
 export const buildReferrerLink = (route: string, referralId: string) => {
     return `${location.protocol}//${location.host ? location.host : ''}${route}?referrerId=${encodeURIComponent(

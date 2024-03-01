@@ -101,7 +101,7 @@ const Notifications: React.FC = () => {
     const hasNotifications = totalNotifications > 0;
 
     return isWalletConnected ? (
-        <SPAAnchor href={buildHref(ROUTES.Options.Profile)}>
+        <SPAAnchor href={buildHref(ROUTES.Markets.Profile)}>
             <Container>
                 {hasNotifications ? (
                     <Tooltip overlay={t('common.header.notification.tooltip', { count: totalNotifications })}>

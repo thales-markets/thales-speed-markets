@@ -126,8 +126,8 @@ const App = () => {
             <QueryClientProvider client={queryConnector.queryClient}>
                 <Router history={history}>
                     <Switch>
-                        {getSupportedNetworksByRoute(ROUTES.Options.SpeedMarkets).includes(networkId) && (
-                            <Route exact path={ROUTES.Options.SpeedMarkets}>
+                        {getSupportedNetworksByRoute(ROUTES.Markets.SpeedMarkets).includes(networkId) && (
+                            <Route exact path={ROUTES.Markets.SpeedMarkets}>
                                 <Suspense fallback={<Loader />}>
                                     <DappLayout>
                                         <SpeedMarkets />
@@ -136,8 +136,8 @@ const App = () => {
                             </Route>
                         )}
 
-                        {getSupportedNetworksByRoute(ROUTES.Options.SpeedMarketsOverview).includes(networkId) && (
-                            <Route exact path={ROUTES.Options.SpeedMarketsOverview}>
+                        {getSupportedNetworksByRoute(ROUTES.Markets.SpeedMarketsOverview).includes(networkId) && (
+                            <Route exact path={ROUTES.Markets.SpeedMarketsOverview}>
                                 <Suspense fallback={<Loader />}>
                                     <DappLayout>
                                         <SpeedMarketsOverview />
@@ -146,8 +146,8 @@ const App = () => {
                             </Route>
                         )}
 
-                        {getSupportedNetworksByRoute(ROUTES.Options.Profile).includes(networkId) && (
-                            <Route exact path={ROUTES.Options.Profile}>
+                        {getSupportedNetworksByRoute(ROUTES.Markets.Profile).includes(networkId) && (
+                            <Route exact path={ROUTES.Markets.Profile}>
                                 <Suspense fallback={<Loader />}>
                                     <DappLayout>
                                         <Profile />
@@ -167,14 +167,14 @@ const App = () => {
                         )}
 
                         <Route>
-                            <Redirect to={ROUTES.Options.SpeedMarkets} />
+                            <Redirect to={ROUTES.Markets.SpeedMarkets} />
                             <Suspense fallback={<Loader />}>
                                 <DappLayout>
-                                    {getSupportedNetworksByRoute(ROUTES.Options.SpeedMarkets).includes(networkId) ? (
+                                    {getSupportedNetworksByRoute(ROUTES.Markets.SpeedMarkets).includes(networkId) ? (
                                         <SpeedMarkets />
                                     ) : (
                                         <UnsupportedNetwork
-                                            supportedNetworks={getSupportedNetworksByRoute(ROUTES.Options.SpeedMarkets)}
+                                            supportedNetworks={getSupportedNetworksByRoute(ROUTES.Markets.SpeedMarkets)}
                                         />
                                     )}
                                 </DappLayout>

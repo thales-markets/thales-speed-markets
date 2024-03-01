@@ -39,7 +39,7 @@ const UnexpectedError: React.FC<{ theme: ThemeInterface }> = ({ theme }) => {
             crate.toggle(false);
         }
         resetBoundary();
-        navigateTo(ROUTES.Options.Home);
+        navigateTo(ROUTES.Markets.SpeedMarkets);
     };
 
     return (

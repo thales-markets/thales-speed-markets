@@ -25,7 +25,7 @@ const DappSidebar: React.FC = () => {
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const showProfilePage =
-        isWalletConnected && getSupportedNetworksByRoute(ROUTES.Options.Profile).includes(networkId);
+        isWalletConnected && getSupportedNetworksByRoute(ROUTES.Markets.Profile).includes(networkId);
 
     return (
         <OutsideClickHandler
@@ -37,23 +37,23 @@ const DappSidebar: React.FC = () => {
         >
             <SidebarHtml id="sidebar">
                 <ItemsContainer onClick={removeCollapse}>
-                    <SPAAnchor className="sidebar-logoSmall" href={buildHref(ROUTES.Options.Home)}>
+                    <SPAAnchor className="sidebar-logoSmall" href={buildHref(ROUTES.Markets.Home)}>
                         <LogoIcon width="38" height="42" src={logoSmallIcon} />
                     </SPAAnchor>
-                    <SPAAnchor className="sidebar-logoBig" href={buildHref(ROUTES.Options.Home)}>
+                    <SPAAnchor className="sidebar-logoBig" href={buildHref(ROUTES.Markets.Home)}>
                         <LogoIcon height="42" src={logoIcon} />
                     </SPAAnchor>
 
-                    {getSupportedNetworksByRoute(ROUTES.Options.SpeedMarkets).includes(networkId) && (
+                    {getSupportedNetworksByRoute(ROUTES.Markets.SpeedMarkets).includes(networkId) && (
                         <DappHeaderItem
                             className={`${
-                                [ROUTES.Options.SpeedMarkets, ROUTES.Options.SpeedMarketsOverview].includes(
+                                [ROUTES.Markets.SpeedMarkets, ROUTES.Markets.SpeedMarketsOverview].includes(
                                     location.pathname
                                 )
                                     ? 'selected'
                                     : ''
                             }`}
-                            href={buildHref(ROUTES.Options.SpeedMarkets)}
+                            href={buildHref(ROUTES.Markets.SpeedMarkets)}
                             iconName="speed-markets"
                             label={t('common.sidebar.speed-markets')}
                         />
@@ -61,8 +61,8 @@ const DappSidebar: React.FC = () => {
 
                     {showProfilePage && (
                         <DappHeaderItem
-                            className={`${location.pathname === ROUTES.Options.Profile ? 'selected' : ''}`}
-                            href={buildHref(ROUTES.Options.Profile)}
+                            className={`${location.pathname === ROUTES.Markets.Profile ? 'selected' : ''}`}
+                            href={buildHref(ROUTES.Markets.Profile)}
                             iconName="profile"
                             label={t('common.sidebar.profile-label')}
                         />

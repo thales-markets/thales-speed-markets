@@ -160,9 +160,9 @@ export const SUPPORTED_NETWORK_IDS_MAP: Record<number, DropdownNetwork> = {
 
 export const getSupportedNetworksByRoute = (route: string): NetworkId[] => {
     switch (route) {
-        case ROUTES.Options.Home:
-        case ROUTES.Options.ChainedSpeedMarkets:
-        case ROUTES.Options.ChainedSpeedMarketsOverview:
+        case ROUTES.Markets.Home:
+        case ROUTES.Markets.ChainedSpeedMarkets:
+        case ROUTES.Markets.ChainedSpeedMarketsOverview:
             return [
                 NetworkId.OptimismMainnet,
                 NetworkId.OptimismGoerli,
@@ -170,9 +170,9 @@ export const getSupportedNetworksByRoute = (route: string): NetworkId[] => {
                 NetworkId.Base,
                 NetworkId.PolygonMainnet,
             ];
-        case ROUTES.Options.SpeedMarkets:
-        case ROUTES.Options.SpeedMarketsOverview:
-        case ROUTES.Options.Profile:
+        case ROUTES.Markets.SpeedMarkets:
+        case ROUTES.Markets.SpeedMarketsOverview:
+        case ROUTES.Markets.Profile:
             return [
                 NetworkId.OptimismMainnet,
                 NetworkId.OptimismGoerli,
