@@ -1,12 +1,11 @@
 import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
 import { ZERO_ADDRESS } from 'constants/network';
-import { OPTIONS_POSITIONS_MAP, SIDE } from 'constants/options';
+import { SIDE_TO_POSITION_MAP } from 'constants/market';
 import QUERY_KEYS from 'constants/queryKeys';
-import { Positions } from 'enums/options';
 import { BigNumber, ethers } from 'ethers';
 import { UseQueryOptions, useQuery } from 'react-query';
 import { NetworkId, bigNumberFormatter, coinFormatter } from 'thales-utils';
-import { AmmSpeedMarketsLimits, OptionSide } from 'types/options';
+import { AmmSpeedMarketsLimits } from 'types/options';
 import snxJSConnector from 'utils/snxJSConnector';
 
 const MAX_BUYIN_COLLATERAL_CONVERSION_BUFFER = 10;
@@ -77,7 +76,7 @@ const useAmmSpeedMarketsLimitsQuery = (
                 directionalRiskForETH.map((risk: any) => {
                     ammSpeedMarketsLimits.risksPerAssetAndDirection.push({
                         currency: CRYPTO_CURRENCY_MAP.ETH,
-                        position: OPTIONS_POSITIONS_MAP[SIDE[risk.direction] as OptionSide] as Positions,
+                        position: SIDE_TO_POSITION_MAP[risk.direction],
                         current: coinFormatter(risk.current, networkId),
                         max: coinFormatter(risk.max, networkId),
                     });
@@ -85,7 +84,7 @@ const useAmmSpeedMarketsLimitsQuery = (
                 directionalRiskForBTC.map((risk: any) => {
                     ammSpeedMarketsLimits.risksPerAssetAndDirection.push({
                         currency: CRYPTO_CURRENCY_MAP.BTC,
-                        position: OPTIONS_POSITIONS_MAP[SIDE[risk.direction] as OptionSide] as Positions,
+                        position: SIDE_TO_POSITION_MAP[risk.direction],
                         current: coinFormatter(risk.current, networkId),
                         max: coinFormatter(risk.max, networkId),
                     });

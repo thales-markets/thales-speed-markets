@@ -18,7 +18,7 @@ import {
     POSITIONS_TO_SIDE_MAP,
     SPEED_MARKETS_QUOTE,
     STABLECOIN_CONVERSION_BUFFER_PERCENTAGE,
-} from 'constants/options';
+} from 'constants/market';
 import { PYTH_CONTRACT_ADDRESS, PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import { millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
 import { Positions } from 'enums/options';

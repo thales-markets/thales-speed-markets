@@ -11,7 +11,6 @@ import { ShareIcon } from 'pages/Trade/components/OpenPosition/OpenPosition';
 import useUserActiveChainedSpeedMarketsDataQuery from 'queries/options/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
 import useUserActiveSpeedMarketsDataQuery from 'queries/options/speedMarkets/useUserActiveSpeedMarketsDataQuery';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
-import useClaimablePositionsQuery from 'queries/profile/useClaimablePositionsQuery';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -45,15 +44,6 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
 
     const [openTwitterShareModal, setOpenTwitterShareModal] = useState<boolean>(false);
     const [positionsShareData, setPositionShareData] = useState<SharePositionData | null>(null);
-
-    const claimablePositionsQuery = useClaimablePositionsQuery(networkId, searchAddress || walletAddress, {
-        enabled: isAppReady && isWalletConnected && !isOnlySpeedMarketsSupported(networkId),
-    });
-
-    const claimablePositions: UserPosition[] = useMemo(
-        () => (claimablePositionsQuery.isSuccess && claimablePositionsQuery.data ? claimablePositionsQuery.data : []),
-        [claimablePositionsQuery.isSuccess, claimablePositionsQuery.data]
-    );
 
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
         networkId,
@@ -190,11 +180,11 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
         );
 
         return orderBy(
-            claimablePositions.concat(speedMarketsOpenPositions).concat(chainedSpeedMarketsOpenPositions),
+            speedMarketsOpenPositions.concat(chainedSpeedMarketsOpenPositions),
             ['maturityDate', 'value'],
             ['asc', 'desc']
         );
-    }, [claimablePositions, userOpenSpeedMarketsData, userOpenChainedSpeedMarketsDataWithPrices]);
+    }, [userOpenSpeedMarketsData, userOpenChainedSpeedMarketsDataWithPrices]);
 
     const filteredData = useMemo(() => {
         if (searchText === '') return data;
@@ -339,7 +329,9 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
         <>
             <TileTable
                 rows={rows as any}
-                isLoading={claimablePositionsQuery.isLoading || userActiveSpeedMarketsDataQuery.isLoading}
+                isLoading={
+                    userActiveSpeedMarketsDataQuery.isLoading || userActiveChainedSpeedMarketsDataQuery.isLoading
+                }
                 hideFlow
             />
             {positionsShareData !== null && openTwitterShareModal && (

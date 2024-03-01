@@ -3,17 +3,15 @@ import {
     BATCH_NUMBER_OF_SPEED_MARKETS,
     MAX_NUMBER_OF_SPEED_MARKETS_TO_FETCH,
     MIN_MATURITY,
-    OPTIONS_POSITIONS_MAP,
-    SIDE,
+    SIDE_TO_POSITION_MAP,
     SPEED_MARKETS_QUOTE,
-} from 'constants/options';
+} from 'constants/market';
 import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
-import { Positions } from 'enums/options';
 import { UseQueryOptions, useQuery } from 'react-query';
 import { NetworkId, bigNumberFormatter, coinFormatter, formatCurrencyWithSign, parseBytes32String } from 'thales-utils';
-import { OptionSide, UserClosedPositions } from 'types/options';
+import { UserClosedPositions } from 'types/options';
 import snxJSConnector from 'utils/snxJSConnector';
 import { getFeesFromHistory } from 'utils/speedAmm';
 
@@ -57,7 +55,7 @@ const useUserResolvedSpeedMarketsDataQuery = (
 
                 for (let i = 0; i < userResolvedMarkets.length; i++) {
                     const marketData = userResolvedMarkets[i];
-                    const side = OPTIONS_POSITIONS_MAP[SIDE[marketData.direction] as OptionSide] as Positions;
+                    const side = SIDE_TO_POSITION_MAP[marketData.direction];
                     const payout = coinFormatter(marketData.buyinAmount, networkId) * SPEED_MARKETS_QUOTE;
                     const maturityDate = secondsToMilliseconds(Number(marketData.strikeTime));
 

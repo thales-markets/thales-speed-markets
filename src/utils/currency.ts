@@ -6,7 +6,7 @@ import {
     currencyKeyToNameMap,
 } from 'constants/currency';
 import { Coins } from 'thales-utils';
-import { CollateralsBalance } from 'types/collaterals';
+import { CollateralsBalance } from 'types/collateral';
 import { SupportedNetwork } from 'types/network';
 
 // TODO: replace this with a more robust logic (like checking the asset field)

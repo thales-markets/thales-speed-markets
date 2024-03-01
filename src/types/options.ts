@@ -3,27 +3,7 @@ import { BigNumber } from 'ethers';
 
 type Phase = 'trading' | 'maturity' | 'expiry';
 
-export type OptionSide = 'long' | 'short';
-
-type OptionType = 'up' | 'down' | 'in' | 'out';
-
-type RangedMarketPositionType = 'in' | 'out';
-
-type OptionsTransactionType = 'mint' | 'exercise' | 'buy' | 'sell';
-
-export type OptionsTransaction = {
-    hash: string;
-    type: OptionsTransactionType;
-    account?: string;
-    currencyKey?: string;
-    timestamp: number;
-    side: OptionSide | RangedMarketPositionType;
-    amount: number | string;
-    market: string;
-    status?: 'pending' | 'confirmed';
-    price?: number;
-    blockNumber: number;
-};
+type OptionType = 'up' | 'down';
 
 export type HistoricalOptionsMarketInfo = {
     address: string;
@@ -47,7 +27,7 @@ export type HistoricalOptionsMarketInfo = {
     shortAddress: string;
     customMarket: boolean;
     customOracle: string;
-    result: OptionSide;
+    result: number;
     availableLongs: number;
     availableShorts: number;
     discountedSide?: string;
@@ -126,7 +106,7 @@ export type Trade = {
     blockNumber: number;
     market: string;
     orderSide: OrderSide;
-    optionSide: OptionSide | RangedMarketPositionType;
+    optionSide: number;
 };
 
 export type UserLivePositions = {
@@ -205,7 +185,7 @@ export type SpeedMarket = {
     strikePrice: number;
     maturityDate: number;
     isOpen: boolean;
-    result: OptionSide | null;
+    result: number;
     finalPrice?: number;
     isSpeedMarket: boolean;
     isChainedSpeedMarket?: boolean;

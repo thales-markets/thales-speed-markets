@@ -1,6 +1,5 @@
 import TileTable from 'components/TileTable';
-import { OPTIONS_POSITIONS_MAP } from 'constants/options';
-import { Positions } from 'enums/options';
+import { SIDE_TO_POSITION_MAP } from 'constants/market';
 import useUserChainedSpeedMarketsTransactionsQuery from 'queries/options/speedMarkets/useUserChainedSpeedMarketsTransactionsQuery';
 import useUserSpeedMarketsTransactionsQuery from 'queries/options/speedMarkets/useUserSpeedMarketsTransactionsQuery';
 import React, { useMemo } from 'react';
@@ -17,7 +16,7 @@ import {
     formatShortDateWithTime,
     getEtherscanTxLink,
 } from 'thales-utils';
-import { HistoricalOptionsMarketInfo, OptionSide, RangedMarket, SpeedMarket } from 'types/options';
+import { HistoricalOptionsMarketInfo, SpeedMarket } from 'types/options';
 import { TradeWithMarket } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
@@ -97,7 +96,6 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ searchAddress, 
                     if (typeof row === 'string') {
                         return row;
                     }
-                    const isRanged = row.optionSide === 'in' || row.optionSide == 'out';
                     const isSpeedMarket = (row.marketItem as SpeedMarket)?.isSpeedMarket;
                     const marketExpired = row.marketItem.result;
                     const optionPrice =
@@ -109,11 +107,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ searchAddress, 
                         { title: row.orderSide, value: formatHoursAndMinutesFromTimestamp(row.timestamp) },
                         {
                             title: t('profile.history.strike'),
-                            value: isRanged
-                                ? `$${formatCurrency((row.marketItem as RangedMarket).leftPrice)} - $${formatCurrency(
-                                      (row.marketItem as RangedMarket).rightPrice
-                                  )}`
-                                : `$${formatCurrency((row.marketItem as HistoricalOptionsMarketInfo).strikePrice)}`,
+                            value: `$${formatCurrency((row.marketItem as HistoricalOptionsMarketInfo).strikePrice)}`,
                         },
                         {
                             title: t('profile.history.price'),
@@ -123,7 +117,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ searchAddress, 
                             title: t('profile.history.amount'),
                             value: getAmount(
                                 formatCurrency(amount),
-                                OPTIONS_POSITIONS_MAP[row.optionSide as OptionSide] as Positions,
+                                SIDE_TO_POSITION_MAP[row.optionSide],
                                 theme,
                                 (row.marketItem as SpeedMarket).isChainedSpeedMarket
                             ),

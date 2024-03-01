@@ -2,7 +2,7 @@ import { CRYPTO_CURRENCY_MAP, SYNTHS_MAP } from 'constants/currency';
 import QUERY_KEYS from 'constants/queryKeys';
 import { UseQueryOptions, useQuery } from 'react-query';
 import { COLLATERAL_DECIMALS, Coins, NetworkId, bigNumberFormatter } from 'thales-utils';
-import { CollateralsBalance } from 'types/collaterals';
+import { CollateralsBalance } from 'types/collateral';
 import snxJSConnector from 'utils/snxJSConnector';
 
 const useMultipleCollateralBalanceQuery = (

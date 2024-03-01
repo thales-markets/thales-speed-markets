@@ -1,6 +1,6 @@
 import Button from 'components/Button';
 import SimpleLoader from 'components/SimpleLoader/SimpleLoader';
-import { SPEED_MARKETS_OVERVIEW_SECTIONS as SECTIONS } from 'constants/options';
+import { SPEED_MARKETS_OVERVIEW_SECTIONS as SECTIONS } from 'constants/market';
 import { millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
 import { Positions } from 'enums/options';
 import useInterval from 'hooks/useInterval';

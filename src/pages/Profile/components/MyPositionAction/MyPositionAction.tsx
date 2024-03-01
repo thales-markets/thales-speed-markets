@@ -15,7 +15,6 @@ import { USD_SIGN } from 'constants/currency';
 import { ZERO_ADDRESS } from 'constants/network';
 import { CONNECTION_TIMEOUT_MS, PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
 import { differenceInSeconds, millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
-import { Positions } from 'enums/options';
 import { BigNumber, ethers } from 'ethers';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -59,8 +58,6 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
 }) => {
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
-
-    const isRangedMarket = [Positions.IN, Positions.OUT].includes(position.side);
 
     const networkId = useSelector((state: RootState) => getNetworkId(state));
     const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
@@ -125,7 +122,6 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
         isWalletConnected,
         hasAllowance,
         isAllowing,
-        isRangedMarket,
         isDefaultCollateral,
     ]);
 

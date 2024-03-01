@@ -19,7 +19,6 @@ export const AreaSeriesComponent: React.FC<{
     const [series, setSeries] = useState<ISeriesApi<'Area'> | undefined>();
     const [rangeSeries, setRangeSeries] = useState<ISeriesApi<'Area'> | undefined>();
     const [dataSeries, setDataSeries] = useState<any>([]);
-    const [rangeDataSeries, setRangeDataSeries] = useState<any>([]);
 
     useEffect(() => {
         if (series) {
@@ -86,20 +85,8 @@ export const AreaSeriesComponent: React.FC<{
                 value: selectedPrice,
             });
             setDataSeries(lineDataSelected);
-            if (selectedRightPrice) {
-                const rangeSeriesLocal = lineDataSelected.map((singleData: any) => {
-                    return {
-                        ...singleData,
-                        value: selectedRightPrice,
-                    };
-                });
-                setRangeDataSeries(rangeSeriesLocal);
-            } else {
-                setRangeDataSeries([]);
-            }
         } else {
             setDataSeries([]);
-            setRangeDataSeries([]);
         }
     }, [selectedPrice, selectedDate, position, data, asset, selectedRightPrice]);
 
@@ -129,43 +116,9 @@ export const AreaSeriesComponent: React.FC<{
                         bottomColor: position === Positions.UP ? Colors.GREEN_DARK_START : Colors.RED_END,
                         invertFilledArea: position === Positions.UP,
                     });
-                } else {
-                    series.applyOptions({
-                        topColor: position === Positions.OUT ? Colors.GREEN_DARK_START : Colors.GREEN_IN_END,
-                        bottomColor: position === Positions.OUT ? Colors.GREEN_DARK_END : Colors.GREEN_IN_START,
-                        invertFilledArea: position === Positions.IN,
-                    });
                 }
             } else {
                 series.setData([]);
-            }
-        }
-        if (rangeSeries) {
-            if (rangeDataSeries.length) {
-                rangeSeries.setMarkers([]);
-                const dataInLocalTime = rangeDataSeries.map((data: any) => {
-                    return {
-                        ...data,
-                        time: timeToLocal(data.time),
-                    };
-                });
-                rangeSeries.setData(dataInLocalTime);
-                rangeSeries?.setMarkers([
-                    {
-                        time: dataInLocalTime[dataInLocalTime.length - 1].time,
-                        position: 'inBar',
-                        size: 0.1,
-                        color: Colors.GREEN,
-                        shape: 'circle',
-                    },
-                ]);
-                rangeSeries.applyOptions({
-                    topColor: position === Positions.OUT ? Colors.GREEN_DARK_END : Colors.GREEN_IN_START,
-                    bottomColor: position === Positions.OUT ? Colors.GREEN_DARK_START : Colors.GREEN_IN_END,
-                    invertFilledArea: position === Positions.OUT,
-                });
-            } else {
-                rangeSeries.setData([]);
             }
         }
         // eslint-disable-next-line

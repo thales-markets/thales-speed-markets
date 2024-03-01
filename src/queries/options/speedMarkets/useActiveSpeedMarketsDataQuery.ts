@@ -1,13 +1,12 @@
 import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
+import { SIDE_TO_POSITION_MAP, SPEED_MARKETS_QUOTE } from 'constants/market';
 import { ZERO_ADDRESS } from 'constants/network';
-import { OPTIONS_POSITIONS_MAP, SIDE, SPEED_MARKETS_QUOTE } from 'constants/options';
 import { CONNECTION_TIMEOUT_MS, PYTH_CURRENCY_DECIMALS, SUPPORTED_ASSETS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
-import { Positions } from 'enums/options';
 import { UseQueryOptions, useQuery } from 'react-query';
 import { NetworkId, bigNumberFormatter, coinFormatter, parseBytes32String } from 'thales-utils';
-import { OptionSide, UserLivePositions } from 'types/options';
+import { UserLivePositions } from 'types/options';
 import { getCurrentPrices, getPriceId, getPriceServiceEndpoint } from 'utils/pyth';
 import snxJSConnector from 'utils/snxJSConnector';
 import { getFeesFromHistory } from 'utils/speedAmm';
@@ -40,7 +39,7 @@ const useActiveSpeedMarketsDataQuery = (networkId: NetworkId, options?: UseQuery
                 // Matured markets - not resolved
                 for (let i = 0; i < maturedMarkets.length; i++) {
                     const marketData = maturedMarkets[i];
-                    const side = OPTIONS_POSITIONS_MAP[SIDE[marketData.direction] as OptionSide] as Positions;
+                    const side = SIDE_TO_POSITION_MAP[marketData.direction];
                     const payout = coinFormatter(marketData.buyinAmount, networkId) * SPEED_MARKETS_QUOTE;
 
                     const maturityDate = secondsToMilliseconds(Number(marketData.strikeTime));
@@ -86,7 +85,7 @@ const useActiveSpeedMarketsDataQuery = (networkId: NetworkId, options?: UseQuery
                 for (let i = 0; i < openMarkets.length; i++) {
                     const marketData = openMarkets[i];
                     const currencyKey = parseBytes32String(marketData.asset);
-                    const side = OPTIONS_POSITIONS_MAP[SIDE[marketData.direction] as OptionSide] as Positions;
+                    const side = SIDE_TO_POSITION_MAP[marketData.direction];
                     const payout = coinFormatter(marketData.buyinAmount, networkId) * SPEED_MARKETS_QUOTE;
 
                     const lpFee = !marketData.lpFee.isZero()

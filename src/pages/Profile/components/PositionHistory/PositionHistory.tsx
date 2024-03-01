@@ -5,14 +5,12 @@ import { ZERO_ADDRESS } from 'constants/network';
 import { orderBy } from 'lodash';
 import useUserResolvedChainedSpeedMarketsDataQuery from 'queries/options/speedMarkets/useUserResolvedChainedSpeedMarketsDataQuery';
 import useUserResolvedSpeedMarketsDataQuery from 'queries/options/speedMarkets/useUserResolvedSpeedMarketsDataQuery';
-import useClosedPositionsQuery from 'queries/profile/useClosedPositionsQuery';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
 import { getIsWalletConnected, getNetworkId, getWalletAddress } from 'redux/modules/wallet';
-import { RootState } from 'types/ui';
 import { useTheme } from 'styled-components';
 import {
     coinParser,
@@ -22,7 +20,7 @@ import {
     formatShortDateWithTime,
 } from 'thales-utils';
 import { UserPosition } from 'types/profile';
-import { ThemeInterface } from 'types/ui';
+import { RootState, ThemeInterface } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { buildOptionsMarketLink, buildRangeMarketLink } from 'utils/routes';
 import { IconLink, getAmount, getStatus } from '../styled-components';
@@ -40,15 +38,6 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
     const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
-
-    const closedPositionsQuery = useClosedPositionsQuery(networkId, searchAddress || walletAddress, {
-        enabled: isAppReady && isWalletConnected && !isOnlySpeedMarketsSupported(networkId),
-    });
-
-    const closedPositions: UserPosition[] = useMemo(
-        () => (closedPositionsQuery.isSuccess && closedPositionsQuery.data ? closedPositionsQuery.data : []),
-        [closedPositionsQuery.isSuccess, closedPositionsQuery.data]
-    );
 
     const closedSpeedMarketsDataQuery = useUserResolvedSpeedMarketsDataQuery(
         networkId,
@@ -135,11 +124,11 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
         });
 
         return orderBy(
-            closedPositions.concat(speedMarketsClosedPositions).concat(chainedSpeedMarketsClosedPositions),
+            speedMarketsClosedPositions.concat(chainedSpeedMarketsClosedPositions),
             ['maturityDate'],
             ['desc']
         );
-    }, [closedPositions, closedSpeedMarketsData, closedChainedSpeedMarketsData, networkId]);
+    }, [closedSpeedMarketsData, closedChainedSpeedMarketsData, networkId]);
 
     const filteredData = useMemo(() => {
         if (searchText === '') return data;
@@ -223,7 +212,12 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
         return [];
     }, [filteredData, isMobile, t, theme]);
 
-    return <TileTable rows={rows as any} isLoading={closedPositionsQuery.isLoading} />;
+    return (
+        <TileTable
+            rows={rows as any}
+            isLoading={closedSpeedMarketsDataQuery.isLoading || closedChainedSpeedMarketsDataQuery.isLoading}
+        />
+    );
 };
 
 export default PositionHistory;

@@ -1,13 +1,12 @@
+import { SIDE_TO_POSITION_MAP } from 'constants/market';
 import { ZERO_ADDRESS } from 'constants/network';
-import { OPTIONS_POSITIONS_MAP, SIDE } from 'constants/options';
 import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { secondsToMilliseconds } from 'date-fns';
-import { Positions } from 'enums/options';
 import { parseBytes32String } from 'ethers/lib/utils.js';
 import { UseQueryOptions, useQuery } from 'react-query';
 import { NetworkId, bigNumberFormatter, coinFormatter, roundNumberToDecimals } from 'thales-utils';
-import { ChainedSpeedMarket, OptionSide } from 'types/options';
+import { ChainedSpeedMarket } from 'types/options';
 import snxJSConnector from 'utils/snxJSConnector';
 
 const useActiveChainedSpeedMarketsDataQuery = (
@@ -37,9 +36,7 @@ const useActiveChainedSpeedMarketsDataQuery = (
                 for (let i = 0; i < activeMarkets.length; i++) {
                     const marketData = activeMarkets[i];
 
-                    const sides = marketData.directions.map(
-                        (direction: number) => OPTIONS_POSITIONS_MAP[SIDE[direction] as OptionSide] as Positions
-                    );
+                    const sides = marketData.directions.map((direction: number) => SIDE_TO_POSITION_MAP[direction]);
                     const maturityDate = secondsToMilliseconds(Number(marketData.strikeTime));
                     const strikeTimes = Array(sides.length)
                         .fill(0)

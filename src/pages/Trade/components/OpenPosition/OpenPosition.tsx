@@ -1,25 +1,20 @@
-import SPAAnchor from 'components/SPAAnchor/SPAAnchor';
 import Tooltip from 'components/Tooltip';
 import { USD_SIGN } from 'constants/currency';
 import { secondsToMilliseconds } from 'date-fns';
-import { Positions } from 'enums/options';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import useInterval from 'hooks/useInterval';
 import MyPositionAction from 'pages/Profile/components/MyPositionAction/MyPositionAction';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { getIsMobile } from 'redux/modules/ui';
 import { getNetworkId, getWalletAddress } from 'redux/modules/wallet';
-import { RootState } from 'types/ui';
 import styled, { useTheme } from 'styled-components';
 import { formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
 import { UserLivePositions } from 'types/options';
-import { ThemeInterface } from 'types/ui';
+import { RootState, ThemeInterface } from 'types/ui';
 import { formatNumberShort } from 'utils/formatters/number';
 import { getColorPerPosition } from 'utils/options';
 import { refetchUserSpeedMarkets } from 'utils/queryConnector';
-import { buildOptionsMarketLink, buildRangeMarketLink } from 'utils/routes';
 import SharePositionModal from '../AmmTrading/components/SharePositionModal';
 
 type OpenPositionProps = {
@@ -40,14 +35,11 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
 
     const networkId = useSelector((state: RootState) => getNetworkId(state));
     const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
-    const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const [openTwitterShareModal, setOpenTwitterShareModal] = useState(false);
     const [isSpeedMarketMatured, setIsSpeedMarketMatured] = useState(
         position.isSpeedMarket && Date.now() > position.maturityDate
     );
-
-    const isRanged = [Positions.IN, Positions.OUT].includes(position.side);
 
     useInterval(() => {
         if (position.isSpeedMarket && Date.now() > position.maturityDate) {
@@ -137,31 +129,6 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
                     />
                 )}
             </ShareDiv>
-            {!position.isSpeedMarket && (
-                <SPAAnchor
-                    href={
-                        isRanged
-                            ? buildRangeMarketLink(position.market, position.side)
-                            : buildOptionsMarketLink(position.market, position.side)
-                    }
-                >
-                    {isMobile ? (
-                        <TextLink>
-                            {t('profile.go-to-market')}{' '}
-                            <IconLink
-                                className="icon icon--right"
-                                fontSize="10px"
-                                marginTop="-2px"
-                                color={theme.link.textColor.primary}
-                            />
-                        </TextLink>
-                    ) : (
-                        <Tooltip overlay={t('common.tooltip.open-market')}>
-                            <IconLink className="icon icon--right" />
-                        </Tooltip>
-                    )}
-                </SPAAnchor>
-            )}
             {openTwitterShareModal && (
                 <SharePositionModal
                     type={
@@ -264,23 +231,6 @@ const Separator = styled.div`
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         display: none;
     }
-`;
-
-const TextLink = styled.span`
-    text-transform: uppercase;
-    font-size: 13px;
-    font-weight: 700;
-    color: ${(props) => props.theme.link.textColor.primary};
-    &:hover {
-        text-decoration: underline;
-    }
-`;
-
-const IconLink = styled.i<{ color?: string; fontSize?: string; marginTop?: string }>`
-    font-size: ${(props) => props.fontSize || '20px'};
-    color: ${(props) => props.color || props.theme.textColor.secondary};
-    text-transform: none;
-    margin-top: ${(props) => props.marginTop || '0px'};
 `;
 
 const ShareDiv = styled.div`

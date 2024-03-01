@@ -21,7 +21,7 @@ import { RootState, ThemeInterface } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getPriceId } from 'utils/pyth';
 import { history } from 'utils/routes';
-import { MARKET_DURATION_IN_DAYS } from '../../constants/options';
+import { MARKET_DURATION_IN_DAYS } from '../../constants/market';
 import ClaimablePositions from './components/ClaimablePositions';
 import OpenPositions from './components/OpenPositions';
 import PositionHistory from './components/PositionHistory';

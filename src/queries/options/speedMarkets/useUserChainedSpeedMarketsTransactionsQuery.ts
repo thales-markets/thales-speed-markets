@@ -1,15 +1,10 @@
-import {
-    BATCH_NUMBER_OF_SPEED_MARKETS,
-    MAX_NUMBER_OF_SPEED_MARKETS_TO_FETCH,
-    MIN_MATURITY,
-    SIDE,
-} from 'constants/options';
+import { BATCH_NUMBER_OF_SPEED_MARKETS, MAX_NUMBER_OF_SPEED_MARKETS_TO_FETCH, MIN_MATURITY } from 'constants/market';
 import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { secondsToMilliseconds } from 'date-fns';
 import { UseQueryOptions, useQuery } from 'react-query';
 import { NetworkId, bigNumberFormatter, coinFormatter, parseBytes32String, roundNumberToDecimals } from 'thales-utils';
-import { OptionSide, SpeedMarket } from 'types/options';
+import { SpeedMarket } from 'types/options';
 import { TradeWithMarket } from 'types/profile';
 import snxJSConnector from 'utils/snxJSConnector';
 
@@ -84,7 +79,7 @@ const useUserChainedSpeedMarketsTransactionsQuery = (
                     const marketData = filteredMarketsData[i];
 
                     const maturityDate = secondsToMilliseconds(Number(marketData.strikeTime));
-                    const sides = marketData.directions.map((direction: number) => SIDE[direction] as OptionSide);
+                    const sides = marketData.directions.map((direction: number) => direction);
                     const side = marketData.resolved ? sides[sides.length - 1] : sides[0];
                     const buyinAmount = coinFormatter(marketData.buyinAmount, networkId);
                     const payout = roundNumberToDecimals(
@@ -147,7 +142,7 @@ const useUserChainedSpeedMarketsTransactionsQuery = (
                         userData.timestamp = 1702229901000;
                         userData.makerAmount = roundNumberToDecimals(5 * 1.9 ** 6, 8);
                         userData.takerAmount = 5.1;
-                        userData.optionSide = SIDE[0] as OptionSide;
+                        userData.optionSide = 0;
 
                         userData.marketItem = {
                             address: userData.market,
@@ -156,7 +151,7 @@ const useUserChainedSpeedMarketsTransactionsQuery = (
                             strikePrice: 43890.09284569,
                             maturityDate: 1702233501000,
                             isOpen: false,
-                            result: SIDE[0] as OptionSide,
+                            result: 0,
                             finalPrice: 43869.69322549,
                             isSpeedMarket: true,
                             isChainedSpeedMarket: true,
@@ -177,7 +172,7 @@ const useUserChainedSpeedMarketsTransactionsQuery = (
                         userData.timestamp = 1701461351000;
                         userData.makerAmount = roundNumberToDecimals(5 * 1.9 ** 6, 8);
                         userData.takerAmount = 5.1;
-                        userData.optionSide = SIDE[1] as OptionSide;
+                        userData.optionSide = 1;
 
                         userData.marketItem = {
                             address: userData.market,
@@ -186,7 +181,7 @@ const useUserChainedSpeedMarketsTransactionsQuery = (
                             strikePrice: 38770.95500499,
                             maturityDate: 1701464951000,
                             isOpen: false,
-                            result: SIDE[1] as OptionSide,
+                            result: 1,
                             finalPrice: 38797.0925,
                             isSpeedMarket: true,
                             isChainedSpeedMarket: true,

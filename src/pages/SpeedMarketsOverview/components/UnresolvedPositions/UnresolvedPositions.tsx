@@ -2,7 +2,7 @@ import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
 import Button from 'components/Button';
 import SimpleLoader from 'components/SimpleLoader/SimpleLoader';
 import { CRYPTO_CURRENCY_MAP, USD_SIGN } from 'constants/currency';
-import { SPEED_MARKETS_OVERVIEW_SECTIONS as SECTIONS } from 'constants/options';
+import { SPEED_MARKETS_OVERVIEW_SECTIONS as SECTIONS } from 'constants/market';
 import { CONNECTION_TIMEOUT_MS, SUPPORTED_ASSETS } from 'constants/pyth';
 import { millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
 import { Positions } from 'enums/options';

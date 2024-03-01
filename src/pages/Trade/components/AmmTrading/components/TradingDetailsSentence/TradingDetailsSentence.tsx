@@ -82,10 +82,6 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
             ? t('common.above')
             : market.positionType === Positions.DOWN
             ? t('common.below')
-            : market.positionType === Positions.IN
-            ? t('common.between')
-            : market.positionType === Positions.OUT
-            ? t('common.not-between')
             : '';
 
     const chainedPositions = (market as SpeedMarketsTrade).chainedPositions || [];

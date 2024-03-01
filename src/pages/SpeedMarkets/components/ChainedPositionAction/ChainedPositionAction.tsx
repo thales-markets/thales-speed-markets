@@ -13,7 +13,7 @@ import {
 import Tooltip from 'components/Tooltip';
 import { USD_SIGN } from 'constants/currency';
 import { ZERO_ADDRESS } from 'constants/network';
-import { ONE_HUNDRED_AND_THREE_PERCENT } from 'constants/options';
+import { ONE_HUNDRED_AND_THREE_PERCENT } from 'constants/market';
 import { CONNECTION_TIMEOUT_MS, PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
 import { differenceInSeconds, millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
 import { BigNumber, ethers } from 'ethers';

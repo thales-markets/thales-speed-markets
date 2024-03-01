@@ -2,15 +2,13 @@ import {
     BATCH_NUMBER_OF_SPEED_MARKETS,
     MAX_NUMBER_OF_SPEED_MARKETS_TO_FETCH,
     MIN_MATURITY,
-    SIDE,
     SPEED_MARKETS_QUOTE,
-} from 'constants/options';
+} from 'constants/market';
 import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
 import { UseQueryOptions, useQuery } from 'react-query';
 import { NetworkId, bigNumberFormatter, coinFormatter, parseBytes32String } from 'thales-utils';
-import { OptionSide } from 'types/options';
 import { TradeWithMarket } from 'types/profile';
 import snxJSConnector from 'utils/snxJSConnector';
 import { getFeesFromHistory } from 'utils/speedAmm';
@@ -56,7 +54,7 @@ const useUserSpeedMarketsTransactionsQuery = (
 
                 for (let i = 0; i < filteredMarketsData.length; i++) {
                     const marketData = filteredMarketsData[i];
-                    const side = SIDE[marketData.direction] as OptionSide;
+                    const side = marketData.direction;
                     const payout = coinFormatter(marketData.buyinAmount, networkId) * SPEED_MARKETS_QUOTE;
 
                     const createdAt = !marketData.createdAt.isZero()
