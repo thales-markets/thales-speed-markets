@@ -18,7 +18,6 @@ import { isFirefox, isIos, isMetamask } from 'thales-utils';
 import { SharePositionData } from 'types/flexCards';
 import { RootState } from 'types/ui';
 import ChainedSpeedMarketFlexCard from './components/ChainedSpeedMarketFlexCard';
-import MarketFlexCard from './components/MarketFlexCard';
 import SpeedMarketFlexCard from './components/SpeedMarketFlexCard';
 
 type SharePositionModalProps = SharePositionData & {
@@ -36,8 +35,6 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
     currencyKey,
     strikePrices,
     finalPrices,
-    leftPrice,
-    rightPrice,
     strikeDate,
     buyIn,
     payout,
@@ -52,7 +49,6 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
     const [toastId, setToastId] = useState<string | number>(0);
     const [isMetamaskBrowser, setIsMetamaskBrowser] = useState(false);
 
-    const isRegularMarkets = ['potential', 'resolved'].includes(type);
     const isSpeedMarkets = ['potential-speed', 'resolved-speed'].includes(type);
     const isChainedMarkets = ['chained-speed-won', 'chained-speed-lost'].includes(type);
 
@@ -144,11 +140,7 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
                     const twitterLinkWithStatusMessage =
                         LINKS.TwitterTweetStatus +
                         TWITTER_MESSAGE_CHECKOUT +
-                        (isRegularMarkets
-                            ? LINKS.Markets.Home
-                            : isSpeedMarkets
-                            ? LINKS.Markets.Speed
-                            : LINKS.Markets.ChainedSpeed) +
+                        (isSpeedMarkets ? LINKS.Markets.Speed : LINKS.Markets.ChainedSpeed) +
                         (useDownloadImage ? TWITTER_MESSAGE_UPLOAD : TWITTER_MESSAGE_PASTE);
 
                     // Mobile requires user action in order to open new window, it can't open in async call, so adding <a>
@@ -208,7 +200,7 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
                 }
             }
         },
-        [isLoading, useDownloadImage, isMobile, t, onClose, isRegularMarkets, isSpeedMarkets]
+        [isLoading, useDownloadImage, isMobile, t, onClose, isSpeedMarkets]
     );
 
     const onTwitterShareClick = () => {
@@ -254,19 +246,6 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
         >
             <Container ref={ref}>
                 {!isMobile && <CloseIcon className={`icon icon--x-sign`} onClick={onClose} />}
-                {isRegularMarkets && (
-                    <MarketFlexCard
-                        type={type}
-                        currencyKey={currencyKey}
-                        positions={positions}
-                        strikeDate={strikeDate}
-                        strikePrices={strikePrices}
-                        leftPrice={leftPrice}
-                        rightPrice={rightPrice}
-                        buyIn={buyIn}
-                        payout={payout}
-                    />
-                )}
                 {isSpeedMarkets && (
                     <SpeedMarketFlexCard
                         type={type}

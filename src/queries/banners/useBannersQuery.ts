@@ -1,15 +1,15 @@
+import axios from 'axios';
+import { generalConfig } from 'config/general';
 import QUERY_KEYS from 'constants/queryKeys';
 import { useQuery, UseQueryOptions } from 'react-query';
-import { generalConfig } from 'config/general';
-import axios from 'axios';
-import { Network } from 'enums/network';
+import { NetworkId } from 'thales-utils';
 
 export type Banner = {
     url: string;
     image: string;
 };
 
-export const useBannersQuery = (networkId: Network, options?: UseQueryOptions<Banner[]>) => {
+export const useBannersQuery = (networkId: NetworkId, options?: UseQueryOptions<Banner[]>) => {
     return useQuery<Banner[]>(
         QUERY_KEYS.Banners(networkId),
         async () => {

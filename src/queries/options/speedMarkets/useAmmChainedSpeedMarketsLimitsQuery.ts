@@ -1,14 +1,13 @@
 import { ZERO_ADDRESS } from 'constants/network';
 import QUERY_KEYS from 'constants/queryKeys';
-import { Network } from 'enums/network';
 import { BigNumber } from 'ethers';
 import { UseQueryOptions, useQuery } from 'react-query';
-import { bigNumberFormatter, coinFormatter } from 'thales-utils';
+import { NetworkId, bigNumberFormatter, coinFormatter } from 'thales-utils';
 import { AmmChainedSpeedMarketsLimits } from 'types/options';
 import snxJSConnector from 'utils/snxJSConnector';
 
 const useChainedAmmSpeedMarketsLimitsQuery = (
-    networkId: Network,
+    networkId: NetworkId,
     walletAddress?: string,
     options?: UseQueryOptions<AmmChainedSpeedMarketsLimits>
 ) => {

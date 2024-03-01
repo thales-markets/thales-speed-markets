@@ -2,18 +2,17 @@ import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
 import { ZERO_ADDRESS } from 'constants/network';
 import { OPTIONS_POSITIONS_MAP, SIDE } from 'constants/options';
 import QUERY_KEYS from 'constants/queryKeys';
-import { Network } from 'enums/network';
 import { Positions } from 'enums/options';
 import { BigNumber, ethers } from 'ethers';
-import { useQuery, UseQueryOptions } from 'react-query';
+import { UseQueryOptions, useQuery } from 'react-query';
+import { NetworkId, bigNumberFormatter, coinFormatter } from 'thales-utils';
 import { AmmSpeedMarketsLimits, OptionSide } from 'types/options';
-import { bigNumberFormatter, coinFormatter } from 'thales-utils';
 import snxJSConnector from 'utils/snxJSConnector';
 
 const MAX_BUYIN_COLLATERAL_CONVERSION_BUFFER = 10;
 
 const useAmmSpeedMarketsLimitsQuery = (
-    networkId: Network,
+    networkId: NetworkId,
     walletAddress?: string,
     options?: UseQueryOptions<AmmSpeedMarketsLimits>
 ) => {

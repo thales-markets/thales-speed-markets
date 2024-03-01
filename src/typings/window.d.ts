@@ -1,4 +1,4 @@
-import { Network } from 'enums/network';
+import { NetworkId } from 'thales-utils';
 
 interface RequestArguments {
     method: string;
@@ -10,17 +10,17 @@ declare global {
         web3?: {
             eth?: {
                 net: {
-                    getId: () => Network;
+                    getId: () => NetworkId;
                 };
             };
             version: {
                 getNetwork(cb: (err: Error | undefined, networkId: string) => void): void;
-                network: Network;
+                network: NetworkId;
             };
         };
         ethereum?: {
             on: (event: string, cb: () => void) => void;
-            networkVersion: Network;
+            networkVersion: NetworkId;
             request: (args: RequestArguments) => Promise<unknown>;
             isMetaMask: boolean;
         };

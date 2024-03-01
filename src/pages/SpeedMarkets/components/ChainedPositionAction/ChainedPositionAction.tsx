@@ -31,12 +31,11 @@ import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsMobile } from 'redux/modules/ui';
 import { getIsWalletConnected, getNetworkId, getSelectedCollateralIndex, getWalletAddress } from 'redux/modules/wallet';
-import { RootState } from 'types/ui';
 import { useTheme } from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
 import { coinParser, formatCurrencyWithSign, roundNumberToDecimals } from 'thales-utils';
 import { ChainedSpeedMarket } from 'types/options';
-import { ThemeInterface } from 'types/ui';
+import { RootState, ThemeInterface } from 'types/ui';
 import erc20Contract from 'utils/contracts/erc20Contract';
 import { getCollateral, getCollaterals, getDefaultCollateral } from 'utils/currency';
 import { checkAllowance, getIsMultiCollateralSupported } from 'utils/network';
@@ -78,9 +77,9 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
 
-    const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId, true);
+    const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
     const defaultCollateral = useMemo(() => getDefaultCollateral(networkId), [networkId]);
-    const selectedCollateral = useMemo(() => getCollateral(networkId, selectedCollateralIndex, true), [
+    const selectedCollateral = useMemo(() => getCollateral(networkId, selectedCollateralIndex), [
         networkId,
         selectedCollateralIndex,
     ]);
@@ -374,7 +373,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                     <CollateralSelectorContainer>
                         <InLabel color={theme.button.textColor.quaternary}>{t('common.in')}</InLabel>
                         <CollateralSelector
-                            collateralArray={getCollaterals(networkId, true)}
+                            collateralArray={getCollaterals(networkId)}
                             selectedItem={selectedCollateralIndex}
                             onChangeCollateral={() => {}}
                             disabled={isSubmitting || isAllowing}

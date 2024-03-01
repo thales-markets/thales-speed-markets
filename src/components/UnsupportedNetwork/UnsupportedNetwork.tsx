@@ -6,15 +6,15 @@ import { ReactComponent as PolygonLogo } from 'assets/images/polygon-circle-logo
 import { ReactComponent as ZkSyncLogo } from 'assets/images/zksync-circle-logo.svg';
 import Button from 'components/Button';
 import { TEST_NETWORKS } from 'constants/network';
-import { Network } from 'enums/network';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import { NetworkId } from 'thales-utils';
 import { SUPPORTED_NETWORK_IDS_MAP } from 'utils/network';
 
 type UnsupportedNetworkProps = {
-    supportedNetworks: Network[];
+    supportedNetworks: NetworkId[];
 };
 
 const UnsupportedNetwork: React.FC<UnsupportedNetworkProps> = ({ supportedNetworks }) => {
@@ -24,31 +24,31 @@ const UnsupportedNetwork: React.FC<UnsupportedNetworkProps> = ({ supportedNetwor
         (supportedNetwork) => !TEST_NETWORKS.includes(supportedNetwork)
     );
 
-    const getButton = (networkId: Network) => {
+    const getButton = (networkId: NetworkId) => {
         let logo;
         let text;
         switch (networkId) {
-            case Network.OptimismMainnet:
+            case NetworkId.OptimismMainnet:
                 logo = <OpLogo />;
                 text = t(`common.unsupported-network.button.optimism`);
                 break;
-            case Network.PolygonMainnet:
+            case NetworkId.PolygonMainnet:
                 logo = <PolygonLogo />;
                 text = t(`common.unsupported-network.button.polygon`);
                 break;
-            case Network.Arbitrum:
+            case NetworkId.Arbitrum:
                 logo = <ArbitrumLogo />;
                 text = t(`common.unsupported-network.button.arbitrum`);
                 break;
-            case Network.Base:
+            case NetworkId.Base:
                 logo = <StyledBaseLogo />;
                 text = t(`common.unsupported-network.button.base`);
                 break;
-            case Network.ZkSync:
+            case NetworkId.ZkSync:
                 logo = <ZkSyncLogo />;
                 text = t(`common.unsupported-network.button.zkSync`);
                 break;
-            case Network.BlastSepolia:
+            case NetworkId.BlastSepolia:
                 logo = (
                     <BlastLogoWrapper>
                         <BlastSepoliaLogo />

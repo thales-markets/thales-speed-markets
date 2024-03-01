@@ -1,16 +1,16 @@
-import { Network } from 'enums/network';
+import { NetworkId } from 'thales-utils';
 
 const chainedSpeedMarketsAMMContract = {
     addresses: {
-        [Network.OptimismMainnet]: '0xFf8Cf5ABF583D0979C0B9c35d62dd1fD52cce7C7',
-        [Network.OptimismGoerli]: '0xe9FdD4717f9dDAa7e74e9a63B559F54A38f98613',
-        [Network.OptimismSepolia]: 'TBD',
-        [Network.PolygonMainnet]: '0x14D2d7f64D6F10f8eF06372c2e5E36850661a537',
-        [Network.Arbitrum]: '0xe92B4c614b04c239d30c31A7ea1290AdDCb8217D',
-        [Network.Base]: '0x6848F001ddDb4442d352C495c7B4a231e3889b70',
-        [Network.ZkSync]: 'TBD',
-        [Network.ZkSyncSepolia]: 'TBD',
-        [Network.BlastSepolia]: 'TBD',
+        [NetworkId.OptimismMainnet]: '0xFf8Cf5ABF583D0979C0B9c35d62dd1fD52cce7C7',
+        [NetworkId.OptimismGoerli]: '0xe9FdD4717f9dDAa7e74e9a63B559F54A38f98613',
+        [NetworkId.OptimismSepolia]: 'TBD',
+        [NetworkId.PolygonMainnet]: '0x14D2d7f64D6F10f8eF06372c2e5E36850661a537',
+        [NetworkId.Arbitrum]: '0xe92B4c614b04c239d30c31A7ea1290AdDCb8217D',
+        [NetworkId.Base]: '0x6848F001ddDb4442d352C495c7B4a231e3889b70',
+        [NetworkId.ZkSync]: 'TBD',
+        [NetworkId.ZkSyncSepolia]: 'TBD',
+        [NetworkId.BlastSepolia]: 'TBD',
     },
     abi: [
         {

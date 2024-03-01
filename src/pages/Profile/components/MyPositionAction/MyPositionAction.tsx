@@ -68,9 +68,9 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
 
-    const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId, true);
+    const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
     const defaultCollateral = useMemo(() => getDefaultCollateral(networkId), [networkId]);
-    const selectedCollateral = useMemo(() => getCollateral(networkId, selectedCollateralIndex, true), [
+    const selectedCollateral = useMemo(() => getCollateral(networkId, selectedCollateralIndex), [
         networkId,
         selectedCollateralIndex,
     ]);
@@ -297,7 +297,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                     <CollateralSelectorContainer>
                         <InLabel color={theme.button.textColor.quaternary}>{t('common.in')}</InLabel>
                         <CollateralSelector
-                            collateralArray={getCollaterals(networkId, true)}
+                            collateralArray={getCollaterals(networkId)}
                             selectedItem={selectedCollateralIndex}
                             onChangeCollateral={() => {}}
                             disabled={isSubmitting || isAllowing}

@@ -48,7 +48,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({
     const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
-    const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId, true);
+    const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     // For sorting purpose as claimable status is unknown until all chained positions is rendered

@@ -10,16 +10,15 @@ import {
 import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
-import { Network } from 'enums/network';
 import { Positions } from 'enums/options';
-import { useQuery, UseQueryOptions } from 'react-query';
+import { UseQueryOptions, useQuery } from 'react-query';
+import { NetworkId, bigNumberFormatter, coinFormatter, formatCurrencyWithSign, parseBytes32String } from 'thales-utils';
 import { OptionSide, UserClosedPositions } from 'types/options';
-import { bigNumberFormatter, parseBytes32String, coinFormatter, formatCurrencyWithSign } from 'thales-utils';
 import snxJSConnector from 'utils/snxJSConnector';
 import { getFeesFromHistory } from 'utils/speedAmm';
 
 const useUserResolvedSpeedMarketsDataQuery = (
-    networkId: Network,
+    networkId: NetworkId,
     walletAddress: string,
     options?: UseQueryOptions<UserClosedPositions[]>
 ) => {

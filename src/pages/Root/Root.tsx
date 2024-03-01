@@ -18,12 +18,12 @@ import { PLAUSIBLE } from 'constants/analytics';
 import { BlastSepolia, base, optimismSepolia, zkSyncSepolia } from 'constants/network';
 import { ThemeMap } from 'constants/ui';
 import dotenv from 'dotenv';
-import { Network } from 'enums/network';
 import { merge } from 'lodash';
 import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Provider } from 'react-redux';
 import { Store } from 'redux';
+import { NetworkId } from 'thales-utils';
 import { getDefaultTheme } from 'utils/style';
 import { WagmiConfig, configureChains, createClient } from 'wagmi';
 import { arbitrum, optimism, optimismGoerli, polygon, zkSync } from 'wagmi/chains';
@@ -40,23 +40,23 @@ type RpcProvider = {
 };
 
 const CHAIN_TO_RPC_PROVIDER_NETWORK_NAME: Record<number, RpcProvider> = {
-    [Network.OptimismMainnet]: {
+    [NetworkId.OptimismMainnet]: {
         ankr: 'optimism',
         chainnode: 'optimism-mainnet',
         blast: 'optimism-mainnet',
     },
-    [Network.PolygonMainnet]: {
+    [NetworkId.PolygonMainnet]: {
         ankr: '',
         chainnode: 'polygon-mainnet',
         blast: 'polygon-mainnet',
     },
-    [Network.OptimismGoerli]: { ankr: 'optimism_testnet', chainnode: 'optimism-goerli', blast: 'optimism-goerli' },
-    [Network.OptimismSepolia]: { ankr: '', chainnode: '', blast: '' },
-    [Network.Arbitrum]: { ankr: 'arbitrum', chainnode: 'arbitrum-one', blast: 'arbitrum-one' },
-    [Network.Base]: { ankr: 'base', chainnode: 'base-mainnet', blast: '' },
-    [Network.ZkSync]: { ankr: '', chainnode: '', blast: '' },
-    [Network.ZkSyncSepolia]: { ankr: '', chainnode: '', blast: '' },
-    [Network.BlastSepolia]: { ankr: '', chainnode: '', blast: '' },
+    [NetworkId.OptimismGoerli]: { ankr: 'optimism_testnet', chainnode: 'optimism-goerli', blast: 'optimism-goerli' },
+    [NetworkId.OptimismSepolia]: { ankr: '', chainnode: '', blast: '' },
+    [NetworkId.Arbitrum]: { ankr: 'arbitrum', chainnode: 'arbitrum-one', blast: 'arbitrum-one' },
+    [NetworkId.Base]: { ankr: 'base', chainnode: 'base-mainnet', blast: '' },
+    [NetworkId.ZkSync]: { ankr: '', chainnode: '', blast: '' },
+    [NetworkId.ZkSyncSepolia]: { ankr: '', chainnode: '', blast: '' },
+    [NetworkId.BlastSepolia]: { ankr: '', chainnode: '', blast: '' },
 };
 
 const STALL_TIMEOUT = 2000;
@@ -69,10 +69,10 @@ const { chains, provider } = configureChains(
                 const chainnodeNetworkName = CHAIN_TO_RPC_PROVIDER_NETWORK_NAME[chain.id]?.chainnode;
                 return {
                     http:
-                        process.env.REACT_APP_PRIMARY_PROVIDER_ID === 'INFURA' && chain.id === Network.Base
+                        process.env.REACT_APP_PRIMARY_PROVIDER_ID === 'INFURA' && chain.id === NetworkId.Base
                             ? // For Base use Ankr when Infura is primary as Infura doesn't support it
                               `https://rpc.ankr.com/base/${process.env.REACT_APP_ANKR_PROJECT_ID}`
-                            : chain.id === Network.PolygonMainnet
+                            : chain.id === NetworkId.PolygonMainnet
                             ? // For Polygon always use Infura as Chainnode is having issues
                               `https://polygon-mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_PROJECT_ID}`
                             : !!chainnodeNetworkName

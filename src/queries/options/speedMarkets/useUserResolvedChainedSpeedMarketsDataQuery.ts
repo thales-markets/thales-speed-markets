@@ -7,16 +7,15 @@ import {
 import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { secondsToMilliseconds } from 'date-fns';
-import { Network } from 'enums/network';
 import { Positions } from 'enums/options';
 import { parseBytes32String } from 'ethers/lib/utils.js';
 import { UseQueryOptions, useQuery } from 'react-query';
-import { bigNumberFormatter, coinFormatter, roundNumberToDecimals } from 'thales-utils';
+import { NetworkId, bigNumberFormatter, coinFormatter, roundNumberToDecimals } from 'thales-utils';
 import { ChainedSpeedMarket, OptionSide } from 'types/options';
 import snxJSConnector from 'utils/snxJSConnector';
 
 const useUserResolvedChainedSpeedMarketsDataQuery = (
-    networkId: Network,
+    networkId: NetworkId,
     walletAddress: string,
     options?: UseQueryOptions<ChainedSpeedMarket[]>
 ) => {
@@ -47,14 +46,14 @@ const useUserResolvedChainedSpeedMarketsDataQuery = (
                             let marketAddresss;
                             // Hot fix for 2 markets when resolved with final price 0 and fetching data for that market is failing
                             if (
-                                networkId === Network.OptimismMainnet &&
+                                networkId === NetworkId.OptimismMainnet &&
                                 walletAddress === '0x5ef88d0a93e5773DB543bd421864504618A18de4' &&
                                 market === '0x79F6f48410fC659a274c0A236e19e581373bf2f9'
                             ) {
                                 // some other market address of this user
                                 marketAddresss = '0x6A01283c0F4579B55FB7214CaF619CFe72044b68';
                             } else if (
-                                networkId === Network.PolygonMainnet &&
+                                networkId === NetworkId.PolygonMainnet &&
                                 walletAddress === '0x8AAcec3D7077D04F19aC924d2743fc0DE1456941' &&
                                 market === '0x1e195Ea2ABf23C1A793F01c934692A230bb5Fc40'
                             ) {
@@ -129,7 +128,7 @@ const useUserResolvedChainedSpeedMarketsDataQuery = (
 
                     // Hot fix for 3 markets when resolved with final price 0 and fetching data for that market is failing
                     if (
-                        networkId === Network.OptimismMainnet &&
+                        networkId === NetworkId.OptimismMainnet &&
                         userData.address === '0x79F6f48410fC659a274c0A236e19e581373bf2f9'
                     ) {
                         userData.timestamp = 1702229901000;
@@ -171,12 +170,12 @@ const useUserResolvedChainedSpeedMarketsDataQuery = (
                         userData.paid = 5.1;
                         userData.isUserWinner = false;
                     } else if (
-                        networkId === Network.PolygonMainnet &&
+                        networkId === NetworkId.PolygonMainnet &&
                         userData.address === '0x9C5e5C979DbCaB721336AD3eD6eac76650F7eB2C'
                     ) {
                         userData.finalPrices = [38830.08275709];
                     } else if (
-                        networkId === Network.PolygonMainnet &&
+                        networkId === NetworkId.PolygonMainnet &&
                         userData.address === '0x1e195Ea2ABf23C1A793F01c934692A230bb5Fc40'
                     ) {
                         userData.timestamp = 1701461351000;

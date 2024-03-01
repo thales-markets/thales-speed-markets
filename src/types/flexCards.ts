@@ -14,8 +14,6 @@ export type SharePositionData = {
     currencyKey: string;
     strikePrices?: (number | string)[];
     finalPrices?: (number | string)[];
-    leftPrice?: number;
-    rightPrice?: number;
     strikeDate: number;
     buyIn: number;
     payout: number;

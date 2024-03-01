@@ -4,16 +4,15 @@ import { OPTIONS_POSITIONS_MAP, SIDE, SPEED_MARKETS_QUOTE } from 'constants/opti
 import { CONNECTION_TIMEOUT_MS, PYTH_CURRENCY_DECIMALS, SUPPORTED_ASSETS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
-import { Network } from 'enums/network';
 import { Positions } from 'enums/options';
 import { UseQueryOptions, useQuery } from 'react-query';
-import { bigNumberFormatter, coinFormatter, parseBytes32String } from 'thales-utils';
+import { NetworkId, bigNumberFormatter, coinFormatter, parseBytes32String } from 'thales-utils';
 import { OptionSide, UserLivePositions } from 'types/options';
 import { getCurrentPrices, getPriceId, getPriceServiceEndpoint } from 'utils/pyth';
 import snxJSConnector from 'utils/snxJSConnector';
 import { getFeesFromHistory } from 'utils/speedAmm';
 
-const useActiveSpeedMarketsDataQuery = (networkId: Network, options?: UseQueryOptions<UserLivePositions[]>) => {
+const useActiveSpeedMarketsDataQuery = (networkId: NetworkId, options?: UseQueryOptions<UserLivePositions[]>) => {
     return useQuery<UserLivePositions[]>(
         QUERY_KEYS.BinaryOptions.ActiveSpeedMarkets(networkId),
         async () => {

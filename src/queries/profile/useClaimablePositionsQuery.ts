@@ -1,17 +1,16 @@
-import { useQuery, UseQueryOptions } from 'react-query';
-import QUERY_KEYS from 'constants/queryKeys';
-import thalesData from 'thales-data';
-import { UserPosition } from 'types/profile';
-import { Network } from 'enums/network';
-import { bigNumberFormatter, coinFormatter } from 'thales-utils';
 import { POSITION_BALANCE_THRESHOLD } from 'constants/options';
+import QUERY_KEYS from 'constants/queryKeys';
 import { Positions } from 'enums/options';
-import { parseBytes32String } from 'ethers/lib/utils.js';
 import { BigNumber } from 'ethers';
+import { parseBytes32String } from 'ethers/lib/utils.js';
+import { useQuery, UseQueryOptions } from 'react-query';
+import thalesData from 'thales-data';
+import { bigNumberFormatter, coinFormatter, NetworkId } from 'thales-utils';
+import { UserPosition } from 'types/profile';
 import { getMinMaturityDateForClaim, isOptionClaimable } from 'utils/options';
 
 const useClaimablePositionsQuery = (
-    networkId: Network,
+    networkId: NetworkId,
     walletAddress: string,
     options?: UseQueryOptions<UserPosition[]>
 ) => {

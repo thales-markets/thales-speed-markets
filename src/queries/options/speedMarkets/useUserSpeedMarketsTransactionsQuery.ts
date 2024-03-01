@@ -8,16 +8,15 @@ import {
 import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
-import { Network } from 'enums/network';
 import { UseQueryOptions, useQuery } from 'react-query';
+import { NetworkId, bigNumberFormatter, coinFormatter, parseBytes32String } from 'thales-utils';
 import { OptionSide } from 'types/options';
 import { TradeWithMarket } from 'types/profile';
-import { bigNumberFormatter, coinFormatter, parseBytes32String } from 'thales-utils';
 import snxJSConnector from 'utils/snxJSConnector';
 import { getFeesFromHistory } from 'utils/speedAmm';
 
 const useUserSpeedMarketsTransactionsQuery = (
-    networkId: Network,
+    networkId: NetworkId,
     walletAddress: string,
     options?: UseQueryOptions<TradeWithMarket[]>
 ) => {

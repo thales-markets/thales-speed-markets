@@ -1,18 +1,17 @@
-import { useQuery, UseQueryOptions } from 'react-query';
+import { MAX_MATURITY, MIN_MATURITY, POSITION_BALANCE_THRESHOLD } from 'constants/options';
 import QUERY_KEYS from 'constants/queryKeys';
+import { Positions } from 'enums/options';
+import { BigNumber } from 'ethers';
+import { parseBytes32String } from 'ethers/lib/utils.js';
+import { useQuery, UseQueryOptions } from 'react-query';
 import thalesData from 'thales-data';
+import { bigNumberFormatter, coinFormatter, NetworkId } from 'thales-utils';
 import { HistoricalOptionsMarketInfo, OptionsTransaction, RangedMarket } from 'types/options';
 import { UserPosition } from 'types/profile';
-import { Network } from 'enums/network';
-import { bigNumberFormatter, coinFormatter } from 'thales-utils';
-import { MAX_MATURITY, MIN_MATURITY, POSITION_BALANCE_THRESHOLD } from 'constants/options';
-import { Positions } from 'enums/options';
-import { parseBytes32String } from 'ethers/lib/utils.js';
-import { BigNumber } from 'ethers';
 import { isOptionClaimable } from 'utils/options';
 
 const useClosedPositionsQuery = (
-    networkId: Network,
+    networkId: NetworkId,
     walletAddress: string,
     options?: UseQueryOptions<UserPosition[]>
 ) => {

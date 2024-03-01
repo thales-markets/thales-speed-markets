@@ -1,7 +1,6 @@
 import axios from 'axios';
 import ElectionsBanner from 'components/ElectionsBannerV2';
 import { generalConfig } from 'config/general';
-import { Network } from 'enums/network';
 import useWidgetBotScript from 'hooks/useWidgetBotScript';
 import queryString from 'query-string';
 import React, { useEffect, useState } from 'react';
@@ -11,7 +10,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getNetworkId } from 'redux/modules/wallet';
 import styled, { useTheme } from 'styled-components';
-import { isAndroid, isMetamask } from 'thales-utils';
+import { NetworkId, isAndroid, isMetamask } from 'thales-utils';
 import { RootState, ThemeInterface } from 'types/ui';
 import { isMobile } from 'utils/device';
 import { setReferralWallet } from 'utils/referral';
@@ -68,7 +67,7 @@ const DappLayout: React.FC<DappLayoutProps> = ({ children }) => {
 
     return (
         <Background id="main-content">
-            {networkId === Network.Arbitrum && <ElectionsBanner />}
+            {networkId === NetworkId.Arbitrum && <ElectionsBanner />}
             <Wrapper>
                 <DappSidebar />
                 <DappHeader />

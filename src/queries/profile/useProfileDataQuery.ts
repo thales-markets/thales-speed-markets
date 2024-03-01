@@ -1,16 +1,19 @@
 import { BATCH_NUMBER_OF_SPEED_MARKETS, SPEED_MARKETS_QUOTE } from 'constants/options';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
-import { Network } from 'enums/network';
 import { UseQueryOptions, useQuery } from 'react-query';
 import thalesData from 'thales-data';
-import { bigNumberFormatter, coinFormatter, roundNumberToDecimals } from 'thales-utils';
+import { NetworkId, bigNumberFormatter, coinFormatter, roundNumberToDecimals } from 'thales-utils';
 import { UserProfileData } from 'types/profile';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 import snxJSConnector from 'utils/snxJSConnector';
 import { getFeesFromHistory } from 'utils/speedAmm';
 
-const useProfileDataQuery = (networkId: Network, walletAddress: string, options?: UseQueryOptions<UserProfileData>) => {
+const useProfileDataQuery = (
+    networkId: NetworkId,
+    walletAddress: string,
+    options?: UseQueryOptions<UserProfileData>
+) => {
     return useQuery<UserProfileData>(
         QUERY_KEYS.Profile.Data(walletAddress, networkId),
         async () => {
@@ -136,14 +139,14 @@ const useProfileDataQuery = (networkId: Network, walletAddress: string, options?
                                 let marketAddresss;
                                 // Hot fix for 2 markets when resolved with final price 0 and fetching data for that market is failing
                                 if (
-                                    networkId === Network.OptimismMainnet &&
+                                    networkId === NetworkId.OptimismMainnet &&
                                     walletAddress === '0x5ef88d0a93e5773DB543bd421864504618A18de4' &&
                                     market === '0x79F6f48410fC659a274c0A236e19e581373bf2f9'
                                 ) {
                                     // some other market address of this user
                                     marketAddresss = '0x6A01283c0F4579B55FB7214CaF619CFe72044b68';
                                 } else if (
-                                    networkId === Network.PolygonMainnet &&
+                                    networkId === NetworkId.PolygonMainnet &&
                                     walletAddress === '0x8AAcec3D7077D04F19aC924d2743fc0DE1456941' &&
                                     market === '0x1e195Ea2ABf23C1A793F01c934692A230bb5Fc40'
                                 ) {

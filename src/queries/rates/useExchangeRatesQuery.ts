@@ -1,12 +1,11 @@
-import { useQuery, UseQueryOptions } from 'react-query';
-import QUERY_KEYS from 'constants/queryKeys';
-import { bigNumberFormatter, parseBytes32String } from 'thales-utils';
-import snxJSConnector from 'utils/snxJSConnector';
-import { Network } from 'enums/network';
 import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
+import QUERY_KEYS from 'constants/queryKeys';
+import { useQuery, UseQueryOptions } from 'react-query';
+import { bigNumberFormatter, NetworkId, parseBytes32String } from 'thales-utils';
+import snxJSConnector from 'utils/snxJSConnector';
 export type Rates = Record<string, number>;
 
-const useExchangeRatesQuery = (networkId: Network, options?: UseQueryOptions<Rates>) => {
+const useExchangeRatesQuery = (networkId: NetworkId, options?: UseQueryOptions<Rates>) => {
     return useQuery<Rates>(
         QUERY_KEYS.Rates.ExchangeRates(networkId),
         async () => {

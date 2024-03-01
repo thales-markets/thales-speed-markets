@@ -18,12 +18,11 @@ import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
 import { getIsWalletConnected, getNetworkId, getWalletAddress } from 'redux/modules/wallet';
-import { RootState } from 'types/ui';
 import { useTheme } from 'styled-components';
 import { formatCurrency, formatCurrencyWithSign, formatShortDate, formatShortDateWithTime } from 'thales-utils';
 import { SharePositionData } from 'types/flexCards';
 import { UserPosition } from 'types/profile';
-import { ThemeInterface } from 'types/ui';
+import { RootState, ThemeInterface } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getPriceId } from 'utils/pyth';
 import { buildOptionsMarketLink, buildRangeMarketLink } from 'utils/routes';
@@ -274,8 +273,6 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
                                                 positions: [row.side],
                                                 currencyKey: row.currencyKey,
                                                 strikePrices: [row.strikePrice],
-                                                leftPrice: row.leftPrice,
-                                                rightPrice: row.rightPrice,
                                                 strikeDate: row.maturityDate,
                                                 buyIn: row.paid,
                                                 payout: row.amount,
@@ -353,8 +350,6 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
                     strikeDate={positionsShareData.strikeDate}
                     strikePrices={positionsShareData.strikePrices}
                     finalPrices={positionsShareData.finalPrices}
-                    leftPrice={positionsShareData.leftPrice}
-                    rightPrice={positionsShareData.rightPrice}
                     buyIn={positionsShareData.buyIn}
                     payout={positionsShareData.payout}
                     payoutMultiplier={positionsShareData.payoutMultiplier}

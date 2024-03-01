@@ -1,16 +1,16 @@
-import { Network } from 'enums/network';
+import { NetworkId } from 'thales-utils';
 
 const speedMarketsAMMContract = {
     addresses: {
-        [Network.OptimismMainnet]: '0xE16B8a01490835EC1e76bAbbB3Cadd8921b32001',
-        [Network.OptimismGoerli]: '0x05cD078cECB32d62b304e9028C147bBCdef5Ba24',
-        [Network.OptimismSepolia]: 'TBD',
-        [Network.PolygonMainnet]: '0x4B1aED25f1877E1E9fBECBd77EeE95BB1679c361',
-        [Network.Arbitrum]: '0x02D0123a89Ae6ef27419d5EBb158d1ED4Cf24FA3',
-        [Network.Base]: '0x85b827d133FEDC36B844b20f4a198dA583B25BAA',
-        [Network.ZkSync]: '0x508F31897c25C436b257E37763E157Cb53D0a6fa',
-        [Network.ZkSyncSepolia]: '0xF0C711f9DBd9937fc43BEa168B3F40614B3D6821',
-        [Network.BlastSepolia]: '0xA2dCFEe657Bc0a71AC31d146366246202eae18a4',
+        [NetworkId.OptimismMainnet]: '0xE16B8a01490835EC1e76bAbbB3Cadd8921b32001',
+        [NetworkId.OptimismGoerli]: '0x05cD078cECB32d62b304e9028C147bBCdef5Ba24',
+        [NetworkId.OptimismSepolia]: 'TBD',
+        [NetworkId.PolygonMainnet]: '0x4B1aED25f1877E1E9fBECBd77EeE95BB1679c361',
+        [NetworkId.Arbitrum]: '0x02D0123a89Ae6ef27419d5EBb158d1ED4Cf24FA3',
+        [NetworkId.Base]: '0x85b827d133FEDC36B844b20f4a198dA583B25BAA',
+        [NetworkId.ZkSync]: '0x508F31897c25C436b257E37763E157Cb53D0a6fa',
+        [NetworkId.ZkSyncSepolia]: '0xF0C711f9DBd9937fc43BEa168B3F40614B3D6821',
+        [NetworkId.BlastSepolia]: '0xA2dCFEe657Bc0a71AC31d146366246202eae18a4',
     },
     abi: [
         {
@@ -1655,7 +1655,7 @@ const speedMarketsAMMContract = {
         },
     ],
     abis: {
-        [Network.ZkSync]: [
+        [NetworkId.ZkSync]: [
             {
                 anonymous: false,
                 inputs: [
@@ -3257,7 +3257,7 @@ const speedMarketsAMMContract = {
                 type: 'receive',
             },
         ],
-        [Network.ZkSyncSepolia]: [
+        [NetworkId.ZkSyncSepolia]: [
             {
                 anonymous: false,
                 inputs: [

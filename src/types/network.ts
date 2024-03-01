@@ -1,4 +1,4 @@
-import { Network } from 'enums/network';
+import { NetworkId } from "thales-utils";
 
 export type NetworkParams = {
     chainId: string;
@@ -13,4 +13,4 @@ export type NetworkParams = {
     };
 };
 
-export type SupportedNetwork = Exclude<Network, Network.Mainnet>;
+export type SupportedNetwork = Exclude<NetworkId, NetworkId.Mainnet>;

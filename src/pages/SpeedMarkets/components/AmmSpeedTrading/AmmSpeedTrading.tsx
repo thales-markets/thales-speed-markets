@@ -21,7 +21,6 @@ import {
 } from 'constants/options';
 import { PYTH_CONTRACT_ADDRESS, PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import { millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
-import { Network } from 'enums/network';
 import { Positions } from 'enums/options';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import { BigNumber, ethers } from 'ethers';
@@ -39,11 +38,11 @@ import { toast } from 'react-toastify';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
 import { getIsWalletConnected, getNetworkId, getSelectedCollateralIndex, getWalletAddress } from 'redux/modules/wallet';
-import { RootState } from 'types/ui';
 import styled from 'styled-components';
 import { FlexDivCentered, FlexDivColumn, FlexDivRow, FlexDivRowCentered } from 'styles/common';
 import {
     COLLATERAL_DECIMALS,
+    NetworkId,
     bigNumberFormatter,
     coinParser,
     formatCurrency,
@@ -54,6 +53,7 @@ import {
     truncToDecimals,
 } from 'thales-utils';
 import { AmmChainedSpeedMarketsLimits, AmmSpeedMarketsLimits } from 'types/options';
+import { RootState } from 'types/ui';
 import { getCurrencyKeyStableBalance } from 'utils/balances';
 import erc20Contract from 'utils/contracts/erc20Contract';
 import { getCoinBalance, getCollateral, getCollaterals, getDefaultCollateral, isStableCurrency } from 'utils/currency';
@@ -124,7 +124,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     const [openApprovalModal, setOpenApprovalModal] = useState(false);
     const [openTwitterShareModal, setOpenTwitterShareModal] = useState(false);
 
-    const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId, true);
+    const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
 
     const isPositionSelected = isChained
         ? chainedPositions.every((pos) => pos !== undefined)
@@ -175,7 +175,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     );
 
     const defaultCollateral = useMemo(() => getDefaultCollateral(networkId), [networkId]);
-    const selectedCollateral = useMemo(() => getCollateral(networkId, selectedCollateralIndex, true), [
+    const selectedCollateral = useMemo(() => getCollateral(networkId, selectedCollateralIndex), [
         networkId,
         selectedCollateralIndex,
     ]);
@@ -213,7 +213,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         selectedCollateral,
     ]);
 
-    const isBlastSepolia = networkId === Network.BlastSepolia;
+    const isBlastSepolia = networkId === NetworkId.BlastSepolia;
     const isMintAvailable = isBlastSepolia && collateralBalance < totalPaidAmount;
 
     const exchangeRatesMarketDataQuery = useExchangeRatesQuery(networkId, {
@@ -816,7 +816,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                         currencyComponent={
                             isMultiCollateralSupported ? (
                                 <CollateralSelector
-                                    collateralArray={getCollaterals(networkId, true)}
+                                    collateralArray={getCollaterals(networkId)}
                                     selectedItem={selectedCollateralIndex}
                                     onChangeCollateral={() => {}}
                                     disabled={isSubmitting}

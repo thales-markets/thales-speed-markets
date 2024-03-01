@@ -60,14 +60,11 @@ import { ReactComponent as sSOLIcon } from 'assets/synths/sSOL.svg';
 import { ReactComponent as sTRXIcon } from 'assets/synths/sTRX.svg';
 import { ReactComponent as sTSLAIcon } from 'assets/synths/sTSLA.svg';
 import { ReactComponent as sUNIIcon } from 'assets/synths/sUNI.svg';
-import { ReactComponent as XAGIcon, ReactComponent as sXAGIcon } from 'assets/synths/sXAG.svg';
-import { ReactComponent as XAUIcon, ReactComponent as sXAUIcon } from 'assets/synths/sXAU.svg';
 import { ReactComponent as sXMRIcon } from 'assets/synths/sXMR.svg';
 import { ReactComponent as sXRPIcon } from 'assets/synths/sXRP.svg';
 import { ReactComponent as sXTZIcon } from 'assets/synths/sXTZ.svg';
 import { ReactComponent as sYFIIcon } from 'assets/synths/sYFI.svg';
-import { Network } from 'enums/network';
-import { Coins } from 'thales-utils';
+import { Coins, NetworkId } from 'thales-utils';
 import { SupportedNetwork } from 'types/network';
 
 const SYNTHS = [
@@ -120,8 +117,7 @@ const SYNTHS = [
 ];
 export const SYNTHS_MAP = keyBy(SYNTHS);
 
-// Order is important, used for sorting
-export const CRYPTO_CURRENCY = [
+const CRYPTO_CURRENCY = [
     'BTC',
     'ETH',
     'SNX',
@@ -191,9 +187,6 @@ export const STABLE_COINS = [
     CRYPTO_CURRENCY_MAP.BUSD,
 ];
 
-export const COMMODITY = ['XAU', 'XAG'];
-export const COMMODITY_MAP = keyBy(COMMODITY);
-
 const FIAT_CURRENCY = ['USD'];
 export const FIAT_CURRENCY_MAP = keyBy(FIAT_CURRENCY);
 const FIAT_CURRENCY_SIGN = {
@@ -217,7 +210,6 @@ export const currencyKeyToAssetIconMap = {
     [SYNTHS_MAP.sGBP]: sGBPIcon,
     [SYNTHS_MAP.sCHF]: sCHFIcon,
     [SYNTHS_MAP.sKRW]: sKRWIcon,
-    [SYNTHS_MAP.sXAU]: sXAUIcon,
     [SYNTHS_MAP.sOIL]: sOILIcon,
     [SYNTHS_MAP.sBNB]: sBNBIcon,
     [SYNTHS_MAP.sTRX]: sTRXIcon,
@@ -239,16 +231,17 @@ export const currencyKeyToAssetIconMap = {
     [SYNTHS_MAP.sCRV]: sCRVIcon,
     [SYNTHS_MAP.sAMZN]: sAMZNIcon,
     [SYNTHS_MAP.sCEX]: sCEXIcon,
-    [SYNTHS_MAP.sXAG]: sXAGIcon,
     [SYNTHS_MAP.sJPY]: sJPYIcon,
     [SYNTHS_MAP.sUSD]: sUSDIcon,
     [SYNTHS_MAP.sFTSE]: sFTSEIcon,
     [SYNTHS_MAP.sREN]: sRENIcon,
     [SYNTHS_MAP.sBCH]: BCHIcon,
+    [SYNTHS_MAP.sSOL]: sSOLIcon,
+    [CRYPTO_CURRENCY_MAP.ETH]: sETHIcon,
+    [CRYPTO_CURRENCY_MAP.WETH]: sETHIcon,
     [CRYPTO_CURRENCY_MAP.SNX]: SNXIcon,
     [CRYPTO_CURRENCY_MAP.KNC]: KNCIcon,
     [CRYPTO_CURRENCY_MAP.LEND]: sAAVEIcon,
-    [SYNTHS_MAP.sSOL]: sSOLIcon,
     [CRYPTO_CURRENCY_MAP.LYRA]: LYRAIcon,
     [CRYPTO_CURRENCY_MAP.LUNA]: LUNAIcon,
     [CRYPTO_CURRENCY_MAP.MATIC]: MATICIcon,
@@ -271,8 +264,6 @@ export const currencyKeyToAssetIconMap = {
     [CRYPTO_CURRENCY_MAP.DPX]: DPXIcon,
     [CRYPTO_CURRENCY_MAP.GMX]: GMXIcon,
     [CRYPTO_CURRENCY_MAP.CAKE]: CAKEIcon,
-    [COMMODITY_MAP.XAU]: XAUIcon,
-    [COMMODITY_MAP.XAG]: XAGIcon,
 };
 
 export const currencyKeyToNameMap = {
@@ -353,53 +344,39 @@ export const currencyKeyToNameMap = {
     [CRYPTO_CURRENCY_MAP.WLD]: 'Worldcoin',
     [CRYPTO_CURRENCY_MAP.TIA]: 'TIA',
     [CRYPTO_CURRENCY_MAP.BONK]: 'BONK',
-    [COMMODITY_MAP.XAU]: 'Gold',
-    [COMMODITY_MAP.XAG]: 'Silver',
 };
 
 export const COLLATERALS: Record<SupportedNetwork, Coins[]> = {
-    [Network.OptimismMainnet]: [
+    [NetworkId.OptimismMainnet]: [
         SYNTHS_MAP.sUSD as Coins,
         CRYPTO_CURRENCY_MAP.DAI as Coins,
         CRYPTO_CURRENCY_MAP.USDC as Coins,
         CRYPTO_CURRENCY_MAP.USDT as Coins,
-    ],
-    [Network.OptimismGoerli]: [
-        SYNTHS_MAP.sUSD as Coins,
-        CRYPTO_CURRENCY_MAP.DAI as Coins,
-        CRYPTO_CURRENCY_MAP.USDC as Coins,
-        CRYPTO_CURRENCY_MAP.USDT as Coins,
-    ],
-    [Network.OptimismSepolia]: [
-        SYNTHS_MAP.sUSD as Coins,
-        CRYPTO_CURRENCY_MAP.DAI as Coins,
-        CRYPTO_CURRENCY_MAP.USDC as Coins,
-        CRYPTO_CURRENCY_MAP.USDT as Coins,
-    ],
-    [Network.PolygonMainnet]: [CRYPTO_CURRENCY_MAP.USDCe as Coins],
-    [Network.Base]: [CRYPTO_CURRENCY_MAP.USDbC as Coins],
-    [Network.Arbitrum]: [CRYPTO_CURRENCY_MAP.USDCe as Coins],
-    [Network.ZkSync]: [CRYPTO_CURRENCY_MAP.USDC as Coins],
-    [Network.ZkSyncSepolia]: [SYNTHS_MAP.sUSD as Coins],
-    [Network.BlastSepolia]: [SYNTHS_MAP.sUSD as Coins],
-};
-
-// TODO: merge with COLLATERALS when all pages will support these
-export const ADDITIONAL_COLLATERALS: Record<SupportedNetwork, Coins[]> = {
-    [Network.OptimismMainnet]: [
         CRYPTO_CURRENCY_MAP.OP as Coins,
         CRYPTO_CURRENCY_MAP.WETH as Coins,
         CRYPTO_CURRENCY_MAP.ETH as Coins,
     ],
-    [Network.OptimismGoerli]: [],
-    [Network.OptimismSepolia]: [],
-    [Network.PolygonMainnet]: [],
-    [Network.Base]: [
+    [NetworkId.OptimismGoerli]: [
+        SYNTHS_MAP.sUSD as Coins,
+        CRYPTO_CURRENCY_MAP.DAI as Coins,
+        CRYPTO_CURRENCY_MAP.USDC as Coins,
+        CRYPTO_CURRENCY_MAP.USDT as Coins,
+    ],
+    [NetworkId.OptimismSepolia]: [
+        SYNTHS_MAP.sUSD as Coins,
+        CRYPTO_CURRENCY_MAP.DAI as Coins,
+        CRYPTO_CURRENCY_MAP.USDC as Coins,
+        CRYPTO_CURRENCY_MAP.USDT as Coins,
+    ],
+    [NetworkId.PolygonMainnet]: [CRYPTO_CURRENCY_MAP.USDCe as Coins],
+    [NetworkId.Base]: [
+        CRYPTO_CURRENCY_MAP.USDbC as Coins,
         CRYPTO_CURRENCY_MAP.USDC as Coins,
         CRYPTO_CURRENCY_MAP.WETH as Coins,
         CRYPTO_CURRENCY_MAP.ETH as Coins,
     ],
-    [Network.Arbitrum]: [
+    [NetworkId.Arbitrum]: [
+        CRYPTO_CURRENCY_MAP.USDCe as Coins,
         CRYPTO_CURRENCY_MAP.USDC as Coins,
         CRYPTO_CURRENCY_MAP.DAI as Coins,
         CRYPTO_CURRENCY_MAP.USDT as Coins,
@@ -407,7 +384,7 @@ export const ADDITIONAL_COLLATERALS: Record<SupportedNetwork, Coins[]> = {
         CRYPTO_CURRENCY_MAP.WETH as Coins,
         CRYPTO_CURRENCY_MAP.ETH as Coins,
     ],
-    [Network.ZkSync]: [],
-    [Network.ZkSyncSepolia]: [],
-    [Network.BlastSepolia]: [],
+    [NetworkId.ZkSync]: [CRYPTO_CURRENCY_MAP.USDC as Coins],
+    [NetworkId.ZkSyncSepolia]: [SYNTHS_MAP.sUSD as Coins],
+    [NetworkId.BlastSepolia]: [SYNTHS_MAP.sUSD as Coins],
 };

@@ -286,8 +286,6 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
                                             positions: [row.side],
                                             currencyKey: row.currencyKey,
                                             strikePrices: [row.strikePrice],
-                                            leftPrice: row.leftPrice,
-                                            rightPrice: row.rightPrice,
                                             strikeDate: row.maturityDate,
                                             buyIn: row.paid,
                                             payout: row.amount,
@@ -367,8 +365,6 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
                     currencyKey={positionsShareData.currencyKey}
                     strikeDate={positionsShareData.strikeDate}
                     strikePrices={positionsShareData.strikePrices}
-                    leftPrice={positionsShareData.leftPrice}
-                    rightPrice={positionsShareData.rightPrice}
                     buyIn={positionsShareData.buyIn}
                     payout={positionsShareData.payout}
                     onClose={() => setOpenTwitterShareModal(false)}

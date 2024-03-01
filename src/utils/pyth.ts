@@ -2,13 +2,12 @@ import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
 import { generalConfig } from 'config/general';
 import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
 import { PRICE_ID, PRICE_SERVICE_ENDPOINTS, PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
-import { Network } from 'enums/network';
 import { ethers } from 'ethers';
-import { bigNumberFormatter, floorNumberToDecimals } from 'thales-utils';
+import { NetworkId, bigNumberFormatter, floorNumberToDecimals } from 'thales-utils';
 
-export const getPriceServiceEndpoint = (networkId: Network) => {
+export const getPriceServiceEndpoint = (networkId: NetworkId) => {
     if (
-        [Network.OptimismGoerli, Network.OptimismSepolia, Network.ZkSyncSepolia, Network.BlastSepolia].includes(
+        [NetworkId.OptimismGoerli, NetworkId.OptimismSepolia, NetworkId.ZkSyncSepolia, NetworkId.BlastSepolia].includes(
             networkId
         )
     ) {
@@ -18,9 +17,9 @@ export const getPriceServiceEndpoint = (networkId: Network) => {
     }
 };
 
-export const getPriceId = (networkId: Network, currency: typeof CRYPTO_CURRENCY_MAP[number]) => {
+export const getPriceId = (networkId: NetworkId, currency: typeof CRYPTO_CURRENCY_MAP[number]) => {
     if (
-        [Network.OptimismGoerli, Network.OptimismSepolia, Network.ZkSyncSepolia, Network.BlastSepolia].includes(
+        [NetworkId.OptimismGoerli, NetworkId.OptimismSepolia, NetworkId.ZkSyncSepolia, NetworkId.BlastSepolia].includes(
             networkId
         )
     ) {
@@ -30,9 +29,9 @@ export const getPriceId = (networkId: Network, currency: typeof CRYPTO_CURRENCY_
     }
 };
 
-const getCurrencyByPriceId = (networkId: Network, priceId: string) => {
+const getCurrencyByPriceId = (networkId: NetworkId, priceId: string) => {
     if (
-        [Network.OptimismGoerli, Network.OptimismSepolia, Network.ZkSyncSepolia, Network.BlastSepolia].includes(
+        [NetworkId.OptimismGoerli, NetworkId.OptimismSepolia, NetworkId.ZkSyncSepolia, NetworkId.BlastSepolia].includes(
             networkId
         )
     ) {
@@ -48,7 +47,7 @@ const getCurrencyByPriceId = (networkId: Network, priceId: string) => {
 
 export const getCurrentPrices = async (
     connection: EvmPriceServiceConnection,
-    networkId: Network,
+    networkId: NetworkId,
     priceIds: string[]
 ) => {
     const priceFeeds = await connection.getLatestPriceFeeds(priceIds);

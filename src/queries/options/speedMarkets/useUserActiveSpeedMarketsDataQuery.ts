@@ -5,18 +5,17 @@ import { OPTIONS_POSITIONS_MAP, SIDE, SPEED_MARKETS_QUOTE } from 'constants/opti
 import { CONNECTION_TIMEOUT_MS, PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
-import { Network } from 'enums/network';
 import { Positions } from 'enums/options';
 import { reject } from 'lodash';
-import { useQuery, UseQueryOptions } from 'react-query';
+import { UseQueryOptions, useQuery } from 'react-query';
+import { NetworkId, bigNumberFormatter, coinFormatter, formatCurrencyWithSign, parseBytes32String } from 'thales-utils';
 import { OptionSide, UserLivePositions } from 'types/options';
-import { bigNumberFormatter, parseBytes32String, coinFormatter, formatCurrencyWithSign } from 'thales-utils';
 import { getBenchmarksPriceFeeds, getPriceId, getPriceServiceEndpoint } from 'utils/pyth';
 import snxJSConnector from 'utils/snxJSConnector';
 import { getFeesFromHistory } from 'utils/speedAmm';
 
 const useUserActiveSpeedMarketsDataQuery = (
-    networkId: Network,
+    networkId: NetworkId,
     walletAddress: string,
     options?: UseQueryOptions<UserLivePositions[]>
 ) => {

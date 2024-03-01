@@ -3,15 +3,17 @@ import { OPTIONS_POSITIONS_MAP, SIDE } from 'constants/options';
 import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { secondsToMilliseconds } from 'date-fns';
-import { Network } from 'enums/network';
 import { Positions } from 'enums/options';
 import { parseBytes32String } from 'ethers/lib/utils.js';
 import { UseQueryOptions, useQuery } from 'react-query';
-import { bigNumberFormatter, coinFormatter, roundNumberToDecimals } from 'thales-utils';
+import { NetworkId, bigNumberFormatter, coinFormatter, roundNumberToDecimals } from 'thales-utils';
 import { ChainedSpeedMarket, OptionSide } from 'types/options';
 import snxJSConnector from 'utils/snxJSConnector';
 
-const useActiveChainedSpeedMarketsDataQuery = (networkId: Network, options?: UseQueryOptions<ChainedSpeedMarket[]>) => {
+const useActiveChainedSpeedMarketsDataQuery = (
+    networkId: NetworkId,
+    options?: UseQueryOptions<ChainedSpeedMarket[]>
+) => {
     return useQuery<ChainedSpeedMarket[]>(
         QUERY_KEYS.BinaryOptions.ActiveChainedSpeedMarkets(networkId),
         async () => {

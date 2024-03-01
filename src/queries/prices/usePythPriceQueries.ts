@@ -2,8 +2,8 @@ import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
 import { CONNECTION_TIMEOUT_MS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds } from 'date-fns';
-import { Network } from 'enums/network';
 import { UseQueryOptions, useQueries } from 'react-query';
+import { NetworkId } from 'thales-utils';
 import { getBenchmarksPriceFeeds, getPriceServiceEndpoint } from 'utils/pyth';
 
 type PriceRequest = {
@@ -11,7 +11,11 @@ type PriceRequest = {
     publishTime: number;
 };
 
-const usePythPriceQueries = (networkId: Network, priceRequests: PriceRequest[], options?: UseQueryOptions<number>) => {
+const usePythPriceQueries = (
+    networkId: NetworkId,
+    priceRequests: PriceRequest[],
+    options?: UseQueryOptions<number>
+) => {
     const fetchPythPrice = async (priceRequest: PriceRequest) => {
         const priceConnection = new EvmPriceServiceConnection(getPriceServiceEndpoint(networkId), {
             timeout: CONNECTION_TIMEOUT_MS,

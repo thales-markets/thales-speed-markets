@@ -7,7 +7,7 @@ import { getIsWalletConnected, getWalletAddress } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { truncateAddress } from 'thales-utils';
 import { RootState } from 'types/ui';
-import UserSwap from '../UserSwap';
+import UserCollaterals from '../UserCollaterals';
 
 const TRUNCATE_ADDRESS_NUMBER_OF_CHARS = 5;
 
@@ -24,7 +24,7 @@ const UserWallet: React.FC = () => {
     return (
         <Container>
             <Wrapper>
-                <UserSwap />
+                <UserCollaterals />
                 <WalletContainer
                     connected={isWalletConnected}
                     onClick={() => {
