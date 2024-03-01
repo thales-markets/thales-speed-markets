@@ -68,6 +68,7 @@ import { ReactComponent as sXTZIcon } from 'assets/synths/sXTZ.svg';
 import { ReactComponent as sYFIIcon } from 'assets/synths/sYFI.svg';
 import { Network } from 'enums/network';
 import { Coins } from 'thales-utils';
+import { SupportedNetwork } from 'types/network';
 
 const SYNTHS = [
     'sBTC',
@@ -356,8 +357,7 @@ export const currencyKeyToNameMap = {
     [COMMODITY_MAP.XAG]: 'Silver',
 };
 
-export const COLLATERALS: Record<Network, Coins[]> = {
-    [Network.Mainnet]: [SYNTHS_MAP.sUSD as Coins],
+export const COLLATERALS: Record<SupportedNetwork, Coins[]> = {
     [Network.OptimismMainnet]: [
         SYNTHS_MAP.sUSD as Coins,
         CRYPTO_CURRENCY_MAP.DAI as Coins,
@@ -385,8 +385,7 @@ export const COLLATERALS: Record<Network, Coins[]> = {
 };
 
 // TODO: merge with COLLATERALS when all pages will support these
-export const ADDITIONAL_COLLATERALS: Record<Network, Coins[]> = {
-    [Network.Mainnet]: [],
+export const ADDITIONAL_COLLATERALS: Record<SupportedNetwork, Coins[]> = {
     [Network.OptimismMainnet]: [
         CRYPTO_CURRENCY_MAP.OP as Coins,
         CRYPTO_CURRENCY_MAP.WETH as Coins,

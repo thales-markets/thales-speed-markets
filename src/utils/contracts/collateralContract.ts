@@ -2,7 +2,6 @@ import { Network } from 'enums/network';
 
 const erc20Contract = {
     addresses: {
-        [Network.Mainnet]: 'TBD',
         [Network.OptimismMainnet]: '0x8c6f28f2F1A3C87F0f938b96d27520d9751ec8d9', // sUSD
         [Network.OptimismGoerli]: '0xE1ceaa829525a08C1d39A5CEBe4b42aF58d77198', // exoticSUSD
         [Network.OptimismSepolia]: 'TBD',

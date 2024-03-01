@@ -1,6 +1,6 @@
 import { Network } from 'enums/network';
-import { CRYPTO_CURRENCY_MAP } from './currency';
 import { getCurrencyPriority } from 'utils/currency';
+import { CRYPTO_CURRENCY_MAP } from './currency';
 
 export const PRICE_SERVICE_ENDPOINTS = {
     testnet: 'https://hermes.pyth.network',
@@ -23,7 +23,6 @@ export const CONNECTION_TIMEOUT_MS = 15000;
 
 // You can find at https://docs.pyth.network/price-feeds/contract-addresses/evm
 export const PYTH_CONTRACT_ADDRESS = {
-    [Network.Mainnet]: '0x4305FB66699C3B2702D4d05CF36551390A4c69C6',
     [Network.OptimismMainnet]: '0xff1a0f4744e8582DF1aE09D5611b887B6a12925C',
     [Network.PolygonMainnet]: '0xff1a0f4744e8582DF1aE09D5611b887B6a12925C',
     [Network.OptimismGoerli]: '0xDd24F84d36BF92C65F92307595335bdFab5Bbd21',

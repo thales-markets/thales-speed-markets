@@ -1,9 +1,7 @@
-import { hexStripZeros } from '@ethersproject/bytes';
 import detectEthereumProvider from '@metamask/detect-provider';
 import { ReactComponent as ArbitrumLogo } from 'assets/images/arbitrum-circle-logo.svg';
 import { ReactComponent as BaseLogo } from 'assets/images/base-circle-logo.svg';
 import { ReactComponent as BlastSepoliaLogo } from 'assets/images/blast-sepolia-circle-logo.svg';
-import { ReactComponent as EthereumLogo } from 'assets/images/ethereum-circle-logo.svg';
 import { ReactComponent as OpLogo } from 'assets/images/optimism-circle-logo.svg';
 import { ReactComponent as PolygonLogo } from 'assets/images/polygon-circle-logo.svg';
 import { ReactComponent as ZkSyncLogo } from 'assets/images/zksync-circle-logo.svg';
@@ -19,7 +17,7 @@ import ROUTES from 'constants/routes';
 import { Network } from 'enums/network';
 import { BigNumber } from 'ethers';
 import { FunctionComponent, SVGProps } from 'react';
-import { NetworkParams } from '../types/network';
+import { NetworkParams, SupportedNetwork } from '../types/network';
 
 type EthereumProvider = {
     isMetaMask: boolean;
@@ -35,7 +33,7 @@ export async function getEthereumNetwork() {
         if (hasEthereumInjected()) {
             const provider = (await detectEthereumProvider()) as EthereumProvider;
             if (provider && provider.networkVersion != null) {
-                const networkId = Number(provider.networkVersion) as Network;
+                const networkId = Number(provider.networkVersion) as SupportedNetwork;
                 return { name: SUPPORTED_NETWORKS_NAMES[networkId], networkId };
             }
         }
@@ -46,11 +44,11 @@ export async function getEthereumNetwork() {
     }
 }
 
-export const isNetworkSupported = (networkId: Network): boolean => {
+export const isNetworkSupported = (networkId: SupportedNetwork): boolean => {
     return !!SUPPORTED_NETWORKS[networkId];
 };
 
-export const getIsMultiCollateralSupported = (networkId: Network, includeAdditional?: boolean): boolean =>
+export const getIsMultiCollateralSupported = (networkId: SupportedNetwork, includeAdditional?: boolean): boolean =>
     COLLATERALS[networkId].concat(includeAdditional ? ADDITIONAL_COLLATERALS[networkId] : []).length > 1;
 
 export const getIsOVM = (networkId: number): boolean =>
@@ -124,15 +122,6 @@ export const SUPPORTED_NETWORK_IDS_MAP: Record<number, DropdownNetwork> = {
             await changeNetwork(polygonNetworkParams, callback);
         },
         order: 4,
-    },
-    [Network.Mainnet]: {
-        name: 'Mainnet',
-        icon: EthereumLogo,
-        changeNetwork: async (networkId: number, callback?: VoidFunction) => {
-            const formattedChainId = hexStripZeros(BigNumber.from(networkId).toHexString());
-            await changeNetwork(undefined, callback, formattedChainId);
-        },
-        order: 6,
     },
     [Network.Arbitrum]: {
         name: 'Arbitrum',

@@ -2,7 +2,6 @@ import { Network } from 'enums/network';
 
 const chainedSpeedMarketsAMMContract = {
     addresses: {
-        [Network.Mainnet]: 'TBD',
         [Network.OptimismMainnet]: '0xFf8Cf5ABF583D0979C0B9c35d62dd1fD52cce7C7',
         [Network.OptimismGoerli]: '0xe9FdD4717f9dDAa7e74e9a63B559F54A38f98613',
         [Network.OptimismSepolia]: 'TBD',

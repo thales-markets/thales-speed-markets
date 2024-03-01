@@ -1,18 +1,17 @@
 import { ReactComponent as ArbitrumLogo } from 'assets/images/arbitrum-circle-logo.svg';
-import { ReactComponent as EthereumLogo } from 'assets/images/ethereum-circle-logo.svg';
+import { ReactComponent as BaseLogo } from 'assets/images/base-circle-logo.svg';
+import { ReactComponent as BlastSepoliaLogo } from 'assets/images/blast-sepolia-circle-logo.svg';
 import { ReactComponent as OpLogo } from 'assets/images/optimism-circle-logo.svg';
 import { ReactComponent as PolygonLogo } from 'assets/images/polygon-circle-logo.svg';
-import { ReactComponent as BaseLogo } from 'assets/images/base-circle-logo.svg';
 import { ReactComponent as ZkSyncLogo } from 'assets/images/zksync-circle-logo.svg';
-import { ReactComponent as BlastSepoliaLogo } from 'assets/images/blast-sepolia-circle-logo.svg';
 import Button from 'components/Button';
-import { SUPPORTED_NETWORK_IDS_MAP } from 'utils/network';
+import { TEST_NETWORKS } from 'constants/network';
 import { Network } from 'enums/network';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { TEST_NETWORKS } from 'constants/network';
+import { SUPPORTED_NETWORK_IDS_MAP } from 'utils/network';
 
 type UnsupportedNetworkProps = {
     supportedNetworks: Network[];
@@ -29,10 +28,6 @@ const UnsupportedNetwork: React.FC<UnsupportedNetworkProps> = ({ supportedNetwor
         let logo;
         let text;
         switch (networkId) {
-            case Network.Mainnet:
-                logo = <EthereumLogo />;
-                text = t(`common.unsupported-network.button.mainnet`);
-                break;
             case Network.OptimismMainnet:
                 logo = <OpLogo />;
                 text = t(`common.unsupported-network.button.optimism`);

@@ -7,7 +7,6 @@ import useUserActiveChainedSpeedMarketsDataQuery from 'queries/options/speedMark
 import useUserActiveSpeedMarketsDataQuery from 'queries/options/speedMarkets/useUserActiveSpeedMarketsDataQuery';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import useProfileDataQuery from 'queries/profile/useProfileDataQuery';
-import useUserNotificationsQuery from 'queries/user/useUserNotificationsQuery';
 import queryString from 'query-string';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -15,11 +14,10 @@ import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsWalletConnected, getNetworkId, getWalletAddress } from 'redux/modules/wallet';
-import { RootState } from 'types/ui';
 import { useTheme } from 'styled-components';
 import { formatCurrencyWithSign, formatPercentage } from 'thales-utils';
 import { UserProfileData } from 'types/profile';
-import { ThemeInterface } from 'types/ui';
+import { RootState, ThemeInterface } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getPriceId } from 'utils/pyth';
 import { history } from 'utils/routes';
@@ -60,11 +58,6 @@ const Profile: React.FC = () => {
 
     const [searchAddress, setSearchAddress] = useState<string>('');
     const [searchText, setSearchText] = useState<string>('');
-
-    const notificationsQuery = useUserNotificationsQuery(networkId, searchAddress || walletAddress, {
-        enabled: isAppReady && isWalletConnected && !isOnlySpeedMarketsSupported(networkId),
-    });
-    const notifications = notificationsQuery.isSuccess && notificationsQuery.data ? notificationsQuery.data : 0;
 
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
         networkId,
@@ -138,7 +131,7 @@ const Profile: React.FC = () => {
         })
         .filter((marketData) => marketData.claimable).length;
 
-    const totalNotifications = notifications + speedMarketsNotifications + chainedSpeedMarketsNotifications;
+    const totalNotifications = speedMarketsNotifications + chainedSpeedMarketsNotifications;
 
     const userProfileDataQuery = useProfileDataQuery(networkId, searchAddress || walletAddress, {
         enabled: isAppReady && isWalletConnected,

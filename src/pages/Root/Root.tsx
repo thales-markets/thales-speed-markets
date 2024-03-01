@@ -26,7 +26,7 @@ import { Provider } from 'react-redux';
 import { Store } from 'redux';
 import { getDefaultTheme } from 'utils/style';
 import { WagmiConfig, configureChains, createClient } from 'wagmi';
-import { arbitrum, mainnet, optimism, optimismGoerli, polygon, zkSync } from 'wagmi/chains';
+import { arbitrum, optimism, optimismGoerli, polygon, zkSync } from 'wagmi/chains';
 import { infuraProvider } from 'wagmi/providers/infura';
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 import { publicProvider } from 'wagmi/providers/public';
@@ -40,11 +40,6 @@ type RpcProvider = {
 };
 
 const CHAIN_TO_RPC_PROVIDER_NETWORK_NAME: Record<number, RpcProvider> = {
-    [Network.Mainnet]: {
-        ankr: '',
-        chainnode: 'mainnet',
-        blast: 'eth-mainnet',
-    },
     [Network.OptimismMainnet]: {
         ankr: 'optimism',
         chainnode: 'optimism-mainnet',
@@ -67,7 +62,7 @@ const CHAIN_TO_RPC_PROVIDER_NETWORK_NAME: Record<number, RpcProvider> = {
 const STALL_TIMEOUT = 2000;
 
 const { chains, provider } = configureChains(
-    [optimism, optimismGoerli, optimismSepolia, mainnet, polygon, arbitrum, base, zkSync, zkSyncSepolia, BlastSepolia],
+    [optimism, optimismGoerli, optimismSepolia, polygon, arbitrum, base, zkSync, zkSyncSepolia, BlastSepolia],
     [
         jsonRpcProvider({
             rpc: (chain) => {

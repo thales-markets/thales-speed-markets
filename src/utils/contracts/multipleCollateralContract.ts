@@ -1106,7 +1106,6 @@ const abi = [
 const multipleCollateral = {
     sUSD: {
         addresses: {
-            [Network.Mainnet]: 'TBD',
             [Network.OptimismMainnet]: '0x8c6f28f2F1A3C87F0f938b96d27520d9751ec8d9', // sUSD
             [Network.OptimismGoerli]: '0xE1ceaa829525a08C1d39A5CEBe4b42aF58d77198', // exoticSUSD
             [Network.OptimismSepolia]: 'TBD',
@@ -1121,7 +1120,6 @@ const multipleCollateral = {
     },
     DAI: {
         addresses: {
-            [Network.Mainnet]: 'TBD',
             [Network.OptimismMainnet]: '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1',
             [Network.OptimismGoerli]: 'TBD',
             [Network.OptimismSepolia]: 'TBD',
@@ -1136,7 +1134,6 @@ const multipleCollateral = {
     },
     USDCe: {
         addresses: {
-            [Network.Mainnet]: 'TBD',
             [Network.OptimismMainnet]: 'TBD',
             [Network.OptimismGoerli]: 'TBD',
             [Network.OptimismSepolia]: 'TBD',
@@ -1151,7 +1148,6 @@ const multipleCollateral = {
     },
     USDbC: {
         addresses: {
-            [Network.Mainnet]: 'TBD',
             [Network.OptimismMainnet]: 'TBD',
             [Network.OptimismGoerli]: 'TBD',
             [Network.OptimismSepolia]: 'TBD',
@@ -1166,7 +1162,6 @@ const multipleCollateral = {
     },
     USDC: {
         addresses: {
-            [Network.Mainnet]: 'TBD',
             [Network.OptimismMainnet]: '0x7F5c764cBc14f9669B88837ca1490cCa17c31607',
             [Network.OptimismGoerli]: 'TBD',
             [Network.OptimismSepolia]: 'TBD',
@@ -1181,7 +1176,6 @@ const multipleCollateral = {
     },
     USDT: {
         addresses: {
-            [Network.Mainnet]: 'TBD',
             [Network.OptimismMainnet]: '0x94b008aA00579c1307B0EF2c499aD98a8ce58e58',
             [Network.OptimismGoerli]: 'TBD',
             [Network.OptimismSepolia]: 'TBD',
@@ -1196,7 +1190,6 @@ const multipleCollateral = {
     },
     OP: {
         addresses: {
-            [Network.Mainnet]: 'TBD',
             [Network.OptimismMainnet]: '0x4200000000000000000000000000000000000042',
             [Network.OptimismGoerli]: 'TBD',
             [Network.OptimismSepolia]: 'TBD',
@@ -1211,7 +1204,6 @@ const multipleCollateral = {
     },
     ARB: {
         addresses: {
-            [Network.Mainnet]: 'TBD',
             [Network.OptimismMainnet]: 'TBD',
             [Network.OptimismGoerli]: 'TBD',
             [Network.OptimismSepolia]: 'TBD',
@@ -1226,7 +1218,6 @@ const multipleCollateral = {
     },
     WETH: {
         addresses: {
-            [Network.Mainnet]: 'TBD',
             [Network.OptimismMainnet]: '0x4200000000000000000000000000000000000006',
             [Network.OptimismGoerli]: 'TBD',
             [Network.OptimismSepolia]: 'TBD',
@@ -1241,7 +1232,6 @@ const multipleCollateral = {
     },
     ETH: {
         addresses: {
-            [Network.Mainnet]: ZERO_ADDRESS,
             [Network.OptimismMainnet]: ZERO_ADDRESS,
             [Network.OptimismGoerli]: ZERO_ADDRESS,
             [Network.OptimismSepolia]: ZERO_ADDRESS,
@@ -1256,7 +1246,6 @@ const multipleCollateral = {
     },
     BUSD: {
         addresses: {
-            [Network.Mainnet]: 'TBD',
             [Network.OptimismMainnet]: 'TBD',
             [Network.OptimismGoerli]: 'TBD',
             [Network.OptimismSepolia]: 'TBD',

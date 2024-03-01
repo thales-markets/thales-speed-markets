@@ -156,13 +156,15 @@ const App = () => {
                             </Route>
                         )}
 
-                        <Route exact path={ROUTES.Home}>
-                            <Suspense fallback={<Loader />}>
-                                <DappLayout>
-                                    <SpeedMarkets />
-                                </DappLayout>
-                            </Suspense>
-                        </Route>
+                        {getSupportedNetworksByRoute(ROUTES.Home).includes(networkId) && (
+                            <Route exact path={ROUTES.Home}>
+                                <Suspense fallback={<Loader />}>
+                                    <DappLayout>
+                                        <SpeedMarkets />
+                                    </DappLayout>
+                                </Suspense>
+                            </Route>
+                        )}
 
                         <Route>
                             <Redirect to={ROUTES.Options.SpeedMarkets} />

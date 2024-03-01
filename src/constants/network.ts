@@ -1,11 +1,10 @@
 import { Network } from 'enums/network';
-import { NetworkParams } from 'types/network';
+import { NetworkParams, SupportedNetwork } from 'types/network';
 import { Chain } from 'wagmi';
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
-export const SUPPORTED_NETWORKS: Record<Network, string> = {
-    [Network.Mainnet]: 'MAINNET',
+export const SUPPORTED_NETWORKS: Record<SupportedNetwork, string> = {
     [Network.OptimismMainnet]: 'OPTIMISTIC',
     [Network.PolygonMainnet]: 'POLYGON-MAINNET',
     [Network.OptimismGoerli]: 'GOERLI-OPTIMISM',
@@ -17,8 +16,7 @@ export const SUPPORTED_NETWORKS: Record<Network, string> = {
     [Network.BlastSepolia]: 'BLAST-SEPOLIA',
 };
 
-export const SUPPORTED_NETWORKS_NAMES: Record<Network, string> = {
-    [Network.Mainnet]: 'MAINNET',
+export const SUPPORTED_NETWORKS_NAMES: Record<SupportedNetwork, string> = {
     [Network.OptimismMainnet]: 'OPTIMISM MAINNET',
     [Network.PolygonMainnet]: 'POLYGON',
     [Network.OptimismGoerli]: 'OPTIMISM GOERLI',
@@ -34,7 +32,7 @@ export const SWAP_SUPPORTED_NETWORKS: Network[] = [];
 
 export const TEST_NETWORKS = [Network.OptimismGoerli, Network.OptimismSepolia, Network.ZkSyncSepolia];
 
-export const DEFAULT_NETWORK: { name: string; networkId: Network } = {
+export const DEFAULT_NETWORK: { name: string; networkId: SupportedNetwork } = {
     name: SUPPORTED_NETWORKS_NAMES[Network.OptimismMainnet],
     networkId: Network.OptimismMainnet,
 };

@@ -1,10 +1,10 @@
 import { DEFAULT_NETWORK } from 'constants/network';
-import { Network } from 'enums/network';
 import React, { useMemo, useState } from 'react';
 import OutsideClickHandler from 'react-outside-click-handler';
 import { useDispatch, useSelector } from 'react-redux';
 import { getNetworkId, switchToNetworkId } from 'redux/modules/wallet';
 import styled from 'styled-components';
+import { SupportedNetwork } from 'types/network';
 import { RootState } from 'types/ui';
 import { SUPPORTED_NETWORK_IDS_MAP } from 'utils/network';
 import { useSwitchNetwork } from 'wagmi';
@@ -82,7 +82,7 @@ const NetworkSwitch: React.FC<NetworkSwitchProps> = ({
                                                         // do not use updateNetworkSettings(networkId) as it will trigger queries before provider in App.js is initialized
                                                         dispatch(
                                                             switchToNetworkId({
-                                                                networkId: Number(network.id) as Network,
+                                                                networkId: Number(network.id) as SupportedNetwork,
                                                             })
                                                         );
                                                     }
