@@ -286,7 +286,7 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
             return generateRows(filteredData);
         }
         return [];
-    }, [filteredData, isMobile, t, userOpenChainedSpeedMarketsDataWithPrices]);
+    }, [filteredData, isMobile, t, theme, userOpenChainedSpeedMarketsDataWithPrices]);
 
     return (
         <>
