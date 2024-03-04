@@ -144,7 +144,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
     const claimableSpeedPositionsSum = claimableSpeedPositions.reduce((acc, pos) => acc + pos.value, 0);
 
     const claimableChainedPositions = chainedWithClaimableStatus.filter((p) => p.claimable);
-    const claimableChainedPositionsSum = claimableChainedPositions.reduce((acc, pos) => acc + pos.amount, 0);
+    const claimableChainedPositionsSum = claimableChainedPositions.reduce((acc, pos) => acc + pos.payout, 0);
 
     const hasClaimableSpeedPositions = isChained
         ? !!claimableChainedPositions.length
@@ -245,7 +245,7 @@ const dummyPositions: UserOpenPositions[] = [
         positionAddress: ZERO_ADDRESS,
         market: '0x1',
         currencyKey: 'BTC',
-        amount: 15,
+        payout: 15,
         paid: 100,
         maturityDate: 1684483200000,
         strikePrice: '$ 25,000.00',
@@ -256,7 +256,7 @@ const dummyPositions: UserOpenPositions[] = [
         positionAddress: ZERO_ADDRESS,
         market: '0x2',
         currencyKey: 'BTC',
-        amount: 10,
+        payout: 10,
         paid: 200,
         maturityDate: 1684483200000,
         strikePrice: '$ 35,000.00',

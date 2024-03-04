@@ -183,7 +183,7 @@ const Profile: React.FC = () => {
                 <MainContainer>
                     <StatsContainer>
                         <StatsItem>
-                            <StatsLabel>{t('profile.leaderboard.table.netprofit-col')}:</StatsLabel>
+                            <StatsLabel>{t('profile.stats.netprofit-col')}:</StatsLabel>
                             <StatsValue
                                 color={
                                     profileData.profit > 0
@@ -199,7 +199,7 @@ const Profile: React.FC = () => {
                             </StatsValue>
                         </StatsItem>
                         <StatsItem>
-                            <StatsLabel>{t('profile.leaderboard.table.gain-col')}:</StatsLabel>
+                            <StatsLabel>{t('profile.stats.gain-col')}:</StatsLabel>
                             <StatsValue
                                 color={
                                     profileData.gain > 0
@@ -213,11 +213,11 @@ const Profile: React.FC = () => {
                             </StatsValue>
                         </StatsItem>
                         <StatsItem>
-                            <StatsLabel>{t('profile.leaderboard.table.trades-col')}:</StatsLabel>
+                            <StatsLabel>{t('profile.stats.trades-col')}:</StatsLabel>
                             <StatsValue>{userProfileDataQuery.isLoading ? '-' : profileData.numberOfTrades}</StatsValue>
                         </StatsItem>
                         <StatsItem>
-                            <StatsLabel>{t('profile.leaderboard.table.volume-col')}:</StatsLabel>
+                            <StatsLabel>{t('profile.stats.volume-col')}:</StatsLabel>
                             <StatsValue>
                                 {userProfileDataQuery.isLoading
                                     ? '-'

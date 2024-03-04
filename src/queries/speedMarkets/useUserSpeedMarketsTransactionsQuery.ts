@@ -2,6 +2,7 @@ import {
     BATCH_NUMBER_OF_SPEED_MARKETS,
     MAX_NUMBER_OF_SPEED_MARKETS_TO_FETCH,
     MIN_MATURITY,
+    SIDE_TO_POSITION_MAP,
     SPEED_MARKETS_QUOTE,
 } from 'constants/market';
 import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
@@ -54,7 +55,7 @@ const useUserSpeedMarketsTransactionsQuery = (
 
                 for (let i = 0; i < filteredMarketsData.length; i++) {
                     const marketData = filteredMarketsData[i];
-                    const side = marketData.direction;
+                    const sides = [SIDE_TO_POSITION_MAP[marketData.direction]];
                     const payout = coinFormatter(marketData.buyinAmount, networkId) * SPEED_MARKETS_QUOTE;
 
                     const createdAt = !marketData.createdAt.isZero()
@@ -69,12 +70,10 @@ const useUserSpeedMarketsTransactionsQuery = (
                     const fees = lpFee + safeBoxImpact;
 
                     const userData: TradeWithMarket = {
-                        timestamp: createdAt,
                         user: walletAddress,
                         payout,
                         paid: coinFormatter(marketData.buyinAmount, networkId) * (1 + fees),
-                        market: marketData.market,
-                        side,
+                        sides,
                         marketItem: {
                             address: marketData.market,
                             timestamp: createdAt,
@@ -82,7 +81,7 @@ const useUserSpeedMarketsTransactionsQuery = (
                             strikePrice: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS),
                             maturityDate: secondsToMilliseconds(Number(marketData.strikeTime)),
                             isOpen: !marketData.resolved,
-                            result: marketData.resolved ? side : null,
+                            isChained: false,
                             finalPrice: bigNumberFormatter(marketData.finalPrice, PYTH_CURRENCY_DECIMALS),
                         },
                     };

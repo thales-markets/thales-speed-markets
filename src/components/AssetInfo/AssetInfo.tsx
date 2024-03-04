@@ -1,39 +1,25 @@
-import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
-import { Chain, Icon } from 'pages/SpeedMarkets/components/SelectPosition/styled-components';
 import React from 'react';
-import styled, { useTheme } from 'styled-components';
-import { ThemeInterface } from 'types/ui';
+import styled from 'styled-components';
 import { getSynthName } from 'utils/currency';
-import { getColorPerPosition } from 'utils/style';
 
 export type AssetInfoProps = {
     currencyKey: string;
     iconFontSize?: string;
-    assetNameFontSize?: string;
     currencyKeyFontSize?: string;
     displayInRow?: boolean;
     displayInRowMobile?: boolean;
-    hideFullName?: boolean;
-    position?: Positions;
-    isChainedPosition?: boolean;
     width?: string;
 };
 
 const AssetInfo: React.FC<AssetInfoProps> = ({
     currencyKey,
     iconFontSize,
-    assetNameFontSize,
     currencyKeyFontSize,
     displayInRow,
-    hideFullName,
     displayInRowMobile,
-    position,
-    isChainedPosition,
     width,
 }) => {
-    const theme: ThemeInterface = useTheme();
-
     return (
         <AssetContainer displayInRowMobile={displayInRowMobile} width={width}>
             <CurrencyIcon
@@ -42,20 +28,8 @@ const AssetInfo: React.FC<AssetInfoProps> = ({
                 displayInRowMobile={displayInRowMobile}
             />
             <AssetNameContainer displayInRow={displayInRow} displayInRowMobile={displayInRowMobile}>
-                {!hideFullName && !position && (
-                    <AssetName fontSize={assetNameFontSize}>{getSynthName(currencyKey)}</AssetName>
-                )}
+                <AssetName>{getSynthName(currencyKey)}</AssetName>
                 <CurrencyKey fontSize={currencyKeyFontSize}>{currencyKey}</CurrencyKey>
-                {!isChainedPosition && position && (
-                    <Position fontSize={currencyKeyFontSize} color={getColorPerPosition(position, theme)}>
-                        {position}
-                    </Position>
-                )}
-                {isChainedPosition && position && (
-                    <Chain isSelectedUp={position === Positions.UP}>
-                        <Icon className="icon icon--chain" />
-                    </Chain>
-                )}
             </AssetNameContainer>
         </AssetContainer>
     );
@@ -106,14 +80,6 @@ const CurrencyKey = styled.span<{ fontSize?: string }>`
     line-height: 120%;
     font-size: ${(props) => props.fontSize || '12px'};
     color: ${(props) => props.theme.textColor.primary};
-    text-transform: uppercase;
-`;
-
-const Position = styled.span<{ fontSize?: string; color?: string }>`
-    display: block;
-    font-weight: 700;
-    font-size: ${(props) => props.fontSize || '12px'};
-    color: ${(props) => props.color};
     text-transform: uppercase;
 `;
 

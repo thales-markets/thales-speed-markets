@@ -131,15 +131,6 @@ export const SUPPORTED_NETWORK_IDS_MAP: Record<number, DropdownNetwork> = {
 export const getSupportedNetworksByRoute = (route: string): NetworkId[] => {
     switch (route) {
         case ROUTES.Markets.Home:
-        case ROUTES.Markets.ChainedSpeedMarkets:
-        case ROUTES.Markets.ChainedSpeedMarketsOverview:
-            return [
-                NetworkId.OptimismMainnet,
-                NetworkId.OptimismGoerli,
-                NetworkId.Arbitrum,
-                NetworkId.Base,
-                NetworkId.PolygonMainnet,
-            ];
         case ROUTES.Markets.SpeedMarkets:
         case ROUTES.Markets.SpeedMarketsOverview:
         case ROUTES.Markets.Profile:
@@ -152,6 +143,15 @@ export const getSupportedNetworksByRoute = (route: string): NetworkId[] => {
                 NetworkId.ZkSync,
                 NetworkId.ZkSyncSepolia,
                 NetworkId.BlastSepolia,
+            ];
+        case ROUTES.Markets.ChainedSpeedMarkets:
+        case ROUTES.Markets.ChainedSpeedMarketsOverview:
+            return [
+                NetworkId.OptimismMainnet,
+                NetworkId.OptimismGoerli,
+                NetworkId.Arbitrum,
+                NetworkId.Base,
+                NetworkId.PolygonMainnet,
             ];
         default:
             return Object.keys(SUPPORTED_NETWORKS).map((network) => Number(network) as NetworkId);

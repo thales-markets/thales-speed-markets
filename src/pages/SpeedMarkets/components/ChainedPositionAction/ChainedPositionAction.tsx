@@ -112,7 +112,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
 
         const getAllowance = async () => {
             try {
-                const parsedAmount = coinParser(position.amount.toString(), networkId);
+                const parsedAmount = coinParser(position.payout.toString(), networkId);
 
                 const allowance = await checkAllowance(parsedAmount, erc20Instance, walletAddress, addressToApprove);
                 setAllowance(allowance);
@@ -124,7 +124,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
             getAllowance();
         }
     }, [
-        position.amount,
+        position.payout,
         position.isOpen,
         position.claimable,
         networkId,
@@ -305,7 +305,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                                   ? `${t('common.admin')} ${t('speed-markets.overview.resolve')}`
                                   : t('speed-markets.overview.resolve')
                               : t('markets.user-positions.claim-win')
-                      } ${formatCurrencyWithSign(USD_SIGN, position.amount, 2)}`
+                      } ${formatCurrencyWithSign(USD_SIGN, position.payout, 2)}`
                     : isAllowing
                     ? `${t('common.enable-wallet-access.approve-progress')} ${defaultCollateral}...`
                     : t('common.enable-wallet-access.approve-swap', {
@@ -390,7 +390,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
             {openApprovalModal && (
                 <ApprovalModal
                     // add three percent to approval amount to take into account price changes
-                    defaultAmount={roundNumberToDecimals(ONE_HUNDRED_AND_THREE_PERCENT * position.amount)}
+                    defaultAmount={roundNumberToDecimals(ONE_HUNDRED_AND_THREE_PERCENT * position.payout)}
                     tokenSymbol={defaultCollateral}
                     isAllowing={isAllowing}
                     onSubmit={handleAllowance}

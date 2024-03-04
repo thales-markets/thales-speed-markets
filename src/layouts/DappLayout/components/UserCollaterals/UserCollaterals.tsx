@@ -37,7 +37,7 @@ const UserCollaterals: React.FC = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const multipleCollateralBalances = useMultipleCollateralBalanceQuery(walletAddress, networkId, {
-        enabled: isAppReady && walletAddress !== '' && isMultiCollateralSupported,
+        enabled: isAppReady && walletAddress !== '',
     });
 
     const multipleCollateralBalancesData =

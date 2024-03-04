@@ -23,7 +23,7 @@ import { RootState, ThemeInterface } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getPriceId } from 'utils/pyth';
 import MyPositionAction from '../MyPositionAction';
-import { getAmount } from '../styled-components';
+import { getDirections } from '../styled-components';
 
 type ClaimablePositionsProps = {
     searchAddress: string;
@@ -33,6 +33,7 @@ type ClaimablePositionsProps = {
 const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, searchText }) => {
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
+
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const networkId = useSelector((state: RootState) => getNetworkId(state));
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
@@ -135,15 +136,16 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
                     leftPrice: 0,
                     rightPrice: 0,
                     finalPrice: marketData.finalPrice || 0,
-                    amount: marketData.amount,
+                    payout: marketData.payout,
                     maturityDate: marketData.maturityDate,
                     expiryDate: marketData.maturityDate,
                     market: marketData.market,
-                    side: marketData.side,
+                    sides: [marketData.side],
                     paid: marketData.paid,
                     value: marketData.value,
                     claimable: !!marketData.claimable,
                     claimed: false,
+                    isChained: false,
                 };
             });
 
@@ -156,13 +158,13 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
                     leftPrice: 0,
                     rightPrice: 0,
                     finalPrice: marketData.finalPrices[marketData.finalPrices.length - 1],
-                    amount: marketData.amount,
+                    payout: marketData.payout,
                     maturityDate: marketData.maturityDate,
                     expiryDate: marketData.maturityDate,
                     market: marketData.address,
-                    side: marketData.sides[marketData.sides.length - 1],
+                    sides: marketData.sides,
                     paid: marketData.paid,
-                    value: marketData.amount,
+                    value: marketData.payout,
                     claimable: marketData.claimable,
                     claimed: false,
                     isChained: true,
@@ -204,8 +206,12 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
                             value: formatCurrencyWithSign(USD_SIGN, row.finalPrice),
                         },
                         {
-                            title: t('profile.leaderboard.trades.table.amount-col'),
-                            value: getAmount(formatCurrency(row.amount, 2), row.side, theme, row.isChained),
+                            title: row.isChained ? t('profile.history.directions') : t('profile.history.direction'),
+                            value: getDirections(row.sides, theme, row.isChained),
+                        },
+                        {
+                            title: t('profile.history.payout'),
+                            value: formatCurrencyWithSign(USD_SIGN, row.payout, 2),
                         },
                         {
                             title: t('profile.history.expired'),
@@ -240,18 +246,18 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
                                                 strikePrices: chainedPosition.strikePrices,
                                                 finalPrices: chainedPosition.finalPrices,
                                                 buyIn: chainedPosition.paid,
-                                                payout: chainedPosition.amount,
+                                                payout: chainedPosition.payout,
                                                 payoutMultiplier: chainedPosition.payoutMultiplier,
                                             });
                                         } else {
                                             setPositionShareData({
                                                 type: 'resolved-speed',
-                                                positions: [row.side],
+                                                positions: row.sides,
                                                 currencyKey: row.currencyKey,
                                                 strikePrices: [row.strikePrice],
                                                 strikeDate: row.maturityDate,
                                                 buyIn: row.paid,
-                                                payout: row.amount,
+                                                payout: row.payout,
                                             });
                                         }
                                     }}
@@ -264,9 +270,6 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
                     return {
                         asset: {
                             currencyKey: row.currencyKey,
-                            position: row.side,
-                            isChainedPosition: row.isChained,
-                            width: '50px',
                             displayInRowMobile: true,
                         },
                         cells: cells,
@@ -283,7 +286,7 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
             return generateRows(filteredData);
         }
         return [];
-    }, [filteredData, isMobile, t, theme, userOpenChainedSpeedMarketsDataWithPrices]);
+    }, [filteredData, isMobile, t, userOpenChainedSpeedMarketsDataWithPrices]);
 
     return (
         <>

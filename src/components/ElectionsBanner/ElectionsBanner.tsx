@@ -10,7 +10,7 @@ const ElectionsBanner: React.FC = () => {
     return (
         <SPAAnchor href={'https://dune.com/leifu/arb-incentive-program-dashboard'}>
             <Container>
-                <Label>{t('banner.arb-distribution-message')}</Label>
+                <Label>{t('common.banner.arb-distribution-message')}</Label>
             </Container>
         </SPAAnchor>
     );

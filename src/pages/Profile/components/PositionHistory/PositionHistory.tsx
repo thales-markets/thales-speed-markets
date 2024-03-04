@@ -10,11 +10,11 @@ import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsWalletConnected, getNetworkId, getWalletAddress } from 'redux/modules/wallet';
 import { useTheme } from 'styled-components';
-import { formatCurrency, formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
+import { formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
 import { UserPosition } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
-import { getAmount, getStatus } from '../styled-components';
+import { getStatus } from '../styled-components';
 
 type PositionHistoryProps = {
     searchAddress: string;
@@ -71,15 +71,16 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
                 leftPrice: 0,
                 rightPrice: 0,
                 finalPrice: marketData.finalPrice,
-                amount: marketData.amount,
+                payout: marketData.payout,
                 maturityDate: marketData.maturityDate,
                 expiryDate: marketData.maturityDate,
                 market: marketData.market,
-                side: marketData.side,
+                sides: [marketData.side],
                 paid: marketData.paid,
                 value: marketData.value,
                 claimable: false,
                 claimed: marketData.isUserWinner,
+                isChained: false,
             };
         });
 
@@ -95,13 +96,13 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
                 leftPrice: 0,
                 rightPrice: 0,
                 finalPrice: marketData.finalPrices[lastPositivePriceIndex],
-                amount: marketData.amount,
+                payout: marketData.payout,
                 maturityDate: marketData.strikeTimes[lastPositivePriceIndex],
                 expiryDate: marketData.maturityDate,
                 market: marketData.address,
-                side: marketData.sides[lastPositivePriceIndex],
+                sides: marketData.sides,
                 paid: marketData.paid,
-                value: marketData.amount,
+                value: marketData.payout,
                 claimable: false,
                 claimed: marketData.isUserWinner,
                 isChained: true,
@@ -139,8 +140,8 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
                             value: formatCurrencyWithSign(USD_SIGN, row.finalPrice),
                         },
                         {
-                            title: t('profile.leaderboard.trades.table.amount-col'),
-                            value: getAmount(formatCurrency(row.amount, 2), row.side, theme, row.isChained),
+                            title: t('profile.history.payout'),
+                            value: formatCurrencyWithSign(USD_SIGN, row.payout, 2),
                         },
                         {
                             title: t('profile.history.expired'),

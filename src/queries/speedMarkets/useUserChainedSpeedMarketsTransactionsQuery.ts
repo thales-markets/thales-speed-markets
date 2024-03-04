@@ -1,7 +1,13 @@
-import { BATCH_NUMBER_OF_SPEED_MARKETS, MAX_NUMBER_OF_SPEED_MARKETS_TO_FETCH, MIN_MATURITY } from 'constants/market';
+import {
+    BATCH_NUMBER_OF_SPEED_MARKETS,
+    MAX_NUMBER_OF_SPEED_MARKETS_TO_FETCH,
+    MIN_MATURITY,
+    SIDE_TO_POSITION_MAP,
+} from 'constants/market';
 import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { secondsToMilliseconds } from 'date-fns';
+import { Positions } from 'enums/market';
 import { UseQueryOptions, useQuery } from 'react-query';
 import { NetworkId, bigNumberFormatter, coinFormatter, parseBytes32String, roundNumberToDecimals } from 'thales-utils';
 import { SpeedMarket } from 'types/market';
@@ -79,8 +85,9 @@ const useUserChainedSpeedMarketsTransactionsQuery = (
                     const marketData = filteredMarketsData[i];
 
                     const maturityDate = secondsToMilliseconds(Number(marketData.strikeTime));
-                    const sides = marketData.directions.map((direction: number) => direction);
-                    const side = marketData.resolved ? sides[sides.length - 1] : sides[0];
+                    const sides: Positions[] = marketData.directions.map(
+                        (direction: number) => SIDE_TO_POSITION_MAP[direction]
+                    );
                     const buyinAmount = coinFormatter(marketData.buyinAmount, networkId);
                     const payout = roundNumberToDecimals(
                         buyinAmount * bigNumberFormatter(marketData.payoutMultiplier) ** sides.length,
@@ -103,12 +110,10 @@ const useUserChainedSpeedMarketsTransactionsQuery = (
                         : 0;
 
                     const userData: TradeWithMarket = {
-                        timestamp: createdAt,
                         user: walletAddress,
                         payout,
                         paid: buyinAmount * (1 + safeBoxImpact),
-                        market: marketData.market,
-                        side,
+                        sides,
                         marketItem: {
                             address: marketData.market,
                             timestamp: createdAt,
@@ -116,30 +121,34 @@ const useUserChainedSpeedMarketsTransactionsQuery = (
                             strikePrice,
                             maturityDate,
                             isOpen: !marketData.resolved,
-                            result: marketData.resolved ? side : null,
+                            result: null,
                             finalPrice,
                             isChained: true,
                         } as SpeedMarket,
                     };
 
-                    // Hot fix for one market when resolved with final price 0 and fetching data for that market is failing
+                    // Hot fix for 3 markets when resolved with final price 0 and fetching data for that market is failing
                     if (
                         networkId === NetworkId.OptimismMainnet &&
                         userData.marketItem.address === '0x79F6f48410fC659a274c0A236e19e581373bf2f9'
                     ) {
-                        userData.timestamp = 1702229901000;
                         userData.payout = roundNumberToDecimals(5 * 1.9 ** 6, 8);
                         userData.paid = 5.1;
-                        userData.side = 0;
+                        userData.sides = [
+                            Positions.UP,
+                            Positions.UP,
+                            Positions.UP,
+                            Positions.UP,
+                            Positions.UP,
+                            Positions.UP,
+                        ];
 
                         userData.marketItem = {
-                            address: userData.market,
                             timestamp: 1702229901000,
                             currencyKey: 'BTC',
                             strikePrice: 43890.09284569,
                             maturityDate: 1702233501000,
                             isOpen: false,
-                            result: 0,
                             finalPrice: 43869.69322549,
                             isChained: true,
                         } as SpeedMarket;
@@ -156,19 +165,23 @@ const useUserChainedSpeedMarketsTransactionsQuery = (
                         networkId === NetworkId.PolygonMainnet &&
                         userData.marketItem.address === '0x1e195Ea2ABf23C1A793F01c934692A230bb5Fc40'
                     ) {
-                        userData.timestamp = 1701461351000;
                         userData.payout = roundNumberToDecimals(5 * 1.9 ** 6, 8);
                         userData.paid = 5.1;
-                        userData.side = 1;
+                        userData.sides = [
+                            Positions.UP,
+                            Positions.DOWN,
+                            Positions.DOWN,
+                            Positions.DOWN,
+                            Positions.DOWN,
+                            Positions.DOWN,
+                        ];
 
                         userData.marketItem = {
-                            address: userData.market,
                             timestamp: 1701461351000,
                             currencyKey: 'BTC',
                             strikePrice: 38770.95500499,
                             maturityDate: 1701464951000,
                             isOpen: false,
-                            result: 1,
                             finalPrice: 38797.0925,
                             isChained: true,
                         } as SpeedMarket;

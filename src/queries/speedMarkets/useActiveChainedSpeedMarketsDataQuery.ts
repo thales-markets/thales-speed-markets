@@ -62,7 +62,7 @@ const useActiveChainedSpeedMarketsDataQuery = (
                         strikePrices,
                         strikeTimes,
                         maturityDate,
-                        amount: payout,
+                        payout: payout,
                         paid: buyinAmount * (1 + fee),
                         payoutMultiplier: bigNumberFormatter(marketData.payoutMultiplier),
                         finalPrices: Array(sides.length).fill(0),

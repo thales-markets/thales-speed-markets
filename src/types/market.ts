@@ -17,7 +17,7 @@ export type UserOpenPositions = {
     currencyKey: string;
     strikePrice: string;
     strikePriceNum?: number;
-    amount: number;
+    payout: number;
     maturityDate: number;
     market: string;
     side: Positions;
@@ -33,7 +33,7 @@ export type UserClosedPositions = {
     currencyKey: string;
     strikePrice: string;
     strikePriceNum: number;
-    amount: number;
+    payout: number;
     maturityDate: number;
     market: string;
     side: Positions;
@@ -85,9 +85,8 @@ export type SpeedMarket = {
     strikePrice: number;
     maturityDate: number;
     isOpen: boolean;
-    result: number;
+    isChained: boolean;
     finalPrice?: number;
-    isChained?: boolean;
 };
 
 export type ChainedSpeedMarket = {
@@ -98,7 +97,7 @@ export type ChainedSpeedMarket = {
     strikePrices: number[];
     strikeTimes: number[];
     maturityDate: number;
-    amount: number;
+    payout: number;
     paid: number;
     payoutMultiplier: number;
     finalPrices: number[];

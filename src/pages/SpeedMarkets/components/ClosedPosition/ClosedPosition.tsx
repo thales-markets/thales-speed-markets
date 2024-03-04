@@ -43,7 +43,7 @@ const ClosedPosition: React.FC<ClosedPositionProps> = ({ position }) => {
                 <FlexContainer>
                     <Label>{t('markets.user-positions.size')}</Label>
                     <Value>
-                        {formatNumberShort(position.amount)}{' '}
+                        {formatNumberShort(position.payout)}{' '}
                         <Value color={getColorPerPosition(position.side, theme)}>{position.side}</Value>
                     </Value>
                 </FlexContainer>
@@ -80,7 +80,7 @@ const ClosedPosition: React.FC<ClosedPositionProps> = ({ position }) => {
                     strikeDate={position.maturityDate}
                     strikePrices={[position.strikePrice]}
                     buyIn={position.paid}
-                    payout={position.amount}
+                    payout={position.payout}
                     onClose={() => setOpenTwitterShareModal(false)}
                 />
             )}

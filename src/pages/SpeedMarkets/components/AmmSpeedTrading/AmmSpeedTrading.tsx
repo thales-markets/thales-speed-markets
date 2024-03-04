@@ -203,7 +203,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             ? multipleCollateralBalances.isSuccess
                 ? getCoinBalance(multipleCollateralBalances?.data, selectedCollateral)
                 : null
-            : walletBalancesMap[defaultCollateral]?.balance || 0;
+            : (walletBalancesMap && walletBalancesMap[defaultCollateral]?.balance) || 0;
     }, [
         multipleCollateralBalances,
         walletBalancesMap,

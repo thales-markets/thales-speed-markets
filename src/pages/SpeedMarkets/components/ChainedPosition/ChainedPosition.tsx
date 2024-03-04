@@ -188,7 +188,7 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                     </FlexContainer>
                     <FlexContainer>
                         <Text>{t('markets.user-positions.size')}</Text>
-                        <Text isActiveColor>{formatNumberShort(positionWithPrices.amount)}</Text>
+                        <Text isActiveColor>{formatNumberShort(positionWithPrices.payout)}</Text>
                     </FlexContainer>
                     <FlexContainer>
                         <Text>{t('markets.user-positions.paid')}</Text>
@@ -302,7 +302,7 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                         <BuyInfo>
                             <Text>
                                 {t('markets.user-positions.size')}
-                                <Text isActiveColor>{` ${formatNumberShort(positionWithPrices.amount)}`}</Text>
+                                <Text isActiveColor>{` ${formatNumberShort(positionWithPrices.payout)}`}</Text>
                             </Text>
                             <Text padding="0 0 0 30px">
                                 {t('markets.user-positions.paid')}
@@ -355,7 +355,7 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                     strikePrices={positionWithPrices.strikePrices}
                     finalPrices={positionWithPrices.finalPrices}
                     buyIn={positionWithPrices.paid}
-                    payout={positionWithPrices.amount}
+                    payout={positionWithPrices.payout}
                     payoutMultiplier={positionWithPrices.payoutMultiplier}
                     onClose={() => setOpenTwitterShareModal(false)}
                 />

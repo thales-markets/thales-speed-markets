@@ -72,7 +72,7 @@ const UnresolvedPosition: React.FC<UnresolvedPositionProps> = ({
                 <FlexContainer>
                     <Label>{t('markets.user-positions.size')}</Label>
                     <Value>
-                        {formatNumberShort(position.amount)}{' '}
+                        {formatNumberShort(position.payout)}{' '}
                         <Value color={getColorPerPosition(position.side, theme)}>{position.side}</Value>
                     </Value>
                 </FlexContainer>

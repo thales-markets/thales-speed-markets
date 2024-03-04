@@ -185,11 +185,9 @@
             "error": "Error"
         },
         "banner": {
-            "op-rewards-banner-message": "OP rewards have started, check how you can earn those on <bold>the OP rewards page</bold>",
-            "elections-banner-message": "Elections are now live, exercise your voting power as a THALES staker <bold>here</bold>",
+            "arb-distribution-message": "ARB distribution has started. Earn ARB tokens by using Thales products. Checkout the details here.",
             "page-link": {
                 "thales-markets": "Looking for markets with longer time frames (days, weeks, or months)?",
-                "speed-markets": "Looking for markets that resolve in hours and not days?",
                 "try": "Try <bold>{{value}}</bold>"
             }
         },
@@ -350,10 +348,6 @@
         "current-price-tooltip": "This is a Speed Market position that uses Pyth oracles for querying the current price",
         "claimed": "CLAIMED",
         "rip": "RIP",
-        "chart-info": {
-            "in-wallet": "in wallet",
-            "claimable": "Claimable"
-        },
         "winnings-are-forfeit": "* Winnings not claimed within {{days}} days of a market being resolved are forfeit.",
         "history-limit": "* Showing only markets with expiry date not older than {{days}} days.",
         "tabs": {
@@ -369,32 +363,19 @@
         "search-placeholder": "Search wallet",
         "history": {
             "strike": "Strike",
-            "price": "Price",
-            "amount": "Amount",
+            "direction": "Direction",
+            "directions": "Directions",
+            "payout": "Payout",
             "paid": "Paid",
             "received": "Received",
             "expired": "Expired",
             "expires": "Expires @"
         },
-        "leaderboard": {
-            "table": {
-                "trades-col": "Trades",
-                "volume-col": "Volume",
-                "netprofit-col": "Net Profit",
-                "gain-col": "Gain"
-            },
-            "trades": {
-                "table": {
-                    "amount-col": "Amount"
-                }
-            },
-            "highlight-card": {
-                "total-points": "Total Points",
-                "total-rewards": "Total Rewards"
-            }
+        "stats": {
+            "trades-col": "Trades",
+            "volume-col": "Volume",
+            "netprofit-col": "Net Profit",
+            "gain-col": "Gain"
         }
-    },
-    "banner": {
-        "arb-distribution-message": "ARB distribution has started. Earn ARB tokens by using Thales products. Checkout the details here."
     }
 }

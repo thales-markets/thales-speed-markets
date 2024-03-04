@@ -121,7 +121,7 @@ const useUserActiveSpeedMarketsDataQuery = (
                             bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS)
                         ),
                         strikePriceNum: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS),
-                        amount: payout,
+                        payout: payout,
                         maturityDate,
                         market: marketData.market,
                         side,

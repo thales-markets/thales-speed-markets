@@ -1,5 +1,5 @@
 import TileTable from 'components/TileTable';
-import { SIDE_TO_POSITION_MAP } from 'constants/market';
+import { USD_SIGN } from 'constants/currency';
 import useUserChainedSpeedMarketsTransactionsQuery from 'queries/speedMarkets/useUserChainedSpeedMarketsTransactionsQuery';
 import useUserSpeedMarketsTransactionsQuery from 'queries/speedMarkets/useUserSpeedMarketsTransactionsQuery';
 import React, { useMemo } from 'react';
@@ -9,16 +9,15 @@ import { getIsAppReady } from 'redux/modules/app';
 import { getIsWalletConnected, getNetworkId, getWalletAddress } from 'redux/modules/wallet';
 import { useTheme } from 'styled-components';
 import {
-    formatCurrency,
+    formatCurrencyWithSign,
     formatHoursAndMinutesFromTimestamp,
     formatShortDate,
     formatShortDateWithTime,
 } from 'thales-utils';
-import { SpeedMarket } from 'types/market';
 import { TradeWithMarket } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
-import { getAmount } from '../styled-components';
+import { getDirections } from '../styled-components';
 
 type TransactionHistoryProps = {
     searchAddress: string;
@@ -75,9 +74,9 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ searchAddress, 
         const generateRows = (data: TradeWithMarket[]) => {
             try {
                 const dateMap: Record<string, TradeWithMarket[]> = {};
-                const sortedData = data.sort((a, b) => b.timestamp - a.timestamp);
+                const sortedData = data.sort((a, b) => b.marketItem.timestamp - a.marketItem.timestamp);
                 sortedData.forEach((trade) => {
-                    const tradeDateKey = formatShortDate(trade.timestamp).toUpperCase();
+                    const tradeDateKey = formatShortDate(trade.marketItem.timestamp).toUpperCase();
                     if (!dateMap[tradeDateKey]) {
                         dateMap[tradeDateKey] = [];
                     }
@@ -95,33 +94,27 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ searchAddress, 
                         return row;
                     }
 
-                    const marketExpired = row.marketItem.result;
-                    const optionPrice = row.paid / row.payout;
-                    const paidAmount = row.paid;
-                    const amount = row.payout;
+                    const marketExpired = row.marketItem.maturityDate < Date.now();
 
                     const cells: any = [
-                        { title: 'buy', value: formatHoursAndMinutesFromTimestamp(row.timestamp) },
+                        { title: 'buy', value: formatHoursAndMinutesFromTimestamp(row.marketItem.timestamp) },
                         {
                             title: t('profile.history.strike'),
-                            value: `$${formatCurrency(row.marketItem.strikePrice)}`,
+                            value: formatCurrencyWithSign(USD_SIGN, row.marketItem.strikePrice),
                         },
                         {
-                            title: t('profile.history.price'),
-                            value: `$${formatCurrency(optionPrice)}`,
+                            title: row.marketItem.isChained
+                                ? t('profile.history.directions')
+                                : t('profile.history.direction'),
+                            value: getDirections(row.sides, theme, row.marketItem.isChained),
                         },
                         {
-                            title: t('profile.history.amount'),
-                            value: getAmount(
-                                formatCurrency(amount),
-                                SIDE_TO_POSITION_MAP[row.side],
-                                theme,
-                                (row.marketItem as SpeedMarket).isChained
-                            ),
+                            title: t('profile.history.payout'),
+                            value: formatCurrencyWithSign(USD_SIGN, row.payout),
                         },
                         {
                             title: t('profile.history.paid'),
-                            value: `$${formatCurrency(paidAmount)}`,
+                            value: formatCurrencyWithSign(USD_SIGN, row.paid),
                         },
                         {
                             title: marketExpired ? t('profile.history.expired') : t('profile.history.expires'),

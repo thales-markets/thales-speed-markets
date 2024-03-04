@@ -111,7 +111,7 @@ const useUserResolvedChainedSpeedMarketsDataQuery = (
                         strikePrices,
                         strikeTimes,
                         maturityDate,
-                        amount: payout,
+                        payout,
                         paid: buyinAmount * (1 + fee),
                         payoutMultiplier: bigNumberFormatter(marketData.payoutMultiplier),
                         finalPrices,
@@ -163,7 +163,7 @@ const useUserResolvedChainedSpeedMarketsDataQuery = (
                             1702233501000,
                         ];
                         userData.maturityDate = 1702233501000;
-                        userData.amount = roundNumberToDecimals(5 * 1.9 ** 6, 8);
+                        userData.payout = roundNumberToDecimals(5 * 1.9 ** 6, 8);
                         userData.paid = 5.1;
                         userData.isUserWinner = false;
                     } else if (
@@ -196,7 +196,7 @@ const useUserResolvedChainedSpeedMarketsDataQuery = (
                             1701464951000,
                         ];
                         userData.maturityDate = 1701464951000;
-                        userData.amount = roundNumberToDecimals(5 * 1.9 ** 6, 8);
+                        userData.payout = roundNumberToDecimals(5 * 1.9 ** 6, 8);
                         userData.paid = 5.1;
                         userData.isUserWinner = false;
                     }
