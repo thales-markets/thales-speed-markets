@@ -1,7 +1,7 @@
 import TooltipInfo from 'components/Tooltip';
 import { USD_SIGN } from 'constants/currency';
 import { LINKS } from 'constants/links';
-import { Positions } from 'enums/options';
+import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 
 import usePythCandlestickQuery from 'queries/prices/usePythCandlestickQuery';

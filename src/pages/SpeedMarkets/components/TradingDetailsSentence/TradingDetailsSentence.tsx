@@ -1,7 +1,7 @@
 import Tooltip from 'components/Tooltip/Tooltip';
 import { USD_SIGN } from 'constants/currency';
 import { secondsToHours, secondsToMilliseconds, secondsToMinutes } from 'date-fns';
-import { Positions } from 'enums/options';
+import { Positions } from 'enums/market';
 import useInterval from 'hooks/useInterval';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

@@ -1,4 +1,4 @@
-import { Positions } from 'enums/options';
+import { Positions } from 'enums/market';
 import { SpeedMarket } from './market';
 
 export type UserPosition = {

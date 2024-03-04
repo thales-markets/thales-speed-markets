@@ -5,7 +5,7 @@ import { CRYPTO_CURRENCY_MAP, USD_SIGN } from 'constants/currency';
 import { SPEED_MARKETS_OVERVIEW_SECTIONS as SECTIONS } from 'constants/market';
 import { CONNECTION_TIMEOUT_MS, SUPPORTED_ASSETS } from 'constants/pyth';
 import { millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
-import { Positions } from 'enums/options';
+import { Positions } from 'enums/market';
 import useInterval from 'hooks/useInterval';
 import {
     LoaderContainer,

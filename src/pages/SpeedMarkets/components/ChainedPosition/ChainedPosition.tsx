@@ -1,7 +1,7 @@
 import Tooltip from 'components/Tooltip';
 import { USD_SIGN } from 'constants/currency';
 import { millisecondsToSeconds } from 'date-fns';
-import { Positions } from 'enums/options';
+import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import { ShareIcon } from 'pages/SpeedMarkets/components/OpenPosition/OpenPosition';
 import SharePositionModal from 'pages/SpeedMarkets/components/SharePositionModal';

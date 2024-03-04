@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
-import { Positions } from 'enums/options';
+import { Positions } from 'enums/market';
 import { Theme } from 'enums/ui';
 import { localStore } from 'thales-utils';
 import { ThemeInterface } from 'types/ui';

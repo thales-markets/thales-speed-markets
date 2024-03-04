@@ -1,5 +1,5 @@
 import Tooltip from 'components/Tooltip';
-import { Positions } from 'enums/options';
+import { Positions } from 'enums/market';
 import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { FlexDivColumnCentered } from 'styles/common';

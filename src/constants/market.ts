@@ -1,4 +1,4 @@
-import { Positions } from 'enums/options';
+import { Positions } from 'enums/market';
 
 export const POSITIONS_TO_SIDE_MAP: Record<Positions, number> = {
     UP: 0,

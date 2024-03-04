@@ -1,6 +1,6 @@
 import { ChartContext } from 'constants/chart';
 import { millisecondsToSeconds } from 'date-fns';
-import { Positions } from 'enums/options';
+import { Positions } from 'enums/market';
 import { ISeriesApi } from 'lightweight-charts';
 import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveSpeedMarketsDataQuery';
 import { useContext, useEffect, useState } from 'react';

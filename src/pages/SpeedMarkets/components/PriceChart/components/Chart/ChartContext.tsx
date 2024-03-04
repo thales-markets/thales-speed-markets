@@ -1,6 +1,6 @@
 import Button from 'components/Button';
 import { ChartContext } from 'constants/chart';
-import { Positions } from 'enums/options';
+import { Positions } from 'enums/market';
 import { ColorType, IChartApi, createChart } from 'lightweight-charts';
 import React, { useEffect, useRef, useState } from 'react';
 import styled, { useTheme } from 'styled-components';

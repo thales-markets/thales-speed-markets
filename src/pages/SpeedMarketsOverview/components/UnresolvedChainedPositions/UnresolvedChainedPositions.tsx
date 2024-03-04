@@ -2,7 +2,7 @@ import Button from 'components/Button';
 import SimpleLoader from 'components/SimpleLoader/SimpleLoader';
 import { SPEED_MARKETS_OVERVIEW_SECTIONS as SECTIONS } from 'constants/market';
 import { millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
-import { Positions } from 'enums/options';
+import { Positions } from 'enums/market';
 import useInterval from 'hooks/useInterval';
 import ChainedPosition from 'pages/SpeedMarkets/components/ChainedPosition';
 import {

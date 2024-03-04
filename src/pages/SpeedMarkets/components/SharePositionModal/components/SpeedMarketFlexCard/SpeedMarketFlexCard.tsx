@@ -2,7 +2,7 @@ import DownBackground from 'assets/images/flex-cards/down-background.png';
 import ZeusResolvedWinBackground from 'assets/images/flex-cards/resolved.png';
 import UpBackground from 'assets/images/flex-cards/up-background.png';
 import { USD_SIGN } from 'constants/currency';
-import { Positions } from 'enums/options';
+import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';

@@ -10,7 +10,7 @@ import {
 import { ZERO_ADDRESS } from 'constants/network';
 import { CONNECTION_TIMEOUT_MS, PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
 import { millisecondsToSeconds, secondsToMinutes } from 'date-fns';
-import { Positions } from 'enums/options';
+import { Positions } from 'enums/market';
 import { BigNumber, ethers } from 'ethers';
 import i18n from 'i18n';
 import { toast } from 'react-toastify';

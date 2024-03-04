@@ -83,7 +83,6 @@ const QUERY_KEYS = {
     Referral: {
         ReferrerID: (walletAddress: string) => ['referrerId', walletAddress],
     },
-    Banners: (networkId: NetworkId) => ['banners', networkId],
 };
 
 export default QUERY_KEYS;

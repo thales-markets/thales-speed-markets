@@ -1,7 +1,7 @@
 import TileTable from 'components/TileTable/TileTable';
 import { USD_SIGN } from 'constants/currency';
 import { millisecondsToSeconds } from 'date-fns';
-import { Positions } from 'enums/options';
+import { Positions } from 'enums/market';
 import { orderBy } from 'lodash';
 import ChainedPositionAction from 'pages/SpeedMarkets/components/ChainedPositionAction';
 import { ShareIcon } from 'pages/SpeedMarkets/components/OpenPosition/OpenPosition';

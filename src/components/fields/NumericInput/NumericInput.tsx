@@ -2,7 +2,6 @@ import MuiTooltip from '@material-ui/core/Tooltip';
 import { ReactComponent as BalanceIcon } from 'assets/images/balance-icon.svg';
 import InlineLoader from 'components/InlineLoader';
 import Tooltip from 'components/Tooltip';
-import { DEFAULT_TOKEN_DECIMALS } from 'constants/defaults';
 import React, { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -35,6 +34,7 @@ type NumericInputProps = {
 };
 
 const INVALID_CHARS = ['-', '+', 'e'];
+const DEFAULT_TOKEN_DECIMALS = 18;
 
 const NumericInput: React.FC<NumericInputProps> = ({
     value,

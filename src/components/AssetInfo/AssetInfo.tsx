@@ -1,4 +1,4 @@
-import { Positions } from 'enums/options';
+import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import { Chain, Icon } from 'pages/SpeedMarkets/components/SelectPosition/styled-components';
 import React from 'react';

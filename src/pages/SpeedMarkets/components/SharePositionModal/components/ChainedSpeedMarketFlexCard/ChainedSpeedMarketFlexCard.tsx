@@ -1,7 +1,7 @@
 import ChainedLostBackground from 'assets/images/flex-cards/chained-lost.png';
 import ChainedWonBackground from 'assets/images/flex-cards/chained-won.png';
 import { FIAT_CURRENCY_MAP, USD_SIGN } from 'constants/currency';
-import { Positions } from 'enums/options';
+import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import { Icon } from 'pages/SpeedMarkets/components/SelectPosition/styled-components';
 import React from 'react';

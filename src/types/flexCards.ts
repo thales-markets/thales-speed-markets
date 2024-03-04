@@ -1,4 +1,4 @@
-import { Positions } from 'enums/options';
+import { Positions } from 'enums/market';
 
 export type SharePositionType = 'resolved-speed' | 'potential-speed' | 'chained-speed-won' | 'chained-speed-lost';
 

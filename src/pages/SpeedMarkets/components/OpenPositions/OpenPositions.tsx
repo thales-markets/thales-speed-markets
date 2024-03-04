@@ -3,7 +3,7 @@ import CollateralSelector from 'components/CollateralSelector';
 import SimpleLoader from 'components/SimpleLoader/SimpleLoader';
 import { USD_SIGN } from 'constants/currency';
 import { ZERO_ADDRESS } from 'constants/network';
-import { Positions } from 'enums/options';
+import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import { CollateralSelectorContainer, InLabel } from 'pages/Profile/components/MyPositionAction/MyPositionAction';
 import ChainedPosition from 'pages/SpeedMarkets/components/ChainedPosition';

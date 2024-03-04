@@ -1,4 +1,4 @@
-import { Positions } from 'enums/options';
+import { Positions } from 'enums/market';
 import { TFunction } from 'i18next';
 import styled from 'styled-components';
 import { ThemeInterface } from 'types/ui';
