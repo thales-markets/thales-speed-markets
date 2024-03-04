@@ -1,6 +1,6 @@
 import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
-import { generalConfig } from 'config/general';
 import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
+import { LINKS } from 'constants/links';
 import { PRICE_ID, PRICE_SERVICE_ENDPOINTS, PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import { ethers } from 'ethers';
 import { NetworkId, bigNumberFormatter, floorNumberToDecimals } from 'thales-utils';
@@ -80,7 +80,7 @@ export const getBenchmarksPriceFeeds = async (priceFeeds: { priceId: string; pub
 
     if (priceFeeds.length) {
         const benchmarksPricePromises = priceFeeds.map((data: any) =>
-            fetch(`${generalConfig.PYTH_BENCHMARKS_API_URL}${data.publishTime}?ids=${data.priceId}`).catch((e) =>
+            fetch(`${LINKS.Pyth.BenchmarksPrice}${data.publishTime}?ids=${data.priceId}`).catch((e) =>
                 console.log('Pyth price benchmarks error', e)
             )
         );

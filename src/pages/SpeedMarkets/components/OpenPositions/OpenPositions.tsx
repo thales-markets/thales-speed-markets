@@ -26,18 +26,12 @@ import { resolveAllChainedMarkets, resolveAllSpeedPositions } from 'utils/speedA
 import OpenPosition from '../OpenPosition';
 
 type OpenPositionsProps = {
-    isSpeedMarkets?: boolean;
-    isChainedSpeedMarkets?: boolean;
+    isChained?: boolean;
     maxPriceDelayForResolvingSec?: number;
     currentPrices?: { [key: string]: number };
 };
 
-const OpenPositions: React.FC<OpenPositionsProps> = ({
-    isSpeedMarkets,
-    isChainedSpeedMarkets,
-    maxPriceDelayForResolvingSec,
-    currentPrices,
-}) => {
+const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayForResolvingSec, currentPrices }) => {
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 
@@ -57,7 +51,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({
     const [chainedWithClaimableStatus, setChainedWithClaimableStatus] = useState<ChainedSpeedMarket[]>([]);
 
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(networkId, walletAddress, {
-        enabled: isAppReady && isWalletConnected && !!isSpeedMarkets && !isChainedSpeedMarkets,
+        enabled: isAppReady && isWalletConnected && !isChained,
     });
 
     const userOpenSpeedMarketsData = useMemo(
@@ -69,7 +63,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({
     );
 
     const userChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(networkId, walletAddress, {
-        enabled: isAppReady && isWalletConnected && !!isChainedSpeedMarkets,
+        enabled: isAppReady && isWalletConnected && !!isChained,
     });
 
     const userOpenChainedSpeedMarketsData = useMemo(
@@ -139,7 +133,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({
         chainedWithClaimableStatus.length ? chainedWithClaimableStatus : userOpenChainedSpeedMarketsData
     ) as ChainedSpeedMarket[];
 
-    const noPositions = isChainedSpeedMarkets
+    const noPositions = isChained
         ? userOpenChainedSpeedMarketsData.length === 0
         : userOpenSpeedMarketsData.length === 0;
     const positions = noPositions ? dummyPositions : sortedUserOpenSpeedMarketsData;
@@ -152,13 +146,13 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({
     const claimableChainedPositions = chainedWithClaimableStatus.filter((p) => p.claimable);
     const claimableChainedPositionsSum = claimableChainedPositions.reduce((acc, pos) => acc + pos.amount, 0);
 
-    const hasClaimableSpeedPositions = isChainedSpeedMarkets
+    const hasClaimableSpeedPositions = isChained
         ? !!claimableChainedPositions.length
         : !!claimableSpeedPositions.length;
 
     const handleSubmit = async () => {
         setIsSubmitting(true);
-        if (isChainedSpeedMarkets) {
+        if (isChained) {
             await resolveAllChainedMarkets(claimableChainedPositions, false, networkId);
         } else {
             await resolveAllSpeedPositions(claimableSpeedPositions, false, networkId);
@@ -180,19 +174,17 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({
                     : t('speed-markets.user-positions.claim-all')
             } ${formatCurrencyWithSign(
                 USD_SIGN,
-                isChainedSpeedMarkets ? claimableChainedPositionsSum : claimableSpeedPositionsSum,
+                isChained ? claimableChainedPositionsSum : claimableSpeedPositionsSum,
                 2
             )}`}
         </Button>
     );
 
-    const showClaimAll = isSpeedMarkets && hasClaimableSpeedPositions;
-
     return (
         <Wrapper>
             <Header>
                 <Title>{t('markets.user-positions.your-positions')}</Title>
-                {showClaimAll && (
+                {hasClaimableSpeedPositions && (
                     <ButtonWrapper>
                         {getClaimAllButton()}
                         {isMultiCollateralSupported && (
@@ -218,8 +210,8 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({
                 </LoaderContainer>
             ) : (
                 <>
-                    <PositionsWrapper noPositions={noPositions} isChained={isChainedSpeedMarkets}>
-                        {isChainedSpeedMarkets && !noPositions
+                    <PositionsWrapper noPositions={noPositions} isChained={isChained}>
+                        {isChained && !noPositions
                             ? sortedUserOpenChainedSpeedMarketsData.map((position, index) => (
                                   <ChainedPosition
                                       position={position}

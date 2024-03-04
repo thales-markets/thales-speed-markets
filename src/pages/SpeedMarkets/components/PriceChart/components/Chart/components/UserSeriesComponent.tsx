@@ -12,10 +12,9 @@ import { RootState } from 'types/ui';
 import { timeToLocal } from 'utils/formatters/date';
 
 export const UserPositionAreaSeries: React.FC<{
-    isSpeedMarkets: boolean;
     asset: string;
     candlestickData: any;
-}> = ({ isSpeedMarkets, asset, candlestickData }) => {
+}> = ({ asset, candlestickData }) => {
     const chart = useContext(ChartContext);
     const [series, setSeries] = useState<ISeriesApi<'Area'> | undefined>();
     const networkId = useSelector((state: RootState) => getNetworkId(state));
@@ -25,7 +24,7 @@ export const UserPositionAreaSeries: React.FC<{
     const [userData, setUserData] = useState<any>([]);
 
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(networkId, walletAddress, {
-        enabled: isAppReady && isWalletConnected && isSpeedMarkets,
+        enabled: isAppReady && isWalletConnected,
         refetchInterval: 30 * 1000,
     });
 

@@ -13,8 +13,7 @@ export const AreaSeriesComponent: React.FC<{
     selectedPrice?: number;
     selectedRightPrice?: number;
     selectedDate?: number;
-    isSpeedMarkets: boolean;
-}> = ({ data, position, selectedPrice, isSpeedMarkets, selectedDate, asset, selectedRightPrice }) => {
+}> = ({ data, position, selectedPrice, selectedDate, asset, selectedRightPrice }) => {
     const chart = useContext(ChartContext);
     const [series, setSeries] = useState<ISeriesApi<'Area'> | undefined>();
     const [rangeSeries, setRangeSeries] = useState<ISeriesApi<'Area'> | undefined>();
@@ -37,13 +36,13 @@ export const AreaSeriesComponent: React.FC<{
             crosshairMarkerVisible: false,
             lineColor: Colors.BLUE_MIDNIGHT_LIGHT,
             lineWidth: 1,
-            lastValueVisible: !isSpeedMarkets,
+            lastValueVisible: false,
         });
         const localRangeSeries = chart?.addAreaSeries({
             crosshairMarkerVisible: false,
             lineColor: Colors.BLUE_MIDNIGHT_LIGHT,
             lineWidth: 1,
-            lastValueVisible: !isSpeedMarkets,
+            lastValueVisible: false,
         });
 
         setSeries(localSeries);

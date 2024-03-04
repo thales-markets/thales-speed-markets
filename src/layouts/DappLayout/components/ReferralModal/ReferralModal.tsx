@@ -6,7 +6,7 @@ import SelectInput from 'components/SelectInput';
 import ToastMessage from 'components/ToastMessage';
 import { getErrorToastOptions, getSuccessToastOptions } from 'components/ToastMessage/ToastMessage';
 import TextInput from 'components/fields/TextInput';
-import { generalConfig } from 'config/general';
+import { LINKS } from 'constants/links';
 import ROUTES from 'constants/routes';
 import useGetReffererIdQuery from 'queries/referral/useGetReffererIdQuery';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -85,7 +85,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
 
     const generateLinkHandler = useCallback(async () => {
         const signature = await (snxJSConnector as any).signer.signMessage(referrerID);
-        const response = await axios.post(`${generalConfig.API_URL}/update-refferer-id`, {
+        const response = await axios.post(`${LINKS.API}/update-refferer-id`, {
             walletAddress,
             reffererID: referrerID,
             signature,

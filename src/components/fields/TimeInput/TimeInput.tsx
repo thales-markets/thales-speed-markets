@@ -1,12 +1,12 @@
+import MuiTooltip from '@material-ui/core/Tooltip';
+import { ReactComponent as BalanceIcon } from 'assets/images/balance-icon.svg';
+import InlineLoader from 'components/InlineLoader';
 import Tooltip from 'components/Tooltip';
 import React, { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { FieldContainer, FieldLabel, Input } from '../common';
-import MuiTooltip from '@material-ui/core/Tooltip';
 import { FlexDivCentered } from 'styles/common';
-import { ReactComponent as BalanceIcon } from 'assets/images/token/balance-icon.svg';
-import InlineLoader from 'components/InlineLoader';
+import { FieldContainer, FieldLabel, Input } from '../common';
 
 type TimeInputProps = {
     value: string | number;

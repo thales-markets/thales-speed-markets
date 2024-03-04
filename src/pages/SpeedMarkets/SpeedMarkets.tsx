@@ -1,11 +1,12 @@
 import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
-import banner from 'assets/images/speed-markets/speed-markets-banner.png';
+import banner from 'assets/images/speed-markets-banner.png';
 import PageLinkBanner from 'components/PageLinkBanner';
 import SPAAnchor from 'components/SPAAnchor/SPAAnchor';
 import SimpleLoader from 'components/SimpleLoader';
 import SwitchInput from 'components/SwitchInput';
 import Tooltip from 'components/Tooltip';
 import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
+import { LINKS } from 'constants/links';
 import { CONNECTION_TIMEOUT_MS, SUPPORTED_ASSETS } from 'constants/pyth';
 import ROUTES from 'constants/routes';
 import { secondsToMilliseconds } from 'date-fns';
@@ -13,6 +14,7 @@ import { Positions } from 'enums/options';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import useInterval from 'hooks/useInterval';
 import OpenPositions from 'pages/SpeedMarkets/components/OpenPositions';
+import LightweightChart from 'pages/SpeedMarkets/components/PriceChart/LightweightChart';
 import useAmmChainedSpeedMarketsLimitsQuery from 'queries/speedMarkets/useAmmChainedSpeedMarketsLimitsQuery';
 import useAmmSpeedMarketsLimitsQuery from 'queries/speedMarkets/useAmmSpeedMarketsLimitsQuery';
 import queryString from 'query-string';
@@ -23,11 +25,10 @@ import { useLocation } from 'react-router-dom';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
 import { getIsWalletConnected, getNetworkId } from 'redux/modules/wallet';
-import { RootState } from 'types/ui';
 import styled, { useTheme } from 'styled-components';
 import { BoldText, FlexDivCentered, FlexDivRowCentered, FlexDivSpaceBetween, FlexDivStart } from 'styles/common';
 import { roundNumberToDecimals } from 'thales-utils';
-import { ThemeInterface } from 'types/ui';
+import { RootState, ThemeInterface } from 'types/ui';
 import { getSupportedNetworksByRoute } from 'utils/network';
 import { getCurrentPrices, getPriceId, getPriceServiceEndpoint } from 'utils/pyth';
 import { buildHref, history } from 'utils/routes';
@@ -38,8 +39,6 @@ import SelectBuyin from './components/SelectBuyin';
 import SelectPosition from './components/SelectPosition';
 import { SelectedPosition } from './components/SelectPosition/SelectPosition';
 import SelectTime from './components/SelectTime';
-import LightweightChart from 'pages/SpeedMarkets/components/PriceChart/LightweightChart';
-import { LINKS } from 'constants/links';
 
 const SpeedMarkets: React.FC = () => {
     const { t } = useTranslation();
@@ -334,7 +333,6 @@ const SpeedMarkets: React.FC = () => {
                                 selectedDate={getTimeStampForDelta(deltaTimeSec)}
                                 deltaTimeSec={deltaTimeSec}
                                 selectedRightPrice={undefined}
-                                isSpeedMarkets
                                 explicitCurrentPrice={currentPrices[currencyKey]}
                                 prevExplicitPrice={prevPrice.current}
                                 chainedRisk={isChained ? ammChainedSpeedMarketsLimitsData?.risk : undefined}
@@ -376,8 +374,7 @@ const SpeedMarkets: React.FC = () => {
                     {isWalletConnected && (
                         <>
                             <OpenPositions
-                                isSpeedMarkets
-                                isChainedSpeedMarkets={isChained}
+                                isChained={isChained}
                                 maxPriceDelayForResolvingSec={ammSpeedMarketsLimitsData?.maxPriceDelayForResolvingSec}
                                 currentPrices={currentPrices}
                             />

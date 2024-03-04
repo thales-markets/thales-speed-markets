@@ -1,6 +1,6 @@
 import axios from 'axios';
 import ElectionsBanner from 'components/ElectionsBanner';
-import { generalConfig } from 'config/general';
+import { LINKS } from 'constants/links';
 import useWidgetBotScript from 'hooks/useWidgetBotScript';
 import queryString from 'query-string';
 import React, { useEffect, useState } from 'react';
@@ -41,7 +41,7 @@ const DappLayout: React.FC<DappLayoutProps> = ({ children }) => {
                 const response = await axios.get(
                     // passing an encoded string to encodeURIComponent causes an error in some cases
                     // reffererId is already encoded so we have to decode it
-                    `${generalConfig.API_URL}/get-refferer-id-address/${encodeURIComponent(
+                    `${LINKS.API}/get-refferer-id-address/${encodeURIComponent(
                         decodeURIComponent(queryParams.referrerId)
                     )}`
                 );

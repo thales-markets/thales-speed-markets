@@ -1,4 +1,4 @@
-import { generalConfig } from 'config/general';
+import { LINKS } from 'constants/links';
 import QUERY_KEYS from 'constants/queryKeys';
 import { millisecondsToSeconds } from 'date-fns';
 import { UseQueryOptions, useQuery } from 'react-query';
@@ -23,7 +23,7 @@ const usePythCandlestickQuery = (
             const startDate = new Date(date);
             const response = await fetch(
                 `${
-                    generalConfig.PYTH_BENCHMARKS_TRADINGVIEW_HISTORY
+                    LINKS.Pyth.BenchmarksTradingViewHistory
                 }?symbol=Crypto.${asset}/USD&resolution=${resolution}&from=${millisecondsToSeconds(
                     Number(startDate)
                 )}&to=${millisecondsToSeconds(Number(Date.now()))}`

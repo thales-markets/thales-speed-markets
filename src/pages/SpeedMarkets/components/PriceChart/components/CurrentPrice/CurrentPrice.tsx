@@ -7,50 +7,43 @@ import { formatCurrencyWithSign } from 'thales-utils';
 type CurrentPriceProps = {
     asset: string;
     currentPrice: number | undefined;
-    animatePrice?: boolean;
     isPriceUp?: boolean;
 };
 
-const CurrentPrice: React.FC<CurrentPriceProps> = ({ asset, currentPrice, animatePrice, isPriceUp }) => {
+const CurrentPrice: React.FC<CurrentPriceProps> = ({ asset, currentPrice, isPriceUp }) => {
     const currentPriceFormatted = formatCurrencyWithSign(USD_SIGN, currentPrice || 0);
     const skipIndexes: number[] = [];
 
     return (
         <Container>
             <Icon className={`currency-icon currency-icon--${asset.toLowerCase()}`} />
-            {animatePrice ? (
-                <>
-                    <AnimatedPrice key={currentPrice}>
-                        {currentPriceFormatted.split('').map((letter: string, index) => {
-                            if (isNaN(parseInt(letter))) {
-                                skipIndexes.push(index + 1);
-                                return (
-                                    <Price isUp={isPriceUp} key={`priceLetter${index}`}>
-                                        {letter}
-                                    </Price>
-                                );
-                            } else {
-                                return (
-                                    <PriceNumber
-                                        priceLength={currentPriceFormatted.length}
-                                        skipIndexes={skipIndexes}
-                                        isUp={isPriceUp}
-                                        key={`priceNumber${index}`}
-                                    >
-                                        <i>1</i>
-                                        <i>2</i>
-                                        <i>3</i>
-                                        {letter}
-                                    </PriceNumber>
-                                );
-                            }
-                        })}
-                    </AnimatedPrice>
-                    <Icon className="icon icon--arrow" isUp={isPriceUp} />
-                </>
-            ) : (
-                <Price>{currentPrice ? currentPriceFormatted : 'N/A'}</Price>
-            )}
+            <AnimatedPrice key={currentPrice}>
+                {currentPriceFormatted.split('').map((letter: string, index) => {
+                    if (isNaN(parseInt(letter))) {
+                        skipIndexes.push(index + 1);
+                        return (
+                            <Price isUp={isPriceUp} key={`priceLetter${index}`}>
+                                {letter}
+                            </Price>
+                        );
+                    } else {
+                        return (
+                            <PriceNumber
+                                priceLength={currentPriceFormatted.length}
+                                skipIndexes={skipIndexes}
+                                isUp={isPriceUp}
+                                key={`priceNumber${index}`}
+                            >
+                                <i>1</i>
+                                <i>2</i>
+                                <i>3</i>
+                                {letter}
+                            </PriceNumber>
+                        );
+                    }
+                })}
+            </AnimatedPrice>
+            <Icon className="icon icon--arrow" isUp={isPriceUp} />
         </Container>
     );
 };

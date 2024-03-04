@@ -49,7 +49,6 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
     const [toastId, setToastId] = useState<string | number>(0);
     const [isMetamaskBrowser, setIsMetamaskBrowser] = useState(false);
 
-    const isSpeedMarkets = ['potential-speed', 'resolved-speed'].includes(type);
     const isChainedMarkets = ['chained-speed-won', 'chained-speed-lost'].includes(type);
 
     const ref = useRef<HTMLDivElement>(null);
@@ -140,7 +139,7 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
                     const twitterLinkWithStatusMessage =
                         LINKS.TwitterTweetStatus +
                         TWITTER_MESSAGE_CHECKOUT +
-                        (isSpeedMarkets ? LINKS.Markets.Speed : LINKS.Markets.ChainedSpeed) +
+                        (isChainedMarkets ? LINKS.Markets.ChainedSpeed : LINKS.Markets.Speed) +
                         (useDownloadImage ? TWITTER_MESSAGE_UPLOAD : TWITTER_MESSAGE_PASTE);
 
                     // Mobile requires user action in order to open new window, it can't open in async call, so adding <a>
@@ -200,7 +199,7 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
                 }
             }
         },
-        [isLoading, useDownloadImage, isMobile, t, onClose, isSpeedMarkets]
+        [isLoading, useDownloadImage, isMobile, t, onClose, isChainedMarkets]
     );
 
     const onTwitterShareClick = () => {
@@ -246,18 +245,7 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
         >
             <Container ref={ref}>
                 {!isMobile && <CloseIcon className={`icon icon--x-sign`} onClick={onClose} />}
-                {isSpeedMarkets && (
-                    <SpeedMarketFlexCard
-                        type={type}
-                        currencyKey={currencyKey}
-                        positions={positions}
-                        strikeDate={strikeDate}
-                        strikePrices={strikePrices}
-                        buyIn={buyIn}
-                        payout={payout}
-                    />
-                )}
-                {isChainedMarkets && (
+                {isChainedMarkets ? (
                     <ChainedSpeedMarketFlexCard
                         type={type}
                         currencyKey={currencyKey}
@@ -268,6 +256,16 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
                         buyIn={buyIn}
                         payout={payout}
                         payoutMultiplier={payoutMultiplier}
+                    />
+                ) : (
+                    <SpeedMarketFlexCard
+                        type={type}
+                        currencyKey={currencyKey}
+                        positions={positions}
+                        strikeDate={strikeDate}
+                        strikePrices={strikePrices}
+                        buyIn={buyIn}
+                        payout={payout}
                     />
                 )}
                 <TwitterShare disabled={isLoading} onClick={onTwitterShareClick}>

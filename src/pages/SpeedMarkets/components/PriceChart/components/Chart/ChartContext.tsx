@@ -18,7 +18,6 @@ type ChartProps = {
     data: any;
     position: Positions | undefined;
     asset: string;
-    isSpeedMarkets: boolean;
     selectedPrice?: number;
     selectedRightPrice?: number;
     selectedDate?: number;
@@ -33,7 +32,6 @@ export const ChartComponent: React.FC<ChartProps> = ({
     data,
     position,
     asset,
-    isSpeedMarkets,
     selectedPrice,
     selectedRightPrice,
     selectedDate,
@@ -75,12 +73,8 @@ export const ChartComponent: React.FC<ChartProps> = ({
     }, [theme]);
 
     useEffect(() => {
-        if (!isSpeedMarkets) chart?.timeScale().fitContent();
-    }, [isSpeedMarkets, selectedPrice, chart]);
-
-    useEffect(() => {
-        setDisplayPositions(Number(resolution) === 1 && isSpeedMarkets);
-    }, [resolution, isSpeedMarkets]);
+        setDisplayPositions(Number(resolution) === 1);
+    }, [resolution]);
 
     return (
         <ChartContainer>
@@ -92,20 +86,13 @@ export const ChartComponent: React.FC<ChartProps> = ({
                         <AreaSeriesComponent
                             asset={asset}
                             data={data}
-                            isSpeedMarkets={isSpeedMarkets}
                             position={position}
                             selectedPrice={selectedPrice}
                             selectedRightPrice={selectedRightPrice}
                             selectedDate={selectedDate}
                         />
 
-                        {displayPositions && (
-                            <UserPositionAreaSeries
-                                candlestickData={data}
-                                asset={asset}
-                                isSpeedMarkets={isSpeedMarkets}
-                            />
-                        )}
+                        {displayPositions && <UserPositionAreaSeries candlestickData={data} asset={asset} />}
                     </ChartProvider>
                 )}
             </Chart>

@@ -1,13 +1,13 @@
-import React from 'react';
-import styled from 'styled-components';
-import SpeedMarketsLogo from 'assets/images/flex-cards/speed_markets_logo.svg';
-import { useSelector } from 'react-redux';
-import { RootState } from 'types/ui';
-import useGetReffererIdQuery from 'queries/referral/useGetReffererIdQuery';
-import { getWalletAddress } from 'redux/modules/wallet';
-import { buildReferrerLink } from 'utils/routes';
-import QRCode from 'react-qr-code';
+import SpeedMarketsLogo from 'assets/images/flex-cards/speed-markets-logo.svg';
 import ROUTES from 'constants/routes';
+import useGetReffererIdQuery from 'queries/referral/useGetReffererIdQuery';
+import React from 'react';
+import QRCode from 'react-qr-code';
+import { useSelector } from 'react-redux';
+import { getWalletAddress } from 'redux/modules/wallet';
+import styled from 'styled-components';
+import { RootState } from 'types/ui';
+import { buildReferrerLink } from 'utils/routes';
 
 const SpeedMarketsFooter: React.FC = () => {
     const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
