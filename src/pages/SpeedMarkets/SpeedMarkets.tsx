@@ -5,7 +5,6 @@ import SPAAnchor from 'components/SPAAnchor/SPAAnchor';
 import SimpleLoader from 'components/SimpleLoader';
 import SwitchInput from 'components/SwitchInput';
 import Tooltip from 'components/Tooltip';
-import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
 import { LINKS } from 'constants/links';
 import { CONNECTION_TIMEOUT_MS, SUPPORTED_ASSETS } from 'constants/pyth';
 import ROUTES from 'constants/routes';
@@ -30,7 +29,7 @@ import { BoldText, FlexDivCentered, FlexDivRowCentered, FlexDivSpaceBetween, Fle
 import { roundNumberToDecimals } from 'thales-utils';
 import { RootState, ThemeInterface } from 'types/ui';
 import { getSupportedNetworksByRoute } from 'utils/network';
-import { getCurrentPrices, getPriceId, getPriceServiceEndpoint } from 'utils/pyth';
+import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAssetsAsObject } from 'utils/pyth';
 import { buildHref, history } from 'utils/routes';
 import AmmSpeedTrading from './components/AmmSpeedTrading';
 import ClosedPositions from './components/ClosedPositions';
@@ -54,10 +53,7 @@ const SpeedMarkets: React.FC = () => {
     const isChainedMarkets = isChainedSupported && queryString.parse(location.search).isChained === 'true';
 
     const [isChained, setIsChained] = useState(isChainedMarkets);
-    const [currentPrices, setCurrentPrices] = useState<{ [key: string]: number }>({
-        [CRYPTO_CURRENCY_MAP.BTC]: 0,
-        [CRYPTO_CURRENCY_MAP.ETH]: 0,
-    });
+    const [currentPrices, setCurrentPrices] = useState<{ [key: string]: number }>(getSupportedAssetsAsObject());
     const [currencyKey, setCurrencyKey] = useState(SUPPORTED_ASSETS[0]);
     const [positionType, setPositionType] = useState<SelectedPosition>(undefined);
     const [chainedPositions, setChainedPositions] = useState<SelectedPosition[]>([undefined, undefined]);

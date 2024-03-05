@@ -326,12 +326,10 @@
         "choose-landing": "Choose landing page",
         "choose-referral": "Choose your Referral ID",
         "choose-referral-placeholder": "Enter Referral ID",
+        "copied": "Copied!",
         "pages": {
             "speed-market-page": "Speed markets page",
             "landing-page": "Landing page"
-        },
-        "modal": {
-            "copied": "Copied!"
         },
         "generate": {
             "id-exists": "Referral ID already exists",

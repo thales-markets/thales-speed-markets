@@ -1,7 +1,7 @@
 import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
 import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
 import { LINKS } from 'constants/links';
-import { PRICE_ID, PRICE_SERVICE_ENDPOINTS, PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
+import { PRICE_ID, PRICE_SERVICE_ENDPOINTS, PYTH_CURRENCY_DECIMALS, SUPPORTED_ASSETS } from 'constants/pyth';
 import { ethers } from 'ethers';
 import { NetworkId, bigNumberFormatter, floorNumberToDecimals } from 'thales-utils';
 
@@ -45,24 +45,34 @@ const getCurrencyByPriceId = (networkId: NetworkId, priceId: string) => {
     }
 };
 
+export const getSupportedAssetsAsObject = () => SUPPORTED_ASSETS.reduce((acc, asset) => ({ ...acc, [asset]: 0 }), {});
+
 export const getCurrentPrices = async (
     connection: EvmPriceServiceConnection,
     networkId: NetworkId,
     priceIds: string[]
 ) => {
-    const priceFeeds = await connection.getLatestPriceFeeds(priceIds);
+    let currentPrices = getSupportedAssetsAsObject();
 
-    return priceFeeds
-        ? priceFeeds.reduce(
-              (accumulator, priceFeed) => ({
-                  ...accumulator,
-                  [getCurrencyByPriceId(networkId, priceFeed.id)]:
-                      // Get the price if it is not older than 30 seconds from the current time
-                      priceFeed.getPriceNoOlderThan(30)?.getPriceAsNumberUnchecked() || 0,
-              }),
-              {}
-          )
-        : { [CRYPTO_CURRENCY_MAP.BTC]: 0, [CRYPTO_CURRENCY_MAP.ETH]: 0 };
+    try {
+        const priceFeeds = await connection.getLatestPriceFeeds(priceIds);
+
+        if (priceFeeds) {
+            currentPrices = priceFeeds.reduce(
+                (accumulator, priceFeed) => ({
+                    ...accumulator,
+                    [getCurrencyByPriceId(networkId, priceFeed.id)]:
+                        // Get the price if it is not older than 30 seconds from the current time
+                        priceFeed.getPriceNoOlderThan(30)?.getPriceAsNumberUnchecked() || 0,
+                }),
+                {}
+            );
+        }
+    } catch (e) {
+        console.log('Error while fetching Pyth latest price feeds', e);
+    }
+
+    return currentPrices;
 };
 
 /*

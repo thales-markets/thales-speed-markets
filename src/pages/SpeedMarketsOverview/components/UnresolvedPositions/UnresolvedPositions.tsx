@@ -29,7 +29,7 @@ import { getNetworkId, getWalletAddress } from 'redux/modules/wallet';
 import { RootState } from 'types/ui';
 import { formatCurrencyWithSign } from 'thales-utils';
 import { UserOpenPositions } from 'types/market';
-import { getCurrentPrices, getPriceId, getPriceServiceEndpoint } from 'utils/pyth';
+import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAssetsAsObject } from 'utils/pyth';
 import { refetchActiveSpeedMarkets, refetchPythPrice } from 'utils/queryConnector';
 import { resolveAllSpeedPositions } from 'utils/speedAmm';
 import UnresolvedPosition from '../UnresolvedPosition';
@@ -42,10 +42,7 @@ const UnresolvedPositions: React.FC = () => {
     const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
-    const [currentPrices, setCurrentPrices] = useState<{ [key: string]: number }>({
-        [CRYPTO_CURRENCY_MAP.BTC]: 0,
-        [CRYPTO_CURRENCY_MAP.ETH]: 0,
-    });
+    const [currentPrices, setCurrentPrices] = useState<{ [key: string]: number }>(getSupportedAssetsAsObject());
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSubmittingSection, setIsSubmittingSection] = useState('');
     const [isLoadingEnabled, setIsLoadingEnabled] = useState(true);

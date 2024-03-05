@@ -109,7 +109,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
     const copyLink = () => {
         navigator.clipboard.writeText(referralLink);
         toast(
-            <ToastMessage id="customId" type="success" message={t('referral.modal.copied')} />,
+            <ToastMessage id="customId" type="success" message={t('referral.copied')} />,
             getSuccessToastOptions('', 'customId')
         );
     };
