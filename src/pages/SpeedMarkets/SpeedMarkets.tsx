@@ -1,20 +1,21 @@
 import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
-import banner from 'assets/images/speed-markets/speed-markets-banner.png';
+import banner from 'assets/images/speed-markets-banner.png';
 import PageLinkBanner from 'components/PageLinkBanner';
 import SPAAnchor from 'components/SPAAnchor/SPAAnchor';
 import SimpleLoader from 'components/SimpleLoader';
 import SwitchInput from 'components/SwitchInput';
 import Tooltip from 'components/Tooltip';
-import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
+import { LINKS } from 'constants/links';
 import { CONNECTION_TIMEOUT_MS, SUPPORTED_ASSETS } from 'constants/pyth';
 import ROUTES from 'constants/routes';
 import { secondsToMilliseconds } from 'date-fns';
-import { Positions } from 'enums/options';
+import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import useInterval from 'hooks/useInterval';
-import OpenPositions from 'pages/Trade/components/OpenPositions';
-import useAmmChainedSpeedMarketsLimitsQuery from 'queries/options/speedMarkets/useAmmChainedSpeedMarketsLimitsQuery';
-import useAmmSpeedMarketsLimitsQuery from 'queries/options/speedMarkets/useAmmSpeedMarketsLimitsQuery';
+import OpenPositions from 'pages/SpeedMarkets/components/OpenPositions';
+import LightweightChart from 'pages/SpeedMarkets/components/PriceChart/LightweightChart';
+import useAmmChainedSpeedMarketsLimitsQuery from 'queries/speedMarkets/useAmmChainedSpeedMarketsLimitsQuery';
+import useAmmSpeedMarketsLimitsQuery from 'queries/speedMarkets/useAmmSpeedMarketsLimitsQuery';
 import queryString from 'query-string';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
@@ -23,13 +24,12 @@ import { useLocation } from 'react-router-dom';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
 import { getIsWalletConnected, getNetworkId } from 'redux/modules/wallet';
-import { RootState } from 'types/ui';
 import styled, { useTheme } from 'styled-components';
 import { BoldText, FlexDivCentered, FlexDivRowCentered, FlexDivSpaceBetween, FlexDivStart } from 'styles/common';
 import { roundNumberToDecimals } from 'thales-utils';
-import { ThemeInterface } from 'types/ui';
+import { RootState, ThemeInterface } from 'types/ui';
 import { getSupportedNetworksByRoute } from 'utils/network';
-import { getCurrentPrices, getPriceId, getPriceServiceEndpoint } from 'utils/pyth';
+import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAssetsAsObject } from 'utils/pyth';
 import { buildHref, history } from 'utils/routes';
 import AmmSpeedTrading from './components/AmmSpeedTrading';
 import ClosedPositions from './components/ClosedPositions';
@@ -38,7 +38,6 @@ import SelectBuyin from './components/SelectBuyin';
 import SelectPosition from './components/SelectPosition';
 import { SelectedPosition } from './components/SelectPosition/SelectPosition';
 import SelectTime from './components/SelectTime';
-import LightweightChart from 'pages/Trade/components/PriceChart/LightweightChart';
 
 const SpeedMarkets: React.FC = () => {
     const { t } = useTranslation();
@@ -50,14 +49,11 @@ const SpeedMarkets: React.FC = () => {
     const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
-    const isChainedSupported = getSupportedNetworksByRoute(ROUTES.Options.ChainedSpeedMarkets).includes(networkId);
+    const isChainedSupported = getSupportedNetworksByRoute(ROUTES.Markets.ChainedSpeedMarkets).includes(networkId);
     const isChainedMarkets = isChainedSupported && queryString.parse(location.search).isChained === 'true';
 
     const [isChained, setIsChained] = useState(isChainedMarkets);
-    const [currentPrices, setCurrentPrices] = useState<{ [key: string]: number }>({
-        [CRYPTO_CURRENCY_MAP.BTC]: 0,
-        [CRYPTO_CURRENCY_MAP.ETH]: 0,
-    });
+    const [currentPrices, setCurrentPrices] = useState<{ [key: string]: number }>(getSupportedAssetsAsObject());
     const [currencyKey, setCurrencyKey] = useState(SUPPORTED_ASSETS[0]);
     const [positionType, setPositionType] = useState<SelectedPosition>(undefined);
     const [chainedPositions, setChainedPositions] = useState<SelectedPosition[]>([undefined, undefined]);
@@ -333,7 +329,6 @@ const SpeedMarkets: React.FC = () => {
                                 selectedDate={getTimeStampForDelta(deltaTimeSec)}
                                 deltaTimeSec={deltaTimeSec}
                                 selectedRightPrice={undefined}
-                                isSpeedMarkets
                                 explicitCurrentPrice={currentPrices[currencyKey]}
                                 prevExplicitPrice={prevPrice.current}
                                 chainedRisk={isChained ? ammChainedSpeedMarketsLimitsData?.risk : undefined}
@@ -371,17 +366,11 @@ const SpeedMarkets: React.FC = () => {
                         setSkewImpact={setSkew}
                         resetData={resetData}
                     />
-                    {
-                        // TODO: set link to thales markets dApp
-                        getSupportedNetworksByRoute(ROUTES.Options.Home).includes(networkId) && (
-                            <PageLinkBanner rout={ROUTES.Options.Home} />
-                        )
-                    }
+                    <PageLinkBanner link={LINKS.Markets.Thales} />
                     {isWalletConnected && (
                         <>
                             <OpenPositions
-                                isSpeedMarkets
-                                isChainedSpeedMarkets={isChained}
+                                isChained={isChained}
                                 maxPriceDelayForResolvingSec={ammSpeedMarketsLimitsData?.maxPriceDelayForResolvingSec}
                                 currentPrices={currentPrices}
                             />
@@ -389,7 +378,7 @@ const SpeedMarkets: React.FC = () => {
                         </>
                     )}
                     <OverviewLinkWrapper>
-                        <SPAAnchor href={buildHref(`${ROUTES.Options.SpeedMarketsOverview}?isChained=${isChained}`)}>
+                        <SPAAnchor href={buildHref(`${ROUTES.Markets.SpeedMarketsOverview}?isChained=${isChained}`)}>
                             <OverviewLinkText>
                                 {isChained
                                     ? t('speed-markets.overview.navigate-chained')

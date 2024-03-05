@@ -1,14 +1,16 @@
 import Tooltip from 'components/Tooltip';
 import { USD_SIGN } from 'constants/currency';
 import { millisecondsToSeconds } from 'date-fns';
-import { Positions } from 'enums/options';
+import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
+import { ShareIcon } from 'pages/SpeedMarkets/components/OpenPosition/OpenPosition';
+import SharePositionModal from 'pages/SpeedMarkets/components/SharePositionModal';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { getIsMobile } from 'redux/modules/ui';
 import { getNetworkId } from 'redux/modules/wallet';
-import { RootState } from 'types/ui';
 import styled, { useTheme } from 'styled-components';
 import { FlexDivCentered, FlexDivColumn, FlexDivColumnCentered, FlexDivSpaceBetween } from 'styles/common';
 import {
@@ -17,17 +19,14 @@ import {
     formatShortDate,
     formatShortDateWithTime,
 } from 'thales-utils';
-import { ChainedSpeedMarket } from 'types/options';
-import { ThemeInterface } from 'types/ui';
-import { getPriceId } from 'utils/pyth';
-import { AssetIcon, Icon, PositionSymbolDown, PositionSymbolUp } from '../SelectPosition/styled-components';
+import { ChainedSpeedMarket } from 'types/market';
+import { RootState, ThemeInterface } from 'types/ui';
 import { formatNumberShort } from 'utils/formatters/number';
-import ChainedPositionAction from '../ChainedPositionAction';
+import { getPriceId } from 'utils/pyth';
 import { refetchPythPrice } from 'utils/queryConnector';
-import { getIsMobile } from 'redux/modules/ui';
-import { getColorPerPosition } from 'utils/options';
-import { ShareIcon } from 'pages/Trade/components/OpenPosition/OpenPosition';
-import SharePositionModal from 'pages/Trade/components/AmmTrading/components/SharePositionModal';
+import { getColorPerPosition } from 'utils/style';
+import ChainedPositionAction from '../ChainedPositionAction';
+import { AssetIcon, Icon, PositionSymbolDown, PositionSymbolUp } from '../SelectPosition/styled-components';
 
 type ChainedPositionProps = {
     position: ChainedSpeedMarket;
@@ -188,11 +187,11 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                         ))}
                     </FlexContainer>
                     <FlexContainer>
-                        <Text>{t('markets.user-positions.size')}</Text>
-                        <Text isActiveColor>{formatNumberShort(positionWithPrices.amount)}</Text>
+                        <Text>{t('speed-markets.user-positions.size')}</Text>
+                        <Text isActiveColor>{formatNumberShort(positionWithPrices.payout)}</Text>
                     </FlexContainer>
                     <FlexContainer>
-                        <Text>{t('markets.user-positions.paid')}</Text>
+                        <Text>{t('speed-markets.user-positions.paid')}</Text>
                         <Text isActiveColor>{formatCurrencyWithSign(USD_SIGN, positionWithPrices.paid, 2)}</Text>
                     </FlexContainer>
                     <ChainedPositionAction
@@ -302,11 +301,11 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                     <Summary>
                         <BuyInfo>
                             <Text>
-                                {t('markets.user-positions.size')}
-                                <Text isActiveColor>{` ${formatNumberShort(positionWithPrices.amount)}`}</Text>
+                                {t('speed-markets.user-positions.size')}
+                                <Text isActiveColor>{` ${formatNumberShort(positionWithPrices.payout)}`}</Text>
                             </Text>
                             <Text padding="0 0 0 30px">
-                                {t('markets.user-positions.paid')}
+                                {t('speed-markets.user-positions.paid')}
                                 <Text isActiveColor>{` ${formatCurrencyWithSign(
                                     USD_SIGN,
                                     positionWithPrices.paid
@@ -356,7 +355,7 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                     strikePrices={positionWithPrices.strikePrices}
                     finalPrices={positionWithPrices.finalPrices}
                     buyIn={positionWithPrices.paid}
-                    payout={positionWithPrices.amount}
+                    payout={positionWithPrices.payout}
                     payoutMultiplier={positionWithPrices.payoutMultiplier}
                     onClose={() => setOpenTwitterShareModal(false)}
                 />

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { generalConfig } from 'config/general';
+import { LINKS } from 'constants/links';
 import QUERY_KEYS from 'constants/queryKeys';
 import { useQuery, UseQueryOptions } from 'react-query';
 
@@ -8,7 +8,7 @@ const useGetReffererIdQuery = (walletAddress: string, options?: UseQueryOptions<
         QUERY_KEYS.Referral.ReferrerID(walletAddress),
         async () => {
             try {
-                const response = await axios.get(`${generalConfig.API_URL}/get-address-refferer-id/${walletAddress}`);
+                const response = await axios.get(`${LINKS.API}/get-address-refferer-id/${walletAddress}`);
                 return response.data;
             } catch (e) {
                 return null;

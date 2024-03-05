@@ -1,35 +1,27 @@
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import Button from 'components/Button';
+import Modal from 'components/Modal';
 import Checkbox from 'components/fields/Checkbox';
 import NumericInput from 'components/fields/NumericInput/NumericInput';
-import Modal from 'components/Modal';
 import { BigNumber, ethers } from 'ethers';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsWalletConnected, getNetworkId } from 'redux/modules/wallet';
-import { RootState } from 'types/ui';
 import styled from 'styled-components';
 import { FlexDivCentered, FlexDivColumnCentered, FlexDivRow } from 'styles/common';
-import { bigNumberFormatter, coinParser, Coins } from 'thales-utils';
+import { Coins, bigNumberFormatter, coinParser } from 'thales-utils';
+import { RootState } from 'types/ui';
 
 type ApprovalModalProps = {
     defaultAmount: number | string;
     tokenSymbol: string;
-    isNonStable?: boolean;
     isAllowing: boolean;
     onSubmit: (approveAmount: BigNumber) => void;
     onClose: () => void;
 };
 
-const ApprovalModal: React.FC<ApprovalModalProps> = ({
-    defaultAmount,
-    tokenSymbol,
-    isNonStable,
-    isAllowing,
-    onSubmit,
-    onClose,
-}) => {
+const ApprovalModal: React.FC<ApprovalModalProps> = ({ defaultAmount, tokenSymbol, isAllowing, onSubmit, onClose }) => {
     const { t } = useTranslation();
     const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
     const networkId = useSelector((state: RootState) => getNetworkId(state));
@@ -43,9 +35,7 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({
     const isAmountEntered = Number(amount) > 0;
     const isButtonDisabled = !isWalletConnected || isAllowing || (!approveAll && (!isAmountEntered || !isAmountValid));
 
-    const amountConverted = isNonStable
-        ? ethers.utils.parseEther(Number(amount).toString())
-        : coinParser(Number(amount).toString(), networkId, tokenSymbol as Coins);
+    const amountConverted = coinParser(Number(amount).toString(), networkId, tokenSymbol as Coins);
 
     const getSubmitButton = () => {
         if (!isWalletConnected) {

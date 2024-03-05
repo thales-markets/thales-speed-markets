@@ -3,7 +3,7 @@ import { ScreenSizeBreakpoint } from 'enums/ui';
 import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { FlexDivCentered, FlexDivRow } from 'styles/common';
-import { AmmChainedSpeedMarketsLimits, AmmSpeedMarketsLimits } from 'types/options';
+import { AmmChainedSpeedMarketsLimits, AmmSpeedMarketsLimits } from 'types/market';
 import { SelectedPosition } from '../SelectPosition/SelectPosition';
 import { roundNumberToDecimals } from 'thales-utils';
 

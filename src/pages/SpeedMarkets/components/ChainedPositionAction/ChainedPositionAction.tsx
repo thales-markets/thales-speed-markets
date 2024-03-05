@@ -13,7 +13,7 @@ import {
 import Tooltip from 'components/Tooltip';
 import { USD_SIGN } from 'constants/currency';
 import { ZERO_ADDRESS } from 'constants/network';
-import { ONE_HUNDRED_AND_THREE_PERCENT } from 'constants/options';
+import { ONE_HUNDRED_AND_THREE_PERCENT } from 'constants/market';
 import { CONNECTION_TIMEOUT_MS, PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
 import { differenceInSeconds, millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
 import { BigNumber, ethers } from 'ethers';
@@ -31,12 +31,11 @@ import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsMobile } from 'redux/modules/ui';
 import { getIsWalletConnected, getNetworkId, getSelectedCollateralIndex, getWalletAddress } from 'redux/modules/wallet';
-import { RootState } from 'types/ui';
 import { useTheme } from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
 import { coinParser, formatCurrencyWithSign, roundNumberToDecimals } from 'thales-utils';
-import { ChainedSpeedMarket } from 'types/options';
-import { ThemeInterface } from 'types/ui';
+import { ChainedSpeedMarket } from 'types/market';
+import { RootState, ThemeInterface } from 'types/ui';
 import erc20Contract from 'utils/contracts/erc20Contract';
 import { getCollateral, getCollaterals, getDefaultCollateral } from 'utils/currency';
 import { checkAllowance, getIsMultiCollateralSupported } from 'utils/network';
@@ -78,9 +77,9 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
 
-    const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId, true);
+    const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
     const defaultCollateral = useMemo(() => getDefaultCollateral(networkId), [networkId]);
-    const selectedCollateral = useMemo(() => getCollateral(networkId, selectedCollateralIndex, true), [
+    const selectedCollateral = useMemo(() => getCollateral(networkId, selectedCollateralIndex), [
         networkId,
         selectedCollateralIndex,
     ]);
@@ -113,7 +112,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
 
         const getAllowance = async () => {
             try {
-                const parsedAmount = coinParser(position.amount.toString(), networkId);
+                const parsedAmount = coinParser(position.payout.toString(), networkId);
 
                 const allowance = await checkAllowance(parsedAmount, erc20Instance, walletAddress, addressToApprove);
                 setAllowance(allowance);
@@ -125,7 +124,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
             getAllowance();
         }
     }, [
-        position.amount,
+        position.payout,
         position.isOpen,
         position.claimable,
         networkId,
@@ -300,13 +299,13 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                                   ? isSubmittingBatch
                                       ? t('speed-markets.overview.resolve')
                                       : t(`speed-markets.overview.resolve-progress`)
-                                  : t('markets.user-positions.claim-win-progress')
+                                  : t('speed-markets.user-positions.claim-win-progress')
                               : isOverview
                               ? isAdmin
                                   ? `${t('common.admin')} ${t('speed-markets.overview.resolve')}`
                                   : t('speed-markets.overview.resolve')
-                              : t('markets.user-positions.claim-win')
-                      } ${formatCurrencyWithSign(USD_SIGN, position.amount, 2)}`
+                              : t('speed-markets.user-positions.claim-win')
+                      } ${formatCurrencyWithSign(USD_SIGN, position.payout, 2)}`
                     : isAllowing
                     ? `${t('common.enable-wallet-access.approve-progress')} ${defaultCollateral}...`
                     : t('common.enable-wallet-access.approve-swap', {
@@ -324,7 +323,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                     getResolveButton()
                 ) : (
                     <Tooltip
-                        overlay={t('markets.user-positions.approve-swap-tooltip', {
+                        overlay={t('speed-markets.user-positions.approve-swap-tooltip', {
                             currencyKey: selectedCollateral,
                             defaultCurrency: defaultCollateral,
                         })}
@@ -346,7 +345,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
             } else {
                 return (
                     <ResultsContainer minWidth="180px">
-                        <Label>{t('markets.user-positions.results')}</Label>
+                        <Label>{t('speed-markets.user-positions.results')}</Label>
                         <TimeRemaining fontSize={13} end={position.maturityDate} showFullCounter showSecondsCounter />
                     </ResultsContainer>
                 );
@@ -374,7 +373,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                     <CollateralSelectorContainer>
                         <InLabel color={theme.button.textColor.quaternary}>{t('common.in')}</InLabel>
                         <CollateralSelector
-                            collateralArray={getCollaterals(networkId, true)}
+                            collateralArray={getCollaterals(networkId)}
                             selectedItem={selectedCollateralIndex}
                             onChangeCollateral={() => {}}
                             disabled={isSubmitting || isAllowing}
@@ -391,9 +390,8 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
             {openApprovalModal && (
                 <ApprovalModal
                     // add three percent to approval amount to take into account price changes
-                    defaultAmount={roundNumberToDecimals(ONE_HUNDRED_AND_THREE_PERCENT * position.amount)}
+                    defaultAmount={roundNumberToDecimals(ONE_HUNDRED_AND_THREE_PERCENT * position.payout)}
                     tokenSymbol={defaultCollateral}
-                    isNonStable={false}
                     isAllowing={isAllowing}
                     onSubmit={handleAllowance}
                     onClose={() => setOpenApprovalModal(false)}

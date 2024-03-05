@@ -1,42 +1,38 @@
-import { Network } from 'enums/network';
-import { NetworkParams } from 'types/network';
+import { NetworkId } from 'thales-utils';
+import { NetworkParams, SupportedNetwork } from 'types/network';
 import { Chain } from 'wagmi';
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
-export const SUPPORTED_NETWORKS: Record<Network, string> = {
-    [Network.Mainnet]: 'MAINNET',
-    [Network.OptimismMainnet]: 'OPTIMISTIC',
-    [Network.PolygonMainnet]: 'POLYGON-MAINNET',
-    [Network.OptimismGoerli]: 'GOERLI-OPTIMISM',
-    [Network.OptimismSepolia]: 'SEPOLIA-OPTIMISM',
-    [Network.Arbitrum]: 'ARBITRUM-ONE',
-    [Network.Base]: 'BASE',
-    [Network.ZkSync]: 'ZKSYNC',
-    [Network.ZkSyncSepolia]: 'ZKSYNC-SEPOLIA',
-    [Network.BlastSepolia]: 'BLAST-SEPOLIA',
+export const SUPPORTED_NETWORKS: Record<SupportedNetwork, string> = {
+    [NetworkId.OptimismMainnet]: 'OPTIMISTIC',
+    [NetworkId.PolygonMainnet]: 'POLYGON-MAINNET',
+    [NetworkId.OptimismGoerli]: 'GOERLI-OPTIMISM',
+    [NetworkId.OptimismSepolia]: 'SEPOLIA-OPTIMISM',
+    [NetworkId.Arbitrum]: 'ARBITRUM-ONE',
+    [NetworkId.Base]: 'BASE',
+    [NetworkId.ZkSync]: 'ZKSYNC',
+    [NetworkId.ZkSyncSepolia]: 'ZKSYNC-SEPOLIA',
+    [NetworkId.BlastSepolia]: 'BLAST-SEPOLIA',
 };
 
-export const SUPPORTED_NETWORKS_NAMES: Record<Network, string> = {
-    [Network.Mainnet]: 'MAINNET',
-    [Network.OptimismMainnet]: 'OPTIMISM MAINNET',
-    [Network.PolygonMainnet]: 'POLYGON',
-    [Network.OptimismGoerli]: 'OPTIMISM GOERLI',
-    [Network.OptimismSepolia]: 'OPTIMISM SEPOLIA',
-    [Network.Arbitrum]: 'ARBITRUM ONE',
-    [Network.Base]: 'BASE',
-    [Network.ZkSync]: 'ZKSYNC',
-    [Network.ZkSyncSepolia]: 'ZKSYNC SEPOLIA',
-    [Network.BlastSepolia]: 'BLAST SEPOLIA',
+export const SUPPORTED_NETWORKS_NAMES: Record<SupportedNetwork, string> = {
+    [NetworkId.OptimismMainnet]: 'OPTIMISM MAINNET',
+    [NetworkId.PolygonMainnet]: 'POLYGON',
+    [NetworkId.OptimismGoerli]: 'OPTIMISM GOERLI',
+    [NetworkId.OptimismSepolia]: 'OPTIMISM SEPOLIA',
+    [NetworkId.Arbitrum]: 'ARBITRUM ONE',
+    [NetworkId.Base]: 'BASE',
+    [NetworkId.ZkSync]: 'ZKSYNC',
+    [NetworkId.ZkSyncSepolia]: 'ZKSYNC SEPOLIA',
+    [NetworkId.BlastSepolia]: 'BLAST SEPOLIA',
 };
 
-export const SWAP_SUPPORTED_NETWORKS: Network[] = [];
+export const TEST_NETWORKS = [NetworkId.OptimismGoerli, NetworkId.OptimismSepolia, NetworkId.ZkSyncSepolia];
 
-export const TEST_NETWORKS = [Network.OptimismGoerli, Network.OptimismSepolia, Network.ZkSyncSepolia];
-
-export const DEFAULT_NETWORK: { name: string; networkId: Network } = {
-    name: SUPPORTED_NETWORKS_NAMES[Network.OptimismMainnet],
-    networkId: Network.OptimismMainnet,
+export const DEFAULT_NETWORK: { name: string; networkId: SupportedNetwork } = {
+    name: SUPPORTED_NETWORKS_NAMES[NetworkId.OptimismMainnet],
+    networkId: NetworkId.OptimismMainnet,
 };
 
 type NetworkMapper = Record<number, number>;
@@ -47,7 +43,7 @@ export const L1_TO_L2_NETWORK_MAPPER: NetworkMapper = {
 };
 
 export const SUPPORTED_NETWORKS_PARAMS: Record<number, NetworkParams> = {
-    [Network.OptimismMainnet]: {
+    [NetworkId.OptimismMainnet]: {
         chainId: '0xA',
         chainName: 'Optimism',
         rpcUrls: ['https://mainnet.optimism.io'],
@@ -58,7 +54,7 @@ export const SUPPORTED_NETWORKS_PARAMS: Record<number, NetworkParams> = {
             decimals: 18,
         },
     },
-    [Network.PolygonMainnet]: {
+    [NetworkId.PolygonMainnet]: {
         chainId: '0x89',
         chainName: 'Polygon Mainnet',
         rpcUrls: ['https://polygon-rpc.com'],
@@ -69,7 +65,7 @@ export const SUPPORTED_NETWORKS_PARAMS: Record<number, NetworkParams> = {
             decimals: 18,
         },
     },
-    [Network.Arbitrum]: {
+    [NetworkId.Arbitrum]: {
         chainId: '0xA4B1',
         chainName: 'Arbitrum One',
         rpcUrls: ['https://arb1.arbitrum.io/rpc'],
@@ -80,7 +76,7 @@ export const SUPPORTED_NETWORKS_PARAMS: Record<number, NetworkParams> = {
             decimals: 18,
         },
     },
-    [Network.Base]: {
+    [NetworkId.Base]: {
         chainId: '0x2105',
         chainName: 'BASE',
         rpcUrls: ['https://mainnet.base.org'],
@@ -91,7 +87,7 @@ export const SUPPORTED_NETWORKS_PARAMS: Record<number, NetworkParams> = {
             decimals: 18,
         },
     },
-    [Network.ZkSync]: {
+    [NetworkId.ZkSync]: {
         chainId: '0x144',
         chainName: 'zkSync',
         rpcUrls: ['https://mainnet.era.zksync.io'],
@@ -102,7 +98,7 @@ export const SUPPORTED_NETWORKS_PARAMS: Record<number, NetworkParams> = {
             decimals: 18,
         },
     },
-    [Network.BlastSepolia]: {
+    [NetworkId.BlastSepolia]: {
         chainId: '0xa0c71fd',
         chainName: 'Blast Sepolia',
         rpcUrls: ['https://sepolia.blast.io'],
@@ -213,7 +209,7 @@ export const BlastSepolia = {
     nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
     rpcUrls: {
         default: {
-            http: ['https://sepolia.blast.io'],
+            http: ['https://blast-sepolia.blockpi.network/v1/rpc/public'],
             webSocket: ['wss://sepolia.blast.io/ws'],
         },
         public: {
@@ -223,7 +219,7 @@ export const BlastSepolia = {
     },
     blockExplorers: {
         default: {
-            name: 'zkExplorer',
+            name: 'Blastscan',
             url: 'https://testnet.blastscan.io/',
         },
     },

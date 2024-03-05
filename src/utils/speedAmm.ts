@@ -10,12 +10,12 @@ import {
 import { ZERO_ADDRESS } from 'constants/network';
 import { CONNECTION_TIMEOUT_MS, PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
 import { millisecondsToSeconds, secondsToMinutes } from 'date-fns';
-import { Network } from 'enums/network';
-import { Positions } from 'enums/options';
+import { Positions } from 'enums/market';
 import { BigNumber, ethers } from 'ethers';
 import i18n from 'i18n';
 import { toast } from 'react-toastify';
-import { ChainedSpeedMarket, UserLivePositions } from 'types/options';
+import { SupportedNetwork } from 'types/network';
+import { ChainedSpeedMarket, UserOpenPositions } from 'types/market';
 import { getPriceId, getPriceServiceEndpoint, priceParser } from 'utils/pyth';
 import { refetchActiveSpeedMarkets } from 'utils/queryConnector';
 import snxJSConnector from 'utils/snxJSConnector';
@@ -147,9 +147,9 @@ export const getUserLostAtSideIndex = (position: ChainedSpeedMarket) => {
 };
 
 export const resolveAllSpeedPositions = async (
-    positions: UserLivePositions[],
+    positions: UserOpenPositions[],
     isAdmin: boolean,
-    networkId: Network
+    networkId: SupportedNetwork
 ) => {
     if (!positions.length) {
         return;
@@ -237,7 +237,7 @@ export const resolveAllSpeedPositions = async (
 export const resolveAllChainedMarkets = async (
     positions: ChainedSpeedMarket[],
     isAdmin: boolean,
-    networkId: Network
+    networkId: SupportedNetwork
 ) => {
     if (!positions.length) {
         return;

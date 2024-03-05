@@ -1,60 +1,25 @@
-import { hexStripZeros } from '@ethersproject/bytes';
-import detectEthereumProvider from '@metamask/detect-provider';
 import { ReactComponent as ArbitrumLogo } from 'assets/images/arbitrum-circle-logo.svg';
 import { ReactComponent as BaseLogo } from 'assets/images/base-circle-logo.svg';
 import { ReactComponent as BlastSepoliaLogo } from 'assets/images/blast-sepolia-circle-logo.svg';
-import { ReactComponent as EthereumLogo } from 'assets/images/ethereum-circle-logo.svg';
 import { ReactComponent as OpLogo } from 'assets/images/optimism-circle-logo.svg';
 import { ReactComponent as PolygonLogo } from 'assets/images/polygon-circle-logo.svg';
 import { ReactComponent as ZkSyncLogo } from 'assets/images/zksync-circle-logo.svg';
-import { ADDITIONAL_COLLATERALS, COLLATERALS } from 'constants/currency';
-import {
-    DEFAULT_NETWORK,
-    L1_TO_L2_NETWORK_MAPPER,
-    SUPPORTED_NETWORKS,
-    SUPPORTED_NETWORKS_NAMES,
-    SUPPORTED_NETWORKS_PARAMS,
-} from 'constants/network';
+import { L1_TO_L2_NETWORK_MAPPER, SUPPORTED_NETWORKS, SUPPORTED_NETWORKS_PARAMS } from 'constants/network';
 import ROUTES from 'constants/routes';
-import { Network } from 'enums/network';
 import { BigNumber } from 'ethers';
 import { FunctionComponent, SVGProps } from 'react';
-import { NetworkParams } from '../types/network';
-
-type EthereumProvider = {
-    isMetaMask: boolean;
-    networkVersion: string;
-};
+import { NetworkId } from 'thales-utils';
+import { NetworkParams, SupportedNetwork } from '../types/network';
+import { getCollaterals } from './currency';
 
 const hasEthereumInjected = () => !!window.ethereum;
 
-// Not in use anymore as detectEthereumProvider() doesn't always return value.
-// On page reload returns undefined and on hard reload returns good value from Metamask (e.g. 69)
-export async function getEthereumNetwork() {
-    try {
-        if (hasEthereumInjected()) {
-            const provider = (await detectEthereumProvider()) as EthereumProvider;
-            if (provider && provider.networkVersion != null) {
-                const networkId = Number(provider.networkVersion) as Network;
-                return { name: SUPPORTED_NETWORKS_NAMES[networkId], networkId };
-            }
-        }
-        return DEFAULT_NETWORK;
-    } catch (e) {
-        console.log(e);
-        return DEFAULT_NETWORK;
-    }
-}
-
-export const isNetworkSupported = (networkId: Network): boolean => {
+export const isNetworkSupported = (networkId: SupportedNetwork): boolean => {
     return !!SUPPORTED_NETWORKS[networkId];
 };
 
-export const getIsMultiCollateralSupported = (networkId: Network, includeAdditional?: boolean): boolean =>
-    COLLATERALS[networkId].concat(includeAdditional ? ADDITIONAL_COLLATERALS[networkId] : []).length > 1;
-
-export const getIsOVM = (networkId: number): boolean =>
-    [Network.OptimismMainnet, Network.OptimismGoerli, Network.OptimismSepolia].includes(networkId);
+export const getIsMultiCollateralSupported = (networkId: SupportedNetwork): boolean =>
+    getCollaterals(networkId).length > 1;
 
 export const checkAllowance = async (amount: BigNumber, token: any, walletAddress: string, spender: string) => {
     try {
@@ -106,7 +71,7 @@ type DropdownNetwork = {
 };
 
 export const SUPPORTED_NETWORK_IDS_MAP: Record<number, DropdownNetwork> = {
-    [Network.OptimismMainnet]: {
+    [NetworkId.OptimismMainnet]: {
         name: 'Optimism',
         icon: OpLogo,
         changeNetwork: async (networkId: number, callback?: VoidFunction) => {
@@ -116,7 +81,7 @@ export const SUPPORTED_NETWORK_IDS_MAP: Record<number, DropdownNetwork> = {
         },
         order: 1,
     },
-    [Network.PolygonMainnet]: {
+    [NetworkId.PolygonMainnet]: {
         name: 'Polygon',
         icon: PolygonLogo,
         changeNetwork: async (networkId: number, callback?: VoidFunction) => {
@@ -125,16 +90,7 @@ export const SUPPORTED_NETWORK_IDS_MAP: Record<number, DropdownNetwork> = {
         },
         order: 4,
     },
-    [Network.Mainnet]: {
-        name: 'Mainnet',
-        icon: EthereumLogo,
-        changeNetwork: async (networkId: number, callback?: VoidFunction) => {
-            const formattedChainId = hexStripZeros(BigNumber.from(networkId).toHexString());
-            await changeNetwork(undefined, callback, formattedChainId);
-        },
-        order: 6,
-    },
-    [Network.Arbitrum]: {
+    [NetworkId.Arbitrum]: {
         name: 'Arbitrum',
         icon: ArbitrumLogo,
         changeNetwork: async (networkId: number, callback?: VoidFunction) => {
@@ -143,7 +99,7 @@ export const SUPPORTED_NETWORK_IDS_MAP: Record<number, DropdownNetwork> = {
         },
         order: 2,
     },
-    [Network.Base]: {
+    [NetworkId.Base]: {
         name: 'Base',
         icon: BaseLogo,
         changeNetwork: async (networkId: number, callback?: VoidFunction) => {
@@ -152,7 +108,7 @@ export const SUPPORTED_NETWORK_IDS_MAP: Record<number, DropdownNetwork> = {
         },
         order: 3,
     },
-    [Network.ZkSync]: {
+    [NetworkId.ZkSync]: {
         name: 'ZkSync',
         icon: ZkSyncLogo,
         changeNetwork: async (networkId: number, callback?: VoidFunction) => {
@@ -161,7 +117,7 @@ export const SUPPORTED_NETWORK_IDS_MAP: Record<number, DropdownNetwork> = {
         },
         order: 5,
     },
-    [Network.BlastSepolia]: {
+    [NetworkId.BlastSepolia]: {
         name: 'Blast Sepolia',
         icon: BlastSepoliaLogo,
         changeNetwork: async (networkId: number, callback?: VoidFunction) => {
@@ -172,35 +128,35 @@ export const SUPPORTED_NETWORK_IDS_MAP: Record<number, DropdownNetwork> = {
     },
 };
 
-export const getSupportedNetworksByRoute = (route: string): Network[] => {
+export const getSupportedNetworksByRoute = (route: string): NetworkId[] => {
     switch (route) {
-        case ROUTES.Options.Home:
-        case ROUTES.Options.ChainedSpeedMarkets:
-        case ROUTES.Options.ChainedSpeedMarketsOverview:
+        case ROUTES.Markets.Home:
+        case ROUTES.Markets.SpeedMarkets:
+        case ROUTES.Markets.SpeedMarketsOverview:
+        case ROUTES.Markets.Profile:
             return [
-                Network.OptimismMainnet,
-                Network.OptimismGoerli,
-                Network.Arbitrum,
-                Network.Base,
-                Network.PolygonMainnet,
+                NetworkId.OptimismMainnet,
+                NetworkId.OptimismGoerli,
+                NetworkId.Arbitrum,
+                NetworkId.Base,
+                NetworkId.PolygonMainnet,
+                NetworkId.ZkSync,
+                NetworkId.ZkSyncSepolia,
+                NetworkId.BlastSepolia,
             ];
-        case ROUTES.Options.SpeedMarkets:
-        case ROUTES.Options.SpeedMarketsOverview:
-        case ROUTES.Options.Profile:
+        case ROUTES.Markets.ChainedSpeedMarkets:
+        case ROUTES.Markets.ChainedSpeedMarketsOverview:
             return [
-                Network.OptimismMainnet,
-                Network.OptimismGoerli,
-                Network.Arbitrum,
-                Network.Base,
-                Network.PolygonMainnet,
-                Network.ZkSync,
-                Network.ZkSyncSepolia,
-                Network.BlastSepolia,
+                NetworkId.OptimismMainnet,
+                NetworkId.OptimismGoerli,
+                NetworkId.Arbitrum,
+                NetworkId.Base,
+                NetworkId.PolygonMainnet,
             ];
         default:
-            return Object.keys(SUPPORTED_NETWORKS).map((network) => Number(network) as Network);
+            return Object.keys(SUPPORTED_NETWORKS).map((network) => Number(network) as NetworkId);
     }
 };
 
-export const isOnlySpeedMarketsSupported = (networkId: Network): boolean =>
-    [Network.ZkSync, Network.ZkSyncSepolia, Network.BlastSepolia].includes(networkId);
+export const isOnlySpeedMarketsSupported = (networkId: NetworkId): boolean =>
+    [NetworkId.ZkSync, NetworkId.ZkSyncSepolia, NetworkId.BlastSepolia].includes(networkId);

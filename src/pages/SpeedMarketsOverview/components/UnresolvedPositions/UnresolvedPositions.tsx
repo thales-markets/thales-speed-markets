@@ -2,10 +2,10 @@ import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
 import Button from 'components/Button';
 import SimpleLoader from 'components/SimpleLoader/SimpleLoader';
 import { CRYPTO_CURRENCY_MAP, USD_SIGN } from 'constants/currency';
-import { SPEED_MARKETS_OVERVIEW_SECTIONS as SECTIONS } from 'constants/options';
+import { SPEED_MARKETS_OVERVIEW_SECTIONS as SECTIONS } from 'constants/market';
 import { CONNECTION_TIMEOUT_MS, SUPPORTED_ASSETS } from 'constants/pyth';
 import { millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
-import { Positions } from 'enums/options';
+import { Positions } from 'enums/market';
 import useInterval from 'hooks/useInterval';
 import {
     LoaderContainer,
@@ -17,8 +17,8 @@ import {
     getAdditionalButtonStyle,
     getDefaultButtonProps,
 } from 'pages/SpeedMarketsOverview/styled-components';
-import useActiveSpeedMarketsDataQuery from 'queries/options/speedMarkets/useActiveSpeedMarketsDataQuery';
-import useAmmSpeedMarketsLimitsQuery from 'queries/options/speedMarkets/useAmmSpeedMarketsLimitsQuery';
+import useActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useActiveSpeedMarketsDataQuery';
+import useAmmSpeedMarketsLimitsQuery from 'queries/speedMarkets/useAmmSpeedMarketsLimitsQuery';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -28,8 +28,8 @@ import { getIsMobile } from 'redux/modules/ui';
 import { getNetworkId, getWalletAddress } from 'redux/modules/wallet';
 import { RootState } from 'types/ui';
 import { formatCurrencyWithSign } from 'thales-utils';
-import { UserLivePositions } from 'types/options';
-import { getCurrentPrices, getPriceId, getPriceServiceEndpoint } from 'utils/pyth';
+import { UserOpenPositions } from 'types/market';
+import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAssetsAsObject } from 'utils/pyth';
 import { refetchActiveSpeedMarkets, refetchPythPrice } from 'utils/queryConnector';
 import { resolveAllSpeedPositions } from 'utils/speedAmm';
 import UnresolvedPosition from '../UnresolvedPosition';
@@ -42,10 +42,7 @@ const UnresolvedPositions: React.FC = () => {
     const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
-    const [currentPrices, setCurrentPrices] = useState<{ [key: string]: number }>({
-        [CRYPTO_CURRENCY_MAP.BTC]: 0,
-        [CRYPTO_CURRENCY_MAP.ETH]: 0,
-    });
+    const [currentPrices, setCurrentPrices] = useState<{ [key: string]: number }>(getSupportedAssetsAsObject());
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSubmittingSection, setIsSubmittingSection] = useState('');
     const [isLoadingEnabled, setIsLoadingEnabled] = useState(true);
@@ -152,7 +149,7 @@ const UnresolvedPositions: React.FC = () => {
         setIsLoadingEnabled(true);
     }, [networkId]);
 
-    const handleResolveAll = async (positions: UserLivePositions[], isAdmin: boolean) => {
+    const handleResolveAll = async (positions: UserOpenPositions[], isAdmin: boolean) => {
         setIsSubmitting(true);
         await resolveAllSpeedPositions(positions, isAdmin, networkId);
         setIsSubmitting(false);
@@ -160,7 +157,7 @@ const UnresolvedPositions: React.FC = () => {
     };
 
     const getButton = (
-        positions: UserLivePositions[],
+        positions: UserOpenPositions[],
         sectionName: typeof SECTIONS[keyof typeof SECTIONS],
         isAdmin: boolean
     ) => {
@@ -186,7 +183,7 @@ const UnresolvedPositions: React.FC = () => {
         );
     };
 
-    const getSection = (section: typeof SECTIONS[keyof typeof SECTIONS], positions: UserLivePositions[]) => {
+    const getSection = (section: typeof SECTIONS[keyof typeof SECTIONS], positions: UserOpenPositions[]) => {
         let titleKey = '';
         switch (section) {
             case SECTIONS.userWinner:

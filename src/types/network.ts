@@ -1,3 +1,5 @@
+import { NetworkId } from "thales-utils";
+
 export type NetworkParams = {
     chainId: string;
     chainName: string;
@@ -10,3 +12,5 @@ export type NetworkParams = {
         decimals: number;
     };
 };
+
+export type SupportedNetwork = Exclude<NetworkId, NetworkId.Mainnet>;

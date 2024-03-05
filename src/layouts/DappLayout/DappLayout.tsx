@@ -1,8 +1,6 @@
-import { useMatomo } from '@datapunt/matomo-tracker-react';
 import axios from 'axios';
-import ElectionsBanner from 'components/ElectionsBannerV2';
-import { generalConfig } from 'config/general';
-import { Network } from 'enums/network';
+import ElectionsBanner from 'components/ElectionsBanner';
+import { LINKS } from 'constants/links';
 import useWidgetBotScript from 'hooks/useWidgetBotScript';
 import queryString from 'query-string';
 import React, { useEffect, useState } from 'react';
@@ -11,12 +9,11 @@ import { useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getNetworkId } from 'redux/modules/wallet';
-import { RootState } from 'types/ui';
 import styled, { useTheme } from 'styled-components';
-import { isAndroid, isMetamask } from 'thales-utils';
-import { ThemeInterface } from 'types/ui';
+import { NetworkId, isAndroid, isMetamask } from 'thales-utils';
+import { RootState, ThemeInterface } from 'types/ui';
 import { isMobile } from 'utils/device';
-import { getReferralWallet, setReferralWallet } from 'utils/referral';
+import { setReferralWallet } from 'utils/referral';
 import { ScreenSizeBreakpoint } from '../../enums/ui';
 import DappFooter from './DappFooter';
 import DappHeader from './DappHeader';
@@ -33,8 +30,6 @@ const DappLayout: React.FC<DappLayoutProps> = ({ children }) => {
     const rawParams = useLocation();
     const queryParams = queryString.parse(rawParams?.search);
 
-    const { trackPageView } = useMatomo();
-
     const [preventDiscordWidgetLoad, setPreventDiscordWidgetLoad] = useState(true);
 
     useEffect(() => {
@@ -46,7 +41,7 @@ const DappLayout: React.FC<DappLayoutProps> = ({ children }) => {
                 const response = await axios.get(
                     // passing an encoded string to encodeURIComponent causes an error in some cases
                     // reffererId is already encoded so we have to decode it
-                    `${generalConfig.API_URL}/get-refferer-id-address/${encodeURIComponent(
+                    `${LINKS.API}/get-refferer-id-address/${encodeURIComponent(
                         decodeURIComponent(queryParams.referrerId)
                     )}`
                 );
@@ -57,23 +52,6 @@ const DappLayout: React.FC<DappLayoutProps> = ({ children }) => {
             fetchIdAddress();
         }
     }, [queryParams?.referralId, queryParams?.referrerId]);
-
-    useEffect(() => {
-        const referralWallet = getReferralWallet();
-
-        trackPageView({
-            customDimensions: [
-                {
-                    id: 1,
-                    value: networkId ? networkId?.toString() : '',
-                },
-                {
-                    id: 2,
-                    value: referralWallet ? referralWallet : '',
-                },
-            ],
-        });
-    }, [rawParams, networkId, trackPageView]);
 
     useEffect(() => {
         const checkMetamaskBrowser = async () => {
@@ -89,7 +67,7 @@ const DappLayout: React.FC<DappLayoutProps> = ({ children }) => {
 
     return (
         <Background id="main-content">
-            {networkId === Network.Arbitrum && <ElectionsBanner />}
+            {networkId === NetworkId.Arbitrum && <ElectionsBanner />}
             <Wrapper>
                 <DappSidebar />
                 <DappHeader />

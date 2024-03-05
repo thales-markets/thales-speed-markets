@@ -1,17 +1,16 @@
-import { Network } from 'enums/network';
+import { NetworkId } from 'thales-utils';
 
 const erc20Contract = {
     addresses: {
-        [Network.Mainnet]: 'TBD',
-        [Network.OptimismMainnet]: '0x8c6f28f2F1A3C87F0f938b96d27520d9751ec8d9', // sUSD
-        [Network.OptimismGoerli]: '0xE1ceaa829525a08C1d39A5CEBe4b42aF58d77198', // exoticSUSD
-        [Network.OptimismSepolia]: 'TBD',
-        [Network.PolygonMainnet]: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174', //USDCe
-        [Network.Arbitrum]: '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8', //USDCe
-        [Network.Base]: '0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA', // USDbC
-        [Network.ZkSync]: '0x3355df6D4c9C3035724Fd0e3914dE96A5a83aaf4', // USDC
-        [Network.ZkSyncSepolia]: '0xCa032EdCFfC65Fc5FAea69624700d61318D6f6e8', // exoticSUSD
-        [Network.BlastSepolia]: '0x0E350351d27F950c92280c6B76ee49f0a64275fe', // exoticSUSD
+        [NetworkId.OptimismMainnet]: '0x8c6f28f2F1A3C87F0f938b96d27520d9751ec8d9', // sUSD
+        [NetworkId.OptimismGoerli]: '0xE1ceaa829525a08C1d39A5CEBe4b42aF58d77198', // exoticSUSD
+        [NetworkId.OptimismSepolia]: 'TBD',
+        [NetworkId.PolygonMainnet]: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174', //USDCe
+        [NetworkId.Arbitrum]: '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8', //USDCe
+        [NetworkId.Base]: '0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA', // USDbC
+        [NetworkId.ZkSync]: '0x3355df6D4c9C3035724Fd0e3914dE96A5a83aaf4', // USDC
+        [NetworkId.ZkSyncSepolia]: '0xCa032EdCFfC65Fc5FAea69624700d61318D6f6e8', // exoticSUSD
+        [NetworkId.BlastSepolia]: '0x0E350351d27F950c92280c6B76ee49f0a64275fe', // exoticSUSD
     },
     abi: [
         { inputs: [], stateMutability: 'nonpayable', type: 'constructor' },

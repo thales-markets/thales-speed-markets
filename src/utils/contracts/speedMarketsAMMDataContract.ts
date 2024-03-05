@@ -1,17 +1,16 @@
-import { Network } from 'enums/network';
+import { NetworkId } from 'thales-utils';
 
 const speedMarketsDataContract = {
     addresses: {
-        [Network.Mainnet]: 'TBD',
-        [Network.OptimismMainnet]: '0x467e14ac025499d60c417D7F00A7D9E83293F43c',
-        [Network.OptimismGoerli]: '0x39d1a205F72eC54aca01013c682A1A5C1625f4f6',
-        [Network.OptimismSepolia]: 'TBD',
-        [Network.PolygonMainnet]: '0xA30200A8eD9655d7096814D0cC1f76639aa42AED',
-        [Network.Arbitrum]: '0xbbE161Bf57799104eFd6524133e305BBcB7C07EA',
-        [Network.Base]: '0xD6155E7C948458D6Ab58f9D63E1566493b9304C1',
-        [Network.ZkSync]: '0x6356454D76642c72edb9170EF1102418D656887d',
-        [Network.ZkSyncSepolia]: '0x32A27803257207Fe4DB699A97Fb2CF055C9Ca727',
-        [Network.BlastSepolia]: '0x82dD5508537C2355c321584EcB440E3340d3aB79',
+        [NetworkId.OptimismMainnet]: '0x467e14ac025499d60c417D7F00A7D9E83293F43c',
+        [NetworkId.OptimismGoerli]: '0x39d1a205F72eC54aca01013c682A1A5C1625f4f6',
+        [NetworkId.OptimismSepolia]: 'TBD',
+        [NetworkId.PolygonMainnet]: '0xA30200A8eD9655d7096814D0cC1f76639aa42AED',
+        [NetworkId.Arbitrum]: '0xbbE161Bf57799104eFd6524133e305BBcB7C07EA',
+        [NetworkId.Base]: '0xD6155E7C948458D6Ab58f9D63E1566493b9304C1',
+        [NetworkId.ZkSync]: '0x6356454D76642c72edb9170EF1102418D656887d',
+        [NetworkId.ZkSyncSepolia]: '0x32A27803257207Fe4DB699A97Fb2CF055C9Ca727',
+        [NetworkId.BlastSepolia]: '0x82dD5508537C2355c321584EcB440E3340d3aB79',
     },
     abi: [
         {
@@ -701,7 +700,7 @@ const speedMarketsDataContract = {
         },
     ],
     abis: {
-        [Network.ZkSync]: [
+        [NetworkId.ZkSync]: [
             {
                 anonymous: false,
                 inputs: [
@@ -1207,7 +1206,7 @@ const speedMarketsDataContract = {
                 type: 'function',
             },
         ],
-        [Network.ZkSyncSepolia]: [
+        [NetworkId.ZkSyncSepolia]: [
             {
                 anonymous: false,
                 inputs: [

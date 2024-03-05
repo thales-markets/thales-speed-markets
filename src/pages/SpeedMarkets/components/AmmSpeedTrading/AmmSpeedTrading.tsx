@@ -18,17 +18,16 @@ import {
     POSITIONS_TO_SIDE_MAP,
     SPEED_MARKETS_QUOTE,
     STABLECOIN_CONVERSION_BUFFER_PERCENTAGE,
-} from 'constants/options';
+} from 'constants/market';
 import { PYTH_CONTRACT_ADDRESS, PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import { millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
-import { Network } from 'enums/network';
-import { Positions } from 'enums/options';
+import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import { BigNumber, ethers } from 'ethers';
 import useDebouncedEffect from 'hooks/useDebouncedEffect';
 import useInterval from 'hooks/useInterval';
-import SharePositionModal from 'pages/Trade/components/AmmTrading/components/SharePositionModal';
-import TradingDetailsSentence from 'pages/Trade/components/AmmTrading/components/TradingDetailsSentence';
+import SharePositionModal from 'pages/SpeedMarkets/components/SharePositionModal';
+import TradingDetailsSentence from 'pages/SpeedMarkets/components/TradingDetailsSentence';
 import useExchangeRatesQuery, { Rates } from 'queries/rates/useExchangeRatesQuery';
 import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipleCollateralBalanceQuery';
 import useStableBalanceQuery from 'queries/walletBalances/useStableBalanceQuery';
@@ -39,11 +38,11 @@ import { toast } from 'react-toastify';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
 import { getIsWalletConnected, getNetworkId, getSelectedCollateralIndex, getWalletAddress } from 'redux/modules/wallet';
-import { RootState } from 'types/ui';
 import styled from 'styled-components';
 import { FlexDivCentered, FlexDivColumn, FlexDivRow, FlexDivRowCentered } from 'styles/common';
 import {
     COLLATERAL_DECIMALS,
+    NetworkId,
     bigNumberFormatter,
     coinParser,
     formatCurrency,
@@ -53,8 +52,8 @@ import {
     roundNumberToDecimals,
     truncToDecimals,
 } from 'thales-utils';
-import { AmmChainedSpeedMarketsLimits, AmmSpeedMarketsLimits } from 'types/options';
-import { getCurrencyKeyStableBalance } from 'utils/balances';
+import { AmmChainedSpeedMarketsLimits, AmmSpeedMarketsLimits } from 'types/market';
+import { RootState } from 'types/ui';
 import erc20Contract from 'utils/contracts/erc20Contract';
 import { getCoinBalance, getCollateral, getCollaterals, getDefaultCollateral, isStableCurrency } from 'utils/currency';
 import { checkAllowance, getIsMultiCollateralSupported } from 'utils/network';
@@ -124,7 +123,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     const [openApprovalModal, setOpenApprovalModal] = useState(false);
     const [openTwitterShareModal, setOpenTwitterShareModal] = useState(false);
 
-    const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId, true);
+    const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
 
     const isPositionSelected = isChained
         ? chainedPositions.every((pos) => pos !== undefined)
@@ -175,7 +174,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     );
 
     const defaultCollateral = useMemo(() => getDefaultCollateral(networkId), [networkId]);
-    const selectedCollateral = useMemo(() => getCollateral(networkId, selectedCollateralIndex, true), [
+    const selectedCollateral = useMemo(() => getCollateral(networkId, selectedCollateralIndex), [
         networkId,
         selectedCollateralIndex,
     ]);
@@ -204,7 +203,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             ? multipleCollateralBalances.isSuccess
                 ? getCoinBalance(multipleCollateralBalances?.data, selectedCollateral)
                 : null
-            : getCurrencyKeyStableBalance(walletBalancesMap, defaultCollateral);
+            : (walletBalancesMap && walletBalancesMap[defaultCollateral]?.balance) || 0;
     }, [
         multipleCollateralBalances,
         walletBalancesMap,
@@ -213,7 +212,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         selectedCollateral,
     ]);
 
-    const isBlastSepolia = networkId === Network.BlastSepolia;
+    const isBlastSepolia = networkId === NetworkId.BlastSepolia;
     const isMintAvailable = isBlastSepolia && collateralBalance < totalPaidAmount;
 
     const exchangeRatesMarketDataQuery = useExchangeRatesQuery(networkId, {
@@ -650,12 +649,12 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 <Button disabled={true}>
                     {isChained
                         ? t('speed-markets.chained.errors.choose-directions')
-                        : t('markets.amm-trading.choose-direction')}
+                        : t('speed-markets.amm-trading.choose-direction')}
                 </Button>
             );
         }
         if (!(strikeTimeSec || deltaTimeSec)) {
-            return <Button disabled={true}>{t('markets.amm-trading.choose-time')}</Button>;
+            return <Button disabled={true}>{t('speed-markets.amm-trading.choose-time')}</Button>;
         }
         if (!isPaidAmountEntered) {
             return <Button disabled={true}>{t('common.enter-amount')}</Button>;
@@ -740,12 +739,10 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                         positionType: isChained ? undefined : positionType,
                         chainedPositions: isChained ? chainedPositions : undefined,
                     }}
-                    isRangedMarket={false}
                     isFetchingQuote={false}
                     priceProfit={(isChained ? chainedQuote : SPEED_MARKETS_QUOTE) - 1}
                     paidAmount={selectedStableBuyinAmount || convertToStable(Number(paidAmount))}
                     hasCollateralConversion={selectedCollateral !== defaultCollateral}
-                    breakFirstLine={false}
                 />
                 {!isChained && (
                     <ShareIcon
@@ -816,7 +813,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                         currencyComponent={
                             isMultiCollateralSupported ? (
                                 <CollateralSelector
-                                    collateralArray={getCollaterals(networkId, true)}
+                                    collateralArray={getCollaterals(networkId)}
                                     selectedItem={selectedCollateralIndex}
                                     onChangeCollateral={() => {}}
                                     disabled={isSubmitting}
@@ -940,7 +937,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                             : roundNumberToDecimals(totalPaidAmount, COLLATERAL_DECIMALS[selectedCollateral])
                     }
                     tokenSymbol={selectedCollateral}
-                    isNonStable={false}
                     isAllowing={isAllowing}
                     onSubmit={handleAllowance}
                     onClose={() => setOpenApprovalModal(false)}

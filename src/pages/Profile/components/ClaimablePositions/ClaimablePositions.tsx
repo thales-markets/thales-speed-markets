@@ -1,34 +1,29 @@
-import SPAAnchor from 'components/SPAAnchor/SPAAnchor';
 import TileTable from 'components/TileTable/TileTable';
 import { USD_SIGN } from 'constants/currency';
 import { millisecondsToSeconds } from 'date-fns';
-import { Positions } from 'enums/options';
-import { BigNumber } from 'ethers';
+import { Positions } from 'enums/market';
 import { orderBy } from 'lodash';
 import ChainedPositionAction from 'pages/SpeedMarkets/components/ChainedPositionAction';
-import SharePositionModal from 'pages/Trade/components/AmmTrading/components/SharePositionModal/SharePositionModal';
-import { ShareIcon } from 'pages/Trade/components/OpenPosition/OpenPosition';
-import useUserActiveChainedSpeedMarketsDataQuery from 'queries/options/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
-import useUserActiveSpeedMarketsDataQuery from 'queries/options/speedMarkets/useUserActiveSpeedMarketsDataQuery';
+import { ShareIcon } from 'pages/SpeedMarkets/components/OpenPosition/OpenPosition';
+import SharePositionModal from 'pages/SpeedMarkets/components/SharePositionModal/SharePositionModal';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
-import useClaimablePositionsQuery from 'queries/profile/useClaimablePositionsQuery';
+import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
+import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveSpeedMarketsDataQuery';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
 import { getIsWalletConnected, getNetworkId, getWalletAddress } from 'redux/modules/wallet';
-import { RootState } from 'types/ui';
 import { useTheme } from 'styled-components';
-import { formatCurrency, formatCurrencyWithSign, formatShortDate, formatShortDateWithTime } from 'thales-utils';
+import { formatCurrency, formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
 import { SharePositionData } from 'types/flexCards';
 import { UserPosition } from 'types/profile';
-import { ThemeInterface } from 'types/ui';
+import { RootState, ThemeInterface } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getPriceId } from 'utils/pyth';
-import { buildOptionsMarketLink, buildRangeMarketLink } from 'utils/routes';
 import MyPositionAction from '../MyPositionAction';
-import { IconLink, TextLink, getAmount } from '../styled-components';
+import { getDirections } from '../styled-components';
 
 type ClaimablePositionsProps = {
     searchAddress: string;
@@ -38,6 +33,7 @@ type ClaimablePositionsProps = {
 const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, searchText }) => {
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
+
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const networkId = useSelector((state: RootState) => getNetworkId(state));
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
@@ -46,15 +42,6 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
 
     const [openTwitterShareModal, setOpenTwitterShareModal] = useState<boolean>(false);
     const [positionsShareData, setPositionShareData] = useState<SharePositionData | null>(null);
-
-    const claimablePositionsQuery = useClaimablePositionsQuery(networkId, searchAddress || walletAddress, {
-        enabled: isAppReady && isWalletConnected && !isOnlySpeedMarketsSupported(networkId),
-    });
-
-    const claimablePositions: UserPosition[] = useMemo(
-        () => (claimablePositionsQuery.isSuccess && claimablePositionsQuery.data ? claimablePositionsQuery.data : []),
-        [claimablePositionsQuery.isSuccess, claimablePositionsQuery.data]
-    );
 
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
         networkId,
@@ -149,18 +136,16 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
                     leftPrice: 0,
                     rightPrice: 0,
                     finalPrice: marketData.finalPrice || 0,
-                    amount: marketData.amount,
-                    amountBigNumber: marketData.amountBigNumber,
+                    payout: marketData.payout,
                     maturityDate: marketData.maturityDate,
                     expiryDate: marketData.maturityDate,
                     market: marketData.market,
-                    side: marketData.side,
+                    sides: [marketData.side],
                     paid: marketData.paid,
                     value: marketData.value,
                     claimable: !!marketData.claimable,
                     claimed: false,
-                    isRanged: false,
-                    isSpeedMarket: true,
+                    isChained: false,
                 };
             });
 
@@ -173,29 +158,26 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
                     leftPrice: 0,
                     rightPrice: 0,
                     finalPrice: marketData.finalPrices[marketData.finalPrices.length - 1],
-                    amount: marketData.amount,
-                    amountBigNumber: BigNumber.from(0), // won't be used
+                    payout: marketData.payout,
                     maturityDate: marketData.maturityDate,
                     expiryDate: marketData.maturityDate,
                     market: marketData.address,
-                    side: marketData.sides[marketData.sides.length - 1],
+                    sides: marketData.sides,
                     paid: marketData.paid,
-                    value: marketData.amount,
+                    value: marketData.payout,
                     claimable: marketData.claimable,
                     claimed: false,
-                    isRanged: false,
-                    isSpeedMarket: true,
-                    isChainedSpeedMarket: true,
+                    isChained: true,
                 };
             }
         );
 
         return orderBy(
-            claimablePositions.concat(speedMarketsOpenPositions).concat(chainedSpeedMarketsOpenPositions),
+            speedMarketsOpenPositions.concat(chainedSpeedMarketsOpenPositions),
             ['maturityDate', 'value'],
             ['asc', 'desc']
         );
-    }, [claimablePositions, userOpenSpeedMarketsData, userOpenChainedSpeedMarketsDataWithPrices]);
+    }, [userOpenSpeedMarketsData, userOpenChainedSpeedMarketsDataWithPrices]);
 
     const filteredData = useMemo(() => {
         if (searchText === '') return data;
@@ -208,33 +190,32 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
         const generateRows = (data: UserPosition[]) => {
             try {
                 return data.map((row: UserPosition) => {
-                    const chainedPosition = row.isChainedSpeedMarket
+                    const chainedPosition = row.isChained
                         ? userOpenChainedSpeedMarketsDataWithPrices.find(
                               (marketData) => marketData.address === row.market
                           )
                         : undefined;
+
                     const cells: any = [
                         {
-                            title: row.isRanged
-                                ? t('markets.market.ranged-markets.strike-range')
-                                : t(`profile.strike-price`),
-                            value: row.isRanged
-                                ? `$${formatCurrency(row.leftPrice)} - $${formatCurrency(row.rightPrice)}`
-                                : `$${formatCurrency(row.strikePrice)}`,
+                            title: t(`profile.strike-price`),
+                            value: `$${formatCurrency(row.strikePrice)}`,
                         },
                         {
                             title: t('profile.final-price'),
                             value: formatCurrencyWithSign(USD_SIGN, row.finalPrice),
                         },
                         {
-                            title: t('profile.leaderboard.trades.table.amount-col'),
-                            value: getAmount(formatCurrency(row.amount, 2), row.side, theme, row.isChainedSpeedMarket),
+                            title: row.isChained ? t('profile.history.directions') : t('profile.history.direction'),
+                            value: getDirections(row.sides, theme, row.isChained),
+                        },
+                        {
+                            title: t('profile.history.payout'),
+                            value: formatCurrencyWithSign(USD_SIGN, row.payout, 2),
                         },
                         {
                             title: t('profile.history.expired'),
-                            value: row.isSpeedMarket
-                                ? formatShortDateWithTime(row.maturityDate)
-                                : formatShortDate(row.maturityDate),
+                            value: formatShortDateWithTime(row.maturityDate),
                         },
                         {
                             value: chainedPosition ? (
@@ -256,7 +237,7 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
                                     disabled={false}
                                     onClick={() => {
                                         setOpenTwitterShareModal(true);
-                                        if (row.isChainedSpeedMarket && chainedPosition) {
+                                        if (row.isChained && chainedPosition) {
                                             setPositionShareData({
                                                 type: 'chained-speed-won',
                                                 positions: chainedPosition.sides,
@@ -265,20 +246,18 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
                                                 strikePrices: chainedPosition.strikePrices,
                                                 finalPrices: chainedPosition.finalPrices,
                                                 buyIn: chainedPosition.paid,
-                                                payout: chainedPosition.amount,
+                                                payout: chainedPosition.payout,
                                                 payoutMultiplier: chainedPosition.payoutMultiplier,
                                             });
                                         } else {
                                             setPositionShareData({
-                                                type: row.isSpeedMarket ? 'resolved-speed' : 'resolved',
-                                                positions: [row.side],
+                                                type: 'resolved-speed',
+                                                positions: row.sides,
                                                 currencyKey: row.currencyKey,
                                                 strikePrices: [row.strikePrice],
-                                                leftPrice: row.leftPrice,
-                                                rightPrice: row.rightPrice,
                                                 strikeDate: row.maturityDate,
                                                 buyIn: row.paid,
-                                                payout: row.amount,
+                                                payout: row.payout,
                                             });
                                         }
                                     }}
@@ -286,40 +265,11 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
                             ),
                             width: isMobile ? undefined : '20px',
                         },
-                        {
-                            value: !row.isSpeedMarket && (
-                                <SPAAnchor
-                                    href={
-                                        row.isRanged
-                                            ? buildRangeMarketLink(row.market, row.side)
-                                            : buildOptionsMarketLink(row.market, row.side)
-                                    }
-                                >
-                                    {isMobile ? (
-                                        <TextLink>
-                                            {t('profile.go-to-market')}{' '}
-                                            <IconLink
-                                                className="icon icon--right"
-                                                fontSize="10px"
-                                                marginTop="-2px"
-                                                color={theme.link.textColor.primary}
-                                            />
-                                        </TextLink>
-                                    ) : (
-                                        <IconLink className="icon icon--right" />
-                                    )}
-                                </SPAAnchor>
-                            ),
-                            width: isMobile ? undefined : '30px',
-                        },
                     ];
 
                     return {
                         asset: {
                             currencyKey: row.currencyKey,
-                            position: row.side,
-                            isChainedPosition: row.isChainedSpeedMarket,
-                            width: '50px',
                             displayInRowMobile: true,
                         },
                         cells: cells,
@@ -342,7 +292,9 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
         <>
             <TileTable
                 rows={rows as any}
-                isLoading={claimablePositionsQuery.isLoading || userActiveSpeedMarketsDataQuery.isLoading}
+                isLoading={
+                    userActiveSpeedMarketsDataQuery.isLoading || userActiveChainedSpeedMarketsDataQuery.isLoading
+                }
                 hideFlow
             />
             {positionsShareData !== null && openTwitterShareModal && (
@@ -353,8 +305,6 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
                     strikeDate={positionsShareData.strikeDate}
                     strikePrices={positionsShareData.strikePrices}
                     finalPrices={positionsShareData.finalPrices}
-                    leftPrice={positionsShareData.leftPrice}
-                    rightPrice={positionsShareData.rightPrice}
                     buyIn={positionsShareData.buyIn}
                     payout={positionsShareData.payout}
                     payoutMultiplier={positionsShareData.payoutMultiplier}

@@ -2,20 +2,18 @@ import SPAAnchor from 'components/SPAAnchor/SPAAnchor';
 import Tooltip from 'components/Tooltip';
 import ROUTES from 'constants/routes';
 import { millisecondsToSeconds } from 'date-fns';
-import { Network } from 'enums/network';
-import { Positions } from 'enums/options';
-import useUserActiveChainedSpeedMarketsDataQuery from 'queries/options/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
-import useUserActiveSpeedMarketsDataQuery from 'queries/options/speedMarkets/useUserActiveSpeedMarketsDataQuery';
+import { Positions } from 'enums/market';
+import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
+import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveSpeedMarketsDataQuery';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
-import useUserNotificationsQuery from 'queries/user/useUserNotificationsQuery';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsWalletConnected, getNetworkId, getWalletAddress } from 'redux/modules/wallet';
-import { RootState } from 'types/ui';
 import styled from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
+import { RootState } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getPriceId } from 'utils/pyth';
 import { buildHref } from 'utils/routes';
@@ -27,18 +25,7 @@ const Notifications: React.FC = () => {
     const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
     const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
 
-    const isNetworkSupported = networkId !== Network.Mainnet && !isOnlySpeedMarketsSupported(networkId);
-
-    const notificationsQuery = useUserNotificationsQuery(networkId, walletAddress, {
-        enabled: isAppReady && isWalletConnected && isNetworkSupported,
-    });
-
-    const notifications = useMemo(() => {
-        if (notificationsQuery.isSuccess && notificationsQuery.data) {
-            return notificationsQuery.data;
-        }
-        return 0;
-    }, [notificationsQuery]);
+    const isNetworkSupported = !isOnlySpeedMarketsSupported(networkId);
 
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(networkId, walletAddress, {
         enabled: isAppReady && isWalletConnected,
@@ -109,12 +96,12 @@ const Notifications: React.FC = () => {
         })
         .filter((marketData) => marketData.claimable).length;
 
-    const totalNotifications = notifications + speedMarketsNotifications + chainedSpeedMarketsNotifications;
+    const totalNotifications = speedMarketsNotifications + chainedSpeedMarketsNotifications;
 
     const hasNotifications = totalNotifications > 0;
 
     return isWalletConnected ? (
-        <SPAAnchor href={buildHref(ROUTES.Options.Profile)}>
+        <SPAAnchor href={buildHref(ROUTES.Markets.Profile)}>
             <Container>
                 {hasNotifications ? (
                     <Tooltip overlay={t('common.header.notification.tooltip', { count: totalNotifications })}>

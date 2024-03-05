@@ -19,14 +19,14 @@ const SpeedMarketsOverview: React.FC = () => {
 
     const networkId = useSelector((state: RootState) => getNetworkId(state));
 
-    const isChainedSupported = getSupportedNetworksByRoute(ROUTES.Options.ChainedSpeedMarkets).includes(networkId);
+    const isChainedSupported = getSupportedNetworksByRoute(ROUTES.Markets.ChainedSpeedMarkets).includes(networkId);
     const isChainedMarkets = isChainedSupported && queryString.parse(location.search).isChained === 'true';
 
     return (
         <Container>
             <Header>
                 <div>
-                    <SPAAnchor href={`${buildHref(ROUTES.Options.SpeedMarkets)}?isChained=${isChainedMarkets}`}>
+                    <SPAAnchor href={`${buildHref(ROUTES.Markets.SpeedMarkets)}?isChained=${isChainedMarkets}`}>
                         <LinkContainer>
                             <NavigationIcon isLeft className={`icon icon--left`} />
                             {isChainedMarkets ? t('speed-markets.chained.name') : t('speed-markets.title')}
@@ -38,7 +38,7 @@ const SpeedMarketsOverview: React.FC = () => {
                     <div>
                         {t(`speed-markets.overview.title`)}&nbsp;/&nbsp;
                         <SPAAnchor
-                            href={`${buildHref(ROUTES.Options.SpeedMarketsOverview)}?isChained=${!isChainedMarkets}`}
+                            href={`${buildHref(ROUTES.Markets.SpeedMarketsOverview)}?isChained=${!isChainedMarkets}`}
                         >
                             <LinkContainer>
                                 {isChainedMarkets ? t('speed-markets.title') : t('speed-markets.chained.name')}

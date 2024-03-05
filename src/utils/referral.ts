@@ -10,7 +10,7 @@ export const setReferralWallet = (referralWallet: string) => {
         return null;
     }
 
-    cookies.set('referralId', referralWallet, {
+    cookies.set(LOCAL_STORAGE_KEYS.REFERRAL_WALLET, referralWallet, {
         path: '/',
         maxAge: REFERRAL_COOKIE_LIFETIME,
     });
@@ -19,7 +19,7 @@ export const setReferralWallet = (referralWallet: string) => {
 };
 
 export const getReferralWallet = () => {
-    const referralWalletFromCookie = cookies.get('referralId');
+    const referralWalletFromCookie = cookies.get(LOCAL_STORAGE_KEYS.REFERRAL_WALLET);
     const referralWalletFromLocalStorage = localStorage.getItem(LOCAL_STORAGE_KEYS.REFERRAL_WALLET);
 
     if (!referralWalletFromCookie && !referralWalletFromLocalStorage) {

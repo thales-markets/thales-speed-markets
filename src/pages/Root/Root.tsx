@@ -1,4 +1,3 @@
-import { MatomoProvider, createInstance } from '@datapunt/matomo-tracker-react';
 import { RainbowKitProvider, connectorsForWallets, darkTheme } from '@rainbow-me/rainbowkit';
 import '@rainbow-me/rainbowkit/dist/index.css';
 import {
@@ -19,15 +18,15 @@ import { PLAUSIBLE } from 'constants/analytics';
 import { BlastSepolia, base, optimismSepolia, zkSyncSepolia } from 'constants/network';
 import { ThemeMap } from 'constants/ui';
 import dotenv from 'dotenv';
-import { Network } from 'enums/network';
 import { merge } from 'lodash';
 import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Provider } from 'react-redux';
 import { Store } from 'redux';
+import { NetworkId } from 'thales-utils';
 import { getDefaultTheme } from 'utils/style';
 import { WagmiConfig, configureChains, createClient } from 'wagmi';
-import { arbitrum, mainnet, optimism, optimismGoerli, polygon, zkSync } from 'wagmi/chains';
+import { arbitrum, optimism, optimismGoerli, polygon, zkSync } from 'wagmi/chains';
 import { infuraProvider } from 'wagmi/providers/infura';
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 import { publicProvider } from 'wagmi/providers/public';
@@ -41,44 +40,39 @@ type RpcProvider = {
 };
 
 const CHAIN_TO_RPC_PROVIDER_NETWORK_NAME: Record<number, RpcProvider> = {
-    [Network.Mainnet]: {
-        ankr: '',
-        chainnode: 'mainnet',
-        blast: 'eth-mainnet',
-    },
-    [Network.OptimismMainnet]: {
+    [NetworkId.OptimismMainnet]: {
         ankr: 'optimism',
         chainnode: 'optimism-mainnet',
         blast: 'optimism-mainnet',
     },
-    [Network.PolygonMainnet]: {
+    [NetworkId.PolygonMainnet]: {
         ankr: '',
         chainnode: 'polygon-mainnet',
         blast: 'polygon-mainnet',
     },
-    [Network.OptimismGoerli]: { ankr: 'optimism_testnet', chainnode: 'optimism-goerli', blast: 'optimism-goerli' },
-    [Network.OptimismSepolia]: { ankr: '', chainnode: '', blast: '' },
-    [Network.Arbitrum]: { ankr: 'arbitrum', chainnode: 'arbitrum-one', blast: 'arbitrum-one' },
-    [Network.Base]: { ankr: 'base', chainnode: 'base-mainnet', blast: '' },
-    [Network.ZkSync]: { ankr: '', chainnode: '', blast: '' },
-    [Network.ZkSyncSepolia]: { ankr: '', chainnode: '', blast: '' },
-    [Network.BlastSepolia]: { ankr: '', chainnode: '', blast: '' },
+    [NetworkId.OptimismGoerli]: { ankr: 'optimism_testnet', chainnode: 'optimism-goerli', blast: 'optimism-goerli' },
+    [NetworkId.OptimismSepolia]: { ankr: '', chainnode: '', blast: '' },
+    [NetworkId.Arbitrum]: { ankr: 'arbitrum', chainnode: 'arbitrum-one', blast: 'arbitrum-one' },
+    [NetworkId.Base]: { ankr: 'base', chainnode: 'base-mainnet', blast: '' },
+    [NetworkId.ZkSync]: { ankr: '', chainnode: '', blast: '' },
+    [NetworkId.ZkSyncSepolia]: { ankr: '', chainnode: '', blast: '' },
+    [NetworkId.BlastSepolia]: { ankr: '', chainnode: '', blast: '' },
 };
 
 const STALL_TIMEOUT = 2000;
 
 const { chains, provider } = configureChains(
-    [optimism, optimismGoerli, optimismSepolia, mainnet, polygon, arbitrum, base, zkSync, zkSyncSepolia, BlastSepolia],
+    [optimism, optimismGoerli, optimismSepolia, polygon, arbitrum, base, zkSync, zkSyncSepolia, BlastSepolia],
     [
         jsonRpcProvider({
             rpc: (chain) => {
                 const chainnodeNetworkName = CHAIN_TO_RPC_PROVIDER_NETWORK_NAME[chain.id]?.chainnode;
                 return {
                     http:
-                        process.env.REACT_APP_PRIMARY_PROVIDER_ID === 'INFURA' && chain.id === Network.Base
+                        process.env.REACT_APP_PRIMARY_PROVIDER_ID === 'INFURA' && chain.id === NetworkId.Base
                             ? // For Base use Ankr when Infura is primary as Infura doesn't support it
                               `https://rpc.ankr.com/base/${process.env.REACT_APP_ANKR_PROJECT_ID}`
-                            : chain.id === Network.PolygonMainnet
+                            : chain.id === NetworkId.PolygonMainnet
                             ? // For Polygon always use Infura as Chainnode is having issues
                               `https://polygon-mainnet.infura.io/v3/${process.env.REACT_APP_INFURA_PROJECT_ID}`
                             : !!chainnodeNetworkName
@@ -123,27 +117,6 @@ const wagmiClient = createClient({
     provider,
 });
 
-const instance = createInstance({
-    urlBase: 'https://data.thalesmarket.io',
-    siteId: process.env.REACT_APP_SITE_ID ? Number(process.env.REACT_APP_SITE_ID) : 1,
-    trackerUrl: 'https://data.thalesmarket.io/p.php', // optional, default value: `${urlBase}matomo.php`
-    srcUrl: 'https://data.thalesmarket.io/p.js', //
-    configurations: {
-        // optional, default value: {}
-        // any valid matomo configuration, all below are optional
-        disableCookies: true,
-        setSecureCookie: true,
-        setRequestMethod: 'POST',
-    },
-    disabled: false, // optional, false by default. Makes all tracking calls no-ops if set to true.
-    heartBeat: {
-        // optional, enabled by default
-        active: true, // optional, default value: true
-        seconds: 10, // optional, default value: `15
-    },
-    linkTracking: true, // optional, default value: true
-});
-
 interface RootProps {
     store: Store;
 }
@@ -156,20 +129,18 @@ const Root: React.FC<RootProps> = ({ store }) => {
     return (
         <ErrorBoundary fallback={<UnexpectedError theme={ThemeMap[theme]} />} onError={() => {}}>
             <Provider store={store}>
-                <MatomoProvider value={instance}>
-                    <WagmiConfig client={wagmiClient}>
-                        <RainbowKitProvider
-                            chains={chains}
-                            theme={customTheme}
-                            appInfo={{
-                                appName: 'Overtime',
-                                disclaimer: WalletDisclaimer,
-                            }}
-                        >
-                            <App />
-                        </RainbowKitProvider>
-                    </WagmiConfig>
-                </MatomoProvider>
+                <WagmiConfig client={wagmiClient}>
+                    <RainbowKitProvider
+                        chains={chains}
+                        theme={customTheme}
+                        appInfo={{
+                            appName: 'SpeedMarkets',
+                            disclaimer: WalletDisclaimer,
+                        }}
+                    >
+                        <App />
+                    </RainbowKitProvider>
+                </WagmiConfig>
             </Provider>
         </ErrorBoundary>
     );

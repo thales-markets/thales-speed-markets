@@ -6,18 +6,17 @@ import SelectInput from 'components/SelectInput';
 import ToastMessage from 'components/ToastMessage';
 import { getErrorToastOptions, getSuccessToastOptions } from 'components/ToastMessage/ToastMessage';
 import TextInput from 'components/fields/TextInput';
-import { generalConfig } from 'config/general';
+import { LINKS } from 'constants/links';
 import ROUTES from 'constants/routes';
 import useGetReffererIdQuery from 'queries/referral/useGetReffererIdQuery';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { getIsWalletConnected, getNetworkId, getWalletAddress } from 'redux/modules/wallet';
-import { RootState } from 'types/ui';
+import { getIsWalletConnected, getWalletAddress } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { BoldText, FlexDivCentered, FlexDivColumnCentered, FlexDivRowCentered, FlexDivStart } from 'styles/common';
-import { isOnlySpeedMarketsSupported } from 'utils/network';
+import { RootState } from 'types/ui';
 import { buildReferrerLink } from 'utils/routes';
 import snxJSConnector from 'utils/snxJSConnector';
 
@@ -36,7 +35,6 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
     const { t } = useTranslation();
     const { openConnectModal } = useConnectModal();
 
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
     const walletAddress = useSelector((state: RootState) => getWalletAddress(state));
     const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
 
@@ -50,37 +48,25 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
     const referralPageOptions = [
         {
             value: Pages.SpeedMarkets,
-            label: t('referral-page.pages.speed-market-page'),
+            label: t('referral.pages.speed-market-page'),
         },
         {
             value: Pages.LandingPage,
-            label: t('referral-page.pages.landing-page'),
+            label: t('referral.pages.landing-page'),
         },
     ];
 
-    !isOnlySpeedMarketsSupported(networkId) &&
-        referralPageOptions.unshift(
-            {
-                value: Pages.Markets,
-                label: t('referral-page.pages.market-page'),
-            },
-            {
-                value: Pages.RangeMarkets,
-                label: t('referral-page.pages.range-market-page'),
-            }
-        );
-
     const populateReferralLink = (referralPageId: Pages, reffererId: string) => {
-        let link = ROUTES.Options.Home;
+        let link = ROUTES.Markets.Home;
         switch (referralPageId) {
             case Pages.SpeedMarkets:
-                link = ROUTES.Options.SpeedMarkets;
+                link = ROUTES.Markets.SpeedMarkets;
                 break;
             case Pages.LandingPage:
                 link = ROUTES.Home;
                 break;
             default:
-                link = ROUTES.Options.Home;
+                link = ROUTES.Markets.Home;
         }
         setReferralLink(`${buildReferrerLink(link, reffererId)}`);
     };
@@ -99,7 +85,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
 
     const generateLinkHandler = useCallback(async () => {
         const signature = await (snxJSConnector as any).signer.signMessage(referrerID);
-        const response = await axios.post(`${generalConfig.API_URL}/update-refferer-id`, {
+        const response = await axios.post(`${LINKS.API}/update-refferer-id`, {
             walletAddress,
             reffererID: referrerID,
             signature,
@@ -107,14 +93,14 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
         });
         if (response.data.error) {
             toast(
-                <ToastMessage id="customId" type="error" message={t('referral-page.generate.id-exists')} />,
+                <ToastMessage id="customId" type="error" message={t('referral.generate.id-exists')} />,
                 getErrorToastOptions('', 'customId')
             );
         } else {
             populateReferralLink(referralPage, referrerID);
             setSavedReferrerID(referrerID);
             toast(
-                <ToastMessage id="customId" type="success" message={t('referral-page.generate.id-create-success')} />,
+                <ToastMessage id="customId" type="success" message={t('referral.generate.id-create-success')} />,
                 getSuccessToastOptions('', 'customId')
             );
         }
@@ -123,7 +109,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
     const copyLink = () => {
         navigator.clipboard.writeText(referralLink);
         toast(
-            <ToastMessage id="customId" type="success" message={t('referral-page.modal.copied')} />,
+            <ToastMessage id="customId" type="success" message={t('referral.copied')} />,
             getSuccessToastOptions('', 'customId')
         );
     };
@@ -170,7 +156,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
                     <TextInput
                         value={referrerID}
                         onChange={(e: any) => setReferrerID(e.target.value)}
-                        placeholder={t('referral-page.choose-referral-placeholder')}
+                        placeholder={t('referral.choose-referral-placeholder')}
                         width="100%"
                         height="38px"
                     />
@@ -181,7 +167,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
                         disabled={isWalletConnected && (!referrerID || savedReferrerID === referrerID)}
                         onClick={isWalletConnected ? generateLinkHandler : openConnectModal}
                     >
-                        {walletAddress ? t('referral-page.generate.link-btn') : t('common.wallet.connect-your-wallet')}
+                        {walletAddress ? t('referral.generate.link-btn') : t('common.wallet.connect-your-wallet')}
                     </Button>
                 </RowWrapper>
                 <RowWrapper>

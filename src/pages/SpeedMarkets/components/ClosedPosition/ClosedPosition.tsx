@@ -1,15 +1,15 @@
 import { USD_SIGN } from 'constants/currency';
 import { ScreenSizeBreakpoint } from 'enums/ui';
-import SharePositionModal from 'pages/Trade/components/AmmTrading/components/SharePositionModal';
-import { ShareIcon } from 'pages/Trade/components/OpenPosition/OpenPosition';
+import { ShareIcon } from 'pages/SpeedMarkets/components/OpenPosition/OpenPosition';
+import SharePositionModal from 'pages/SpeedMarkets/components/SharePositionModal';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
 import { formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
-import { UserClosedPositions } from 'types/options';
+import { UserClosedPositions } from 'types/market';
 import { ThemeInterface } from 'types/ui';
 import { formatNumberShort } from 'utils/formatters/number';
-import { getColorPerPosition } from 'utils/options';
+import { getColorPerPosition } from 'utils/style';
 
 type ClosedPositionProps = {
     position: UserClosedPositions;
@@ -41,15 +41,15 @@ const ClosedPosition: React.FC<ClosedPositionProps> = ({ position }) => {
                 </FlexContainer>
                 <Separator />
                 <FlexContainer>
-                    <Label>{t('markets.user-positions.size')}</Label>
+                    <Label>{t('speed-markets.user-positions.size')}</Label>
                     <Value>
-                        {formatNumberShort(position.amount)}{' '}
+                        {formatNumberShort(position.payout)}{' '}
                         <Value color={getColorPerPosition(position.side, theme)}>{position.side}</Value>
                     </Value>
                 </FlexContainer>
                 <Separator />
                 <FlexContainer>
-                    <Label>{t('markets.user-positions.paid')}</Label>
+                    <Label>{t('speed-markets.user-positions.paid')}</Label>
                     <Value>{formatCurrencyWithSign(USD_SIGN, position.paid, 2)}</Value>
                 </FlexContainer>
                 <Separator />
@@ -80,7 +80,7 @@ const ClosedPosition: React.FC<ClosedPositionProps> = ({ position }) => {
                     strikeDate={position.maturityDate}
                     strikePrices={[position.strikePrice]}
                     buyIn={position.paid}
-                    payout={position.amount}
+                    payout={position.payout}
                     onClose={() => setOpenTwitterShareModal(false)}
                 />
             )}

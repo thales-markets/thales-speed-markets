@@ -1,14 +1,13 @@
 import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
-import { generalConfig } from 'config/general';
 import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
-import { PRICE_ID, PRICE_SERVICE_ENDPOINTS, PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
-import { Network } from 'enums/network';
+import { LINKS } from 'constants/links';
+import { PRICE_ID, PRICE_SERVICE_ENDPOINTS, PYTH_CURRENCY_DECIMALS, SUPPORTED_ASSETS } from 'constants/pyth';
 import { ethers } from 'ethers';
-import { bigNumberFormatter, floorNumberToDecimals } from 'thales-utils';
+import { NetworkId, bigNumberFormatter, floorNumberToDecimals } from 'thales-utils';
 
-export const getPriceServiceEndpoint = (networkId: Network) => {
+export const getPriceServiceEndpoint = (networkId: NetworkId) => {
     if (
-        [Network.OptimismGoerli, Network.OptimismSepolia, Network.ZkSyncSepolia, Network.BlastSepolia].includes(
+        [NetworkId.OptimismGoerli, NetworkId.OptimismSepolia, NetworkId.ZkSyncSepolia, NetworkId.BlastSepolia].includes(
             networkId
         )
     ) {
@@ -18,9 +17,9 @@ export const getPriceServiceEndpoint = (networkId: Network) => {
     }
 };
 
-export const getPriceId = (networkId: Network, currency: typeof CRYPTO_CURRENCY_MAP[number]) => {
+export const getPriceId = (networkId: NetworkId, currency: typeof CRYPTO_CURRENCY_MAP[number]) => {
     if (
-        [Network.OptimismGoerli, Network.OptimismSepolia, Network.ZkSyncSepolia, Network.BlastSepolia].includes(
+        [NetworkId.OptimismGoerli, NetworkId.OptimismSepolia, NetworkId.ZkSyncSepolia, NetworkId.BlastSepolia].includes(
             networkId
         )
     ) {
@@ -30,9 +29,9 @@ export const getPriceId = (networkId: Network, currency: typeof CRYPTO_CURRENCY_
     }
 };
 
-const getCurrencyByPriceId = (networkId: Network, priceId: string) => {
+const getCurrencyByPriceId = (networkId: NetworkId, priceId: string) => {
     if (
-        [Network.OptimismGoerli, Network.OptimismSepolia, Network.ZkSyncSepolia, Network.BlastSepolia].includes(
+        [NetworkId.OptimismGoerli, NetworkId.OptimismSepolia, NetworkId.ZkSyncSepolia, NetworkId.BlastSepolia].includes(
             networkId
         )
     ) {
@@ -46,24 +45,34 @@ const getCurrencyByPriceId = (networkId: Network, priceId: string) => {
     }
 };
 
+export const getSupportedAssetsAsObject = () => SUPPORTED_ASSETS.reduce((acc, asset) => ({ ...acc, [asset]: 0 }), {});
+
 export const getCurrentPrices = async (
     connection: EvmPriceServiceConnection,
-    networkId: Network,
+    networkId: NetworkId,
     priceIds: string[]
 ) => {
-    const priceFeeds = await connection.getLatestPriceFeeds(priceIds);
+    let currentPrices = getSupportedAssetsAsObject();
 
-    return priceFeeds
-        ? priceFeeds.reduce(
-              (accumulator, priceFeed) => ({
-                  ...accumulator,
-                  [getCurrencyByPriceId(networkId, priceFeed.id)]:
-                      // Get the price if it is not older than 30 seconds from the current time
-                      priceFeed.getPriceNoOlderThan(30)?.getPriceAsNumberUnchecked() || 0,
-              }),
-              {}
-          )
-        : { [CRYPTO_CURRENCY_MAP.BTC]: 0, [CRYPTO_CURRENCY_MAP.ETH]: 0 };
+    try {
+        const priceFeeds = await connection.getLatestPriceFeeds(priceIds);
+
+        if (priceFeeds) {
+            currentPrices = priceFeeds.reduce(
+                (accumulator, priceFeed) => ({
+                    ...accumulator,
+                    [getCurrencyByPriceId(networkId, priceFeed.id)]:
+                        // Get the price if it is not older than 30 seconds from the current time
+                        priceFeed.getPriceNoOlderThan(30)?.getPriceAsNumberUnchecked() || 0,
+                }),
+                {}
+            );
+        }
+    } catch (e) {
+        console.log('Error while fetching Pyth latest price feeds', e);
+    }
+
+    return currentPrices;
 };
 
 /*
@@ -81,7 +90,7 @@ export const getBenchmarksPriceFeeds = async (priceFeeds: { priceId: string; pub
 
     if (priceFeeds.length) {
         const benchmarksPricePromises = priceFeeds.map((data: any) =>
-            fetch(`${generalConfig.PYTH_BENCHMARKS_API_URL}${data.publishTime}?ids=${data.priceId}`).catch((e) =>
+            fetch(`${LINKS.Pyth.BenchmarksPrice}${data.publishTime}?ids=${data.priceId}`).catch((e) =>
                 console.log('Pyth price benchmarks error', e)
             )
         );

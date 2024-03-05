@@ -1,19 +1,20 @@
-import { Positions } from 'enums/options';
+import { Positions } from 'enums/market';
 import { TFunction } from 'i18next';
-import React from 'react';
 import styled from 'styled-components';
 import { ThemeInterface } from 'types/ui';
-import { getColorPerPosition } from 'utils/options';
+import { getColorPerPosition } from 'utils/style';
 
-export const getAmount = (
-    amount: number | string,
-    position: Positions,
-    theme: ThemeInterface,
-    isChainedSpeedMarket?: boolean
-) => (
+export const getDirections = (positions: Positions[], theme: ThemeInterface, isChained: boolean) => (
     <Value>
-        {amount}
-        {!isChainedSpeedMarket && <Value color={getColorPerPosition(position, theme)}> {position}</Value>}
+        {isChained ? (
+            positions.map((position, i) => (
+                <Value key={i} color={getColorPerPosition(position, theme)}>
+                    {position + (i !== positions.length - 1 ? ', ' : '')}
+                </Value>
+            ))
+        ) : (
+            <Value color={getColorPerPosition(positions[0], theme)}> {positions}</Value>
+        )}
     </Value>
 );
 
@@ -32,25 +33,3 @@ const Value = styled.span<{ color?: string; fontSize?: string }>`
     font-size: ${(props) => props.fontSize || '12px'};
     color: ${(props) => props.color || props.theme.textColor.primary};
 `;
-
-export const TextLink = styled.span`
-    color: ${(props) => props.theme.link.textColor.primary};
-    &:hover {
-        text-decoration: underline;
-    }
-`;
-
-export const IconLink = styled.i<{ color?: string; fontSize?: string; marginTop?: string }>`
-    font-size: ${(props) => props.fontSize || '20px'};
-    color: ${(props) => props.color || props.theme.textColor.secondary};
-    text-transform: none;
-    margin-top: ${(props) => props.marginTop || '0px'};
-`;
-
-export const ArrowLink: React.FC<{ href: string }> = ({ href }) => {
-    return (
-        <a target="_blank" rel="noreferrer" href={href}>
-            <IconLink className="icon icon--right" />
-        </a>
-    );
-};

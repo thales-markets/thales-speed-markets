@@ -1,21 +1,18 @@
 import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
-import SPAAnchor from 'components/SPAAnchor/SPAAnchor';
 import TileTable from 'components/TileTable/TileTable';
 import Tooltip from 'components/Tooltip/Tooltip';
-import { CRYPTO_CURRENCY_MAP, USD_SIGN } from 'constants/currency';
+import { USD_SIGN } from 'constants/currency';
 import { CONNECTION_TIMEOUT_MS, SUPPORTED_ASSETS } from 'constants/pyth';
 import { millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
-import { Positions } from 'enums/options';
-import { BigNumber } from 'ethers';
+import { Positions } from 'enums/market';
 import useInterval from 'hooks/useInterval';
 import { orderBy } from 'lodash';
-import MaturityDate from 'pages/AMMTrading/components/MaturityDate';
-import SharePositionModal from 'pages/Trade/components/AmmTrading/components/SharePositionModal';
-import { ShareIcon } from 'pages/Trade/components/OpenPosition/OpenPosition';
-import useUserActiveChainedSpeedMarketsDataQuery from 'queries/options/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
-import useUserActiveSpeedMarketsDataQuery from 'queries/options/speedMarkets/useUserActiveSpeedMarketsDataQuery';
+import MaturityDate from 'pages/Profile/components/MaturityDate';
+import { ShareIcon } from 'pages/SpeedMarkets/components/OpenPosition/OpenPosition';
+import SharePositionModal from 'pages/SpeedMarkets/components/SharePositionModal';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
-import useExchangeRatesQuery, { Rates } from 'queries/rates/useExchangeRatesQuery';
+import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
+import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveSpeedMarketsDataQuery';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -28,10 +25,9 @@ import { SharePositionData } from 'types/flexCards';
 import { UserPosition } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
-import { getCurrentPrices, getPriceId, getPriceServiceEndpoint } from 'utils/pyth';
-import { buildOptionsMarketLink, buildRangeMarketLink } from 'utils/routes';
+import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAssetsAsObject } from 'utils/pyth';
 import MyPositionAction from '../MyPositionAction/MyPositionAction';
-import { IconLink, TextLink, getAmount } from '../styled-components';
+import { getDirections } from '../styled-components';
 
 type OpenPositionsProps = {
     searchAddress: string;
@@ -50,10 +46,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
 
     const [openTwitterShareModal, setOpenTwitterShareModal] = useState<boolean>(false);
     const [positionsShareData, setPositionShareData] = useState<SharePositionData | null>(null);
-    const [currentPrices, setCurrentPrices] = useState<{ [key: string]: number }>({
-        [CRYPTO_CURRENCY_MAP.BTC]: 0,
-        [CRYPTO_CURRENCY_MAP.ETH]: 0,
-    });
+    const [currentPrices, setCurrentPrices] = useState<{ [key: string]: number }>(getSupportedAssetsAsObject());
 
     const priceConnection = useMemo(() => {
         return new EvmPriceServiceConnection(getPriceServiceEndpoint(networkId), { timeout: CONNECTION_TIMEOUT_MS });
@@ -74,14 +67,6 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
     useInterval(async () => {
         fetchCurrentPrice();
     }, secondsToMilliseconds(10));
-
-    const exchangeRatesMarketDataQuery = useExchangeRatesQuery(networkId, {
-        enabled: isAppReady,
-    });
-    const exchangeRates: Rates | null =
-        exchangeRatesMarketDataQuery.isSuccess && exchangeRatesMarketDataQuery.data
-            ? exchangeRatesMarketDataQuery.data
-            : null;
 
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
         networkId,
@@ -152,7 +137,6 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
             i === 0 ? strikePrice : finalPrices[i - 1]
         );
         const lastStrikePrice = [...strikePrices].reverse().find((strikePrice) => strikePrice);
-        const currentSide = marketData.sides[marketData.strikeTimes.findIndex((strikeTime) => strikeTime < Date.now())];
         const userWonStatuses = marketData.sides.map((side, i) =>
             finalPrices[i] > 0 && strikePrices[i] > 0
                 ? (side === Positions.UP && finalPrices[i] > strikePrices[i]) ||
@@ -160,7 +144,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
                 : undefined
         );
         const userLost = userWonStatuses.some((status) => status === false);
-        return { ...marketData, strikePrices, userLost, lastStrikePrice, currentSide };
+        return { ...marketData, strikePrices, userLost, lastStrikePrice };
     });
 
     const data = useMemo(() => {
@@ -174,18 +158,16 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
                     leftPrice: 0,
                     rightPrice: 0,
                     finalPrice: marketData.finalPrice || 0,
-                    amount: marketData.amount,
-                    amountBigNumber: marketData.amountBigNumber,
+                    payout: marketData.payout,
                     maturityDate: marketData.maturityDate,
                     expiryDate: marketData.maturityDate,
                     market: marketData.market,
-                    side: marketData.side,
+                    sides: [marketData.side],
                     paid: marketData.paid,
                     value: marketData.value,
                     claimable: !!marketData.claimable,
                     claimed: false,
-                    isRanged: false,
-                    isSpeedMarket: true,
+                    isChained: false,
                 } as UserPosition;
             });
 
@@ -199,19 +181,16 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
                     leftPrice: 0,
                     rightPrice: 0,
                     finalPrice: 0, // won't be used
-                    amount: marketData.amount,
-                    amountBigNumber: BigNumber.from(0), // won't be used
+                    payout: marketData.payout,
                     maturityDate: marketData.maturityDate,
                     expiryDate: marketData.maturityDate,
                     market: marketData.address,
-                    side: marketData.currentSide,
+                    sides: marketData.sides,
                     paid: marketData.paid,
-                    value: marketData.amount,
+                    value: marketData.payout,
                     claimable: marketData.claimable,
                     claimed: false,
-                    isRanged: false,
-                    isSpeedMarket: true,
-                    isChainedSpeedMarket: true,
+                    isChained: true,
                 } as UserPosition;
             });
 
@@ -235,27 +214,25 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
                 return data.map((row: UserPosition) => {
                     const cells: any = [
                         {
-                            title: row.isRanged
-                                ? t('markets.market.ranged-markets.strike-range')
-                                : t(`profile.strike-price`),
-                            value: row.isRanged
-                                ? `$${formatCurrency(row.leftPrice)} - $${formatCurrency(row.rightPrice)}`
-                                : `$${formatCurrency(row.strikePrice)}`,
+                            title: t(`profile.strike-price`),
+                            value: `$${formatCurrency(row.strikePrice)}`,
                         },
                         {
                             title: (
                                 <>
                                     {t('profile.current-price')}
-                                    {row.isSpeedMarket && <Tooltip overlay={t('profile.current-price-tooltip')} />}
+                                    {<Tooltip overlay={t('profile.current-price-tooltip')} />}
                                 </>
                             ),
-                            value: row.isSpeedMarket
-                                ? formatCurrencyWithSign(USD_SIGN, currentPrices[row.currencyKey])
-                                : formatCurrencyWithSign(USD_SIGN, exchangeRates?.[row.currencyKey] || 0),
+                            value: formatCurrencyWithSign(USD_SIGN, currentPrices[row.currencyKey]),
                         },
                         {
-                            title: t('profile.leaderboard.trades.table.amount-col'),
-                            value: getAmount(formatCurrency(row.amount, 2), row.side, theme, row.isChainedSpeedMarket),
+                            title: row.isChained ? t('profile.history.directions') : t('profile.history.direction'),
+                            value: getDirections(row.sides, theme, row.isChained),
+                        },
+                        {
+                            title: t('profile.history.payout'),
+                            value: formatCurrencyWithSign(USD_SIGN, row.payout, 2),
                         },
                         {
                             title: t('profile.history.paid'),
@@ -267,7 +244,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
                                 <MaturityDate
                                     maturityDateUnix={row.maturityDate}
                                     showFullCounter
-                                    showDateWithTime={row.isSpeedMarket}
+                                    showDateWithTime={true}
                                 />
                             ),
                         },
@@ -275,53 +252,25 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
                             value: <MyPositionAction position={row} isProfileAction />,
                         },
                         {
-                            value: !row.isChainedSpeedMarket && (
+                            value: !row.isChained && (
                                 <ShareIcon
                                     className="icon-home icon-home--twitter-x"
                                     disabled={false}
                                     onClick={() => {
                                         setOpenTwitterShareModal(true);
                                         setPositionShareData({
-                                            type: row.isSpeedMarket ? 'potential-speed' : 'potential',
-                                            positions: [row.side],
+                                            type: 'potential-speed',
+                                            positions: row.sides,
                                             currencyKey: row.currencyKey,
                                             strikePrices: [row.strikePrice],
-                                            leftPrice: row.leftPrice,
-                                            rightPrice: row.rightPrice,
                                             strikeDate: row.maturityDate,
                                             buyIn: row.paid,
-                                            payout: row.amount,
+                                            payout: row.payout,
                                         });
                                     }}
                                 />
                             ),
                             width: isMobile ? undefined : '20px',
-                        },
-                        {
-                            value: !row.isSpeedMarket && (
-                                <SPAAnchor
-                                    href={
-                                        row.isRanged
-                                            ? buildRangeMarketLink(row.market, row.side)
-                                            : buildOptionsMarketLink(row.market, row.side)
-                                    }
-                                >
-                                    {isMobile ? (
-                                        <TextLink>
-                                            {t('profile.go-to-market')}{' '}
-                                            <IconLink
-                                                className="icon icon--right"
-                                                fontSize="10px"
-                                                marginTop="-2px"
-                                                color={theme.link.textColor.primary}
-                                            />
-                                        </TextLink>
-                                    ) : (
-                                        <IconLink className="icon icon--right" />
-                                    )}
-                                </SPAAnchor>
-                            ),
-                            width: isMobile ? undefined : '30px',
                         },
                     ];
 
@@ -329,11 +278,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
                         backgroundColor: theme.background.secondary,
                         asset: {
                             currencyKey: row.currencyKey,
-                            position: row.side,
-                            isChainedPosition: row.isChainedSpeedMarket,
-                            width: '50px',
                             displayInRowMobile: true,
-                            hideFullName: true,
                         },
                         cells: cells,
                         displayInRowMobile: true,
@@ -349,7 +294,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
             return generateRows(filteredData);
         }
         return [];
-    }, [filteredData, isMobile, exchangeRates, t, theme, currentPrices]);
+    }, [filteredData, isMobile, t, theme, currentPrices]);
 
     return (
         <>
@@ -367,8 +312,6 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
                     currencyKey={positionsShareData.currencyKey}
                     strikeDate={positionsShareData.strikeDate}
                     strikePrices={positionsShareData.strikePrices}
-                    leftPrice={positionsShareData.leftPrice}
-                    rightPrice={positionsShareData.rightPrice}
                     buyIn={positionsShareData.buyIn}
                     payout={positionsShareData.payout}
                     onClose={() => setOpenTwitterShareModal(false)}

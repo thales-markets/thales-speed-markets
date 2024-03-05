@@ -1,13 +1,11 @@
 import SearchInput from 'components/SearchInput';
 import { USD_SIGN } from 'constants/currency';
 import { millisecondsToSeconds } from 'date-fns';
-import { Positions } from 'enums/options';
-import BannerCarousel from 'pages/Trade/components/BannerCarousel';
-import useUserActiveChainedSpeedMarketsDataQuery from 'queries/options/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
-import useUserActiveSpeedMarketsDataQuery from 'queries/options/speedMarkets/useUserActiveSpeedMarketsDataQuery';
+import { Positions } from 'enums/market';
+import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
+import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveSpeedMarketsDataQuery';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import useProfileDataQuery from 'queries/profile/useProfileDataQuery';
-import useUserNotificationsQuery from 'queries/user/useUserNotificationsQuery';
 import queryString from 'query-string';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -15,15 +13,13 @@ import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsWalletConnected, getNetworkId, getWalletAddress } from 'redux/modules/wallet';
-import { RootState } from 'types/ui';
 import { useTheme } from 'styled-components';
 import { formatCurrencyWithSign, formatPercentage } from 'thales-utils';
 import { UserProfileData } from 'types/profile';
-import { ThemeInterface } from 'types/ui';
-import { isOnlySpeedMarketsSupported } from 'utils/network';
+import { RootState, ThemeInterface } from 'types/ui';
 import { getPriceId } from 'utils/pyth';
 import { history } from 'utils/routes';
-import { MARKET_DURATION_IN_DAYS } from '../../constants/options';
+import { MARKET_DURATION_IN_DAYS } from '../../constants/market';
 import ClaimablePositions from './components/ClaimablePositions';
 import OpenPositions from './components/OpenPositions';
 import PositionHistory from './components/PositionHistory';
@@ -60,11 +56,6 @@ const Profile: React.FC = () => {
 
     const [searchAddress, setSearchAddress] = useState<string>('');
     const [searchText, setSearchText] = useState<string>('');
-
-    const notificationsQuery = useUserNotificationsQuery(networkId, searchAddress || walletAddress, {
-        enabled: isAppReady && isWalletConnected && !isOnlySpeedMarketsSupported(networkId),
-    });
-    const notifications = notificationsQuery.isSuccess && notificationsQuery.data ? notificationsQuery.data : 0;
 
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
         networkId,
@@ -138,7 +129,7 @@ const Profile: React.FC = () => {
         })
         .filter((marketData) => marketData.claimable).length;
 
-    const totalNotifications = notifications + speedMarketsNotifications + chainedSpeedMarketsNotifications;
+    const totalNotifications = speedMarketsNotifications + chainedSpeedMarketsNotifications;
 
     const userProfileDataQuery = useProfileDataQuery(networkId, searchAddress || walletAddress, {
         enabled: isAppReady && isWalletConnected,
@@ -177,7 +168,6 @@ const Profile: React.FC = () => {
 
     return (
         <>
-            {!isOnlySpeedMarketsSupported(networkId) && <BannerCarousel />}
             <Container>
                 <Header>
                     <Title>{t('profile.title')}</Title>
@@ -193,7 +183,7 @@ const Profile: React.FC = () => {
                 <MainContainer>
                     <StatsContainer>
                         <StatsItem>
-                            <StatsLabel>{t('profile.leaderboard.table.netprofit-col')}:</StatsLabel>
+                            <StatsLabel>{t('profile.stats.netprofit-col')}:</StatsLabel>
                             <StatsValue
                                 color={
                                     profileData.profit > 0
@@ -209,7 +199,7 @@ const Profile: React.FC = () => {
                             </StatsValue>
                         </StatsItem>
                         <StatsItem>
-                            <StatsLabel>{t('profile.leaderboard.table.gain-col')}:</StatsLabel>
+                            <StatsLabel>{t('profile.stats.gain-col')}:</StatsLabel>
                             <StatsValue
                                 color={
                                     profileData.gain > 0
@@ -223,11 +213,11 @@ const Profile: React.FC = () => {
                             </StatsValue>
                         </StatsItem>
                         <StatsItem>
-                            <StatsLabel>{t('profile.leaderboard.table.trades-col')}:</StatsLabel>
+                            <StatsLabel>{t('profile.stats.trades-col')}:</StatsLabel>
                             <StatsValue>{userProfileDataQuery.isLoading ? '-' : profileData.numberOfTrades}</StatsValue>
                         </StatsItem>
                         <StatsItem>
-                            <StatsLabel>{t('profile.leaderboard.table.volume-col')}:</StatsLabel>
+                            <StatsLabel>{t('profile.stats.volume-col')}:</StatsLabel>
                             <StatsValue>
                                 {userProfileDataQuery.isLoading
                                     ? '-'

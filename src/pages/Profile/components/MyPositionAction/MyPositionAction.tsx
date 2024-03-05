@@ -15,7 +15,6 @@ import { USD_SIGN } from 'constants/currency';
 import { ZERO_ADDRESS } from 'constants/network';
 import { CONNECTION_TIMEOUT_MS, PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
 import { differenceInSeconds, millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
-import { Positions } from 'enums/options';
 import { BigNumber, ethers } from 'ethers';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -26,7 +25,7 @@ import { getIsWalletConnected, getNetworkId, getSelectedCollateralIndex, getWall
 import styled, { CSSProperties, useTheme } from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
 import { coinParser, formatCurrencyWithSign, roundNumberToDecimals } from 'thales-utils';
-import { UserLivePositions } from 'types/options';
+import { UserOpenPositions } from 'types/market';
 import { UserPosition } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
 import erc20Contract from 'utils/contracts/erc20Contract';
@@ -45,7 +44,7 @@ import { delay } from 'utils/timer';
 const ONE_HUNDRED_AND_THREE_PERCENT = 1.03;
 
 type MyPositionActionProps = {
-    position: UserPosition | UserLivePositions;
+    position: UserPosition | UserOpenPositions;
     isProfileAction?: boolean;
     maxPriceDelayForResolvingSec?: number;
     isMultipleContainerRows?: boolean;
@@ -60,17 +59,15 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 
-    const isRangedMarket = [Positions.IN, Positions.OUT].includes(position.side);
-
     const networkId = useSelector((state: RootState) => getNetworkId(state));
     const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
     const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
 
-    const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId, true);
+    const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
     const defaultCollateral = useMemo(() => getDefaultCollateral(networkId), [networkId]);
-    const selectedCollateral = useMemo(() => getCollateral(networkId, selectedCollateralIndex, true), [
+    const selectedCollateral = useMemo(() => getCollateral(networkId, selectedCollateralIndex), [
         networkId,
         selectedCollateralIndex,
     ]);
@@ -85,16 +82,13 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     const [isAllowing, setIsAllowing] = useState(false);
 
     useEffect(() => {
-        if (
-            (position.positionAddress === ZERO_ADDRESS && !position.isSpeedMarket) ||
-            (isDefaultCollateral && position.isSpeedMarket)
-        ) {
+        if (isDefaultCollateral) {
             return;
         }
 
         const { speedMarketsAMMContract, collateral } = snxJSConnector;
         const erc20Instance = new ethers.Contract(
-            position.isSpeedMarket ? collateral?.address || '' : position.positionAddress,
+            collateral?.address || '',
             erc20Contract.abi,
             snxJSConnector.provider
         );
@@ -102,10 +96,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
 
         const getAllowance = async () => {
             try {
-                const parsedAmount = position.isSpeedMarket
-                    ? coinParser(position.value.toString(), networkId)
-                    : position.amountBigNumber;
-
+                const parsedAmount = coinParser(position.value.toString(), networkId);
                 const allowance = await checkAllowance(parsedAmount, erc20Instance, walletAddress, addressToApprove);
                 setAllowance(allowance);
             } catch (e) {
@@ -115,27 +106,11 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
         if (isWalletConnected && erc20Instance.provider) {
             getAllowance();
         }
-    }, [
-        position.positionAddress,
-        position.amountBigNumber,
-        position.isSpeedMarket,
-        position.value,
-        networkId,
-        walletAddress,
-        isWalletConnected,
-        hasAllowance,
-        isAllowing,
-        isRangedMarket,
-        isDefaultCollateral,
-    ]);
+    }, [position.value, networkId, walletAddress, isWalletConnected, hasAllowance, isAllowing, isDefaultCollateral]);
 
     const handleAllowance = async (approveAmount: BigNumber) => {
         const { speedMarketsAMMContract, collateral } = snxJSConnector;
-        const erc20Instance = new ethers.Contract(
-            position.isSpeedMarket ? collateral?.address || '' : position.positionAddress,
-            erc20Contract.abi,
-            snxJSConnector.signer
-        );
+        const erc20Instance = new ethers.Contract(collateral?.address || '', erc20Contract.abi, snxJSConnector.signer);
         const addressToApprove = speedMarketsAMMContract?.address || '';
 
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
@@ -242,8 +217,8 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
             {hasAllowance || isDefaultCollateral
                 ? `${
                       isSubmitting
-                          ? t('markets.user-positions.claim-win-progress')
-                          : t('markets.user-positions.claim-win')
+                          ? t('speed-markets.user-positions.claim-win-progress')
+                          : t('speed-markets.user-positions.claim-win')
                   } ${formatCurrencyWithSign(USD_SIGN, position.value, 2)}`
                 : isAllowing
                 ? `${t('common.enable-wallet-access.approve-progress')} ${defaultCollateral}...`
@@ -255,37 +230,35 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     );
 
     const getButton = () => {
-        if (position.isSpeedMarket) {
-            if (position.claimable) {
-                return hasAllowance || isDefaultCollateral ? (
-                    getResolveButton()
-                ) : (
-                    <Tooltip
-                        overlay={t('markets.user-positions.approve-swap-tooltip', {
-                            currencyKey: selectedCollateral,
-                            defaultCurrency: defaultCollateral,
-                        })}
-                    >
-                        <div>{getResolveButton()}</div>
-                    </Tooltip>
-                );
-            } else if (position.finalPrice) {
-                return (
-                    <ResultsContainer>
-                        <Label>{t('common.result')}</Label>
-                        <Value isUpperCase color={theme.error.textColor.primary}>
-                            {t('common.loss')}
-                        </Value>
-                    </ResultsContainer>
-                );
-            } else {
-                return (
-                    <ResultsContainer minWidth="180px">
-                        <Label>{t('markets.user-positions.results')}</Label>
-                        <TimeRemaining fontSize={13} end={position.maturityDate} showFullCounter showSecondsCounter />
-                    </ResultsContainer>
-                );
-            }
+        if (position.claimable) {
+            return hasAllowance || isDefaultCollateral ? (
+                getResolveButton()
+            ) : (
+                <Tooltip
+                    overlay={t('speed-markets.user-positions.approve-swap-tooltip', {
+                        currencyKey: selectedCollateral,
+                        defaultCurrency: defaultCollateral,
+                    })}
+                >
+                    <div>{getResolveButton()}</div>
+                </Tooltip>
+            );
+        } else if (position.finalPrice) {
+            return (
+                <ResultsContainer>
+                    <Label>{t('common.result')}</Label>
+                    <Value isUpperCase color={theme.error.textColor.primary}>
+                        {t('common.loss')}
+                    </Value>
+                </ResultsContainer>
+            );
+        } else {
+            return (
+                <ResultsContainer minWidth="180px">
+                    <Label>{t('speed-markets.user-positions.results')}</Label>
+                    <TimeRemaining fontSize={13} end={position.maturityDate} showFullCounter showSecondsCounter />
+                </ResultsContainer>
+            );
         }
     };
 
@@ -293,11 +266,11 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
         <>
             <FlexDivCentered>
                 {getButton()}
-                {isMultiCollateralSupported && position.isSpeedMarket && position.claimable && (
+                {isMultiCollateralSupported && position.claimable && (
                     <CollateralSelectorContainer>
                         <InLabel color={theme.button.textColor.quaternary}>{t('common.in')}</InLabel>
                         <CollateralSelector
-                            collateralArray={getCollaterals(networkId, true)}
+                            collateralArray={getCollaterals(networkId)}
                             selectedItem={selectedCollateralIndex}
                             onChangeCollateral={() => {}}
                             disabled={isSubmitting || isAllowing}
@@ -313,11 +286,8 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
             {openApprovalModal && (
                 <ApprovalModal
                     // add three percent to approval amount to take into account price changes
-                    defaultAmount={roundNumberToDecimals(
-                        ONE_HUNDRED_AND_THREE_PERCENT * (position.isSpeedMarket ? position.value : position.amount)
-                    )}
-                    tokenSymbol={position.isSpeedMarket ? defaultCollateral : position.side}
-                    isNonStable={!position.isSpeedMarket}
+                    defaultAmount={roundNumberToDecimals(ONE_HUNDRED_AND_THREE_PERCENT * position.value)}
+                    tokenSymbol={defaultCollateral}
                     isAllowing={isAllowing}
                     onSubmit={handleAllowance}
                     onClose={() => setOpenApprovalModal(false)}

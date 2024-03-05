@@ -1,4 +1,3 @@
-import { useMatomo } from '@datapunt/matomo-tracker-react';
 import Loader from 'components/Loader';
 import UnsupportedNetwork from 'components/UnsupportedNetwork';
 import { SUPPORTED_NETWORKS_NAMES } from 'constants/network';
@@ -14,7 +13,6 @@ import { setIsMobile } from 'redux/modules/ui';
 import {
     getNetworkId,
     getSwitchToNetworkId,
-    getWalletAddress,
     switchToNetworkId,
     updateNetworkSettings,
     updateWallet,
@@ -25,7 +23,6 @@ import { getSupportedNetworksByRoute, isNetworkSupported } from 'utils/network';
 import queryConnector from 'utils/queryConnector';
 import { history } from 'utils/routes';
 import snxJSConnector from 'utils/snxJSConnector';
-import { getDefaultTheme } from 'utils/style';
 import { useAccount, useDisconnect, useNetwork, useProvider, useSigner } from 'wagmi';
 
 const DappLayout = lazy(() => import(/* webpackChunkName: "DappLayout" */ 'layouts/DappLayout'));
@@ -38,7 +35,7 @@ const Profile = lazy(() => import(/* webpackChunkName: "Profile" */ '../Profile'
 
 const App = () => {
     const dispatch = useDispatch();
-    const walletAddress = useSelector((state) => getWalletAddress(state));
+
     const networkId = useSelector((state) => getNetworkId(state));
     const switchedToNetworkId = useSelector((state) => getSwitchToNetworkId(state));
 
@@ -48,26 +45,7 @@ const App = () => {
     const { disconnect } = useDisconnect();
     const { chain } = useNetwork();
 
-    const { trackPageView } = useMatomo();
-
     queryConnector.setQueryClient();
-
-    useEffect(() => {
-        const theme = getDefaultTheme();
-
-        trackPageView({
-            customDimensions: [
-                {
-                    id: 3,
-                    value: theme,
-                },
-                {
-                    id: 4,
-                    value: walletAddress ? true : false,
-                },
-            ],
-        });
-    }, [walletAddress, trackPageView]);
 
     useEffect(() => {
         const init = async () => {
@@ -148,8 +126,8 @@ const App = () => {
             <QueryClientProvider client={queryConnector.queryClient}>
                 <Router history={history}>
                     <Switch>
-                        {getSupportedNetworksByRoute(ROUTES.Options.SpeedMarkets).includes(networkId) && (
-                            <Route exact path={ROUTES.Options.SpeedMarkets}>
+                        {getSupportedNetworksByRoute(ROUTES.Markets.SpeedMarkets).includes(networkId) && (
+                            <Route exact path={ROUTES.Markets.SpeedMarkets}>
                                 <Suspense fallback={<Loader />}>
                                     <DappLayout>
                                         <SpeedMarkets />
@@ -158,8 +136,8 @@ const App = () => {
                             </Route>
                         )}
 
-                        {getSupportedNetworksByRoute(ROUTES.Options.SpeedMarketsOverview).includes(networkId) && (
-                            <Route exact path={ROUTES.Options.SpeedMarketsOverview}>
+                        {getSupportedNetworksByRoute(ROUTES.Markets.SpeedMarketsOverview).includes(networkId) && (
+                            <Route exact path={ROUTES.Markets.SpeedMarketsOverview}>
                                 <Suspense fallback={<Loader />}>
                                     <DappLayout>
                                         <SpeedMarketsOverview />
@@ -168,8 +146,8 @@ const App = () => {
                             </Route>
                         )}
 
-                        {getSupportedNetworksByRoute(ROUTES.Options.Profile).includes(networkId) && (
-                            <Route exact path={ROUTES.Options.Profile}>
+                        {getSupportedNetworksByRoute(ROUTES.Markets.Profile).includes(networkId) && (
+                            <Route exact path={ROUTES.Markets.Profile}>
                                 <Suspense fallback={<Loader />}>
                                     <DappLayout>
                                         <Profile />
@@ -178,23 +156,25 @@ const App = () => {
                             </Route>
                         )}
 
-                        <Route exact path={ROUTES.Home}>
-                            <Suspense fallback={<Loader />}>
-                                <DappLayout>
-                                    <SpeedMarkets />
-                                </DappLayout>
-                            </Suspense>
-                        </Route>
+                        {getSupportedNetworksByRoute(ROUTES.Home).includes(networkId) && (
+                            <Route exact path={ROUTES.Home}>
+                                <Suspense fallback={<Loader />}>
+                                    <DappLayout>
+                                        <SpeedMarkets />
+                                    </DappLayout>
+                                </Suspense>
+                            </Route>
+                        )}
 
                         <Route>
-                            <Redirect to={ROUTES.Options.SpeedMarkets} />
+                            <Redirect to={ROUTES.Markets.SpeedMarkets} />
                             <Suspense fallback={<Loader />}>
                                 <DappLayout>
-                                    {getSupportedNetworksByRoute(ROUTES.Options.SpeedMarkets).includes(networkId) ? (
+                                    {getSupportedNetworksByRoute(ROUTES.Markets.SpeedMarkets).includes(networkId) ? (
                                         <SpeedMarkets />
                                     ) : (
                                         <UnsupportedNetwork
-                                            supportedNetworks={getSupportedNetworksByRoute(ROUTES.Options.SpeedMarkets)}
+                                            supportedNetworks={getSupportedNetworksByRoute(ROUTES.Markets.SpeedMarkets)}
                                         />
                                     )}
                                 </DappLayout>
