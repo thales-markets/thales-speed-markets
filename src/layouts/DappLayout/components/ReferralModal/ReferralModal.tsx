@@ -1,5 +1,4 @@
 import { useConnectModal } from '@rainbow-me/rainbowkit';
-import axios from 'axios';
 import Button from 'components/Button';
 import Modal from 'components/Modal';
 import SelectInput from 'components/SelectInput';
@@ -85,13 +84,19 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
 
     const generateLinkHandler = useCallback(async () => {
         const signature = await (snxJSConnector as any).signer.signMessage(referrerID);
-        const response = await axios.post(`${LINKS.API}/update-refferer-id`, {
-            walletAddress,
-            reffererID: referrerID,
-            signature,
-            previousReffererID: savedReferrerID,
+        const response = await fetch(`${LINKS.API}/update-refferer-id`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                walletAddress,
+                reffererID: referrerID,
+                signature,
+                previousReffererID: savedReferrerID,
+            }),
         });
-        if (response.data.error) {
+        if (!response.ok) {
             toast(
                 <ToastMessage id="customId" type="error" message={t('referral.generate.id-exists')} />,
                 getErrorToastOptions('', 'customId')
@@ -122,12 +127,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
     };
 
     return (
-        <Modal
-            title={t('common.referral.title')}
-            onClose={onClose}
-            shouldCloseOnOverlayClick={true}
-            customStyle={{ overlay: { zIndex: 2000 } }}
-        >
+        <Modal title={t('common.referral.title')} onClose={onClose} shouldCloseOnOverlayClick={true}>
             <Container>
                 <Info>
                     <Trans i18nKey={'common.referral.info'} components={{ bold: <BoldText /> }} />
