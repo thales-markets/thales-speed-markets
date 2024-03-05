@@ -2,7 +2,7 @@ import snxJSConnector from 'utils/snxJSConnector';
 
 import QUERY_KEYS from 'constants/queryKeys';
 import { useQuery, UseQueryOptions } from 'react-query';
-import { Coins, COLLATERAL_DECIMALS } from 'thales-utils';
+import { COLLATERAL_DECIMALS } from 'thales-utils';
 import { SupportedNetwork } from 'types/network';
 import { getDefaultCollateral } from 'utils/currency';
 
@@ -17,10 +17,7 @@ const useStableBalanceQuery = (walletAddress: string, networkId: SupportedNetwor
                 let usdBalance = await collateral?.balanceOf(walletAddress);
                 usdBalance = usdBalance
                     ? parseInt(usdBalance) /
-                      10 **
-                          (COLLATERAL_DECIMALS[collateralKey as Coins]
-                              ? COLLATERAL_DECIMALS[collateralKey as Coins]
-                              : 18)
+                      10 ** (COLLATERAL_DECIMALS[collateralKey] ? COLLATERAL_DECIMALS[collateralKey] : 18)
                     : 0;
 
                 return {

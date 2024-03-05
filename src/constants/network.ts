@@ -28,7 +28,12 @@ export const SUPPORTED_NETWORKS_NAMES: Record<SupportedNetwork, string> = {
     [NetworkId.BlastSepolia]: 'BLAST SEPOLIA',
 };
 
-export const TEST_NETWORKS = [NetworkId.OptimismGoerli, NetworkId.OptimismSepolia, NetworkId.ZkSyncSepolia];
+export const TEST_NETWORKS = [
+    NetworkId.OptimismGoerli,
+    NetworkId.OptimismSepolia,
+    NetworkId.ZkSyncSepolia,
+    NetworkId.BlastSepolia,
+];
 
 export const DEFAULT_NETWORK: { name: string; networkId: SupportedNetwork } = {
     name: SUPPORTED_NETWORKS_NAMES[NetworkId.OptimismMainnet],
@@ -92,17 +97,6 @@ export const SUPPORTED_NETWORKS_PARAMS: Record<number, NetworkParams> = {
         chainName: 'zkSync',
         rpcUrls: ['https://mainnet.era.zksync.io'],
         blockExplorerUrls: ['https://explorer.zksync.io/'],
-        iconUrls: ['https://optimism.io/images/metamask_icon.svg', 'https://optimism.io/images/metamask_icon.png'],
-        nativeCurrency: {
-            symbol: 'ETH',
-            decimals: 18,
-        },
-    },
-    [NetworkId.BlastSepolia]: {
-        chainId: '0xa0c71fd',
-        chainName: 'Blast Sepolia',
-        rpcUrls: ['https://sepolia.blast.io'],
-        blockExplorerUrls: ['https://testnet.blastscan.io/'],
         iconUrls: ['https://optimism.io/images/metamask_icon.svg', 'https://optimism.io/images/metamask_icon.png'],
         nativeCurrency: {
             symbol: 'ETH',
