@@ -65,7 +65,7 @@ const ClosedPositions: React.FC<{ isChained: boolean }> = ({ isChained }) => {
     return (
         <Wrapper>
             <Header>
-                <Title>{t('markets.user-positions.your-closed-positions')}</Title>
+                <Title>{t('speed-markets.user-positions.your-closed-positions')}</Title>
             </Header>
             {userResolvedSpeedMarketsDataQuery.isLoading || userResolvedChainedSpeedMarketsDataQuery.isLoading ? (
                 <LoaderContainer>

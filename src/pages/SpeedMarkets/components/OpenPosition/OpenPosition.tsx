@@ -86,7 +86,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
                 </FlexContainer>
                 <Separator />
                 <FlexContainer>
-                    <Label>{t('markets.user-positions.size')}</Label>
+                    <Label>{t('speed-markets.user-positions.size')}</Label>
                     <Value>
                         {formatNumberShort(position.payout)}{' '}
                         <Value color={getColorPerPosition(position.side, theme)}>{position.side}</Value>
@@ -94,7 +94,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
                 </FlexContainer>
                 <Separator />
                 <FlexContainer>
-                    <Label>{t('markets.user-positions.paid')}</Label>
+                    <Label>{t('speed-markets.user-positions.paid')}</Label>
                     <Value>{formatCurrencyWithSign(USD_SIGN, position.paid, 2)}</Value>
                 </FlexContainer>
                 <Separator />

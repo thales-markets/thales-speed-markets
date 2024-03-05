@@ -95,13 +95,13 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
 
     const fullDateFromDeltaTimeFormatted = deltaTimeSec
         ? `(${isChained ? t('common.starting') + ' ' : ''}${formatShortDateWithTime(dateFromDelta)})`
-        : `( ${t('markets.amm-trading.choose-time')} )`;
+        : `( ${t('speed-markets.amm-trading.choose-time')} )`;
 
     const timeFormatted = deltaTimeSec
         ? `${deltaTimeFormatted} ${fullDateFromDeltaTimeFormatted}`
         : maturityDate
         ? formatShortDateWithTime(maturityDate)
-        : `( ${t('markets.amm-trading.choose-time')} )`;
+        : `( ${t('speed-markets.amm-trading.choose-time')} )`;
 
     const getChainedPositions = () =>
         chainedPositions.map((pos, index) => (
@@ -117,7 +117,7 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
             <FlexDivCentered>
                 <Text>
                     <TextLabel>
-                        {t(isChained ? 'speed-markets.chained.asset-price' : 'markets.amm-trading.asset-price', {
+                        {t(isChained ? 'speed-markets.chained.asset-price' : 'speed-markets.amm-trading.asset-price', {
                             asset: currencyKey,
                         })}
                     </TextLabel>
@@ -138,7 +138,7 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
                                 >
                                     {positionTypeFormatted
                                         ? positionTypeFormatted
-                                        : `( ${t('markets.amm-trading.choose-direction')} )`}
+                                        : `( ${t('speed-markets.amm-trading.choose-direction')} )`}
                                 </SentanceTextValue>
                             )}
                             {!isChained && (
@@ -148,7 +148,7 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
                             )}
                         </>
                     ) : (
-                        <SentanceTextValue>{'( ' + t('markets.amm-trading.pick-price') + ' )'}</SentanceTextValue>
+                        <SentanceTextValue>{'( ' + t('speed-markets.amm-trading.pick-price') + ' )'}</SentanceTextValue>
                     )}
                 </Text>
             </FlexDivCentered>
@@ -187,12 +187,12 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
             )}
             <FlexDivCentered>
                 <Text>
-                    <TextLabel>{t('markets.amm-trading.you-win')}</TextLabel>
-                    {hasCollateralConversion && <TextLabel>{` ${t('markets.amm-trading.at-least')}`}</TextLabel>}
+                    <TextLabel>{t('speed-markets.amm-trading.you-win')}</TextLabel>
+                    {hasCollateralConversion && <TextLabel>{` ${t('speed-markets.amm-trading.at-least')}`}</TextLabel>}
                     <SentanceTextValue isProfit={true}>
                         {Number(priceProfit) > 0 && Number(paidAmount) > 0
                             ? potentialWinFormatted
-                            : '( ' + t('markets.amm-trading.based-amount') + ' )'}
+                            : '( ' + t('speed-markets.amm-trading.based-amount') + ' )'}
                     </SentanceTextValue>
                     {hasCollateralConversion && Number(priceProfit) > 0 && Number(paidAmount) > 0 && (
                         <Tooltip overlay={t('speed-markets.tooltips.payout-conversion')} />

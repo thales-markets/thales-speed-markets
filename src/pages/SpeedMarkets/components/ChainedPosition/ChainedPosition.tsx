@@ -187,11 +187,11 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                         ))}
                     </FlexContainer>
                     <FlexContainer>
-                        <Text>{t('markets.user-positions.size')}</Text>
+                        <Text>{t('speed-markets.user-positions.size')}</Text>
                         <Text isActiveColor>{formatNumberShort(positionWithPrices.payout)}</Text>
                     </FlexContainer>
                     <FlexContainer>
-                        <Text>{t('markets.user-positions.paid')}</Text>
+                        <Text>{t('speed-markets.user-positions.paid')}</Text>
                         <Text isActiveColor>{formatCurrencyWithSign(USD_SIGN, positionWithPrices.paid, 2)}</Text>
                     </FlexContainer>
                     <ChainedPositionAction
@@ -301,11 +301,11 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                     <Summary>
                         <BuyInfo>
                             <Text>
-                                {t('markets.user-positions.size')}
+                                {t('speed-markets.user-positions.size')}
                                 <Text isActiveColor>{` ${formatNumberShort(positionWithPrices.payout)}`}</Text>
                             </Text>
                             <Text padding="0 0 0 30px">
-                                {t('markets.user-positions.paid')}
+                                {t('speed-markets.user-positions.paid')}
                                 <Text isActiveColor>{` ${formatCurrencyWithSign(
                                     USD_SIGN,
                                     positionWithPrices.paid

@@ -26,7 +26,7 @@ const PageLinkBanner: React.FC<PageLinkBannerProps> = ({ link }) => {
                             i18nKey="common.banner.page-link.try"
                             components={{
                                 bold: <BoldText />,
-                                value: t('markets.title'),
+                                value: t('common.thales-markets'),
                             }}
                         />
                     </Text>

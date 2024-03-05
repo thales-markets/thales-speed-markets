@@ -217,8 +217,8 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
             {hasAllowance || isDefaultCollateral
                 ? `${
                       isSubmitting
-                          ? t('markets.user-positions.claim-win-progress')
-                          : t('markets.user-positions.claim-win')
+                          ? t('speed-markets.user-positions.claim-win-progress')
+                          : t('speed-markets.user-positions.claim-win')
                   } ${formatCurrencyWithSign(USD_SIGN, position.value, 2)}`
                 : isAllowing
                 ? `${t('common.enable-wallet-access.approve-progress')} ${defaultCollateral}...`
@@ -235,7 +235,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                 getResolveButton()
             ) : (
                 <Tooltip
-                    overlay={t('markets.user-positions.approve-swap-tooltip', {
+                    overlay={t('speed-markets.user-positions.approve-swap-tooltip', {
                         currencyKey: selectedCollateral,
                         defaultCurrency: defaultCollateral,
                     })}
@@ -255,7 +255,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
         } else {
             return (
                 <ResultsContainer minWidth="180px">
-                    <Label>{t('markets.user-positions.results')}</Label>
+                    <Label>{t('speed-markets.user-positions.results')}</Label>
                     <TimeRemaining fontSize={13} end={position.maturityDate} showFullCounter showSecondsCounter />
                 </ResultsContainer>
             );

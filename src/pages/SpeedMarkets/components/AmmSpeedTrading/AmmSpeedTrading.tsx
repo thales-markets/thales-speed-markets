@@ -649,12 +649,12 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 <Button disabled={true}>
                     {isChained
                         ? t('speed-markets.chained.errors.choose-directions')
-                        : t('markets.amm-trading.choose-direction')}
+                        : t('speed-markets.amm-trading.choose-direction')}
                 </Button>
             );
         }
         if (!(strikeTimeSec || deltaTimeSec)) {
-            return <Button disabled={true}>{t('markets.amm-trading.choose-time')}</Button>;
+            return <Button disabled={true}>{t('speed-markets.amm-trading.choose-time')}</Button>;
         }
         if (!isPaidAmountEntered) {
             return <Button disabled={true}>{t('common.enter-amount')}</Button>;

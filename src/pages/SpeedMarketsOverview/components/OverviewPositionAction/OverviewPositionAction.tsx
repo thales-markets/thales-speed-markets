@@ -128,7 +128,7 @@ const OverviewPositionAction: React.FC<OverviewPositionActionProps> = ({
                 <>
                     <Separator />
                     <ResultsContainer>
-                        <Label>{t('markets.user-positions.results')}</Label>
+                        <Label>{t('speed-markets.user-positions.results')}</Label>
                         <TimeRemaining fontSize={13} end={position.maturityDate} showFullCounter showSecondsCounter />
                     </ResultsContainer>
                 </>

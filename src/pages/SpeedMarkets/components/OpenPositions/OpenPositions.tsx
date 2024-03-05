@@ -183,7 +183,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
     return (
         <Wrapper>
             <Header>
-                <Title>{t('markets.user-positions.your-positions')}</Title>
+                <Title>{t('speed-markets.user-positions.your-positions')}</Title>
                 {hasClaimableSpeedPositions && (
                     <ButtonWrapper>
                         {getClaimAllButton()}
@@ -233,7 +233,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
                                   />
                               ))}
                     </PositionsWrapper>
-                    {noPositions && <NoPositionsText>{t('markets.user-positions.no-positions')}</NoPositionsText>}
+                    {noPositions && <NoPositionsText>{t('speed-markets.user-positions.no-positions')}</NoPositionsText>}
                 </>
             )}
         </Wrapper>

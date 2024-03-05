@@ -299,12 +299,12 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                                   ? isSubmittingBatch
                                       ? t('speed-markets.overview.resolve')
                                       : t(`speed-markets.overview.resolve-progress`)
-                                  : t('markets.user-positions.claim-win-progress')
+                                  : t('speed-markets.user-positions.claim-win-progress')
                               : isOverview
                               ? isAdmin
                                   ? `${t('common.admin')} ${t('speed-markets.overview.resolve')}`
                                   : t('speed-markets.overview.resolve')
-                              : t('markets.user-positions.claim-win')
+                              : t('speed-markets.user-positions.claim-win')
                       } ${formatCurrencyWithSign(USD_SIGN, position.payout, 2)}`
                     : isAllowing
                     ? `${t('common.enable-wallet-access.approve-progress')} ${defaultCollateral}...`
@@ -323,7 +323,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                     getResolveButton()
                 ) : (
                     <Tooltip
-                        overlay={t('markets.user-positions.approve-swap-tooltip', {
+                        overlay={t('speed-markets.user-positions.approve-swap-tooltip', {
                             currencyKey: selectedCollateral,
                             defaultCurrency: defaultCollateral,
                         })}
@@ -345,7 +345,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
             } else {
                 return (
                     <ResultsContainer minWidth="180px">
-                        <Label>{t('markets.user-positions.results')}</Label>
+                        <Label>{t('speed-markets.user-positions.results')}</Label>
                         <TimeRemaining fontSize={13} end={position.maturityDate} showFullCounter showSecondsCounter />
                     </ResultsContainer>
                 );
