@@ -1,4 +1,3 @@
-import axios from 'axios';
 import ElectionsBanner from 'components/ElectionsBanner';
 import { LINKS } from 'constants/links';
 import useWidgetBotScript from 'hooks/useWidgetBotScript';
@@ -38,15 +37,16 @@ const DappLayout: React.FC<DappLayoutProps> = ({ children }) => {
         }
         if (queryParams?.referrerId) {
             const fetchIdAddress = async () => {
-                const response = await axios.get(
+                const response = await fetch(
                     // passing an encoded string to encodeURIComponent causes an error in some cases
                     // reffererId is already encoded so we have to decode it
                     `${LINKS.API}/get-refferer-id-address/${encodeURIComponent(
                         decodeURIComponent(queryParams.referrerId)
                     )}`
                 );
-                if (response.data) {
-                    setReferralWallet(response.data);
+                const wallet = await response.text();
+                if (wallet) {
+                    setReferralWallet(wallet);
                 }
             };
             fetchIdAddress();
@@ -116,7 +116,7 @@ const Wrapper = styled.div`
 
 const StyledToastContainer = styled(ToastContainer)`
     &&&.Toastify__toast-container {
-        z-index: 10001;
+        z-index: 30000;
         width: 330px;
         @media (max-width: 600px) {
             top: 0;
