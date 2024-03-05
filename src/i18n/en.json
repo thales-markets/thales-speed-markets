@@ -11,11 +11,6 @@
             "progress-label": "Buying in progress...",
             "confirmation-message": "Successfully bought"
         },
-        "sell": {
-            "label": "Sell",
-            "progress-label": "Selling in progress...",
-            "confirmation-message": "Successfully sold"
-        },
         "mint": {
             "label": "Get",
             "progress-label": "Getting",
@@ -154,23 +149,6 @@
                 "zkSync": "Switch to ZkSync",
                 "blast-sepolia": "Switch to Blast Sepolia"
             }
-        },
-        "swap": {
-            "title": "Get {{token}}",
-            "button-text": "Get {{token}}",
-            "select-token": "Select a token",
-            "approve": "Give permission to swap {{currency}}",
-            "swap": "Swap",
-            "insufficient-balance": "Insufficient balance",
-            "not-supported": "Swap is not supported on this network",
-            "tx-success": "Successfully bought {{token}}",
-            "tx-failed": "Transaction failed",
-            "tx-user-rejected": "User rejected transaction",
-            "approval-success": "Approval successful",
-            "approval-failed": "Approval failed",
-            "from": "From",
-            "to": "To",
-            "stablecoin": "stablecoin"
         },
         "referral": {
             "title": "Refer and earn",
