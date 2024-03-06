@@ -8,6 +8,7 @@ type FieldValidationMessageProps = {
     style?: CSSProperties;
     href: string;
     simpleOnClick?: boolean;
+    children?: React.ReactNode;
 };
 
 const ifIpfsDeployment = process.env.REACT_APP_IPFS_DEPLOYMENT === 'true';

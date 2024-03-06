@@ -15,6 +15,7 @@ type TooltipProps = {
     iconColor?: string;
     mobileIconFontSize?: number;
     mouseEnterDelay?: number;
+    children?: React.ReactNode;
 };
 
 const Tooltip: React.FC<TooltipProps> = ({
