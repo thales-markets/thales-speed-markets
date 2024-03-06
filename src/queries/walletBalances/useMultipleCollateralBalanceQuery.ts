@@ -1,6 +1,6 @@
 import { CRYPTO_CURRENCY_MAP, SYNTHS_MAP } from 'constants/currency';
 import QUERY_KEYS from 'constants/queryKeys';
-import { UseQueryOptions, useQuery } from 'react-query';
+import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { COLLATERAL_DECIMALS, Coins, NetworkId, bigNumberFormatter } from 'thales-utils';
 import { CollateralsBalance } from 'types/collateral';
 import snxJSConnector from 'utils/snxJSConnector';
@@ -8,11 +8,11 @@ import snxJSConnector from 'utils/snxJSConnector';
 const useMultipleCollateralBalanceQuery = (
     walletAddress: string,
     networkId: NetworkId,
-    options?: UseQueryOptions<any>
+    options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
-    return useQuery<CollateralsBalance>(
-        QUERY_KEYS.WalletBalances.MultipleCollateral(walletAddress, networkId),
-        async () => {
+    return useQuery<CollateralsBalance>({
+        queryKey: QUERY_KEYS.WalletBalances.MultipleCollateral(walletAddress, networkId),
+        queryFn: async () => {
             let collaterasBalance: CollateralsBalance = {
                 sUSD: 0,
                 DAI: 0,
@@ -91,8 +91,8 @@ const useMultipleCollateralBalanceQuery = (
 
             return collaterasBalance;
         },
-        options
-    );
+        ...options,
+    });
 };
 
 export default useMultipleCollateralBalanceQuery;

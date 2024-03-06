@@ -1,7 +1,7 @@
 import { LINKS } from 'constants/links';
 import QUERY_KEYS from 'constants/queryKeys';
 import { millisecondsToSeconds } from 'date-fns';
-import { UseQueryOptions, useQuery } from 'react-query';
+import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 
 type CandlestickData = {
     time: number;
@@ -15,11 +15,11 @@ const usePythCandlestickQuery = (
     asset: string,
     date: number,
     resolution: string,
-    options?: UseQueryOptions<CandlestickData[]>
+    options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
-    return useQuery<CandlestickData[]>(
-        QUERY_KEYS.Prices.PythCandlestickData(asset, date, resolution),
-        async () => {
+    return useQuery<CandlestickData[]>({
+        queryKey: QUERY_KEYS.Prices.PythCandlestickData(asset, date, resolution),
+        queryFn: async () => {
             const startDate = new Date(date);
             const response = await fetch(
                 `${
@@ -42,8 +42,8 @@ const usePythCandlestickQuery = (
 
             return candleStickData;
         },
-        options
-    );
+        ...options,
+    });
 };
 
 export default usePythCandlestickQuery;

@@ -4,17 +4,20 @@ import { ZERO_ADDRESS } from 'constants/network';
 import { CONNECTION_TIMEOUT_MS, PYTH_CURRENCY_DECIMALS, SUPPORTED_ASSETS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
-import { UseQueryOptions, useQuery } from 'react-query';
+import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { NetworkId, bigNumberFormatter, coinFormatter, parseBytes32String } from 'thales-utils';
 import { UserOpenPositions } from 'types/market';
 import { getCurrentPrices, getPriceId, getPriceServiceEndpoint } from 'utils/pyth';
 import snxJSConnector from 'utils/snxJSConnector';
 import { getFeesFromHistory } from 'utils/speedAmm';
 
-const useActiveSpeedMarketsDataQuery = (networkId: NetworkId, options?: UseQueryOptions<UserOpenPositions[]>) => {
-    return useQuery<UserOpenPositions[]>(
-        QUERY_KEYS.Markets.ActiveSpeedMarkets(networkId),
-        async () => {
+const useActiveSpeedMarketsDataQuery = (
+    networkId: NetworkId,
+    options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
+) => {
+    return useQuery<UserOpenPositions[]>({
+        queryKey: QUERY_KEYS.Markets.ActiveSpeedMarkets(networkId),
+        queryFn: async () => {
             const activeSpeedMarketsData: UserOpenPositions[] = [];
 
             const { speedMarketsAMMContract, speedMarketsDataContract } = snxJSConnector;
@@ -116,10 +119,8 @@ const useActiveSpeedMarketsDataQuery = (networkId: NetworkId, options?: UseQuery
 
             return activeSpeedMarketsData;
         },
-        {
-            ...options,
-        }
-    );
+        ...options,
+    });
 };
 
 export default useActiveSpeedMarketsDataQuery;

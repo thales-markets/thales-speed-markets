@@ -3,7 +3,7 @@ import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { secondsToMilliseconds } from 'date-fns';
 import { parseBytes32String } from 'ethers/lib/utils.js';
-import { UseQueryOptions, useQuery } from 'react-query';
+import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { NetworkId, bigNumberFormatter, coinFormatter, roundNumberToDecimals } from 'thales-utils';
 import { ChainedSpeedMarket } from 'types/market';
 import snxJSConnector from 'utils/snxJSConnector';
@@ -11,11 +11,11 @@ import snxJSConnector from 'utils/snxJSConnector';
 const useUserActiveChainedSpeedMarketsDataQuery = (
     networkId: NetworkId,
     walletAddress: string,
-    options?: UseQueryOptions<ChainedSpeedMarket[]>
+    options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
-    return useQuery<ChainedSpeedMarket[]>(
-        QUERY_KEYS.User.ChainedSpeedMarkets(networkId, walletAddress),
-        async () => {
+    return useQuery<ChainedSpeedMarket[]>({
+        queryKey: QUERY_KEYS.User.ChainedSpeedMarkets(networkId, walletAddress),
+        queryFn: async () => {
             const userChainedSpeedMarketsData: ChainedSpeedMarket[] = [];
 
             const { chainedSpeedMarketsAMMContract, speedMarketsDataContract } = snxJSConnector;
@@ -81,10 +81,8 @@ const useUserActiveChainedSpeedMarketsDataQuery = (
 
             return userChainedSpeedMarketsData;
         },
-        {
-            ...options,
-        }
-    );
+        ...options,
+    });
 };
 
 export default useUserActiveChainedSpeedMarketsDataQuery;

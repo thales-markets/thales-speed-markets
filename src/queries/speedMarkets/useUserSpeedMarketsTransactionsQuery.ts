@@ -8,7 +8,7 @@ import {
 import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
-import { UseQueryOptions, useQuery } from 'react-query';
+import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { NetworkId, bigNumberFormatter, coinFormatter, parseBytes32String } from 'thales-utils';
 import { TradeWithMarket } from 'types/profile';
 import snxJSConnector from 'utils/snxJSConnector';
@@ -17,11 +17,11 @@ import { getFeesFromHistory } from 'utils/speedAmm';
 const useUserSpeedMarketsTransactionsQuery = (
     networkId: NetworkId,
     walletAddress: string,
-    options?: UseQueryOptions<TradeWithMarket[]>
+    options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
-    return useQuery<TradeWithMarket[]>(
-        QUERY_KEYS.User.SpeedMarketsTransactions(networkId, walletAddress),
-        async () => {
+    return useQuery<TradeWithMarket[]>({
+        queryKey: QUERY_KEYS.User.SpeedMarketsTransactions(networkId, walletAddress),
+        queryFn: async () => {
             const userTransactions: TradeWithMarket[] = [];
 
             const { speedMarketsAMMContract, speedMarketsDataContract } = snxJSConnector;
@@ -92,10 +92,8 @@ const useUserSpeedMarketsTransactionsQuery = (
 
             return userTransactions;
         },
-        {
-            ...options,
-        }
-    );
+        ...options,
+    });
 };
 
 export default useUserSpeedMarketsTransactionsQuery;

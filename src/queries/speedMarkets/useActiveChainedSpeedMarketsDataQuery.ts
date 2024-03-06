@@ -4,18 +4,19 @@ import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { secondsToMilliseconds } from 'date-fns';
 import { parseBytes32String } from 'ethers/lib/utils.js';
-import { UseQueryOptions, useQuery } from 'react-query';
+import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { NetworkId, bigNumberFormatter, coinFormatter, roundNumberToDecimals } from 'thales-utils';
 import { ChainedSpeedMarket } from 'types/market';
 import snxJSConnector from 'utils/snxJSConnector';
 
 const useActiveChainedSpeedMarketsDataQuery = (
     networkId: NetworkId,
-    options?: UseQueryOptions<ChainedSpeedMarket[]>
+    options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
-    return useQuery<ChainedSpeedMarket[]>(
-        QUERY_KEYS.Markets.ActiveChainedSpeedMarkets(networkId),
-        async () => {
+    return useQuery<ChainedSpeedMarket[]>({
+        ...options,
+        queryKey: QUERY_KEYS.Markets.ActiveChainedSpeedMarkets(networkId),
+        queryFn: async () => {
             const chainedSpeedMarketsData: ChainedSpeedMarket[] = [];
 
             const { chainedSpeedMarketsAMMContract, speedMarketsDataContract } = snxJSConnector;
@@ -80,10 +81,7 @@ const useActiveChainedSpeedMarketsDataQuery = (
 
             return chainedSpeedMarketsData;
         },
-        {
-            ...options,
-        }
-    );
+    });
 };
 
 export default useActiveChainedSpeedMarketsDataQuery;

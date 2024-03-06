@@ -1,4 +1,3 @@
-import { Provider } from '@wagmi/core';
 import { ethers, Signer } from 'ethers';
 import { Coins } from 'thales-utils';
 import chainedSpeedMarketsAMMContract from './contracts/chainedSpeedMarketsAMMContract';
@@ -10,7 +9,7 @@ import speedMarketsDataContract from './contracts/speedMarketsAMMDataContract';
 
 type SnxJSConnector = {
     initialized: boolean;
-    provider: Provider | undefined;
+    provider: any | undefined;
     signer: Signer | undefined;
     collateral?: ethers.Contract;
     multipleCollateral?: Record<Coins, ethers.Contract | undefined>;

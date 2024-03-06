@@ -1,14 +1,14 @@
 import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
 import QUERY_KEYS from 'constants/queryKeys';
-import { useQuery, UseQueryOptions } from 'react-query';
+import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 import { bigNumberFormatter, NetworkId, parseBytes32String } from 'thales-utils';
 import snxJSConnector from 'utils/snxJSConnector';
 export type Rates = Record<string, number>;
 
-const useExchangeRatesQuery = (networkId: NetworkId, options?: UseQueryOptions<Rates>) => {
-    return useQuery<Rates>(
-        QUERY_KEYS.Rates.ExchangeRates(networkId),
-        async () => {
+const useExchangeRatesQuery = (networkId: NetworkId, options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>) => {
+    return useQuery<Rates>({
+        queryKey: QUERY_KEYS.Rates.ExchangeRates(networkId),
+        queryFn: async () => {
             const exchangeRates: Rates = {};
 
             if (snxJSConnector.priceFeedContract) {
@@ -32,11 +32,9 @@ const useExchangeRatesQuery = (networkId: NetworkId, options?: UseQueryOptions<R
 
             return exchangeRates;
         },
-        {
-            refetchInterval: 60 * 1000,
-            ...options,
-        }
-    );
+        refetchInterval: 60 * 1000,
+        ...options,
+    });
 };
 
 export default useExchangeRatesQuery;

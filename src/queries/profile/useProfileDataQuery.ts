@@ -1,7 +1,7 @@
 import { BATCH_NUMBER_OF_SPEED_MARKETS, SPEED_MARKETS_QUOTE } from 'constants/market';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
-import { UseQueryOptions, useQuery } from 'react-query';
+import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { NetworkId, bigNumberFormatter, coinFormatter, roundNumberToDecimals } from 'thales-utils';
 import { UserProfileData } from 'types/profile';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
@@ -11,11 +11,11 @@ import { getFeesFromHistory } from 'utils/speedAmm';
 const useProfileDataQuery = (
     networkId: NetworkId,
     walletAddress: string,
-    options?: UseQueryOptions<UserProfileData>
+    options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
-    return useQuery<UserProfileData>(
-        QUERY_KEYS.Profile.Data(walletAddress, networkId),
-        async () => {
+    return useQuery<UserProfileData>({
+        queryKey: QUERY_KEYS.Profile.Data(walletAddress, networkId),
+        queryFn: async () => {
             let [profit, volume, numberOfTrades, gain, investment] = [0, 0, 0, 0, 0];
             const {
                 speedMarketsAMMContract,
@@ -195,8 +195,8 @@ const useProfileDataQuery = (
 
             return result;
         },
-        options
-    );
+        ...options,
+    });
 };
 
 export default useProfileDataQuery;

@@ -1,15 +1,19 @@
 import snxJSConnector from 'utils/snxJSConnector';
 
 import QUERY_KEYS from 'constants/queryKeys';
-import { useQuery, UseQueryOptions } from 'react-query';
 import { COLLATERAL_DECIMALS } from 'thales-utils';
 import { SupportedNetwork } from 'types/network';
 import { getDefaultCollateral } from 'utils/currency';
+import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 
-const useStableBalanceQuery = (walletAddress: string, networkId: SupportedNetwork, options?: UseQueryOptions<any>) => {
-    return useQuery<any>(
-        QUERY_KEYS.WalletBalances.StableCoinBalance(walletAddress ?? '', networkId),
-        async () => {
+const useStableBalanceQuery = (
+    walletAddress: string,
+    networkId: SupportedNetwork,
+    options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
+) => {
+    return useQuery<any>({
+        queryKey: QUERY_KEYS.WalletBalances.StableCoinBalance(walletAddress ?? '', networkId),
+        queryFn: async () => {
             try {
                 const collateral = snxJSConnector.collateral;
                 const collateralKey = getDefaultCollateral(networkId);
@@ -30,8 +34,8 @@ const useStableBalanceQuery = (walletAddress: string, networkId: SupportedNetwor
                 return null;
             }
         },
-        options
-    );
+        ...options,
+    });
 };
 
 export default useStableBalanceQuery;

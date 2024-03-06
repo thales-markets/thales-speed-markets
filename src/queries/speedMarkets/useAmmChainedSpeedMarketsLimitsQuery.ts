@@ -1,7 +1,7 @@
 import { ZERO_ADDRESS } from 'constants/network';
 import QUERY_KEYS from 'constants/queryKeys';
 import { BigNumber } from 'ethers';
-import { UseQueryOptions, useQuery } from 'react-query';
+import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { NetworkId, bigNumberFormatter, coinFormatter } from 'thales-utils';
 import { AmmChainedSpeedMarketsLimits } from 'types/market';
 import snxJSConnector from 'utils/snxJSConnector';
@@ -9,11 +9,11 @@ import snxJSConnector from 'utils/snxJSConnector';
 const useChainedAmmSpeedMarketsLimitsQuery = (
     networkId: NetworkId,
     walletAddress?: string,
-    options?: UseQueryOptions<AmmChainedSpeedMarketsLimits>
+    options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
-    return useQuery<AmmChainedSpeedMarketsLimits>(
-        QUERY_KEYS.Markets.ChainedSpeedMarketsLimits(networkId, walletAddress),
-        async () => {
+    return useQuery<AmmChainedSpeedMarketsLimits>({
+        queryKey: QUERY_KEYS.Markets.ChainedSpeedMarketsLimits(networkId, walletAddress),
+        queryFn: async () => {
             const ammChainedSpeedMarketsLimits: AmmChainedSpeedMarketsLimits = {
                 minChainedMarkets: 0,
                 maxChainedMarkets: 0,
@@ -65,10 +65,8 @@ const useChainedAmmSpeedMarketsLimitsQuery = (
 
             return ammChainedSpeedMarketsLimits;
         },
-        {
-            ...options,
-        }
-    );
+        ...options,
+    });
 };
 
 export default useChainedAmmSpeedMarketsLimitsQuery;
