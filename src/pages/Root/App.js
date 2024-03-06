@@ -4,26 +4,18 @@ import { SUPPORTED_NETWORKS_NAMES } from 'constants/network';
 import ROUTES from 'constants/routes';
 import ThemeProvider from 'layouts/Theme';
 import { Suspense, lazy, useEffect } from 'react';
-import { QueryClientProvider } from 'react-query';
-import { ReactQueryDevtools } from 'react-query/devtools';
 import { useDispatch, useSelector } from 'react-redux';
 import { Redirect, Route, Router, Switch } from 'react-router-dom';
 import { setAppReady } from 'redux/modules/app';
 import { setIsMobile } from 'redux/modules/ui';
-import {
-    getNetworkId,
-    getSwitchToNetworkId,
-    switchToNetworkId,
-    updateNetworkSettings,
-    updateWallet,
-} from 'redux/modules/wallet';
+import { getSwitchToNetworkId, switchToNetworkId, updateNetworkSettings, updateWallet } from 'redux/modules/wallet';
 import { createGlobalStyle } from 'styled-components';
 import { isMobile } from 'utils/device';
 import { getSupportedNetworksByRoute, isNetworkSupported } from 'utils/network';
 import queryConnector from 'utils/queryConnector';
 import { history } from 'utils/routes';
 import snxJSConnector from 'utils/snxJSConnector';
-import { useAccount, useDisconnect, useNetwork, useProvider, useSigner } from 'wagmi';
+import { useAccount, useChainId, useConnectorClient, useDisconnect, useWalletClient } from 'wagmi';
 
 const DappLayout = lazy(() => import(/* webpackChunkName: "DappLayout" */ 'layouts/DappLayout'));
 
@@ -36,14 +28,13 @@ const Profile = lazy(() => import(/* webpackChunkName: "Profile" */ '../Profile'
 const App = () => {
     const dispatch = useDispatch();
 
-    const networkId = useSelector((state) => getNetworkId(state));
+    const networkId = useChainId();
     const switchedToNetworkId = useSelector((state) => getSwitchToNetworkId(state));
 
     const { address } = useAccount();
-    const provider = useProvider(!address && { chainId: switchedToNetworkId }); // when wallet not connected force chain
-    const { data: signer } = useSigner();
+    const provider = useConnectorClient(!address && { chainId: switchedToNetworkId }); // when wallet not connected force chain
+    const { data: signer } = useWalletClient();
     const { disconnect } = useDisconnect();
-    const { chain } = useNetwork();
 
     queryConnector.setQueryClient();
 
@@ -94,10 +85,10 @@ const App = () => {
     }, [dispatch, address]);
 
     useEffect(() => {
-        if (chain?.unsupported) {
+        if (isNetworkSupported(networkId)) {
             disconnect();
         }
-    }, [disconnect, chain]);
+    }, [disconnect, networkId]);
 
     useEffect(() => {
         const handlePageResized = () => {
@@ -123,67 +114,66 @@ const App = () => {
 
     return (
         <ThemeProvider>
-            <QueryClientProvider client={queryConnector.queryClient}>
-                <Router history={history}>
-                    <Switch>
-                        {getSupportedNetworksByRoute(ROUTES.Markets.SpeedMarkets).includes(networkId) && (
-                            <Route exact path={ROUTES.Markets.SpeedMarkets}>
-                                <Suspense fallback={<Loader />}>
-                                    <DappLayout>
-                                        <SpeedMarkets />
-                                    </DappLayout>
-                                </Suspense>
-                            </Route>
-                        )}
-
-                        {getSupportedNetworksByRoute(ROUTES.Markets.SpeedMarketsOverview).includes(networkId) && (
-                            <Route exact path={ROUTES.Markets.SpeedMarketsOverview}>
-                                <Suspense fallback={<Loader />}>
-                                    <DappLayout>
-                                        <SpeedMarketsOverview />
-                                    </DappLayout>
-                                </Suspense>
-                            </Route>
-                        )}
-
-                        {getSupportedNetworksByRoute(ROUTES.Markets.Profile).includes(networkId) && (
-                            <Route exact path={ROUTES.Markets.Profile}>
-                                <Suspense fallback={<Loader />}>
-                                    <DappLayout>
-                                        <Profile />
-                                    </DappLayout>
-                                </Suspense>
-                            </Route>
-                        )}
-
-                        {getSupportedNetworksByRoute(ROUTES.Home).includes(networkId) && (
-                            <Route exact path={ROUTES.Home}>
-                                <Suspense fallback={<Loader />}>
-                                    <DappLayout>
-                                        <SpeedMarkets />
-                                    </DappLayout>
-                                </Suspense>
-                            </Route>
-                        )}
-
-                        <Route>
-                            <Redirect to={ROUTES.Markets.SpeedMarkets} />
+            <Router history={history}>
+                <Switch>
+                    {getSupportedNetworksByRoute(ROUTES.Markets.SpeedMarkets).includes(networkId) && (
+                        <Route exact path={ROUTES.Markets.SpeedMarkets}>
                             <Suspense fallback={<Loader />}>
                                 <DappLayout>
-                                    {getSupportedNetworksByRoute(ROUTES.Markets.SpeedMarkets).includes(networkId) ? (
-                                        <SpeedMarkets />
-                                    ) : (
-                                        <UnsupportedNetwork
-                                            supportedNetworks={getSupportedNetworksByRoute(ROUTES.Markets.SpeedMarkets)}
-                                        />
-                                    )}
+                                    <SpeedMarkets />
                                 </DappLayout>
                             </Suspense>
                         </Route>
-                    </Switch>
-                </Router>
-                <ReactQueryDevtools initialIsOpen={false} />
-            </QueryClientProvider>
+                    )}
+
+                    {getSupportedNetworksByRoute(ROUTES.Markets.SpeedMarketsOverview).includes(networkId) && (
+                        <Route exact path={ROUTES.Markets.SpeedMarketsOverview}>
+                            <Suspense fallback={<Loader />}>
+                                <DappLayout>
+                                    <SpeedMarketsOverview />
+                                </DappLayout>
+                            </Suspense>
+                        </Route>
+                    )}
+
+                    {getSupportedNetworksByRoute(ROUTES.Markets.Profile).includes(networkId) && (
+                        <Route exact path={ROUTES.Markets.Profile}>
+                            <Suspense fallback={<Loader />}>
+                                <DappLayout>
+                                    <Profile />
+                                </DappLayout>
+                            </Suspense>
+                        </Route>
+                    )}
+
+                    {getSupportedNetworksByRoute(ROUTES.Home).includes(networkId) && (
+                        <Route exact path={ROUTES.Home}>
+                            <Suspense fallback={<Loader />}>
+                                <DappLayout>
+                                    <SpeedMarkets />
+                                </DappLayout>
+                            </Suspense>
+                        </Route>
+                    )}
+
+                    <Route>
+                        <Redirect to={ROUTES.Markets.SpeedMarkets} />
+                        <Suspense fallback={<Loader />}>
+                            <DappLayout>
+                                {getSupportedNetworksByRoute(ROUTES.Markets.SpeedMarkets).includes(networkId) ? (
+                                    <SpeedMarkets />
+                                ) : (
+                                    <UnsupportedNetwork
+                                        supportedNetworks={getSupportedNetworksByRoute(ROUTES.Markets.SpeedMarkets)}
+                                    />
+                                )}
+                            </DappLayout>
+                        </Suspense>
+                    </Route>
+                </Switch>
+            </Router>
+            {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+
             <GlobalStyle />
         </ThemeProvider>
     );

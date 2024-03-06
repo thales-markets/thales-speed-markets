@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import { SupportedNetwork } from 'types/network';
 import { RootState } from 'types/ui';
 import { SUPPORTED_NETWORK_IDS_MAP } from 'utils/network';
-import { useSwitchNetwork } from 'wagmi';
+import { useSwitchChain } from 'wagmi';
 
 type NetworkSwitchProps = {
     selectedNetworkId?: number;
@@ -20,7 +20,7 @@ const NetworkSwitch: React.FC<NetworkSwitchProps> = ({
     setSelectedNetworkId,
     supportedNetworks,
 }) => {
-    const { switchNetwork } = useSwitchNetwork();
+    const { switchChain } = useSwitchChain();
     const dispatch = useDispatch();
 
     const networkId = useSelector((state: RootState) => getNetworkId(state));
@@ -77,7 +77,7 @@ const NetworkSwitch: React.FC<NetworkSwitchProps> = ({
                                                 await filteredSupportedNetworks[network.id].changeNetwork(
                                                     network.id,
                                                     () => {
-                                                        switchNetwork?.(network.id);
+                                                        switchChain?.(network.id);
                                                         // Trigger App.js init
                                                         // do not use updateNetworkSettings(networkId) as it will trigger queries before provider in App.js is initialized
                                                         dispatch(

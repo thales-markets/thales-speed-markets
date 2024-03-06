@@ -1,6 +1,6 @@
 import { NetworkId } from 'thales-utils';
 import { NetworkParams, SupportedNetwork } from 'types/network';
-import { Chain } from 'wagmi';
+import { Chain } from 'viem';
 
 export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 
