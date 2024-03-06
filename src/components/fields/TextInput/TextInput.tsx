@@ -2,7 +2,6 @@ import Tooltip from 'components/Tooltip';
 import React from 'react';
 import styled from 'styled-components';
 import { FieldContainer, FieldLabel, Input } from '../common';
-import MuiTooltip from '@material-ui/core/Tooltip';
 import { FlexDivCentered } from 'styles/common';
 
 type TextInputProps = {
@@ -106,7 +105,7 @@ const Icon = styled.i`
     }
 `;
 
-const ValidationTooltip = styled((props) => <MuiTooltip classes={{ popper: props.className }} {...props} />)`
+const ValidationTooltip = styled((props) => <Tooltip classes={{ popper: props.className }} {...props} />)`
     & .MuiTooltip-tooltip {
         margin: -10px 0 0 0;
         padding: 2px 4px;

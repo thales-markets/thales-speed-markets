@@ -1,4 +1,3 @@
-import MuiTooltip from '@material-ui/core/Tooltip';
 import { ReactComponent as BalanceIcon } from 'assets/images/balance-icon.svg';
 import InlineLoader from 'components/InlineLoader';
 import Tooltip from 'components/Tooltip';
@@ -202,7 +201,7 @@ const MaxButton = styled.button`
     }
 `;
 
-const ValidationTooltip = styled((props) => <MuiTooltip classes={{ popper: props.className }} {...props} />)<{
+const ValidationTooltip = styled((props) => <Tooltip classes={{ popper: props.className }} {...props} />)<{
     margin?: string;
 }>`
     & .MuiTooltip-tooltip {

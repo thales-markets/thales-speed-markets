@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import { CircularProgress } from '@material-ui/core';
 import { history } from 'utils/routes';
 
 const Loader: React.FC = () => {
@@ -16,7 +15,7 @@ const Loader: React.FC = () => {
     );
 };
 
-const CustomCircularProgress = styled(CircularProgress)`
+const CustomCircularProgress = styled.div`
     &.MuiCircularProgress-colorPrimary {
         color: ${(props) => props.theme.background.quaternary};
     }
