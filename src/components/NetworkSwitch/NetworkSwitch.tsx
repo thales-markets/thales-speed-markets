@@ -1,13 +1,12 @@
 import { DEFAULT_NETWORK } from 'constants/network';
 import React, { useMemo, useState } from 'react';
 import OutsideClickHandler from 'react-outside-click-handler';
-import { useDispatch, useSelector } from 'react-redux';
-import { getNetworkId, switchToNetworkId } from 'redux/modules/wallet';
+import { useDispatch } from 'react-redux';
+import { switchToNetworkId } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { SupportedNetwork } from 'types/network';
-import { RootState } from 'types/ui';
 import { SUPPORTED_NETWORK_IDS_MAP } from 'utils/network';
-import { useSwitchChain } from 'wagmi';
+import { useChainId, useSwitchChain } from 'wagmi';
 
 type NetworkSwitchProps = {
     selectedNetworkId?: number;
@@ -23,7 +22,7 @@ const NetworkSwitch: React.FC<NetworkSwitchProps> = ({
     const { switchChain } = useSwitchChain();
     const dispatch = useDispatch();
 
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
+    const networkId = useChainId();
 
     const filteredSupportedNetworks: Record<number, any> = useMemo(
         () =>

@@ -10,7 +10,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsMobile } from 'redux/modules/ui';
-import { getNetworkId } from 'redux/modules/wallet';
 import styled, { useTheme } from 'styled-components';
 import { FlexDivCentered, FlexDivColumn, FlexDivColumnCentered, FlexDivSpaceBetween } from 'styles/common';
 import {
@@ -27,6 +26,7 @@ import { refetchPythPrice } from 'utils/queryConnector';
 import { getColorPerPosition } from 'utils/style';
 import ChainedPositionAction from '../ChainedPositionAction';
 import { AssetIcon, Icon, PositionSymbolDown, PositionSymbolUp } from '../SelectPosition/styled-components';
+import { useChainId } from 'wagmi';
 
 type ChainedPositionProps = {
     position: ChainedSpeedMarket;
@@ -50,7 +50,7 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
+    const networkId = useChainId();
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const [fetchLastFinalPriceIndex, setFetchLastFinalPriceIndex] = useState(0);

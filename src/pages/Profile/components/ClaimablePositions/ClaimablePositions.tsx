@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
-import { getIsWalletConnected, getNetworkId, getWalletAddress } from 'redux/modules/wallet';
+import { getIsWalletConnected, getWalletAddress } from 'redux/modules/wallet';
 import { useTheme } from 'styled-components';
 import { formatCurrency, formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
 import { SharePositionData } from 'types/flexCards';
@@ -24,6 +24,7 @@ import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getPriceId } from 'utils/pyth';
 import MyPositionAction from '../MyPositionAction';
 import { getDirections } from '../styled-components';
+import { useChainId } from 'wagmi';
 
 type ClaimablePositionsProps = {
     searchAddress: string;
@@ -35,7 +36,7 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
     const theme: ThemeInterface = useTheme();
 
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
+    const networkId = useChainId();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
     const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));

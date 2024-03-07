@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsMobile } from 'redux/modules/ui';
-import { getIsWalletConnected, getNetworkId, getSelectedCollateralIndex, getWalletAddress } from 'redux/modules/wallet';
+import { getIsWalletConnected, getSelectedCollateralIndex, getWalletAddress } from 'redux/modules/wallet';
 import styled, { CSSProperties, useTheme } from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
 import { coinParser, formatCurrencyWithSign, roundNumberToDecimals } from 'thales-utils';
@@ -40,6 +40,7 @@ import {
 } from 'utils/queryConnector';
 import snxJSConnector from 'utils/snxJSConnector';
 import { delay } from 'utils/timer';
+import { useChainId } from 'wagmi';
 
 const ONE_HUNDRED_AND_THREE_PERCENT = 1.03;
 
@@ -59,7 +60,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
+    const networkId = useChainId();
     const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
     const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));

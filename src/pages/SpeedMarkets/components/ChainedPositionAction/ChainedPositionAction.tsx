@@ -30,7 +30,7 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsMobile } from 'redux/modules/ui';
-import { getIsWalletConnected, getNetworkId, getSelectedCollateralIndex, getWalletAddress } from 'redux/modules/wallet';
+import { getIsWalletConnected, getSelectedCollateralIndex, getWalletAddress } from 'redux/modules/wallet';
 import { useTheme } from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
 import { coinParser, formatCurrencyWithSign, roundNumberToDecimals } from 'thales-utils';
@@ -48,6 +48,7 @@ import {
 import snxJSConnector from 'utils/snxJSConnector';
 import { getUserLostAtSideIndex } from 'utils/speedAmm';
 import { delay } from 'utils/timer';
+import { useChainId } from 'wagmi';
 
 type ChainedPositionActionProps = {
     position: ChainedSpeedMarket;
@@ -71,7 +72,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
+    const networkId = useChainId();
     const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
     const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
     const isMobile = useSelector((state: RootState) => getIsMobile(state));

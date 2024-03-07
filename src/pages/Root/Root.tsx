@@ -1,4 +1,5 @@
 import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
+import '@rainbow-me/rainbowkit/styles.css';
 import UnexpectedError from 'components/UnexpectedError';
 import WalletDisclaimer from 'components/WalletDisclaimer';
 import { PLAUSIBLE } from 'constants/analytics';
@@ -14,6 +15,8 @@ import App from './App';
 import { config } from './wagmi-config';
 import { QueryClientProvider } from '@tanstack/react-query';
 import queryConnector from 'utils/queryConnector';
+import { Buffer as buffer } from 'buffer';
+window.Buffer = window.Buffer || buffer;
 
 interface RootProps {
     store: Store;

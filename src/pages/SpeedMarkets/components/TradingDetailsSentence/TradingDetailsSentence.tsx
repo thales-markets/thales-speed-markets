@@ -7,7 +7,6 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsMobile } from 'redux/modules/ui';
-import { getNetworkId } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
 import { formatCurrencyWithKey, formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
@@ -15,6 +14,7 @@ import { MarketInfo } from 'types/market';
 import { RootState } from 'types/ui';
 import { getDefaultCollateral } from 'utils/currency';
 import { ColumnSpaceBetween, Text, TextLabel, TextValue } from './styled-components';
+import { useChainId } from 'wagmi';
 
 type SpeedMarketsTrade = {
     address: string;
@@ -46,7 +46,7 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
 }) => {
     const { t } = useTranslation();
 
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
+    const networkId = useChainId();
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const [dateFromDelta, setDateFromDelta] = useState(0);

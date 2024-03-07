@@ -187,7 +187,7 @@ const MaxButton = styled.button`
     }
 `;
 
-const ValidationTooltip = styled((props) => <Tooltip classes={{ popper: props.className }} {...props} />)`
+const ValidationTooltip = styled((props: any) => <Tooltip classes={{ popper: props.className }} {...props} />)`
     & .MuiTooltip-tooltip {
         margin: -10px 0 0 0;
         padding: 2px 4px;

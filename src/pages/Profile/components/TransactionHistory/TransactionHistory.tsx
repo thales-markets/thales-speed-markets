@@ -6,7 +6,7 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
-import { getIsWalletConnected, getNetworkId, getWalletAddress } from 'redux/modules/wallet';
+import { getIsWalletConnected, getWalletAddress } from 'redux/modules/wallet';
 import { useTheme } from 'styled-components';
 import {
     formatCurrencyWithSign,
@@ -18,6 +18,7 @@ import { TradeWithMarket } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getDirections } from '../styled-components';
+import { useChainId } from 'wagmi';
 
 type TransactionHistoryProps = {
     searchAddress: string;
@@ -28,7 +29,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ searchAddress, 
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
+    const networkId = useChainId();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
     const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));

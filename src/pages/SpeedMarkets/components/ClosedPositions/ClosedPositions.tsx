@@ -7,18 +7,19 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
-import { getIsWalletConnected, getNetworkId, getWalletAddress } from 'redux/modules/wallet';
+import { getIsWalletConnected, getWalletAddress } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivCentered, FlexDivRowCentered } from 'styles/common';
 import { UserClosedPositions } from 'types/market';
 import { RootState } from 'types/ui';
 import ChainedPosition from '../ChainedPosition';
 import ClosedPosition from '../ClosedPosition';
+import { useChainId } from 'wagmi';
 
 const ClosedPositions: React.FC<{ isChained: boolean }> = ({ isChained }) => {
     const { t } = useTranslation();
 
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
+    const networkId = useChainId();
     const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));

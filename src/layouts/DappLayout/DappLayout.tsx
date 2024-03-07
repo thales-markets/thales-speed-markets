@@ -3,20 +3,19 @@ import { LINKS } from 'constants/links';
 import useWidgetBotScript from 'hooks/useWidgetBotScript';
 import queryString from 'query-string';
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { getNetworkId } from 'redux/modules/wallet';
 import styled, { useTheme } from 'styled-components';
 import { NetworkId, isAndroid, isMetamask } from 'thales-utils';
-import { RootState, ThemeInterface } from 'types/ui';
+import { ThemeInterface } from 'types/ui';
 import { isMobile } from 'utils/device';
 import { setReferralWallet } from 'utils/referral';
 import { ScreenSizeBreakpoint } from '../../enums/ui';
 import DappFooter from './DappFooter';
 import DappHeader from './DappHeader';
 import DappSidebar from './DappSidebar';
+import { useChainId } from 'wagmi';
 
 type DappLayoutProps = {
     children: React.ReactNode;
@@ -24,7 +23,7 @@ type DappLayoutProps = {
 
 const DappLayout: React.FC<DappLayoutProps> = ({ children }) => {
     const theme: ThemeInterface = useTheme();
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
+    const networkId = useChainId();
 
     const rawParams = useLocation();
     const queryParams = queryString.parse(rawParams?.search);

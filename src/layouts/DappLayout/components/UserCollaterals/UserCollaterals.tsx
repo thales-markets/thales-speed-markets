@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import {
     getIsWalletConnected,
-    getNetworkId,
     getSelectedCollateralIndex,
     getWalletAddress,
     setSelectedCollateralIndex,
@@ -23,11 +22,11 @@ import {
     getCollaterals,
 } from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
+import { useChainId } from 'wagmi';
 
 const UserCollaterals: React.FC = () => {
     const dispatch = useDispatch();
-
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
+    const networkId = useChainId();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
     const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));

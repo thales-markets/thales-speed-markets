@@ -7,11 +7,12 @@ import { BigNumber, ethers } from 'ethers';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { getIsWalletConnected, getNetworkId } from 'redux/modules/wallet';
+import { getIsWalletConnected } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivCentered, FlexDivColumnCentered, FlexDivRow } from 'styles/common';
 import { Coins, bigNumberFormatter, coinParser } from 'thales-utils';
 import { RootState } from 'types/ui';
+import { useChainId } from 'wagmi';
 
 type ApprovalModalProps = {
     defaultAmount: number | string;
@@ -24,7 +25,7 @@ type ApprovalModalProps = {
 const ApprovalModal: React.FC<ApprovalModalProps> = ({ defaultAmount, tokenSymbol, isAllowing, onSubmit, onClose }) => {
     const { t } = useTranslation();
     const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
+    const networkId = useChainId();
     const [amount, setAmount] = useState<number | string>(defaultAmount);
     const [approveAll, setApproveAll] = useState<boolean>(true);
     const [isAmountValid, setIsAmountValid] = useState<boolean>(true);

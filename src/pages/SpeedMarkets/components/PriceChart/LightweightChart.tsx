@@ -10,7 +10,6 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
-import { getNetworkId } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDiv, FlexDivRowCentered, FlexDivSpaceBetween } from 'styles/common';
 import { formatCurrencyWithSign } from 'thales-utils';
@@ -22,6 +21,7 @@ import { hoursToSeconds, minutesToSeconds, subDays } from 'date-fns';
 import { ChartComponent } from './components/Chart/ChartContext';
 import CurrentPrice from './components/CurrentPrice';
 import Toggle from './components/DateToggle';
+import { useChainId } from 'wagmi';
 
 const now = new Date();
 
@@ -66,7 +66,7 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
     const { t } = useTranslation();
 
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
+    const networkId = useChainId();
 
     const [dateRange, setDateRange] = useState(SpeedMarketsToggleButtons[SPEED_DEFAULT_TOGGLE_BUTTON_INDEX]);
     const [selectedToggleIndex, setToggleIndex] = useState(SPEED_DEFAULT_TOGGLE_BUTTON_INDEX);

@@ -17,7 +17,6 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsMobile } from 'redux/modules/ui';
-import { getNetworkId } from 'redux/modules/wallet';
 import { RootState } from 'types/ui';
 import styled, { CSSProperties } from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
@@ -26,6 +25,7 @@ import { getPriceId, getPriceServiceEndpoint, priceParser } from 'utils/pyth';
 import { refetchActiveSpeedMarkets } from 'utils/queryConnector';
 import snxJSConnector from 'utils/snxJSConnector';
 import { delay } from 'utils/timer';
+import { useChainId } from 'wagmi';
 
 type OverviewPositionActionProps = {
     position: UserOpenPositions;
@@ -42,7 +42,7 @@ const OverviewPositionAction: React.FC<OverviewPositionActionProps> = ({
 }) => {
     const { t } = useTranslation();
 
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
+    const networkId = useChainId();
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const [isSubmitting, setIsSubmitting] = useState(false);

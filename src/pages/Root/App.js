@@ -15,7 +15,7 @@ import { getSupportedNetworksByRoute, isNetworkSupported } from 'utils/network';
 import queryConnector from 'utils/queryConnector';
 import { history } from 'utils/routes';
 import snxJSConnector from 'utils/snxJSConnector';
-import { useAccount, useChainId, useConnectorClient, useDisconnect, useWalletClient } from 'wagmi';
+import { useAccount, useChainId, useClient, useDisconnect, useWalletClient } from 'wagmi';
 
 const DappLayout = lazy(() => import(/* webpackChunkName: "DappLayout" */ 'layouts/DappLayout'));
 
@@ -32,7 +32,7 @@ const App = () => {
     const switchedToNetworkId = useSelector((state) => getSwitchToNetworkId(state));
 
     const { address } = useAccount();
-    const provider = useConnectorClient(!address && { chainId: switchedToNetworkId }); // when wallet not connected force chain
+    const provider = useClient(); // when wallet not connected force chain
     const { data: signer } = useWalletClient();
     const { disconnect } = useDisconnect();
 
@@ -41,19 +41,16 @@ const App = () => {
     useEffect(() => {
         const init = async () => {
             try {
-                const chainIdFromProvider = (await provider.getNetwork()).chainId;
-                const providerNetworkId = !!address ? chainIdFromProvider : switchedToNetworkId;
-
                 snxJSConnector.setContractSettings({
-                    networkId: providerNetworkId,
+                    networkId: networkId,
                     provider,
                     signer,
                 });
 
                 dispatch(
                     updateNetworkSettings({
-                        networkId: providerNetworkId,
-                        networkName: SUPPORTED_NETWORKS_NAMES[providerNetworkId]?.toLowerCase(),
+                        networkId: networkId,
+                        networkName: SUPPORTED_NETWORKS_NAMES[networkId]?.toLowerCase(),
                     })
                 );
                 dispatch(setAppReady());
@@ -65,7 +62,7 @@ const App = () => {
             }
         };
         init();
-    }, [dispatch, provider, signer, switchedToNetworkId, address]);
+    }, [dispatch, networkId, provider, signer, switchedToNetworkId, address]);
 
     useEffect(() => {
         dispatch(updateWallet({ walletAddress: address }));

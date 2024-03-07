@@ -7,7 +7,7 @@ import MyPositionAction from 'pages/Profile/components/MyPositionAction/MyPositi
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { getNetworkId, getWalletAddress } from 'redux/modules/wallet';
+import { getWalletAddress } from 'redux/modules/wallet';
 import styled, { useTheme } from 'styled-components';
 import { formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
 import { UserOpenPositions } from 'types/market';
@@ -16,6 +16,7 @@ import { formatNumberShort } from 'utils/formatters/number';
 import { refetchUserSpeedMarkets } from 'utils/queryConnector';
 import { getColorPerPosition } from 'utils/style';
 import SharePositionModal from '../SharePositionModal';
+import { useChainId } from 'wagmi';
 
 type OpenPositionProps = {
     position: UserOpenPositions;
@@ -33,7 +34,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
+    const networkId = useChainId();
     const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
 
     const [openTwitterShareModal, setOpenTwitterShareModal] = useState(false);

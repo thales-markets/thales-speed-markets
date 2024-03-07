@@ -37,7 +37,7 @@ import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
-import { getIsWalletConnected, getNetworkId, getSelectedCollateralIndex, getWalletAddress } from 'redux/modules/wallet';
+import { getIsWalletConnected, getSelectedCollateralIndex, getWalletAddress } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivCentered, FlexDivColumn, FlexDivRow, FlexDivRowCentered } from 'styles/common';
 import {
@@ -64,6 +64,7 @@ import snxJSConnector from 'utils/snxJSConnector';
 import { getFeeByTimeThreshold, getTransactionForSpeedAMM } from 'utils/speedAmm';
 import { delay } from 'utils/timer';
 import { SelectedPosition } from '../SelectPosition/SelectPosition';
+import { useChainId } from 'wagmi';
 
 type AmmSpeedTradingProps = {
     isChained: boolean;
@@ -102,7 +103,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     const { openConnectModal } = useConnectModal();
 
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
+    const networkId = useChainId();
     const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
     const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
     const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
