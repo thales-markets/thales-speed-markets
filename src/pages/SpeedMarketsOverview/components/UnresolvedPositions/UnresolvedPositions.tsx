@@ -25,7 +25,6 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
-import { getWalletAddress } from 'redux/modules/wallet';
 import { RootState } from 'types/ui';
 import { formatCurrencyWithSign } from 'thales-utils';
 import { UserOpenPositions } from 'types/market';
@@ -33,14 +32,15 @@ import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAsse
 import { refetchActiveSpeedMarkets, refetchPythPrice } from 'utils/queryConnector';
 import { resolveAllSpeedPositions } from 'utils/speedAmm';
 import UnresolvedPosition from '../UnresolvedPosition';
-import { useChainId } from 'wagmi';
+import { useAccount, useChainId } from 'wagmi';
 
 const UnresolvedPositions: React.FC = () => {
     const { t } = useTranslation();
 
     const networkId = useChainId();
+    const { address } = useAccount();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
+
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const [currentPrices, setCurrentPrices] = useState<{ [key: string]: number }>(getSupportedAssetsAsObject());
@@ -48,7 +48,7 @@ const UnresolvedPositions: React.FC = () => {
     const [isSubmittingSection, setIsSubmittingSection] = useState('');
     const [isLoadingEnabled, setIsLoadingEnabled] = useState(true);
 
-    const ammSpeedMarketsLimitsQuery = useAmmSpeedMarketsLimitsQuery(networkId, walletAddress, {
+    const ammSpeedMarketsLimitsQuery = useAmmSpeedMarketsLimitsQuery(networkId, address, {
         enabled: isAppReady,
     });
 

@@ -12,7 +12,6 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { getIsAppReady } from 'redux/modules/app';
-import { getIsWalletConnected, getWalletAddress } from 'redux/modules/wallet';
 import { useTheme } from 'styled-components';
 import { formatCurrencyWithSign, formatPercentage } from 'thales-utils';
 import { UserProfileData } from 'types/profile';
@@ -38,7 +37,7 @@ import {
     StatsValue,
     Title,
 } from './styled-components';
-import { useChainId } from 'wagmi';
+import { useAccount, useChainId } from 'wagmi';
 
 enum NavItems {
     MyPositions = 'my-positions',
@@ -52,17 +51,16 @@ const Profile: React.FC = () => {
 
     const networkId = useChainId();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
+    const { address, isConnected } = useAccount();
 
     const [searchAddress, setSearchAddress] = useState<string>('');
     const [searchText, setSearchText] = useState<string>('');
 
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
         networkId,
-        searchAddress || walletAddress,
+        searchAddress || (address as string),
         {
-            enabled: isAppReady && isWalletConnected,
+            enabled: isAppReady && isConnected,
         }
     );
     const speedMarketsNotifications =
@@ -72,9 +70,9 @@ const Profile: React.FC = () => {
 
     const userActiveChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
         networkId,
-        searchAddress || walletAddress,
+        searchAddress || (address as string),
         {
-            enabled: isAppReady && isWalletConnected,
+            enabled: isAppReady && isConnected,
         }
     );
     const userActiveChainedSpeedMarketsData =
@@ -132,8 +130,8 @@ const Profile: React.FC = () => {
 
     const totalNotifications = speedMarketsNotifications + chainedSpeedMarketsNotifications;
 
-    const userProfileDataQuery = useProfileDataQuery(networkId, searchAddress || walletAddress, {
-        enabled: isAppReady && isWalletConnected,
+    const userProfileDataQuery = useProfileDataQuery(networkId, searchAddress || (address as string), {
+        enabled: isAppReady && isConnected,
     });
     const profileData: UserProfileData =
         userProfileDataQuery.isSuccess && userProfileDataQuery.data

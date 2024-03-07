@@ -7,25 +7,23 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
-import { getIsWalletConnected, getWalletAddress } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivCentered, FlexDivRowCentered } from 'styles/common';
 import { UserClosedPositions } from 'types/market';
 import { RootState } from 'types/ui';
 import ChainedPosition from '../ChainedPosition';
 import ClosedPosition from '../ClosedPosition';
-import { useChainId } from 'wagmi';
+import { useAccount, useChainId } from 'wagmi';
 
 const ClosedPositions: React.FC<{ isChained: boolean }> = ({ isChained }) => {
     const { t } = useTranslation();
 
     const networkId = useChainId();
-    const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
+    const { isConnected, address } = useAccount();
 
-    const userResolvedSpeedMarketsDataQuery = useUserResolvedSpeedMarketsDataQuery(networkId, walletAddress, {
-        enabled: isAppReady && isWalletConnected && !isChained,
+    const userResolvedSpeedMarketsDataQuery = useUserResolvedSpeedMarketsDataQuery(networkId, address as string, {
+        enabled: isAppReady && isConnected && !isChained,
     });
 
     const lastTenUserResolvedPositions = useMemo(
@@ -41,9 +39,9 @@ const ClosedPositions: React.FC<{ isChained: boolean }> = ({ isChained }) => {
 
     const userResolvedChainedSpeedMarketsDataQuery = useUserResolvedChainedSpeedMarketsDataQuery(
         networkId,
-        walletAddress,
+        address as string,
         {
-            enabled: isAppReady && isWalletConnected && !!isChained,
+            enabled: isAppReady && isConnected && !!isChained,
         }
     );
 

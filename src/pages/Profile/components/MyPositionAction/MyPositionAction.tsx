@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsMobile } from 'redux/modules/ui';
-import { getIsWalletConnected, getSelectedCollateralIndex, getWalletAddress } from 'redux/modules/wallet';
+import { getSelectedCollateralIndex } from 'redux/modules/wallet';
 import styled, { CSSProperties, useTheme } from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
 import { coinParser, formatCurrencyWithSign, roundNumberToDecimals } from 'thales-utils';
@@ -40,7 +40,7 @@ import {
 } from 'utils/queryConnector';
 import snxJSConnector from 'utils/snxJSConnector';
 import { delay } from 'utils/timer';
-import { useChainId } from 'wagmi';
+import { useAccount, useChainId } from 'wagmi';
 
 const ONE_HUNDRED_AND_THREE_PERCENT = 1.03;
 
@@ -61,8 +61,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     const theme: ThemeInterface = useTheme();
 
     const networkId = useChainId();
-    const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
+    const { isConnected, address } = useAccount();
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
 
@@ -98,16 +97,21 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
         const getAllowance = async () => {
             try {
                 const parsedAmount = coinParser(position.value.toString(), networkId);
-                const allowance = await checkAllowance(parsedAmount, erc20Instance, walletAddress, addressToApprove);
+                const allowance = await checkAllowance(
+                    parsedAmount,
+                    erc20Instance,
+                    address as string,
+                    addressToApprove
+                );
                 setAllowance(allowance);
             } catch (e) {
                 console.log(e);
             }
         };
-        if (isWalletConnected && erc20Instance.provider) {
+        if (isConnected && erc20Instance.provider) {
             getAllowance();
         }
-    }, [position.value, networkId, walletAddress, isWalletConnected, hasAllowance, isAllowing, isDefaultCollateral]);
+    }, [position.value, networkId, address, isConnected, hasAllowance, isAllowing, isDefaultCollateral]);
 
     const handleAllowance = async (approveAmount: BigNumber) => {
         const { speedMarketsAMMContract, collateral } = snxJSConnector;
@@ -193,10 +197,10 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                         id,
                         getSuccessToastOptions(t(`speed-markets.user-positions.confirmation-message`), id)
                     );
-                    refetchUserNotifications(walletAddress, networkId);
-                    refetchUserSpeedMarkets(false, networkId, walletAddress);
-                    refetchUserResolvedSpeedMarkets(false, networkId, walletAddress);
-                    refetchUserProfileQueries(walletAddress, networkId);
+                    refetchUserNotifications(address as string, networkId);
+                    refetchUserSpeedMarkets(false, networkId, address as string);
+                    refetchUserResolvedSpeedMarkets(false, networkId, address as string);
+                    refetchUserProfileQueries(address as string, networkId);
                 }
             } catch (e) {
                 console.log(e);

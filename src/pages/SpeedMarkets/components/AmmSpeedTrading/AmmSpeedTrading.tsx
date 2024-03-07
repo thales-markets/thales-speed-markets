@@ -37,7 +37,7 @@ import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
-import { getIsWalletConnected, getSelectedCollateralIndex, getWalletAddress } from 'redux/modules/wallet';
+import { getSelectedCollateralIndex } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivCentered, FlexDivColumn, FlexDivRow, FlexDivRowCentered } from 'styles/common';
 import {
@@ -64,7 +64,7 @@ import snxJSConnector from 'utils/snxJSConnector';
 import { getFeeByTimeThreshold, getTransactionForSpeedAMM } from 'utils/speedAmm';
 import { delay } from 'utils/timer';
 import { SelectedPosition } from '../SelectPosition/SelectPosition';
-import { useChainId } from 'wagmi';
+import { useAccount, useChainId } from 'wagmi';
 
 type AmmSpeedTradingProps = {
     isChained: boolean;
@@ -104,8 +104,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const networkId = useChainId();
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
-    const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
+    const { isConnected, address } = useAccount();
     const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
@@ -142,7 +141,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         outOfLiquidity;
 
     const isButtonBuyAvailable =
-        isWalletConnected &&
+        isConnected &&
         isPositionSelected &&
         !!(strikeTimeSec || deltaTimeSec) &&
         isPaidAmountEntered &&
@@ -184,15 +183,13 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         : snxJSConnector.collateral?.address;
 
     const referral =
-        walletAddress && getReferralWallet()?.toLowerCase() !== walletAddress?.toLowerCase()
-            ? getReferralWallet()
-            : null;
+        address && getReferralWallet()?.toLowerCase() !== address?.toLowerCase() ? getReferralWallet() : null;
 
-    const stableBalanceQuery = useStableBalanceQuery(walletAddress, networkId, {
-        enabled: isAppReady && isWalletConnected && !isMultiCollateralSupported,
+    const stableBalanceQuery = useStableBalanceQuery(address as string, networkId, {
+        enabled: isAppReady && isConnected && !isMultiCollateralSupported,
     });
-    const multipleCollateralBalances = useMultipleCollateralBalanceQuery(walletAddress, networkId, {
-        enabled: isAppReady && isWalletConnected && isMultiCollateralSupported,
+    const multipleCollateralBalances = useMultipleCollateralBalanceQuery(address as string, networkId, {
+        enabled: isAppReady && isConnected && isMultiCollateralSupported,
     });
 
     const walletBalancesMap = useMemo(() => {
@@ -344,7 +341,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     // Reset inputs
     useEffect(() => {
         setPaidAmount('');
-    }, [networkId, isWalletConnected]);
+    }, [networkId, isConnected]);
 
     // Input field validations
     useEffect(() => {
@@ -355,7 +352,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         }
         if (
             Number(paidAmount) > 0 &&
-            ((isWalletConnected && Number(paidAmount) > collateralBalance) || collateralBalance === 0)
+            ((isConnected && Number(paidAmount) > collateralBalance) || collateralBalance === 0)
         ) {
             messageKey = isBlastSepolia
                 ? 'speed-markets.errors.insufficient-balance-wallet'
@@ -379,7 +376,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         maxBuyinAmount,
         paidAmount,
         collateralBalance,
-        isWalletConnected,
+        isConnected,
         totalPaidAmount,
         selectedCollateral,
         convertToStable,
@@ -450,7 +447,12 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                     networkId,
                     selectedCollateral
                 );
-                const allowance = await checkAllowance(parsedAmount, erc20Instance, walletAddress, addressToApprove);
+                const allowance = await checkAllowance(
+                    parsedAmount,
+                    erc20Instance,
+                    address as string,
+                    addressToApprove
+                );
 
                 setAllowance(allowance);
             } catch (e) {
@@ -458,7 +460,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             }
         };
 
-        if (isWalletConnected && erc20Instance.provider) {
+        if (isConnected && erc20Instance.provider) {
             if (selectedCollateral === CRYPTO_CURRENCY_MAP.ETH) {
                 setAllowance(true);
             } else {
@@ -470,8 +472,8 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         networkId,
         paidAmount,
         totalPaidAmount,
-        walletAddress,
-        isWalletConnected,
+        address,
+        isConnected,
         hasAllowance,
         isAllowing,
         selectedCollateral,
@@ -579,7 +581,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
                 if (txResult && txResult.transactionHash) {
                     toast.update(id, getSuccessToastOptions(t(`common.buy.confirmation-message`), id));
-                    refetchUserSpeedMarkets(isChained, networkId, walletAddress);
+                    refetchUserSpeedMarkets(isChained, networkId, address as string);
                     refetchSpeedMarketsLimits(isChained, networkId);
                     PLAUSIBLE.trackEvent(
                         isChained ? PLAUSIBLE_KEYS.chainedSpeedMarketsBuy : PLAUSIBLE_KEYS.speedMarketsBuy,
@@ -612,7 +614,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
             const collateralWithSigner = collateral.connect(signer);
             try {
-                const tx: ethers.ContractTransaction = await collateralWithSigner.mintForUser(walletAddress);
+                const tx: ethers.ContractTransaction = await collateralWithSigner.mintForUser(address);
 
                 const txResult = await tx.wait();
 
@@ -621,7 +623,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                         id,
                         getSuccessToastOptions(t(`common.mint.confirmation-message`, { token: selectedCollateral }), id)
                     );
-                    refetchBalances(walletAddress, networkId);
+                    refetchBalances(address as string, networkId);
                 }
             } catch (e) {
                 console.log(e);
@@ -633,7 +635,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     };
 
     const getSubmitButton = () => {
-        if (!isWalletConnected) {
+        if (!isConnected) {
             return <Button onClick={openConnectModal}>{t('common.wallet.connect-your-wallet')}</Button>;
         }
         if (isMintAvailable) {
@@ -807,7 +809,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                             fee: totalFee ? formatPercentage(totalFee) : '...',
                         })}
                         balance={
-                            showWalletBalance && isWalletConnected
+                            showWalletBalance && isConnected
                                 ? `${t('common.balance')}: ${formatCurrency(collateralBalance)}`
                                 : undefined
                         }

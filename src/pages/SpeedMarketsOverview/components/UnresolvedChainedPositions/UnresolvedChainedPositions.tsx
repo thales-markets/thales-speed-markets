@@ -23,27 +23,26 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
-import { getWalletAddress } from 'redux/modules/wallet';
 import { RootState } from 'types/ui';
 import { ChainedSpeedMarket } from 'types/market';
 import { getPriceId } from 'utils/pyth';
 import { refetchActiveSpeedMarkets, refetchPythPrice } from 'utils/queryConnector';
 import { resolveAllChainedMarkets } from 'utils/speedAmm';
-import { useChainId } from 'wagmi';
+import { useAccount, useChainId } from 'wagmi';
 
 const UnresolvedChainedPositions: React.FC = () => {
     const { t } = useTranslation();
 
     const networkId = useChainId();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
+    const { address } = useAccount();
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSubmittingSection, setIsSubmittingSection] = useState('');
     const [isLoadingEnabled, setIsLoadingEnabled] = useState(true);
 
-    const ammChainedSpeedMarketsLimitsQuery = useAmmChainedSpeedMarketsLimitsQuery(networkId, walletAddress, {
+    const ammChainedSpeedMarketsLimitsQuery = useAmmChainedSpeedMarketsLimitsQuery(networkId, address, {
         enabled: isAppReady,
     });
 

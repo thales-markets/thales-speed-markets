@@ -3,12 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import OutsideClickHandler from 'react-outside-click-handler';
 import { useDispatch, useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
-import {
-    getIsWalletConnected,
-    getSelectedCollateralIndex,
-    getWalletAddress,
-    setSelectedCollateralIndex,
-} from 'redux/modules/wallet';
+import { getSelectedCollateralIndex, setSelectedCollateralIndex } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivRow } from 'styles/common';
 import { Coins, formatCurrencyWithKey } from 'thales-utils';
@@ -22,21 +17,20 @@ import {
     getCollaterals,
 } from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
-import { useChainId } from 'wagmi';
+import { useAccount, useChainId } from 'wagmi';
 
 const UserCollaterals: React.FC = () => {
     const dispatch = useDispatch();
     const networkId = useChainId();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
+    const { isConnected, address } = useAccount();
     const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
     const userSelectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-    const multipleCollateralBalances = useMultipleCollateralBalanceQuery(walletAddress, networkId, {
-        enabled: isAppReady && walletAddress !== '',
+    const multipleCollateralBalances = useMultipleCollateralBalanceQuery(address as string, networkId, {
+        enabled: isAppReady && isConnected,
     });
 
     const multipleCollateralBalancesData =
@@ -117,9 +111,9 @@ const UserCollaterals: React.FC = () => {
             <OutsideClickHandler onOutsideClick={() => isDropdownOpen && setIsDropdownOpen(false)}>
                 <Wrapper>
                     <SwapWrapper
-                        clickable={isWalletConnected && isMultiCollateralSupported}
+                        clickable={isConnected && isMultiCollateralSupported}
                         onClick={() =>
-                            isWalletConnected &&
+                            isConnected &&
                             (isMultiCollateralSupported
                                 ? setIsDropdownOpen(!isDropdownOpen)
                                 : onCollateralClickHandler(collateral.name))
@@ -129,7 +123,7 @@ const UserCollaterals: React.FC = () => {
                         <BalanceTextWrapper>
                             <BalanceText>{formatCurrencyWithKey(collateral.name, collateral.balance, 2)}</BalanceText>
                         </BalanceTextWrapper>
-                        {isWalletConnected && isMultiCollateralSupported && (
+                        {isConnected && isMultiCollateralSupported && (
                             <Icon className={isDropdownOpen ? `icon icon--caret-up` : `icon icon--caret-down`} />
                         )}
                     </SwapWrapper>
@@ -138,7 +132,7 @@ const UserCollaterals: React.FC = () => {
                             {collateralsWithBalance.map((coin, index) => (
                                 <BalanceWrapper
                                     key={index}
-                                    clickable={isWalletConnected}
+                                    clickable={isConnected}
                                     onClick={() => onCollateralClickHandler(coin.name)}
                                 >
                                     {assetIcon(coin.name)}

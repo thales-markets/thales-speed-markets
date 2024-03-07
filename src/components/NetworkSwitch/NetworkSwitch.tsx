@@ -1,10 +1,7 @@
 import { DEFAULT_NETWORK } from 'constants/network';
 import React, { useMemo, useState } from 'react';
 import OutsideClickHandler from 'react-outside-click-handler';
-import { useDispatch } from 'react-redux';
-import { switchToNetworkId } from 'redux/modules/wallet';
 import styled from 'styled-components';
-import { SupportedNetwork } from 'types/network';
 import { SUPPORTED_NETWORK_IDS_MAP } from 'utils/network';
 import { useChainId, useSwitchChain } from 'wagmi';
 
@@ -20,8 +17,6 @@ const NetworkSwitch: React.FC<NetworkSwitchProps> = ({
     supportedNetworks,
 }) => {
     const { switchChain } = useSwitchChain();
-    const dispatch = useDispatch();
-
     const networkId = useChainId();
 
     const filteredSupportedNetworks: Record<number, any> = useMemo(
@@ -79,11 +74,11 @@ const NetworkSwitch: React.FC<NetworkSwitchProps> = ({
                                                         switchChain?.(network.id);
                                                         // Trigger App.js init
                                                         // do not use updateNetworkSettings(networkId) as it will trigger queries before provider in App.js is initialized
-                                                        dispatch(
-                                                            switchToNetworkId({
-                                                                networkId: Number(network.id) as SupportedNetwork,
-                                                            })
-                                                        );
+                                                        // dispatch(
+                                                        //     switchToNetworkId({
+                                                        //         networkId: Number(network.id) as SupportedNetwork,
+                                                        //     })
+                                                        // );
                                                     }
                                                 );
                                             }

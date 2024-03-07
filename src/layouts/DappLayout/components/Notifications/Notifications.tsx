@@ -10,26 +10,24 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
-import { getIsWalletConnected, getWalletAddress } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
 import { RootState } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getPriceId } from 'utils/pyth';
 import { buildHref } from 'utils/routes';
-import { useChainId } from 'wagmi';
+import { useAccount, useChainId } from 'wagmi';
 
 const Notifications: React.FC = () => {
     const { t } = useTranslation();
     const networkId = useChainId();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
+    const { isConnected, address } = useAccount();
 
     const isNetworkSupported = !isOnlySpeedMarketsSupported(networkId);
 
-    const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(networkId, walletAddress, {
-        enabled: isAppReady && isWalletConnected,
+    const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(networkId, address as string, {
+        enabled: isAppReady && isConnected,
     });
     const speedMarketsNotifications = useMemo(() => {
         if (userActiveSpeedMarketsDataQuery.isSuccess && userActiveSpeedMarketsDataQuery.data) {
@@ -38,9 +36,13 @@ const Notifications: React.FC = () => {
         return 0;
     }, [userActiveSpeedMarketsDataQuery]);
 
-    const userActiveChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(networkId, walletAddress, {
-        enabled: isAppReady && isWalletConnected && isNetworkSupported,
-    });
+    const userActiveChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
+        networkId,
+        address as string,
+        {
+            enabled: isAppReady && isConnected && isNetworkSupported,
+        }
+    );
     const userActiveChainedSpeedMarketsData = useMemo(
         () =>
             userActiveChainedSpeedMarketsDataQuery.isSuccess && userActiveChainedSpeedMarketsDataQuery.data
@@ -101,7 +103,7 @@ const Notifications: React.FC = () => {
 
     const hasNotifications = totalNotifications > 0;
 
-    return isWalletConnected ? (
+    return isConnected ? (
         <SPAAnchor href={buildHref(ROUTES.Markets.Profile)}>
             <Container>
                 {hasNotifications ? (

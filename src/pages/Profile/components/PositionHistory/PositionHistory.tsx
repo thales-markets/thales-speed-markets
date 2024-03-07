@@ -8,14 +8,13 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
-import { getIsWalletConnected, getWalletAddress } from 'redux/modules/wallet';
 import { useTheme } from 'styled-components';
 import { formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
 import { UserPosition } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getStatus } from '../styled-components';
-import { useChainId } from 'wagmi';
+import { useAccount, useChainId } from 'wagmi';
 
 type PositionHistoryProps = {
     searchAddress: string;
@@ -28,14 +27,13 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
 
     const networkId = useChainId();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
+    const { isConnected, address } = useAccount();
 
     const closedSpeedMarketsDataQuery = useUserResolvedSpeedMarketsDataQuery(
         networkId,
-        searchAddress || walletAddress,
+        searchAddress || (address as string),
         {
-            enabled: isAppReady && isWalletConnected,
+            enabled: isAppReady && isConnected,
         }
     );
 
@@ -49,9 +47,9 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
 
     const closedChainedSpeedMarketsDataQuery = useUserResolvedChainedSpeedMarketsDataQuery(
         networkId,
-        searchAddress || walletAddress,
+        searchAddress || (address as string),
         {
-            enabled: isAppReady && isWalletConnected && !isOnlySpeedMarketsSupported(networkId),
+            enabled: isAppReady && isConnected && !isOnlySpeedMarketsSupported(networkId),
         }
     );
 

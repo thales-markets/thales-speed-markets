@@ -14,7 +14,6 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
-import { getIsWalletConnected, getWalletAddress } from 'redux/modules/wallet';
 import styled, { useTheme } from 'styled-components';
 import { FlexDivCentered, FlexDivRow, FlexDivRowCentered } from 'styles/common';
 import { formatCurrencyWithSign } from 'thales-utils';
@@ -24,7 +23,7 @@ import { getDefaultCollateral } from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
 import { resolveAllChainedMarkets, resolveAllSpeedPositions } from 'utils/speedAmm';
 import OpenPosition from '../OpenPosition';
-import { useChainId } from 'wagmi';
+import { useChainId, useAccount } from 'wagmi';
 
 type OpenPositionsProps = {
     isChained?: boolean;
@@ -37,9 +36,8 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
     const theme: ThemeInterface = useTheme();
 
     const networkId = useChainId();
-    const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
+    const { isConnected, address } = useAccount();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
@@ -51,8 +49,8 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
     >([]);
     const [chainedWithClaimableStatus, setChainedWithClaimableStatus] = useState<ChainedSpeedMarket[]>([]);
 
-    const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(networkId, walletAddress, {
-        enabled: isAppReady && isWalletConnected && !isChained,
+    const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(networkId, address as string, {
+        enabled: isAppReady && isConnected && !isChained,
     });
 
     const userOpenSpeedMarketsData = useMemo(
@@ -63,8 +61,8 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
         [userActiveSpeedMarketsDataQuery]
     );
 
-    const userChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(networkId, walletAddress, {
-        enabled: isAppReady && isWalletConnected && !!isChained,
+    const userChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(networkId, address as string, {
+        enabled: isAppReady && isConnected && !!isChained,
     });
 
     const userOpenChainedSpeedMarketsData = useMemo(

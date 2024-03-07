@@ -9,24 +9,22 @@ import { LINKS } from 'constants/links';
 import styled from 'styled-components';
 import ROUTES from 'constants/routes';
 import { RootState } from 'types/ui';
-import { getIsWalletConnected } from 'redux/modules/wallet';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { getIsMobile } from 'redux/modules/ui';
 import DappHeaderItem from '../components/DappHeaderItem';
 import { ScreenSizeBreakpoint } from '../../../enums/ui';
 import OutsideClickHandler from 'react-outside-click-handler';
-import { useChainId } from 'wagmi';
+import { useAccount, useChainId } from 'wagmi';
 
 const DappSidebar: React.FC = () => {
     const { t } = useTranslation();
     const location = useLocation();
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
+    const { isConnected } = useAccount();
     const networkId = useChainId();
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
-    const showProfilePage =
-        isWalletConnected && getSupportedNetworksByRoute(ROUTES.Markets.Profile).includes(networkId);
+    const showProfilePage = isConnected && getSupportedNetworksByRoute(ROUTES.Markets.Profile).includes(networkId);
 
     return (
         <OutsideClickHandler

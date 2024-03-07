@@ -17,12 +17,12 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsMobile } from 'redux/modules/ui';
-import { getIsWalletConnected } from 'redux/modules/wallet';
 import { RootState } from 'types/ui';
 import styled, { useTheme } from 'styled-components';
 import { FlexDivCentered, FlexDivColumnCentered, FlexDivRow } from 'styles/common';
 import { AmmSpeedMarketsLimits } from 'types/market';
 import { ThemeInterface } from 'types/ui';
+import { useAccount } from 'wagmi';
 
 type SelectTimeProps = {
     selectedDeltaSec: number;
@@ -49,7 +49,7 @@ const SelectTime: React.FC<SelectTimeProps> = ({
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
+    const { isConnected } = useAccount();
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const [isDeltaSelected, setIsDeltaSelected] = useState(true); // false is when exact time is selected
@@ -237,10 +237,10 @@ const SelectTime: React.FC<SelectTimeProps> = ({
 
     // Reset inputs
     useEffect(() => {
-        if (!isWalletConnected || isResetTriggered) {
+        if (!isConnected || isResetTriggered) {
             resetData();
         }
-    }, [isWalletConnected, resetData, isResetTriggered]);
+    }, [isConnected, resetData, isResetTriggered]);
 
     useEffect(() => {
         resetData();

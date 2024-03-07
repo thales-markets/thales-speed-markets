@@ -14,7 +14,6 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
-import { getIsWalletConnected, getWalletAddress } from 'redux/modules/wallet';
 import { useTheme } from 'styled-components';
 import { formatCurrency, formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
 import { SharePositionData } from 'types/flexCards';
@@ -24,7 +23,7 @@ import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getPriceId } from 'utils/pyth';
 import MyPositionAction from '../MyPositionAction';
 import { getDirections } from '../styled-components';
-import { useChainId } from 'wagmi';
+import { useAccount, useChainId } from 'wagmi';
 
 type ClaimablePositionsProps = {
     searchAddress: string;
@@ -38,17 +37,16 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const networkId = useChainId();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
+    const { isConnected, address } = useAccount();
 
     const [openTwitterShareModal, setOpenTwitterShareModal] = useState<boolean>(false);
     const [positionsShareData, setPositionShareData] = useState<SharePositionData | null>(null);
 
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
         networkId,
-        searchAddress || walletAddress,
+        searchAddress || (address as string),
         {
-            enabled: isAppReady && isWalletConnected,
+            enabled: isAppReady && isConnected,
         }
     );
 
@@ -62,9 +60,9 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
 
     const userActiveChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
         networkId,
-        searchAddress || walletAddress,
+        searchAddress || (address as string),
         {
-            enabled: isAppReady && isWalletConnected && !isOnlySpeedMarketsSupported(networkId),
+            enabled: isAppReady && isConnected && !isOnlySpeedMarketsSupported(networkId),
         }
     );
 

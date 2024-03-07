@@ -6,11 +6,10 @@ import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActi
 import { useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
-import { getIsWalletConnected, getWalletAddress } from 'redux/modules/wallet';
 import { Colors } from 'styles/common';
 import { RootState } from 'types/ui';
 import { timeToLocal } from 'utils/formatters/date';
-import { useChainId } from 'wagmi';
+import { useAccount, useChainId } from 'wagmi';
 
 export const UserPositionAreaSeries: React.FC<{
     asset: string;
@@ -19,13 +18,12 @@ export const UserPositionAreaSeries: React.FC<{
     const chart = useContext(ChartContext);
     const [series, setSeries] = useState<ISeriesApi<'Area'> | undefined>();
     const networkId = useChainId();
-    const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
+    const { isConnected, address } = useAccount();
     const [userData, setUserData] = useState<any>([]);
 
-    const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(networkId, walletAddress, {
-        enabled: isAppReady && isWalletConnected,
+    const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(networkId, address as string, {
+        enabled: isAppReady && isConnected,
         refetchInterval: 30 * 1000,
     });
 

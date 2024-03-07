@@ -1,21 +1,19 @@
 import Loader from 'components/Loader';
 import UnsupportedNetwork from 'components/UnsupportedNetwork';
-import { SUPPORTED_NETWORKS_NAMES } from 'constants/network';
 import ROUTES from 'constants/routes';
 import ThemeProvider from 'layouts/Theme';
 import { Suspense, lazy, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { Redirect, Route, Router, Switch } from 'react-router-dom';
 import { setAppReady } from 'redux/modules/app';
 import { setIsMobile } from 'redux/modules/ui';
-import { getSwitchToNetworkId, switchToNetworkId, updateNetworkSettings, updateWallet } from 'redux/modules/wallet';
 import { createGlobalStyle } from 'styled-components';
 import { isMobile } from 'utils/device';
 import { getSupportedNetworksByRoute, isNetworkSupported } from 'utils/network';
 import queryConnector from 'utils/queryConnector';
 import { history } from 'utils/routes';
 import snxJSConnector from 'utils/snxJSConnector';
-import { useAccount, useChainId, useClient, useDisconnect, useWalletClient } from 'wagmi';
+import { useAccount, useChainId, useClient, useDisconnect, useSwitchChain, useWalletClient } from 'wagmi';
 
 const DappLayout = lazy(() => import(/* webpackChunkName: "DappLayout" */ 'layouts/DappLayout'));
 
@@ -29,7 +27,7 @@ const App = () => {
     const dispatch = useDispatch();
 
     const networkId = useChainId();
-    const switchedToNetworkId = useSelector((state) => getSwitchToNetworkId(state));
+    const { switchChain } = useSwitchChain();
 
     const { address } = useAccount();
     const provider = useClient(); // when wallet not connected force chain
@@ -47,12 +45,6 @@ const App = () => {
                     signer,
                 });
 
-                dispatch(
-                    updateNetworkSettings({
-                        networkId: networkId,
-                        networkName: SUPPORTED_NETWORKS_NAMES[networkId]?.toLowerCase(),
-                    })
-                );
                 dispatch(setAppReady());
             } catch (e) {
                 if (!e.toString().includes('Error: underlying network changed')) {
@@ -62,11 +54,7 @@ const App = () => {
             }
         };
         init();
-    }, [dispatch, networkId, provider, signer, switchedToNetworkId, address]);
-
-    useEffect(() => {
-        dispatch(updateWallet({ walletAddress: address }));
-    }, [address, dispatch]);
+    }, [dispatch, networkId, provider, signer, address]);
 
     useEffect(() => {
         if (window.ethereum) {
@@ -75,11 +63,11 @@ const App = () => {
 
                 if (!address && isNetworkSupported(chainId)) {
                     // when wallet disconnected reflect network change from browser wallet to dApp
-                    dispatch(switchToNetworkId({ networkId: chainId }));
+                    switchChain({ chainId });
                 }
             });
         }
-    }, [dispatch, address]);
+    }, [dispatch, address, switchChain]);
 
     useEffect(() => {
         if (isNetworkSupported(networkId)) {

@@ -6,7 +6,6 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
-import { getIsWalletConnected, getWalletAddress } from 'redux/modules/wallet';
 import { useTheme } from 'styled-components';
 import {
     formatCurrencyWithSign,
@@ -18,7 +17,7 @@ import { TradeWithMarket } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getDirections } from '../styled-components';
-import { useChainId } from 'wagmi';
+import { useAccount, useChainId } from 'wagmi';
 
 type TransactionHistoryProps = {
     searchAddress: string;
@@ -31,12 +30,15 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ searchAddress, 
 
     const networkId = useChainId();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
+    const { address, isConnected } = useAccount();
 
-    const speedMarketsDataQuery = useUserSpeedMarketsTransactionsQuery(networkId, searchAddress || walletAddress, {
-        enabled: isAppReady && isWalletConnected,
-    });
+    const speedMarketsDataQuery = useUserSpeedMarketsTransactionsQuery(
+        networkId,
+        searchAddress || (address as string),
+        {
+            enabled: isAppReady && isConnected,
+        }
+    );
     const speedMarketsData: TradeWithMarket[] = useMemo(
         () => (speedMarketsDataQuery.isSuccess && speedMarketsDataQuery.data ? speedMarketsDataQuery.data : []),
         [speedMarketsDataQuery.isSuccess, speedMarketsDataQuery.data]
@@ -44,9 +46,9 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ searchAddress, 
 
     const chainedSpeedMarketsDataQuery = useUserChainedSpeedMarketsTransactionsQuery(
         networkId,
-        searchAddress || walletAddress,
+        searchAddress || (address as string),
         {
-            enabled: isAppReady && isWalletConnected && !isOnlySpeedMarketsSupported(networkId),
+            enabled: isAppReady && isConnected && !isOnlySpeedMarketsSupported(networkId),
         }
     );
     const chainedSpeedMarketsData: TradeWithMarket[] = useMemo(

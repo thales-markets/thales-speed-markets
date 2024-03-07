@@ -1,15 +1,10 @@
 import theme from 'styles/themes/dark';
-import { SupportedNetwork } from './network';
 
 export type AppSliceState = {
     isReady: boolean;
 };
 
 export type WalletSliceState = {
-    walletAddress: string | null;
-    networkId: SupportedNetwork;
-    networkName: string;
-    switchToNetworkId: SupportedNetwork; // used to trigger manually network switch in App.js
     selectedCollateralIndex: number;
 };
 
