@@ -43,15 +43,19 @@ const useAmmSpeedMarketsLimitsQuery = (
                     directionalRiskForETH,
                     directionalRiskForBTC,
                 ] = await Promise.all([
-                    speedMarketsDataContract.getSpeedMarketsAMMParameters(walletAddress || ZERO_ADDRESS),
-                    speedMarketsDataContract.getRiskPerAsset(ethers.utils.formatBytes32String(CRYPTO_CURRENCY_MAP.ETH)),
-                    speedMarketsDataContract.getRiskPerAsset(ethers.utils.formatBytes32String(CRYPTO_CURRENCY_MAP.BTC)),
-                    speedMarketsDataContract.getDirectionalRiskPerAsset(
-                        ethers.utils.formatBytes32String(CRYPTO_CURRENCY_MAP.ETH)
-                    ),
-                    speedMarketsDataContract.getDirectionalRiskPerAsset(
-                        ethers.utils.formatBytes32String(CRYPTO_CURRENCY_MAP.BTC)
-                    ),
+                    speedMarketsDataContract.read.getSpeedMarketsAMMParameters([walletAddress || ZERO_ADDRESS]),
+                    speedMarketsDataContract.read.getRiskPerAsset([
+                        ethers.utils.formatBytes32String(CRYPTO_CURRENCY_MAP.ETH),
+                    ]),
+                    speedMarketsDataContract.read.getRiskPerAsset([
+                        ethers.utils.formatBytes32String(CRYPTO_CURRENCY_MAP.BTC),
+                    ]),
+                    speedMarketsDataContract.read.getDirectionalRiskPerAsset([
+                        ethers.utils.formatBytes32String(CRYPTO_CURRENCY_MAP.ETH),
+                    ]),
+                    speedMarketsDataContract.read.getDirectionalRiskPerAsset([
+                        ethers.utils.formatBytes32String(CRYPTO_CURRENCY_MAP.BTC),
+                    ]),
                 ]);
 
                 ammSpeedMarketsLimits.minBuyinAmount = Math.ceil(coinFormatter(ammParams.minBuyinAmount, networkId));

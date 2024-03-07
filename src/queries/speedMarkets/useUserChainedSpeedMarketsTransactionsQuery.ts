@@ -27,17 +27,19 @@ const useUserChainedSpeedMarketsTransactionsQuery = (
             const { chainedSpeedMarketsAMMContract, speedMarketsDataContract } = snxJSConnector;
 
             if (chainedSpeedMarketsAMMContract && speedMarketsDataContract) {
-                const ammParams = await speedMarketsDataContract.getChainedSpeedMarketsAMMParameters(walletAddress);
+                const ammParams = await speedMarketsDataContract.read.getChainedSpeedMarketsAMMParameters([
+                    walletAddress,
+                ]);
 
                 const pageSize = Math.min(ammParams.numMaturedMarketsPerUser, MAX_NUMBER_OF_SPEED_MARKETS_TO_FETCH);
                 const index = Number(ammParams.numMaturedMarketsPerUser) - pageSize;
                 const [activeMarkets, maturedMarkets] = await Promise.all([
-                    chainedSpeedMarketsAMMContract.activeMarketsPerUser(
+                    chainedSpeedMarketsAMMContract.read.activeMarketsPerUser([
                         0,
                         ammParams.numActiveMarketsPerUser,
-                        walletAddress
-                    ),
-                    chainedSpeedMarketsAMMContract.maturedMarketsPerUser(index, pageSize, walletAddress),
+                        walletAddress,
+                    ]),
+                    chainedSpeedMarketsAMMContract.read.maturedMarketsPerUser([index, pageSize, walletAddress]),
                 ]);
                 const allMarkets: any[] = activeMarkets.concat(maturedMarkets);
 
@@ -69,7 +71,7 @@ const useUserChainedSpeedMarketsTransactionsQuery = (
 
                             return marketAddresss;
                         });
-                    promises.push(speedMarketsDataContract.getChainedMarketsData(batchMarkets));
+                    promises.push(speedMarketsDataContract.read.getChainedMarketsData([batchMarkets]));
                 }
                 const allMarketsDataArray = await Promise.all(promises);
 

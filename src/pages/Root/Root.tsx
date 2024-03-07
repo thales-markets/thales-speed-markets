@@ -12,7 +12,7 @@ import { Store } from 'redux';
 import { getDefaultTheme } from 'utils/style';
 import { WagmiProvider } from 'wagmi';
 import App from './App';
-import { config } from './wagmi-config';
+import { wagmiConfig } from './wagmi-config';
 import { QueryClientProvider } from '@tanstack/react-query';
 import queryConnector from 'utils/queryConnector';
 import { Buffer as buffer } from 'buffer';
@@ -32,7 +32,7 @@ const Root: React.FC<RootProps> = ({ store }) => {
         <ErrorBoundary fallback={<UnexpectedError theme={ThemeMap[theme]} />} onError={() => {}}>
             <QueryClientProvider client={queryConnector.queryClient}>
                 <Provider store={store}>
-                    <WagmiProvider config={config}>
+                    <WagmiProvider config={wagmiConfig}>
                         <RainbowKitProvider
                             theme={customTheme}
                             appInfo={{

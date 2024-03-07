@@ -65,6 +65,7 @@ import { getFeeByTimeThreshold, getTransactionForSpeedAMM } from 'utils/speedAmm
 import { delay } from 'utils/timer';
 import { SelectedPosition } from '../SelectPosition/SelectPosition';
 import { useAccount, useChainId } from 'wagmi';
+import { getContract } from 'viem';
 
 type AmmSpeedTradingProps = {
     isChained: boolean;
@@ -432,7 +433,11 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         if (!collateralAddress) {
             return;
         }
-        const erc20Instance = new ethers.Contract(collateralAddress, erc20Contract.abi, snxJSConnector.provider);
+        const erc20Instance = getContract({
+            abi: erc20Contract.abi,
+            address: collateralAddress as any,
+            client: snxJSConnector.client,
+        }) as any;
         const addressToApprove =
             (isChained
                 ? snxJSConnector.chainedSpeedMarketsAMMContract?.address

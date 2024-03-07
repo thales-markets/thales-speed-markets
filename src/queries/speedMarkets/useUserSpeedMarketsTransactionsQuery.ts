@@ -27,13 +27,17 @@ const useUserSpeedMarketsTransactionsQuery = (
             const { speedMarketsAMMContract, speedMarketsDataContract } = snxJSConnector;
 
             if (speedMarketsAMMContract && speedMarketsDataContract) {
-                const ammParams = await speedMarketsDataContract.getSpeedMarketsAMMParameters(walletAddress);
+                const ammParams = await speedMarketsDataContract.read.getSpeedMarketsAMMParameters([walletAddress]);
 
                 const pageSize = Math.min(ammParams.numMaturedMarketsPerUser, MAX_NUMBER_OF_SPEED_MARKETS_TO_FETCH);
                 const index = Number(ammParams.numMaturedMarketsPerUser) - pageSize;
                 const [activeMarkets, maturedMarkets] = await Promise.all([
-                    speedMarketsAMMContract.activeMarketsPerUser(0, ammParams.numActiveMarketsPerUser, walletAddress),
-                    speedMarketsAMMContract.maturedMarketsPerUser(index, pageSize, walletAddress),
+                    speedMarketsAMMContract.read.activeMarketsPerUser(
+                        0,
+                        ammParams.numActiveMarketsPerUser,
+                        walletAddress
+                    ),
+                    speedMarketsAMMContract.read.maturedMarketsPerUser([index, pageSize, walletAddress]),
                 ]);
                 const allMarkets: any[] = activeMarkets.concat(maturedMarkets);
 
@@ -41,7 +45,7 @@ const useUserSpeedMarketsTransactionsQuery = (
                 for (let i = 0; i < Math.ceil(allMarkets.length / BATCH_NUMBER_OF_SPEED_MARKETS); i++) {
                     const start = i * BATCH_NUMBER_OF_SPEED_MARKETS;
                     const batchMarkets = allMarkets.slice(start, start + BATCH_NUMBER_OF_SPEED_MARKETS);
-                    promises.push(speedMarketsDataContract.getMarketsData(batchMarkets));
+                    promises.push(speedMarketsDataContract.read.getMarketsData([batchMarkets]));
                 }
                 const allMarketsDataArray = await Promise.all(promises);
 

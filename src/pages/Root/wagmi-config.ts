@@ -2,7 +2,7 @@ import { http, createConfig } from 'wagmi';
 import { arbitrum, base, blastSepolia, optimism, polygon, zkSync } from 'wagmi/chains';
 import { coinbaseWallet, walletConnect } from 'wagmi/connectors';
 
-export const config = createConfig({
+export const wagmiConfig = createConfig({
     chains: [optimism, arbitrum, base, polygon, zkSync, blastSepolia],
     connectors: [
         coinbaseWallet({ appName: 'Speedmarkets' }),
@@ -20,6 +20,6 @@ export const config = createConfig({
 
 declare module 'wagmi' {
     interface Register {
-        config: typeof config;
+        config: typeof wagmiConfig;
     }
 }

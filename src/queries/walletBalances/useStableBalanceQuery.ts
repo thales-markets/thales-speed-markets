@@ -18,7 +18,7 @@ const useStableBalanceQuery = (
                 const collateral = snxJSConnector.collateral;
                 const collateralKey = getDefaultCollateral(networkId);
 
-                let usdBalance = await collateral?.balanceOf(walletAddress);
+                let usdBalance = await collateral?.read.balanceOf([walletAddress]);
                 usdBalance = usdBalance
                     ? parseInt(usdBalance) /
                       10 ** (COLLATERAL_DECIMALS[collateralKey] ? COLLATERAL_DECIMALS[collateralKey] : 18)

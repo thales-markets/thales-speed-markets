@@ -22,7 +22,7 @@ export const getIsMultiCollateralSupported = (networkId: SupportedNetwork): bool
 
 export const checkAllowance = async (amount: BigNumber, token: any, walletAddress: string, spender: string) => {
     try {
-        const approved = await token.allowance(walletAddress, spender);
+        const approved = await token.read.allowance(walletAddress, spender);
         return approved.gte(amount);
     } catch (err: any) {
         console.log(err);

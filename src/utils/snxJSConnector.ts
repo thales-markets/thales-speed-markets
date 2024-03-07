@@ -1,4 +1,4 @@
-import { ethers, Signer } from 'ethers';
+import { Signer } from 'ethers';
 import { Coins } from 'thales-utils';
 import chainedSpeedMarketsAMMContract from './contracts/chainedSpeedMarketsAMMContract';
 import collateralContract from './contracts/collateralContract';
@@ -6,17 +6,20 @@ import multipleCollateral from './contracts/multipleCollateralContract';
 import priceFeedContract from './contracts/priceFeedContract';
 import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
 import speedMarketsDataContract from './contracts/speedMarketsAMMDataContract';
+import { getContract } from 'viem';
+
+type ViemContract = { abi: any; address: string; read: any; write: any };
 
 type SnxJSConnector = {
     initialized: boolean;
-    provider: any | undefined;
+    client: any | undefined;
     signer: Signer | undefined;
-    collateral?: ethers.Contract;
-    multipleCollateral?: Record<Coins, ethers.Contract | undefined>;
-    priceFeedContract?: ethers.Contract;
-    speedMarketsAMMContract?: ethers.Contract;
-    chainedSpeedMarketsAMMContract?: ethers.Contract;
-    speedMarketsDataContract?: ethers.Contract;
+    collateral?: ViemContract;
+    multipleCollateral?: Record<Coins, ViemContract | undefined>;
+    priceFeedContract?: ViemContract;
+    speedMarketsAMMContract?: ViemContract;
+    chainedSpeedMarketsAMMContract?: ViemContract;
+    speedMarketsDataContract?: ViemContract;
     setContractSettings: (contractSettings: any) => void;
 };
 
@@ -27,7 +30,7 @@ const snxJSConnector: SnxJSConnector = {
     setContractSettings: function (contractSettings: any) {
         this.initialized = true;
         this.signer = contractSettings.signer;
-        this.provider = contractSettings.provider;
+        this.client = contractSettings.client;
         this.collateral = conditionalInitializeContract(collateralContract, contractSettings);
         this.multipleCollateral = {
             sUSD: conditionalInitializeContract(multipleCollateral.sUSD, contractSettings),
@@ -55,9 +58,13 @@ const snxJSConnector: SnxJSConnector = {
 
 const conditionalInitializeContract = (contract: any, contractSettings: any) => {
     const networkId = contractSettings.networkId || 1;
-    const abi = contract.abis && contract.abis[networkId] ? contract.abis[networkId] : contract.abi;
+    const abi = contract.abi;
     return contract.addresses[networkId] !== 'TBD'
-        ? new ethers.Contract(contract.addresses[networkId], abi, snxJSConnector.provider)
+        ? (getContract({
+              abi: abi,
+              address: contract.addresses[networkId],
+              client: contractSettings.client,
+          }) as ViemContract)
         : undefined;
 };
 

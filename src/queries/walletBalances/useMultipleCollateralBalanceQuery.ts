@@ -3,7 +3,9 @@ import QUERY_KEYS from 'constants/queryKeys';
 import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { COLLATERAL_DECIMALS, Coins, NetworkId, bigNumberFormatter } from 'thales-utils';
 import { CollateralsBalance } from 'types/collateral';
+import { getBalance } from '@wagmi/core';
 import snxJSConnector from 'utils/snxJSConnector';
+import { wagmiConfig } from 'pages/Root/wagmi-config';
 
 const useMultipleCollateralBalanceQuery = (
     walletAddress: string,
@@ -45,32 +47,32 @@ const useMultipleCollateralBalanceQuery = (
                     ARBBalance,
                 ] = await Promise.all([
                     multipleCollateral
-                        ? multipleCollateral[SYNTHS_MAP.sUSD as Coins]?.balanceOf(walletAddress)
+                        ? multipleCollateral[SYNTHS_MAP.sUSD as Coins]?.read.balanceOf([walletAddress])
                         : undefined,
                     multipleCollateral
-                        ? multipleCollateral[CRYPTO_CURRENCY_MAP.DAI as Coins]?.balanceOf(walletAddress)
+                        ? multipleCollateral[CRYPTO_CURRENCY_MAP.DAI as Coins]?.read.balanceOf([walletAddress])
                         : undefined,
                     multipleCollateral
-                        ? multipleCollateral[CRYPTO_CURRENCY_MAP.USDC as Coins]?.balanceOf(walletAddress)
+                        ? multipleCollateral[CRYPTO_CURRENCY_MAP.USDC as Coins]?.read.balanceOf([walletAddress])
                         : undefined,
                     multipleCollateral
-                        ? multipleCollateral[CRYPTO_CURRENCY_MAP.USDCe as Coins]?.balanceOf(walletAddress)
+                        ? multipleCollateral[CRYPTO_CURRENCY_MAP.USDCe as Coins]?.read.balanceOf([walletAddress])
                         : undefined,
                     multipleCollateral
-                        ? multipleCollateral[CRYPTO_CURRENCY_MAP.USDbC as Coins]?.balanceOf(walletAddress)
+                        ? multipleCollateral[CRYPTO_CURRENCY_MAP.USDbC as Coins]?.read.balanceOf([walletAddress])
                         : undefined,
                     multipleCollateral
-                        ? multipleCollateral[CRYPTO_CURRENCY_MAP.USDT as Coins]?.balanceOf(walletAddress)
+                        ? multipleCollateral[CRYPTO_CURRENCY_MAP.USDT as Coins]?.read.balanceOf([walletAddress])
                         : undefined,
                     multipleCollateral
-                        ? multipleCollateral[CRYPTO_CURRENCY_MAP.OP as Coins]?.balanceOf(walletAddress)
+                        ? multipleCollateral[CRYPTO_CURRENCY_MAP.OP as Coins]?.read.balanceOf([walletAddress])
                         : undefined,
                     multipleCollateral
-                        ? multipleCollateral[CRYPTO_CURRENCY_MAP.WETH as Coins]?.balanceOf(walletAddress)
+                        ? multipleCollateral[CRYPTO_CURRENCY_MAP.WETH as Coins]?.read.balanceOf([walletAddress])
                         : undefined,
-                    snxJSConnector.provider ? snxJSConnector.provider.getBalance(walletAddress) : undefined,
+                    getBalance(wagmiConfig, { address: walletAddress as any }) as any,
                     multipleCollateral
-                        ? multipleCollateral[CRYPTO_CURRENCY_MAP.ARB as Coins]?.balanceOf(walletAddress)
+                        ? multipleCollateral[CRYPTO_CURRENCY_MAP.ARB as Coins]?.read.balanceOf([walletAddress])
                         : undefined,
                 ]);
                 collaterasBalance = {
@@ -82,7 +84,7 @@ const useMultipleCollateralBalanceQuery = (
                     USDT: USDTBalance ? bigNumberFormatter(USDTBalance, COLLATERAL_DECIMALS.USDT) : 0,
                     OP: OPBalance ? bigNumberFormatter(OPBalance, COLLATERAL_DECIMALS.OP) : 0,
                     WETH: WETHBalance ? bigNumberFormatter(WETHBalance, COLLATERAL_DECIMALS.WETH) : 0,
-                    ETH: ETHBalance ? bigNumberFormatter(ETHBalance, COLLATERAL_DECIMALS.ETH) : 0,
+                    ETH: ETHBalance ? bigNumberFormatter(ETHBalance.value, COLLATERAL_DECIMALS.ETH) : 0,
                     ARB: ARBBalance ? bigNumberFormatter(ARBBalance, COLLATERAL_DECIMALS.ARB) : 0,
                 };
             } catch (e) {

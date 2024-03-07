@@ -31,8 +31,8 @@ const useChainedAmmSpeedMarketsLimitsQuery = (
             const { speedMarketsDataContract } = snxJSConnector;
             if (speedMarketsDataContract) {
                 const [chainedAmmParams, ammParams] = await Promise.all([
-                    speedMarketsDataContract.getChainedSpeedMarketsAMMParameters(walletAddress || ZERO_ADDRESS),
-                    speedMarketsDataContract.getSpeedMarketsAMMParameters(walletAddress || ZERO_ADDRESS),
+                    speedMarketsDataContract.read.getChainedSpeedMarketsAMMParameters([walletAddress || ZERO_ADDRESS]),
+                    speedMarketsDataContract.read.getSpeedMarketsAMMParameters([walletAddress || ZERO_ADDRESS]),
                 ]);
 
                 ammChainedSpeedMarketsLimits.minChainedMarkets = Number(chainedAmmParams.minChainedMarkets);

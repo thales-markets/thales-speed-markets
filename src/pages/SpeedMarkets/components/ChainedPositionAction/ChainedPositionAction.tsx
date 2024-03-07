@@ -49,6 +49,7 @@ import snxJSConnector from 'utils/snxJSConnector';
 import { getUserLostAtSideIndex } from 'utils/speedAmm';
 import { delay } from 'utils/timer';
 import { useAccount, useChainId } from 'wagmi';
+import { getContract } from 'viem';
 
 type ChainedPositionActionProps = {
     position: ChainedSpeedMarket;
@@ -103,11 +104,11 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
         }
 
         const { chainedSpeedMarketsAMMContract, collateral } = snxJSConnector;
-        const erc20Instance = new ethers.Contract(
-            collateral?.address || '',
-            erc20Contract.abi,
-            snxJSConnector.provider
-        );
+        const erc20Instance = getContract({
+            abi: erc20Contract.abi,
+            address: collateral?.address as any,
+            client: snxJSConnector.client,
+        }) as any;
         const addressToApprove = chainedSpeedMarketsAMMContract?.address || '';
 
         const getAllowance = async () => {

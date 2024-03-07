@@ -30,7 +30,7 @@ const App = () => {
     const { switchChain } = useSwitchChain();
 
     const { address } = useAccount();
-    const provider = useClient(); // when wallet not connected force chain
+    const client = useClient(); // when wallet not connected force chain
     const { data: signer } = useWalletClient();
     const { disconnect } = useDisconnect();
 
@@ -41,7 +41,7 @@ const App = () => {
             try {
                 snxJSConnector.setContractSettings({
                     networkId: networkId,
-                    provider,
+                    client,
                     signer,
                 });
 
@@ -54,7 +54,7 @@ const App = () => {
             }
         };
         init();
-    }, [dispatch, networkId, provider, signer, address]);
+    }, [dispatch, networkId, signer, address, client]);
 
     useEffect(() => {
         if (window.ethereum) {

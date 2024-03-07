@@ -26,11 +26,11 @@ const useActiveSpeedMarketsDataQuery = (
             });
 
             if (speedMarketsAMMContract && speedMarketsDataContract) {
-                const ammParams = await speedMarketsDataContract.getSpeedMarketsAMMParameters(ZERO_ADDRESS);
+                const ammParams = await speedMarketsDataContract.read.getSpeedMarketsAMMParameters([ZERO_ADDRESS]);
 
-                const activeMarkets = await speedMarketsAMMContract.activeMarkets(0, ammParams.numActiveMarkets);
+                const activeMarkets = await speedMarketsAMMContract.read.activeMarkets([0, ammParams.numActiveMarkets]);
                 const marketsDataArray = activeMarkets.length
-                    ? await speedMarketsDataContract.getMarketsData(activeMarkets)
+                    ? await speedMarketsDataContract.read.getMarketsData([activeMarkets])
                     : [];
                 const maturedMarkets: any = marketsDataArray
                     .map((marketData: any, index: number) => ({ ...marketData, market: activeMarkets[index] }))

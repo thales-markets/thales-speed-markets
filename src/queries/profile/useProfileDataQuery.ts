@@ -27,11 +27,11 @@ const useProfileDataQuery = (
                 chainedAmmParams = [];
 
             if (isOnlySpeedMarketsSupported(networkId)) {
-                speedAmmParams = await speedMarketsDataContract?.getSpeedMarketsAMMParameters(walletAddress);
+                speedAmmParams = await speedMarketsDataContract?.read.getSpeedMarketsAMMParameters([walletAddress]);
             } else {
                 [speedAmmParams, chainedAmmParams] = await Promise.all([
-                    speedMarketsDataContract?.getSpeedMarketsAMMParameters(walletAddress),
-                    speedMarketsDataContract?.getChainedSpeedMarketsAMMParameters(walletAddress),
+                    speedMarketsDataContract?.read.getSpeedMarketsAMMParameters([walletAddress]),
+                    speedMarketsDataContract?.read.getChainedSpeedMarketsAMMParameters([walletAddress]),
                 ]);
             }
 
@@ -43,16 +43,16 @@ const useProfileDataQuery = (
 
                 if (isOnlySpeedMarketsSupported(networkId)) {
                     [activeSpeedMarkets, maturedSpeedMarkets] = await Promise.all([
-                        speedMarketsAMMContract.activeMarketsPerUser(
+                        speedMarketsAMMContract.read.activeMarketsPerUser([
                             0,
                             speedAmmParams.numActiveMarketsPerUser,
-                            walletAddress
-                        ),
-                        speedMarketsAMMContract.maturedMarketsPerUser(
+                            walletAddress,
+                        ]),
+                        speedMarketsAMMContract.read.maturedMarketsPerUser([
                             0,
                             speedAmmParams.numMaturedMarketsPerUser,
-                            walletAddress
-                        ),
+                            walletAddress,
+                        ]),
                     ]);
                 } else if (chainedSpeedMarketsAMMContract) {
                     [
@@ -61,36 +61,36 @@ const useProfileDataQuery = (
                         activeChainedSpeedMarkets,
                         maturedChainedSpeedMarkets,
                     ] = await Promise.all([
-                        speedMarketsAMMContract.activeMarketsPerUser(
+                        speedMarketsAMMContract.read.activeMarketsPerUser([
                             0,
                             speedAmmParams.numActiveMarketsPerUser,
-                            walletAddress
-                        ),
-                        speedMarketsAMMContract.maturedMarketsPerUser(
+                            walletAddress,
+                        ]),
+                        speedMarketsAMMContract.read.maturedMarketsPerUser([
                             0,
                             speedAmmParams.numMaturedMarketsPerUser,
-                            walletAddress
-                        ),
-                        chainedSpeedMarketsAMMContract.activeMarketsPerUser(
+                            walletAddress,
+                        ]),
+                        chainedSpeedMarketsAMMContract.read.activeMarketsPerUser([
                             0,
                             chainedAmmParams.numActiveMarketsPerUser,
-                            walletAddress
-                        ),
-                        chainedSpeedMarketsAMMContract.maturedMarketsPerUser(
+                            walletAddress,
+                        ]),
+                        chainedSpeedMarketsAMMContract.read.maturedMarketsPerUser([
                             0,
                             chainedAmmParams.numMaturedMarketsPerUser,
-                            walletAddress
-                        ),
+                            walletAddress,
+                        ]),
                     ]);
                 }
 
                 const promises = [];
                 if (activeSpeedMarkets.length) {
-                    promises.push(speedMarketsDataContract.getMarketsData(activeSpeedMarkets));
+                    promises.push(speedMarketsDataContract.read.getMarketsData([activeSpeedMarkets]));
                 }
                 if (!isOnlySpeedMarketsSupported(networkId)) {
                     // Chained speed markets active
-                    promises.push(speedMarketsDataContract.getChainedMarketsData(activeChainedSpeedMarkets));
+                    promises.push(speedMarketsDataContract.read.getChainedMarketsData([activeChainedSpeedMarkets]));
 
                     // Chained speed markets matured
                     for (
@@ -124,7 +124,7 @@ const useProfileDataQuery = (
 
                                 return marketAddresss;
                             });
-                        promises.push(speedMarketsDataContract.getChainedMarketsData(batchMarkets));
+                        promises.push(speedMarketsDataContract.read.getChainedMarketsData([batchMarkets]));
                     }
                 }
 
@@ -132,7 +132,7 @@ const useProfileDataQuery = (
                 for (let i = 0; i < Math.ceil(maturedSpeedMarkets.length / BATCH_NUMBER_OF_SPEED_MARKETS); i++) {
                     const start = i * BATCH_NUMBER_OF_SPEED_MARKETS;
                     const batchMarkets = maturedSpeedMarkets.slice(start, start + BATCH_NUMBER_OF_SPEED_MARKETS);
-                    promises.push(speedMarketsDataContract.getMarketsData(batchMarkets));
+                    promises.push(speedMarketsDataContract.read.getMarketsData([batchMarkets]));
                 }
 
                 const allSpeedMarkets = await Promise.all(promises);

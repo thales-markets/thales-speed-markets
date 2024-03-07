@@ -21,14 +21,16 @@ const useUserActiveChainedSpeedMarketsDataQuery = (
             const { chainedSpeedMarketsAMMContract, speedMarketsDataContract } = snxJSConnector;
 
             if (chainedSpeedMarketsAMMContract && speedMarketsDataContract) {
-                const ammParams = await speedMarketsDataContract.getChainedSpeedMarketsAMMParameters(walletAddress);
+                const ammParams = await speedMarketsDataContract.read.getChainedSpeedMarketsAMMParameters([
+                    walletAddress,
+                ]);
 
-                const activeMarkets = await chainedSpeedMarketsAMMContract.activeMarketsPerUser(
+                const activeMarkets = await chainedSpeedMarketsAMMContract.read.activeMarketsPerUser([
                     0,
                     ammParams.numActiveMarketsPerUser,
-                    walletAddress
-                );
-                const marketsDataArray = await speedMarketsDataContract.getChainedMarketsData(activeMarkets);
+                    walletAddress,
+                ]);
+                const marketsDataArray = await speedMarketsDataContract.read.getChainedMarketsData([activeMarkets]);
                 const userActiveMarkets = marketsDataArray.map((marketData: any, index: number) => ({
                     ...marketData,
                     market: activeMarkets[index],

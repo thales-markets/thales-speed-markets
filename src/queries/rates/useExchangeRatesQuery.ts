@@ -13,8 +13,8 @@ const useExchangeRatesQuery = (networkId: NetworkId, options?: Omit<UseQueryOpti
 
             if (snxJSConnector.priceFeedContract) {
                 const [currencies, rates] = await Promise.all([
-                    snxJSConnector.priceFeedContract.getCurrencies(),
-                    snxJSConnector.priceFeedContract.getRates(),
+                    snxJSConnector.priceFeedContract.read.getCurrencies(),
+                    snxJSConnector.priceFeedContract.read.getRates(),
                 ]);
                 currencies.forEach((currency: string, idx: number) => {
                     const currencyName = parseBytes32String(currency);

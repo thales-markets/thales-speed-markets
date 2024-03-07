@@ -40,6 +40,7 @@ import {
 } from 'utils/queryConnector';
 import snxJSConnector from 'utils/snxJSConnector';
 import { delay } from 'utils/timer';
+import { getContract } from 'viem';
 import { useAccount, useChainId } from 'wagmi';
 
 const ONE_HUNDRED_AND_THREE_PERCENT = 1.03;
@@ -87,11 +88,11 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
         }
 
         const { speedMarketsAMMContract, collateral } = snxJSConnector;
-        const erc20Instance = new ethers.Contract(
-            collateral?.address || '',
-            erc20Contract.abi,
-            snxJSConnector.provider
-        );
+        const erc20Instance = getContract({
+            abi: erc20Contract.abi,
+            address: collateral?.address as any,
+            client: snxJSConnector.client,
+        }) as any;
         const addressToApprove = speedMarketsAMMContract?.address || '';
 
         const getAllowance = async () => {
