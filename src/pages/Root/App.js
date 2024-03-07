@@ -70,7 +70,7 @@ const App = () => {
     }, [dispatch, address, switchChain]);
 
     useEffect(() => {
-        if (isNetworkSupported(networkId)) {
+        if (!isNetworkSupported(networkId)) {
             disconnect();
         }
     }, [disconnect, networkId]);
