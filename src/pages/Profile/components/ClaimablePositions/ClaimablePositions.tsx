@@ -23,7 +23,7 @@ import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getPriceId } from 'utils/pyth';
 import MyPositionAction from '../MyPositionAction';
 import { getDirections } from '../styled-components';
-import { useAccount, useChainId } from 'wagmi';
+import { useAccount, useChainId, useClient } from 'wagmi';
 
 type ClaimablePositionsProps = {
     searchAddress: string;
@@ -36,6 +36,7 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
 
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const networkId = useChainId();
+    const client = useClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const { isConnected, address } = useAccount();
 
@@ -43,7 +44,7 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
     const [positionsShareData, setPositionShareData] = useState<SharePositionData | null>(null);
 
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
-        networkId,
+        { networkId, client },
         searchAddress || (address as string),
         {
             enabled: isAppReady && isConnected,

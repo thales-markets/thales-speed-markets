@@ -15,7 +15,7 @@ import { USD_SIGN } from 'constants/currency';
 import { ZERO_ADDRESS } from 'constants/network';
 import { CONNECTION_TIMEOUT_MS, PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
 import { differenceInSeconds, millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
-import { BigNumber, ethers } from 'ethers';
+import { BigNumberish } from 'ethers';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -28,7 +28,10 @@ import { coinParser, formatCurrencyWithSign, roundNumberToDecimals } from 'thale
 import { UserOpenPositions } from 'types/market';
 import { UserPosition } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
-import erc20Contract from 'utils/contracts/erc20Contract';
+import { ViemContract } from 'types/viem';
+import erc20Contract from 'utils/contracts/collateralContract';
+import multipleCollateral from 'utils/contracts/multipleCollateralContract';
+import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
 import { getCollateral, getCollaterals, getDefaultCollateral } from 'utils/currency';
 import { checkAllowance, getIsMultiCollateralSupported } from 'utils/network';
 import { getPriceId, getPriceServiceEndpoint } from 'utils/pyth';
@@ -38,10 +41,9 @@ import {
     refetchUserResolvedSpeedMarkets,
     refetchUserSpeedMarkets,
 } from 'utils/queryConnector';
-import snxJSConnector from 'utils/snxJSConnector';
 import { delay } from 'utils/timer';
 import { getContract } from 'viem';
-import { useAccount, useChainId } from 'wagmi';
+import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 
 const ONE_HUNDRED_AND_THREE_PERCENT = 1.03;
 
@@ -62,6 +64,8 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     const theme: ThemeInterface = useTheme();
 
     const networkId = useChainId();
+    const client = useClient();
+    const walletClient = useWalletClient();
     const { isConnected, address } = useAccount();
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
@@ -74,8 +78,8 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     ]);
     const isDefaultCollateral = selectedCollateral === defaultCollateral;
     const collateralAddress = isMultiCollateralSupported
-        ? snxJSConnector.multipleCollateral && snxJSConnector.multipleCollateral[selectedCollateral]?.address
-        : snxJSConnector.collateral?.address;
+        ? multipleCollateral[selectedCollateral].addresses[networkId]
+        : erc20Contract.addresses[networkId];
 
     const [openApprovalModal, setOpenApprovalModal] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -87,13 +91,12 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
             return;
         }
 
-        const { speedMarketsAMMContract, collateral } = snxJSConnector;
         const erc20Instance = getContract({
             abi: erc20Contract.abi,
-            address: collateral?.address as any,
-            client: snxJSConnector.client,
+            address: erc20Contract.addresses[networkId] as any,
+            client: client,
         }) as any;
-        const addressToApprove = speedMarketsAMMContract?.address || '';
+        const addressToApprove = speedMarketsAMMContract.addresses[networkId];
 
         const getAllowance = async () => {
             try {
@@ -112,21 +115,24 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
         if (isConnected && erc20Instance.provider) {
             getAllowance();
         }
-    }, [position.value, networkId, address, isConnected, hasAllowance, isAllowing, isDefaultCollateral]);
+    }, [position.value, networkId, address, isConnected, hasAllowance, isAllowing, isDefaultCollateral, client]);
 
-    const handleAllowance = async (approveAmount: BigNumber) => {
-        const { speedMarketsAMMContract, collateral } = snxJSConnector;
-        const erc20Instance = new ethers.Contract(collateral?.address || '', erc20Contract.abi, snxJSConnector.signer);
-        const addressToApprove = speedMarketsAMMContract?.address || '';
+    const handleAllowance = async (approveAmount: BigNumberish) => {
+        const erc20Instance = getContract({
+            abi: erc20Contract.abi,
+            address: erc20Contract.addresses[networkId] as any,
+            client: client,
+        }) as ViemContract;
+        const addressToApprove = speedMarketsAMMContract.addresses[networkId];
 
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
         try {
             setIsAllowing(true);
 
-            const tx = (await erc20Instance.approve(addressToApprove, approveAmount)) as ethers.ContractTransaction;
+            const tx = await erc20Instance.write.approve([addressToApprove, approveAmount]);
             setOpenApprovalModal(false);
-            const txResult = await tx.wait();
-            if (txResult && txResult.transactionHash) {
+
+            if (tx) {
                 toast.update(id, getSuccessToastOptions(t(`common.transaction.successful`), id));
                 setAllowance(true);
                 setIsAllowing(false);
@@ -144,72 +150,66 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
             timeout: CONNECTION_TIMEOUT_MS,
         });
 
-        const { speedMarketsAMMContract, signer } = snxJSConnector as any;
-        if (speedMarketsAMMContract) {
-            setIsSubmitting(true);
-            const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
+        setIsSubmitting(true);
+        const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
 
-            const speedMarketsAMMContractWithSigner = speedMarketsAMMContract.connect(signer);
-            try {
-                const pythContract = new ethers.Contract(
-                    PYTH_CONTRACT_ADDRESS[networkId],
-                    PythInterfaceAbi as any,
-                    (snxJSConnector as any).provider
-                );
+        try {
+            const pythContract = getContract({
+                abi: PythInterfaceAbi,
+                address: PYTH_CONTRACT_ADDRESS[networkId],
+                client,
+            });
 
-                const [priceFeedUpdateVaa, publishTime] = await priceConnection.getVaa(
-                    getPriceId(networkId, position.currencyKey),
-                    millisecondsToSeconds(position.maturityDate)
-                );
+            const [priceFeedUpdateVaa, publishTime] = await priceConnection.getVaa(
+                getPriceId(networkId, position.currencyKey),
+                millisecondsToSeconds(position.maturityDate)
+            );
 
-                // check if price feed is not too late
-                if (
-                    maxPriceDelayForResolvingSec &&
-                    differenceInSeconds(secondsToMilliseconds(publishTime), position.maturityDate) >
-                        maxPriceDelayForResolvingSec
-                ) {
-                    await delay(800);
-                    toast.update(id, getErrorToastOptions(t('speed-markets.user-positions.errors.price-stale'), id));
-                    setIsSubmitting(false);
-                    return;
-                }
-
-                const priceUpdateData = ['0x' + Buffer.from(priceFeedUpdateVaa, 'base64').toString('hex')];
-                const updateFee = await pythContract.getUpdateFee(priceUpdateData);
-
-                const isEth = collateralAddress === ZERO_ADDRESS;
-
-                const tx: ethers.ContractTransaction = isDefaultCollateral
-                    ? await speedMarketsAMMContractWithSigner.resolveMarket(position.market, priceUpdateData, {
-                          value: updateFee,
-                      })
-                    : await speedMarketsAMMContractWithSigner.resolveMarketWithOfframp(
-                          position.market,
-                          priceUpdateData,
-                          collateralAddress,
-                          isEth,
-                          { value: updateFee }
-                      );
-
-                const txResult = await tx.wait();
-
-                if (txResult && txResult.transactionHash) {
-                    toast.update(
-                        id,
-                        getSuccessToastOptions(t(`speed-markets.user-positions.confirmation-message`), id)
-                    );
-                    refetchUserNotifications(address as string, networkId);
-                    refetchUserSpeedMarkets(false, networkId, address as string);
-                    refetchUserResolvedSpeedMarkets(false, networkId, address as string);
-                    refetchUserProfileQueries(address as string, networkId);
-                }
-            } catch (e) {
-                console.log(e);
+            // check if price feed is not too late
+            if (
+                maxPriceDelayForResolvingSec &&
+                differenceInSeconds(secondsToMilliseconds(publishTime), position.maturityDate) >
+                    maxPriceDelayForResolvingSec
+            ) {
                 await delay(800);
-                toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
+                toast.update(id, getErrorToastOptions(t('speed-markets.user-positions.errors.price-stale'), id));
+                setIsSubmitting(false);
+                return;
             }
-            setIsSubmitting(false);
+
+            const priceUpdateData = ['0x' + Buffer.from(priceFeedUpdateVaa, 'base64').toString('hex')];
+            const updateFee = await pythContract.read.getUpdateFee([priceUpdateData]);
+
+            const isEth = collateralAddress === ZERO_ADDRESS;
+
+            const speedMarketsAMMContractWithSigner = getContract({
+                abi: speedMarketsAMMContract.abi,
+                address: speedMarketsAMMContract.addresses[networkId] as any,
+                client: walletClient.data as any,
+            }) as ViemContract;
+
+            const tx = isDefaultCollateral
+                ? await speedMarketsAMMContractWithSigner.write.resolveMarket([position.market, priceUpdateData], {
+                      value: updateFee,
+                  })
+                : await speedMarketsAMMContractWithSigner.write.resolveMarketWithOfframp(
+                      [position.market, priceUpdateData, collateralAddress, isEth],
+                      { value: updateFee }
+                  );
+
+            if (tx) {
+                toast.update(id, getSuccessToastOptions(t(`speed-markets.user-positions.confirmation-message`), id));
+                refetchUserNotifications(address as string, networkId);
+                refetchUserSpeedMarkets(false, { networkId, client }, address as string);
+                refetchUserResolvedSpeedMarkets(false, { networkId, client }, address as string);
+                refetchUserProfileQueries(address as string, { networkId, client });
+            }
+        } catch (e) {
+            console.log(e);
+            await delay(800);
+            toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
         }
+        setIsSubmitting(false);
     };
 
     const getResolveButton = () => (

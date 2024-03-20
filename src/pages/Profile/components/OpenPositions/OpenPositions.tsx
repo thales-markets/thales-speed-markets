@@ -28,6 +28,7 @@ import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAsse
 import MyPositionAction from '../MyPositionAction/MyPositionAction';
 import { getDirections } from '../styled-components';
 import { useAccount, useChainId } from 'wagmi';
+import { useClient } from 'wagmi';
 
 type OpenPositionsProps = {
     searchAddress: string;
@@ -40,6 +41,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
 
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const networkId = useChainId();
+    const client = useClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const { isConnected, address } = useAccount();
 
@@ -68,7 +70,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
     }, secondsToMilliseconds(10));
 
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
-        networkId,
+        { networkId, client },
         searchAddress || (address as string),
         {
             enabled: isAppReady && isConnected,

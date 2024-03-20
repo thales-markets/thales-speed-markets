@@ -9,7 +9,7 @@ import { getIsAppReady } from 'redux/modules/app';
 import { Colors } from 'styles/common';
 import { RootState } from 'types/ui';
 import { timeToLocal } from 'utils/formatters/date';
-import { useAccount, useChainId } from 'wagmi';
+import { useAccount, useChainId, useClient } from 'wagmi';
 
 export const UserPositionAreaSeries: React.FC<{
     asset: string;
@@ -18,14 +18,19 @@ export const UserPositionAreaSeries: React.FC<{
     const chart = useContext(ChartContext);
     const [series, setSeries] = useState<ISeriesApi<'Area'> | undefined>();
     const networkId = useChainId();
+    const client = useClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const { isConnected, address } = useAccount();
     const [userData, setUserData] = useState<any>([]);
 
-    const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(networkId, address as string, {
-        enabled: isAppReady && isConnected,
-        refetchInterval: 30 * 1000,
-    });
+    const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
+        { networkId, client },
+        address as string,
+        {
+            enabled: isAppReady && isConnected,
+            refetchInterval: 30 * 1000,
+        }
+    );
 
     useEffect(() => {
         if (userActiveSpeedMarketsDataQuery.isSuccess && candlestickData && candlestickData.length) {

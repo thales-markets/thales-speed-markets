@@ -14,7 +14,7 @@ import { UserPosition } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getStatus } from '../styled-components';
-import { useAccount, useChainId } from 'wagmi';
+import { useAccount, useChainId, useClient } from 'wagmi';
 
 type PositionHistoryProps = {
     searchAddress: string;
@@ -26,6 +26,7 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
     const theme: ThemeInterface = useTheme();
 
     const networkId = useChainId();
+    const client = useClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const { isConnected, address } = useAccount();
 
@@ -46,7 +47,7 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
     );
 
     const closedChainedSpeedMarketsDataQuery = useUserResolvedChainedSpeedMarketsDataQuery(
-        networkId,
+        { networkId, client },
         searchAddress || (address as string),
         {
             enabled: isAppReady && isConnected && !isOnlySpeedMarketsSupported(networkId),

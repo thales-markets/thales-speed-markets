@@ -23,7 +23,7 @@ import { getDefaultCollateral } from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
 import { resolveAllChainedMarkets, resolveAllSpeedPositions } from 'utils/speedAmm';
 import OpenPosition from '../OpenPosition';
-import { useChainId, useAccount } from 'wagmi';
+import { useChainId, useAccount, useClient } from 'wagmi';
 
 type OpenPositionsProps = {
     isChained?: boolean;
@@ -36,6 +36,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
     const theme: ThemeInterface = useTheme();
 
     const networkId = useChainId();
+    const client = useClient();
     const { isConnected, address } = useAccount();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
@@ -49,9 +50,13 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
     >([]);
     const [chainedWithClaimableStatus, setChainedWithClaimableStatus] = useState<ChainedSpeedMarket[]>([]);
 
-    const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(networkId, address as string, {
-        enabled: isAppReady && isConnected && !isChained,
-    });
+    const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
+        { networkId, client },
+        address as string,
+        {
+            enabled: isAppReady && isConnected && !isChained,
+        }
+    );
 
     const userOpenSpeedMarketsData = useMemo(
         () =>

@@ -7,14 +7,15 @@ import { UserProfileData } from 'types/profile';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 import snxJSConnector from 'utils/snxJSConnector';
 import { getFeesFromHistory } from 'utils/speedAmm';
+import { QueryConfig } from 'types/network';
 
 const useProfileDataQuery = (
-    networkId: NetworkId,
+    queryConfig: QueryConfig,
     walletAddress: string,
     options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
     return useQuery<UserProfileData>({
-        queryKey: QUERY_KEYS.Profile.Data(walletAddress, networkId),
+        queryKey: QUERY_KEYS.Profile.Data(walletAddress, queryConfig),
         queryFn: async () => {
             let [profit, volume, numberOfTrades, gain, investment] = [0, 0, 0, 0, 0];
             const {
@@ -26,7 +27,7 @@ const useProfileDataQuery = (
             let speedAmmParams = [],
                 chainedAmmParams = [];
 
-            if (isOnlySpeedMarketsSupported(networkId)) {
+            if (isOnlySpeedMarketsSupported(queryConfig.networkId)) {
                 speedAmmParams = await speedMarketsDataContract?.read.getSpeedMarketsAMMParameters([walletAddress]);
             } else {
                 [speedAmmParams, chainedAmmParams] = await Promise.all([
@@ -41,7 +42,7 @@ const useProfileDataQuery = (
                     activeChainedSpeedMarkets = [],
                     maturedChainedSpeedMarkets = [];
 
-                if (isOnlySpeedMarketsSupported(networkId)) {
+                if (isOnlySpeedMarketsSupported(queryConfig.networkId)) {
                     [activeSpeedMarkets, maturedSpeedMarkets] = await Promise.all([
                         speedMarketsAMMContract.read.activeMarketsPerUser([
                             0,
@@ -88,7 +89,7 @@ const useProfileDataQuery = (
                 if (activeSpeedMarkets.length) {
                     promises.push(speedMarketsDataContract.read.getMarketsData([activeSpeedMarkets]));
                 }
-                if (!isOnlySpeedMarketsSupported(networkId)) {
+                if (!isOnlySpeedMarketsSupported(queryConfig.networkId)) {
                     // Chained speed markets active
                     promises.push(speedMarketsDataContract.read.getChainedMarketsData([activeChainedSpeedMarkets]));
 
@@ -105,14 +106,14 @@ const useProfileDataQuery = (
                                 let marketAddresss;
                                 // Hot fix for 2 markets when resolved with final price 0 and fetching data for that market is failing
                                 if (
-                                    networkId === NetworkId.OptimismMainnet &&
+                                    queryConfig.networkId === NetworkId.OptimismMainnet &&
                                     walletAddress === '0x5ef88d0a93e5773DB543bd421864504618A18de4' &&
                                     market === '0x79F6f48410fC659a274c0A236e19e581373bf2f9'
                                 ) {
                                     // some other market address of this user
                                     marketAddresss = '0x6A01283c0F4579B55FB7214CaF619CFe72044b68';
                                 } else if (
-                                    networkId === NetworkId.PolygonMainnet &&
+                                    queryConfig.networkId === NetworkId.PolygonMainnet &&
                                     walletAddress === '0x8AAcec3D7077D04F19aC924d2743fc0DE1456941' &&
                                     market === '0x1e195Ea2ABf23C1A793F01c934692A230bb5Fc40'
                                 ) {
@@ -154,7 +155,7 @@ const useProfileDataQuery = (
                         ? bigNumberFormatter(marketData.safeBoxImpact)
                         : getFeesFromHistory(createdAt).safeBoxImpact;
                     const fees = lpFee + safeBoxImpact;
-                    const buyinAmount = coinFormatter(marketData.buyinAmount, networkId);
+                    const buyinAmount = coinFormatter(marketData.buyinAmount, queryConfig.networkId);
                     const paid = buyinAmount * (1 + fees);
                     const payout = isChained
                         ? roundNumberToDecimals(
@@ -176,7 +177,7 @@ const useProfileDataQuery = (
                 const numSpeedMarkets =
                     Number(speedAmmParams.numActiveMarketsPerUser) +
                     Number(speedAmmParams.numMaturedMarketsPerUser) +
-                    (isOnlySpeedMarketsSupported(networkId)
+                    (isOnlySpeedMarketsSupported(queryConfig.networkId)
                         ? 0
                         : Number(chainedAmmParams.numActiveMarketsPerUser) +
                           Number(chainedAmmParams.numMaturedMarketsPerUser));

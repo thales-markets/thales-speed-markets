@@ -14,7 +14,7 @@ import { formatNumberShort } from 'utils/formatters/number';
 import { refetchUserSpeedMarkets } from 'utils/queryConnector';
 import { getColorPerPosition } from 'utils/style';
 import SharePositionModal from '../SharePositionModal';
-import { useAccount, useChainId } from 'wagmi';
+import { useAccount, useChainId, useClient } from 'wagmi';
 
 type OpenPositionProps = {
     position: UserOpenPositions;
@@ -33,6 +33,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
     const theme: ThemeInterface = useTheme();
 
     const networkId = useChainId();
+    const client = useClient();
     const { address } = useAccount();
     const [openTwitterShareModal, setOpenTwitterShareModal] = useState(false);
     const [isSpeedMarketMatured, setIsSpeedMarketMatured] = useState(Date.now() > position.maturityDate);
@@ -43,7 +44,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
                 setIsSpeedMarketMatured(true);
             }
             if (!position.finalPrice) {
-                refetchUserSpeedMarkets(false, networkId, address as string);
+                refetchUserSpeedMarkets(false, { networkId, client }, address as string);
             }
         }
     }, secondsToMilliseconds(10));

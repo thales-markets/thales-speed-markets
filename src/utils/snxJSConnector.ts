@@ -3,7 +3,6 @@ import { Coins } from 'thales-utils';
 import chainedSpeedMarketsAMMContract from './contracts/chainedSpeedMarketsAMMContract';
 import collateralContract from './contracts/collateralContract';
 import multipleCollateral from './contracts/multipleCollateralContract';
-import priceFeedContract from './contracts/priceFeedContract';
 import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
 import speedMarketsDataContract from './contracts/speedMarketsAMMDataContract';
 import { getContract } from 'viem';
@@ -11,12 +10,10 @@ import { getContract } from 'viem';
 type ViemContract = { abi: any; address: string; read: any; write: any };
 
 type SnxJSConnector = {
-    initialized: boolean;
     client: any | undefined;
     signer: Signer | undefined;
     collateral?: ViemContract;
     multipleCollateral?: Record<Coins, ViemContract | undefined>;
-    priceFeedContract?: ViemContract;
     speedMarketsAMMContract?: ViemContract;
     chainedSpeedMarketsAMMContract?: ViemContract;
     speedMarketsDataContract?: ViemContract;
@@ -25,10 +22,7 @@ type SnxJSConnector = {
 
 // @ts-ignore
 const snxJSConnector: SnxJSConnector = {
-    initialized: false,
-
     setContractSettings: function (contractSettings: any) {
-        this.initialized = true;
         this.signer = contractSettings.signer;
         this.client = contractSettings.client;
         this.collateral = conditionalInitializeContract(collateralContract, contractSettings);
@@ -46,7 +40,6 @@ const snxJSConnector: SnxJSConnector = {
             BUSD: conditionalInitializeContract(multipleCollateral.BUSD, contractSettings),
         };
 
-        this.priceFeedContract = conditionalInitializeContract(priceFeedContract, contractSettings);
         this.speedMarketsAMMContract = conditionalInitializeContract(speedMarketsAMMContract, contractSettings);
         this.chainedSpeedMarketsAMMContract = conditionalInitializeContract(
             chainedSpeedMarketsAMMContract,

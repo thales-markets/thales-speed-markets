@@ -13,12 +13,13 @@ import { UserClosedPositions } from 'types/market';
 import { RootState } from 'types/ui';
 import ChainedPosition from '../ChainedPosition';
 import ClosedPosition from '../ClosedPosition';
-import { useAccount, useChainId } from 'wagmi';
+import { useAccount, useChainId, useClient } from 'wagmi';
 
 const ClosedPositions: React.FC<{ isChained: boolean }> = ({ isChained }) => {
     const { t } = useTranslation();
 
     const networkId = useChainId();
+    const client = useClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const { isConnected, address } = useAccount();
 
@@ -38,7 +39,7 @@ const ClosedPositions: React.FC<{ isChained: boolean }> = ({ isChained }) => {
     );
 
     const userResolvedChainedSpeedMarketsDataQuery = useUserResolvedChainedSpeedMarketsDataQuery(
-        networkId,
+        { networkId, client },
         address as string,
         {
             enabled: isAppReady && isConnected && !!isChained,

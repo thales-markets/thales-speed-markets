@@ -1,20 +1,31 @@
 import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
 import QUERY_KEYS from 'constants/queryKeys';
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
-import { bigNumberFormatter, NetworkId, parseBytes32String } from 'thales-utils';
-import snxJSConnector from 'utils/snxJSConnector';
+import { bigNumberFormatter, parseBytes32String } from 'thales-utils';
+import priceFeedContract from 'utils/contracts/priceFeedContract';
+import { getContract } from 'viem';
+import { QueryConfig } from 'types/network';
 export type Rates = Record<string, number>;
 
-const useExchangeRatesQuery = (networkId: NetworkId, options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>) => {
+const useExchangeRatesQuery = (
+    queryConfig: QueryConfig,
+    options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
+) => {
     return useQuery<Rates>({
-        queryKey: QUERY_KEYS.Rates.ExchangeRates(networkId),
+        queryKey: QUERY_KEYS.Rates.ExchangeRates(queryConfig),
         queryFn: async () => {
             const exchangeRates: Rates = {};
 
-            if (snxJSConnector.priceFeedContract) {
+            const priceFeedContractLocal = getContract({
+                address: priceFeedContract.addresses[queryConfig.networkId] as any,
+                abi: priceFeedContract.abi,
+                client: queryConfig.client,
+            }) as any;
+
+            if (priceFeedContractLocal) {
                 const [currencies, rates] = await Promise.all([
-                    snxJSConnector.priceFeedContract.read.getCurrencies(),
-                    snxJSConnector.priceFeedContract.read.getRates(),
+                    priceFeedContractLocal.read.getCurrencies(),
+                    priceFeedContractLocal.read.getRates(),
                 ]);
                 currencies.forEach((currency: string, idx: number) => {
                     const currencyName = parseBytes32String(currency);
@@ -29,6 +40,8 @@ const useExchangeRatesQuery = (networkId: NetworkId, options?: Omit<UseQueryOpti
                     }
                 });
             }
+
+            console.log(exchangeRates);
 
             return exchangeRates;
         },

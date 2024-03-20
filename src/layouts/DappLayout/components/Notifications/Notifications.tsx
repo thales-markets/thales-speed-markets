@@ -16,19 +16,24 @@ import { RootState } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getPriceId } from 'utils/pyth';
 import { buildHref } from 'utils/routes';
-import { useAccount, useChainId } from 'wagmi';
+import { useAccount, useChainId, useClient } from 'wagmi';
 
 const Notifications: React.FC = () => {
     const { t } = useTranslation();
     const networkId = useChainId();
+    const client = useClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const { isConnected, address } = useAccount();
 
     const isNetworkSupported = !isOnlySpeedMarketsSupported(networkId);
 
-    const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(networkId, address as string, {
-        enabled: isAppReady && isConnected,
-    });
+    const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
+        { networkId, client },
+        address as string,
+        {
+            enabled: isAppReady && isConnected,
+        }
+    );
     const speedMarketsNotifications = useMemo(() => {
         if (userActiveSpeedMarketsDataQuery.isSuccess && userActiveSpeedMarketsDataQuery.data) {
             return userActiveSpeedMarketsDataQuery.data.filter((marketData) => marketData.claimable).length;

@@ -8,24 +8,25 @@ import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
 import { Positions } from 'enums/market';
 import { reject } from 'lodash';
 import { UseQueryOptions, useQuery } from '@tanstack/react-query';
-import { NetworkId, bigNumberFormatter, coinFormatter, formatCurrencyWithSign, parseBytes32String } from 'thales-utils';
+import { bigNumberFormatter, coinFormatter, formatCurrencyWithSign, parseBytes32String } from 'thales-utils';
 import { UserOpenPositions } from 'types/market';
 import { getBenchmarksPriceFeeds, getPriceId, getPriceServiceEndpoint } from 'utils/pyth';
 import snxJSConnector from 'utils/snxJSConnector';
 import { getFeesFromHistory } from 'utils/speedAmm';
+import { QueryConfig } from 'types/network';
 
 const useUserActiveSpeedMarketsDataQuery = (
-    networkId: NetworkId,
+    queryConfig: QueryConfig,
     walletAddress: string,
     options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
     return useQuery<UserOpenPositions[]>({
-        queryKey: QUERY_KEYS.User.SpeedMarkets(networkId, walletAddress),
+        queryKey: QUERY_KEYS.User.SpeedMarkets(queryConfig, walletAddress),
         queryFn: async () => {
             const userSpeedMarketsData: UserOpenPositions[] = [];
 
             const { speedMarketsAMMContract, speedMarketsDataContract } = snxJSConnector;
-            const priceConnection = new EvmPriceServiceConnection(getPriceServiceEndpoint(networkId), {
+            const priceConnection = new EvmPriceServiceConnection(getPriceServiceEndpoint(queryConfig.networkId), {
                 timeout: CONNECTION_TIMEOUT_MS,
             });
 
@@ -51,7 +52,7 @@ const useUserActiveSpeedMarketsDataQuery = (
                 const pricePromises = userActiveMarkets.map((market: any) => {
                     const isMarketMatured = secondsToMilliseconds(Number(market.strikeTime)) < Date.now();
                     if (isMarketMatured) {
-                        const priceId = getPriceId(networkId, parseBytes32String(market.asset));
+                        const priceId = getPriceId(queryConfig.networkId, parseBytes32String(market.asset));
                         return priceConnection.getPriceFeed(priceId, Number(market.strikeTime)).catch((e) => {
                             console.log('Pyth price feed error', e);
                             unavailablePrices.push({
@@ -71,7 +72,7 @@ const useUserActiveSpeedMarketsDataQuery = (
                 for (let i = 0; i < userActiveMarkets.length; i++) {
                     const marketData = userActiveMarkets[i];
                     const side = SIDE_TO_POSITION_MAP[marketData.direction];
-                    const payout = coinFormatter(marketData.buyinAmount, networkId) * SPEED_MARKETS_QUOTE;
+                    const payout = coinFormatter(marketData.buyinAmount, queryConfig.networkId) * SPEED_MARKETS_QUOTE;
 
                     let isClaimable = false;
                     let price = 0;
@@ -82,7 +83,7 @@ const useUserActiveSpeedMarketsDataQuery = (
                             price = priceFeed.value.getPriceUnchecked().getPriceAsNumberUnchecked();
                         } else {
                             const benchmarksPriceId = getPriceId(
-                                networkId,
+                                queryConfig.networkId,
                                 parseBytes32String(marketData.asset)
                             ).replace('0x', '');
                             price =
@@ -125,7 +126,7 @@ const useUserActiveSpeedMarketsDataQuery = (
                         maturityDate,
                         market: marketData.market,
                         side,
-                        paid: coinFormatter(marketData.buyinAmount, networkId) * (1 + fees),
+                        paid: coinFormatter(marketData.buyinAmount, queryConfig.networkId) * (1 + fees),
                         value: payout,
                         claimable: isClaimable,
                         finalPrice: price,

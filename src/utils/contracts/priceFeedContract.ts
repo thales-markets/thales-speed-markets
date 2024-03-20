@@ -2,6 +2,7 @@ import { NetworkId } from 'thales-utils';
 
 const priceFeedContract = {
     addresses: {
+        [NetworkId.Mainnet]: 'TBD',
         [NetworkId.OptimismMainnet]: '0xf4aef21d906992aFAdde7A9676e1dB4feb6390DD',
         [NetworkId.OptimismGoerli]: '0x7A13403eBd6ee7a45abA2cEe663eF038A66F0A82',
         [NetworkId.OptimismSepolia]: 'TBD',

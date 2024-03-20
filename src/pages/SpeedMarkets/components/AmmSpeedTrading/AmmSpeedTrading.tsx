@@ -192,9 +192,13 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     const referral =
         address && getReferralWallet()?.toLowerCase() !== address?.toLowerCase() ? getReferralWallet() : null;
 
-    const stableBalanceQuery = useStableBalanceQuery(address as string, networkId, {
-        enabled: isAppReady && isConnected && !isMultiCollateralSupported,
-    });
+    const stableBalanceQuery = useStableBalanceQuery(
+        address as string,
+        { networkId, client },
+        {
+            enabled: isAppReady && isConnected && !isMultiCollateralSupported,
+        }
+    );
     const multipleCollateralBalances = useMultipleCollateralBalanceQuery(address as string, networkId, {
         enabled: isAppReady && isConnected && isMultiCollateralSupported,
     });
@@ -220,9 +224,12 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     const isBlastSepolia = networkId === NetworkId.BlastSepolia;
     const isMintAvailable = isBlastSepolia && collateralBalance < totalPaidAmount;
 
-    const exchangeRatesMarketDataQuery = useExchangeRatesQuery(networkId, {
-        enabled: isAppReady,
-    });
+    const exchangeRatesMarketDataQuery = useExchangeRatesQuery(
+        { networkId, client },
+        {
+            enabled: isAppReady,
+        }
+    );
     const exchangeRates: Rates | null =
         exchangeRatesMarketDataQuery.isSuccess && exchangeRatesMarketDataQuery.data
             ? exchangeRatesMarketDataQuery.data
@@ -592,7 +599,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
             if (tx) {
                 toast.update(id, getSuccessToastOptions(t(`common.buy.confirmation-message`), id));
-                refetchUserSpeedMarkets(isChained, networkId, address as string);
+                refetchUserSpeedMarkets(isChained, { networkId, client }, address as string);
                 refetchSpeedMarketsLimits(isChained, networkId);
                 PLAUSIBLE.trackEvent(
                     isChained ? PLAUSIBLE_KEYS.chainedSpeedMarketsBuy : PLAUSIBLE_KEYS.speedMarketsBuy,
@@ -634,7 +641,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                     id,
                     getSuccessToastOptions(t(`common.mint.confirmation-message`, { token: selectedCollateral }), id)
                 );
-                refetchBalances(address as string, networkId);
+                refetchBalances(address as string, { networkId, client });
             }
         } catch (e) {
             console.log(e);

@@ -37,7 +37,7 @@ import {
     StatsValue,
     Title,
 } from './styled-components';
-import { useAccount, useChainId } from 'wagmi';
+import { useAccount, useChainId, useClient } from 'wagmi';
 
 enum NavItems {
     MyPositions = 'my-positions',
@@ -50,6 +50,7 @@ const Profile: React.FC = () => {
     const theme: ThemeInterface = useTheme();
 
     const networkId = useChainId();
+    const client = useClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const { address, isConnected } = useAccount();
 
@@ -57,7 +58,7 @@ const Profile: React.FC = () => {
     const [searchText, setSearchText] = useState<string>('');
 
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
-        networkId,
+        { networkId, client },
         searchAddress || (address as string),
         {
             enabled: isAppReady && isConnected,
@@ -130,7 +131,7 @@ const Profile: React.FC = () => {
 
     const totalNotifications = speedMarketsNotifications + chainedSpeedMarketsNotifications;
 
-    const userProfileDataQuery = useProfileDataQuery(networkId, searchAddress || (address as string), {
+    const userProfileDataQuery = useProfileDataQuery({ networkId, client }, searchAddress || (address as string), {
         enabled: isAppReady && isConnected,
     });
     const profileData: UserProfileData =

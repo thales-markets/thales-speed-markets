@@ -1,12 +1,13 @@
 import { NetworkId } from 'thales-utils';
+import { QueryConfig } from 'types/network';
 
 const QUERY_KEYS = {
     WalletBalances: {
-        StableCoinBalance: (walletAddress: string, networkId: NetworkId) => [
+        StableCoinBalance: (walletAddress: string, queryConfig: QueryConfig) => [
             'walletBalances',
             'stableCoin',
             walletAddress,
-            networkId,
+            queryConfig,
         ],
         MultipleCollateral: (walletAddress: string, networkId: NetworkId) => [
             'multipleCollateral',
@@ -16,7 +17,7 @@ const QUERY_KEYS = {
         ],
     },
     Rates: {
-        ExchangeRates: (networkId: NetworkId) => ['rates', 'exchangeRates', networkId],
+        ExchangeRates: (queryConfig: QueryConfig) => ['rates', 'exchangeRates', queryConfig],
     },
     Prices: {
         PythPrices: (priceId: string, publishTime: number) => ['prices', 'pythPrices', priceId, publishTime],
@@ -44,7 +45,11 @@ const QUERY_KEYS = {
         ActiveChainedSpeedMarkets: (networkId: NetworkId) => ['activeChainedSpeedMarkets', networkId],
     },
     User: {
-        SpeedMarkets: (networkId: NetworkId, walletAddress: string) => ['userSpeedMarkets', networkId, walletAddress],
+        SpeedMarkets: (queryConfig: QueryConfig, walletAddress: string) => [
+            'userSpeedMarkets',
+            queryConfig,
+            walletAddress,
+        ],
         ChainedSpeedMarkets: (networkId: NetworkId, walletAddress: string) => [
             'userChainedSpeedMarkets',
             networkId,
@@ -65,9 +70,9 @@ const QUERY_KEYS = {
             networkId,
             walletAddress,
         ],
-        ResolvedChainedSpeedMarkets: (networkId: NetworkId, walletAddress: string) => [
+        ResolvedChainedSpeedMarkets: (queryConfig: QueryConfig, walletAddress: string) => [
             'userResolvedChainedSpeedMarkets',
-            networkId,
+            queryConfig,
             walletAddress,
         ],
         Notifications: (walletAddress: string, networkId: NetworkId) => [
@@ -78,7 +83,7 @@ const QUERY_KEYS = {
         ],
     },
     Profile: {
-        Data: (walletAddress: string, networkId: NetworkId) => ['profile', 'data', walletAddress, networkId],
+        Data: (walletAddress: string, queryConfig: QueryConfig) => ['profile', 'data', walletAddress, queryConfig],
     },
     Referral: {
         ReferrerID: (walletAddress: string) => ['referrerId', walletAddress],
