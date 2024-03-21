@@ -17,7 +17,7 @@ import { TradeWithMarket } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getDirections } from '../styled-components';
-import { useAccount, useChainId } from 'wagmi';
+import { useAccount, useChainId, useClient } from 'wagmi';
 
 type TransactionHistoryProps = {
     searchAddress: string;
@@ -29,11 +29,12 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ searchAddress, 
     const theme: ThemeInterface = useTheme();
 
     const networkId = useChainId();
+    const client = useClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const { address, isConnected } = useAccount();
 
     const speedMarketsDataQuery = useUserSpeedMarketsTransactionsQuery(
-        networkId,
+        { networkId, client },
         searchAddress || (address as string),
         {
             enabled: isAppReady && isConnected,
@@ -45,7 +46,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ searchAddress, 
     );
 
     const chainedSpeedMarketsDataQuery = useUserChainedSpeedMarketsTransactionsQuery(
-        networkId,
+        { networkId, client },
         searchAddress || (address as string),
         {
             enabled: isAppReady && isConnected && !isOnlySpeedMarketsSupported(networkId),

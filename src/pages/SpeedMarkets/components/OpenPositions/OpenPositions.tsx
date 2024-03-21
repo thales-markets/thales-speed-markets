@@ -66,9 +66,13 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
         [userActiveSpeedMarketsDataQuery]
     );
 
-    const userChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(networkId, address as string, {
-        enabled: isAppReady && isConnected && !!isChained,
-    });
+    const userChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
+        { networkId, client },
+        address as string,
+        {
+            enabled: isAppReady && isConnected && !!isChained,
+        }
+    );
 
     const userOpenChainedSpeedMarketsData = useMemo(
         () =>
@@ -157,9 +161,9 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
     const handleSubmit = async () => {
         setIsSubmitting(true);
         if (isChained) {
-            await resolveAllChainedMarkets(claimableChainedPositions, false, networkId);
+            await resolveAllChainedMarkets(claimableChainedPositions, false, { networkId, client });
         } else {
-            await resolveAllSpeedPositions(claimableSpeedPositions, false, networkId);
+            await resolveAllSpeedPositions(claimableSpeedPositions, false, { networkId, client });
         }
         setIsSubmitting(false);
     };

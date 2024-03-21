@@ -12,8 +12,7 @@ import { isMobile } from 'utils/device';
 import { getSupportedNetworksByRoute, isNetworkSupported } from 'utils/network';
 import queryConnector from 'utils/queryConnector';
 import { history } from 'utils/routes';
-import snxJSConnector from 'utils/snxJSConnector';
-import { useAccount, useChainId, useClient, useDisconnect, useSwitchChain, useWalletClient } from 'wagmi';
+import { useAccount, useChainId, useDisconnect, useSwitchChain } from 'wagmi';
 
 const DappLayout = lazy(() => import(/* webpackChunkName: "DappLayout" */ 'layouts/DappLayout'));
 
@@ -30,31 +29,13 @@ const App = () => {
     const { switchChain } = useSwitchChain();
 
     const { address } = useAccount();
-    const client = useClient(); // when wallet not connected force chain
-    const { data: signer } = useWalletClient();
     const { disconnect } = useDisconnect();
 
     queryConnector.setQueryClient();
 
     useEffect(() => {
-        const init = async () => {
-            try {
-                snxJSConnector.setContractSettings({
-                    networkId: networkId,
-                    client,
-                    signer,
-                });
-
-                dispatch(setAppReady());
-            } catch (e) {
-                if (!e.toString().includes('Error: underlying network changed')) {
-                    dispatch(setAppReady());
-                    console.log(e);
-                }
-            }
-        };
-        init();
-    }, [dispatch, networkId, signer, address, client]);
+        dispatch(setAppReady());
+    }, [dispatch]);
 
     useEffect(() => {
         if (window.ethereum) {

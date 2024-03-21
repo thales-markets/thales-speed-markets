@@ -199,9 +199,13 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             enabled: isAppReady && isConnected && !isMultiCollateralSupported,
         }
     );
-    const multipleCollateralBalances = useMultipleCollateralBalanceQuery(address as string, networkId, {
-        enabled: isAppReady && isConnected && isMultiCollateralSupported,
-    });
+    const multipleCollateralBalances = useMultipleCollateralBalanceQuery(
+        address as string,
+        { networkId, client },
+        {
+            enabled: isAppReady && isConnected && isMultiCollateralSupported,
+        }
+    );
 
     const walletBalancesMap = useMemo(() => {
         return stableBalanceQuery.isSuccess ? stableBalanceQuery.data : null;
@@ -600,7 +604,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             if (tx) {
                 toast.update(id, getSuccessToastOptions(t(`common.buy.confirmation-message`), id));
                 refetchUserSpeedMarkets(isChained, { networkId, client }, address as string);
-                refetchSpeedMarketsLimits(isChained, networkId);
+                refetchSpeedMarketsLimits(isChained, { networkId, client });
                 PLAUSIBLE.trackEvent(
                     isChained ? PLAUSIBLE_KEYS.chainedSpeedMarketsBuy : PLAUSIBLE_KEYS.speedMarketsBuy,
                     {

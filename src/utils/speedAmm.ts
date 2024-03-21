@@ -14,12 +14,15 @@ import { Positions } from 'enums/market';
 import { BigNumber, ethers } from 'ethers';
 import i18n from 'i18n';
 import { toast } from 'react-toastify';
-import { SupportedNetwork } from 'types/network';
+import { QueryConfig } from 'types/network';
 import { ChainedSpeedMarket, UserOpenPositions } from 'types/market';
 import { getPriceId, getPriceServiceEndpoint, priceParser } from 'utils/pyth';
 import { refetchActiveSpeedMarkets } from 'utils/queryConnector';
-import snxJSConnector from 'utils/snxJSConnector';
 import { delay } from 'utils/timer';
+import { getContract } from 'viem';
+import { ViemContract } from 'types/viem';
+import chainedSpeedMarketsAMMContract from './contracts/chainedSpeedMarketsAMMContract';
+import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
 
 export const getTransactionForSpeedAMM = async (
     speedMarketsAMMContractWithSigner: any, // speed or chained
@@ -151,196 +154,196 @@ export const getUserLostAtSideIndex = (position: ChainedSpeedMarket) => {
 export const resolveAllSpeedPositions = async (
     positions: UserOpenPositions[],
     isAdmin: boolean,
-    networkId: SupportedNetwork
+    queryConfig: QueryConfig
 ) => {
     if (!positions.length) {
         return;
     }
 
-    const priceConnection = new pythEvmJs.EvmPriceServiceConnection(getPriceServiceEndpoint(networkId), {
+    const priceConnection = new pythEvmJs.EvmPriceServiceConnection(getPriceServiceEndpoint(queryConfig.networkId), {
         timeout: CONNECTION_TIMEOUT_MS,
     });
 
-    const { speedMarketsAMMContract, signer } = snxJSConnector as any;
-    if (speedMarketsAMMContract) {
-        const id = toast.loading(getDefaultToastContent(i18n.t('common.progress')), getLoadingToastOptions());
+    const id = toast.loading(getDefaultToastContent(i18n.t('common.progress')), getLoadingToastOptions());
 
-        const speedMarketsAMMContractWithSigner = speedMarketsAMMContract.connect(signer);
+    const speedMarketsAMMContractWithSigner = getContract({
+        abi: speedMarketsAMMContract.abi,
+        address: speedMarketsAMMContract.addresses[queryConfig.networkId] as any,
+        client: queryConfig.client,
+    }) as ViemContract;
 
-        const marketsToResolve: string[] = isAdmin
-            ? positions.filter((position) => !!position.finalPrice).map((position) => position.market)
-            : [];
-        const manualFinalPrices: number[] = isAdmin
-            ? positions
-                  .filter((position) => !!position.finalPrice)
-                  .map((position) => Number(priceParser(position.finalPrice || 0)))
-            : [];
-        const priceUpdateDataArray: string[] = [];
-        let totalUpdateFee = BigNumber.from(0);
+    const marketsToResolve: string[] = isAdmin
+        ? positions.filter((position) => !!position.finalPrice).map((position) => position.market)
+        : [];
+    const manualFinalPrices: number[] = isAdmin
+        ? positions
+              .filter((position) => !!position.finalPrice)
+              .map((position) => Number(priceParser(position.finalPrice || 0)))
+        : [];
+    const priceUpdateDataArray: string[] = [];
+    let totalUpdateFee = BigNumber.from(0);
 
-        for (const position of positions) {
-            if (isAdmin) {
-                break;
-            }
-            try {
-                const pythContract = new ethers.Contract(
-                    PYTH_CONTRACT_ADDRESS[networkId],
-                    PythInterfaceAbi as any,
-                    (snxJSConnector as any).provider
-                );
-
-                const [priceFeedUpdateVaa] = await priceConnection.getVaa(
-                    getPriceId(networkId, position.currencyKey),
-                    millisecondsToSeconds(position.maturityDate)
-                );
-
-                const priceUpdateData = ['0x' + Buffer.from(priceFeedUpdateVaa, 'base64').toString('hex')];
-                const updateFee = await pythContract.getUpdateFee(priceUpdateData);
-
-                marketsToResolve.push(position.market);
-                priceUpdateDataArray.push(priceUpdateData[0]);
-                totalUpdateFee = totalUpdateFee.add(updateFee);
-            } catch (e) {
-                console.log(`Can't fetch VAA from Pyth API for market ${position.market}`, e);
-            }
+    for (const position of positions) {
+        if (isAdmin) {
+            break;
         }
+        try {
+            const pythContract = getContract({
+                abi: PythInterfaceAbi,
+                address: PYTH_CONTRACT_ADDRESS[queryConfig.networkId],
+                client: queryConfig.client,
+            }) as ViemContract;
 
-        if (marketsToResolve.length > 0) {
-            try {
-                const tx: ethers.ContractTransaction = isAdmin
-                    ? await speedMarketsAMMContractWithSigner.resolveMarketManuallyBatch(
-                          marketsToResolve,
-                          manualFinalPrices
-                      )
-                    : await speedMarketsAMMContractWithSigner.resolveMarketsBatch(
-                          marketsToResolve,
-                          priceUpdateDataArray,
-                          { value: totalUpdateFee }
-                      );
+            const [priceFeedUpdateVaa] = await priceConnection.getVaa(
+                getPriceId(queryConfig.networkId, position.currencyKey),
+                millisecondsToSeconds(position.maturityDate)
+            );
 
-                const txResult = await tx.wait();
+            const priceUpdateData = ['0x' + Buffer.from(priceFeedUpdateVaa, 'base64').toString('hex')];
+            const updateFee = await pythContract.read.getUpdateFee([priceUpdateData]);
 
-                if (txResult && txResult.transactionHash) {
-                    toast.update(id, getSuccessToastOptions(i18n.t(`speed-markets.overview.confirmation-message`), id));
-                    await delay(5000);
-                    refetchActiveSpeedMarkets(false, networkId);
-                }
-            } catch (e) {
-                console.log(e);
-                await delay(800);
-                toast.update(id, getErrorToastOptions(i18n.t('common.errors.unknown-error-try-again'), id));
-            }
-        } else {
-            toast.update(id, getInfoToastOptions(i18n.t('speed-markets.overview.no-resolve-positions'), id));
+            marketsToResolve.push(position.market);
+            priceUpdateDataArray.push(priceUpdateData[0]);
+            totalUpdateFee = totalUpdateFee.add(updateFee);
+        } catch (e) {
+            console.log(`Can't fetch VAA from Pyth API for market ${position.market}`, e);
         }
+    }
+
+    if (marketsToResolve.length > 0) {
+        try {
+            const tx: ethers.ContractTransaction = isAdmin
+                ? await speedMarketsAMMContractWithSigner.write.resolveMarketManuallyBatch([
+                      marketsToResolve,
+                      manualFinalPrices,
+                  ])
+                : await speedMarketsAMMContractWithSigner.write.resolveMarketsBatch(
+                      [marketsToResolve, priceUpdateDataArray],
+                      {
+                          value: totalUpdateFee,
+                      }
+                  );
+
+            const txResult = await tx.wait();
+
+            if (txResult && txResult.transactionHash) {
+                toast.update(id, getSuccessToastOptions(i18n.t(`speed-markets.overview.confirmation-message`), id));
+                await delay(5000);
+                refetchActiveSpeedMarkets(false, { networkId: queryConfig.networkId, client: queryConfig.client });
+            }
+        } catch (e) {
+            console.log(e);
+            await delay(800);
+            toast.update(id, getErrorToastOptions(i18n.t('common.errors.unknown-error-try-again'), id));
+        }
+    } else {
+        toast.update(id, getInfoToastOptions(i18n.t('speed-markets.overview.no-resolve-positions'), id));
     }
 };
 
 export const resolveAllChainedMarkets = async (
     positions: ChainedSpeedMarket[],
     isAdmin: boolean,
-    networkId: SupportedNetwork
+    queryConfig: QueryConfig
 ) => {
     if (!positions.length) {
         return;
     }
 
-    const priceConnection = new pythEvmJs.EvmPriceServiceConnection(getPriceServiceEndpoint(networkId), {
+    const priceConnection = new pythEvmJs.EvmPriceServiceConnection(getPriceServiceEndpoint(queryConfig.networkId), {
         timeout: CONNECTION_TIMEOUT_MS,
     });
 
-    const { chainedSpeedMarketsAMMContract, signer } = snxJSConnector as any;
-    if (chainedSpeedMarketsAMMContract) {
-        const id = toast.loading(getDefaultToastContent(i18n.t('common.progress')), getLoadingToastOptions());
+    const id = toast.loading(getDefaultToastContent(i18n.t('common.progress')), getLoadingToastOptions());
 
-        const chainedSpeedMarketsAMMContractWithSigner = chainedSpeedMarketsAMMContract.connect(signer);
+    const chainedSpeedMarketsAMMContractWithSigner = getContract({
+        abi: chainedSpeedMarketsAMMContract.abi,
+        address: chainedSpeedMarketsAMMContract.addresses[queryConfig.networkId] as any,
+        client: queryConfig.client,
+    }) as ViemContract;
 
-        const marketsToResolve: string[] = isAdmin
-            ? positions.filter((position) => position.canResolve).map((position) => position.address)
-            : [];
+    const marketsToResolve: string[] = isAdmin
+        ? positions.filter((position) => position.canResolve).map((position) => position.address)
+        : [];
 
-        const fetchUntilFinalPriceEndIndexes = positions.map((position) => getUserLostAtSideIndex(position) + 1);
-        const manualFinalPrices: number[][] = isAdmin
-            ? positions
-                  .filter((position) => position.canResolve)
-                  .map((position, i) =>
-                      position.finalPrices
-                          .slice(0, fetchUntilFinalPriceEndIndexes[i])
-                          .map((finalPrice) => Number(priceParser(finalPrice)))
-                  )
-            : [];
+    const fetchUntilFinalPriceEndIndexes = positions.map((position) => getUserLostAtSideIndex(position) + 1);
+    const manualFinalPrices: number[][] = isAdmin
+        ? positions
+              .filter((position) => position.canResolve)
+              .map((position, i) =>
+                  position.finalPrices
+                      .slice(0, fetchUntilFinalPriceEndIndexes[i])
+                      .map((finalPrice) => Number(priceParser(finalPrice)))
+              )
+        : [];
 
-        const priceUpdateDataArray: string[][][] = [];
-        let totalUpdateFee = BigNumber.from(0);
+    const priceUpdateDataArray: string[][][] = [];
+    let totalUpdateFee = BigNumber.from(0);
 
-        // Fetch prices for non-admin resolve
-        for (let index = 0; index < positions.length; index++) {
-            if (isAdmin) {
-                break;
-            }
-            const position = positions[index];
-            try {
-                const pythContract = new ethers.Contract(
-                    PYTH_CONTRACT_ADDRESS[networkId],
-                    PythInterfaceAbi as any,
-                    (snxJSConnector as any).provider
-                );
-
-                let promises = [];
-                const pythPriceId = getPriceId(networkId, position.currencyKey);
-                const strikeTimesToFetchPrice = position.strikeTimes.slice(0, fetchUntilFinalPriceEndIndexes[index]);
-                for (let i = 0; i < strikeTimesToFetchPrice.length; i++) {
-                    promises.push(priceConnection.getVaa(pythPriceId, millisecondsToSeconds(position.strikeTimes[i])));
-                }
-                const priceFeedUpdateVaas = await Promise.all(promises);
-
-                promises = [];
-                const priceUpdateDataPerMarket: string[][] = [];
-                for (let i = 0; i < strikeTimesToFetchPrice.length; i++) {
-                    const [priceFeedUpdateVaa] = priceFeedUpdateVaas[i];
-                    const priceUpdateData = ['0x' + Buffer.from(priceFeedUpdateVaa, 'base64').toString('hex')];
-                    priceUpdateDataPerMarket.push(priceUpdateData);
-                    promises.push(pythContract.getUpdateFee(priceUpdateData));
-                }
-                priceUpdateDataArray.push(priceUpdateDataPerMarket);
-
-                const updateFees = await Promise.all(promises);
-                totalUpdateFee = totalUpdateFee.add(
-                    updateFees.reduce((a: BigNumber, b: BigNumber) => a.add(b), BigNumber.from(0))
-                );
-                marketsToResolve.push(position.address);
-            } catch (e) {
-                console.log(`Can't fetch VAA from Pyth API for marekt ${position.address}`, e);
-            }
+    // Fetch prices for non-admin resolve
+    for (let index = 0; index < positions.length; index++) {
+        if (isAdmin) {
+            break;
         }
+        const position = positions[index];
+        try {
+            const pythContract = getContract({
+                abi: PythInterfaceAbi,
+                address: PYTH_CONTRACT_ADDRESS[queryConfig.networkId],
+                client: queryConfig.client,
+            }) as ViemContract;
 
-        if (marketsToResolve.length > 0) {
-            try {
-                const tx: ethers.ContractTransaction = isAdmin
-                    ? await chainedSpeedMarketsAMMContractWithSigner.resolveMarketManuallyBatch(
-                          marketsToResolve,
-                          manualFinalPrices
-                      )
-                    : await chainedSpeedMarketsAMMContractWithSigner.resolveMarketsBatch(
-                          marketsToResolve,
-                          priceUpdateDataArray,
-                          { value: totalUpdateFee }
-                      );
-
-                const txResult = await tx.wait();
-
-                if (txResult && txResult.transactionHash) {
-                    toast.update(id, getSuccessToastOptions(i18n.t(`speed-markets.overview.confirmation-message`), id));
-                    await delay(5000);
-                    refetchActiveSpeedMarkets(true, networkId);
-                }
-            } catch (e) {
-                console.log(e);
-                await delay(800);
-                toast.update(id, getErrorToastOptions(i18n.t('common.errors.unknown-error-try-again'), id));
+            let promises = [];
+            const pythPriceId = getPriceId(queryConfig.networkId, position.currencyKey);
+            const strikeTimesToFetchPrice = position.strikeTimes.slice(0, fetchUntilFinalPriceEndIndexes[index]);
+            for (let i = 0; i < strikeTimesToFetchPrice.length; i++) {
+                promises.push(priceConnection.getVaa(pythPriceId, millisecondsToSeconds(position.strikeTimes[i])));
             }
-        } else {
-            toast.update(id, getInfoToastOptions(i18n.t('speed-markets.overview.no-resolve-positions'), id));
+            const priceFeedUpdateVaas = await Promise.all(promises);
+
+            promises = [];
+            const priceUpdateDataPerMarket: string[][] = [];
+            for (let i = 0; i < strikeTimesToFetchPrice.length; i++) {
+                const [priceFeedUpdateVaa] = priceFeedUpdateVaas[i];
+                const priceUpdateData = ['0x' + Buffer.from(priceFeedUpdateVaa, 'base64').toString('hex')];
+                priceUpdateDataPerMarket.push(priceUpdateData);
+                promises.push(pythContract.read.getUpdateFee([priceUpdateData]));
+            }
+            priceUpdateDataArray.push(priceUpdateDataPerMarket);
+
+            const updateFees = await Promise.all(promises);
+            totalUpdateFee = totalUpdateFee.add(
+                updateFees.reduce((a: BigNumber, b: BigNumber) => a.add(b), BigNumber.from(0))
+            );
+            marketsToResolve.push(position.address);
+        } catch (e) {
+            console.log(`Can't fetch VAA from Pyth API for marekt ${position.address}`, e);
         }
+    }
+
+    if (marketsToResolve.length > 0) {
+        try {
+            const tx = isAdmin
+                ? await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarketManuallyBatch([
+                      marketsToResolve,
+                      manualFinalPrices,
+                  ])
+                : await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarketsBatch(
+                      [marketsToResolve, priceUpdateDataArray],
+                      { value: totalUpdateFee }
+                  );
+
+            if (tx) {
+                toast.update(id, getSuccessToastOptions(i18n.t(`speed-markets.overview.confirmation-message`), id));
+                await delay(5000);
+                refetchActiveSpeedMarkets(true, { networkId: queryConfig.networkId, client: queryConfig.client });
+            }
+        } catch (e) {
+            console.log(e);
+            await delay(800);
+            toast.update(id, getErrorToastOptions(i18n.t('common.errors.unknown-error-try-again'), id));
+        }
+    } else {
+        toast.update(id, getInfoToastOptions(i18n.t('speed-markets.overview.no-resolve-positions'), id));
     }
 };

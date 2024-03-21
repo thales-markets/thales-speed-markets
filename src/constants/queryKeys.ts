@@ -9,11 +9,11 @@ const QUERY_KEYS = {
             walletAddress,
             queryConfig,
         ],
-        MultipleCollateral: (walletAddress: string, networkId: NetworkId) => [
+        MultipleCollateral: (walletAddress: string, queryConfig: QueryConfig) => [
             'multipleCollateral',
             'balance',
             walletAddress,
-            networkId,
+            queryConfig,
         ],
     },
     Rates: {
@@ -31,18 +31,18 @@ const QUERY_KEYS = {
         ],
     },
     Markets: {
-        SpeedMarketsLimits: (networkId: NetworkId, walletAddress?: string) => [
+        SpeedMarketsLimits: (queryConfig: QueryConfig, walletAddress?: string) => [
             'speedMarketsLimits',
-            networkId,
+            queryConfig,
             walletAddress,
         ],
-        ChainedSpeedMarketsLimits: (networkId: NetworkId, walletAddress?: string) => [
+        ChainedSpeedMarketsLimits: (queryConfig: QueryConfig, walletAddress?: string) => [
             'chainedSpeedMarketsLimits',
-            networkId,
+            queryConfig,
             walletAddress,
         ],
-        ActiveSpeedMarkets: (networkId: NetworkId) => ['activeSpeedMarkets', networkId],
-        ActiveChainedSpeedMarkets: (networkId: NetworkId) => ['activeChainedSpeedMarkets', networkId],
+        ActiveSpeedMarkets: (queryConfig: QueryConfig) => ['activeSpeedMarkets', queryConfig],
+        ActiveChainedSpeedMarkets: (queryConfig: QueryConfig) => ['activeChainedSpeedMarkets', queryConfig],
     },
     User: {
         SpeedMarkets: (queryConfig: QueryConfig, walletAddress: string) => [
@@ -50,24 +50,24 @@ const QUERY_KEYS = {
             queryConfig,
             walletAddress,
         ],
-        ChainedSpeedMarkets: (networkId: NetworkId, walletAddress: string) => [
+        ChainedSpeedMarkets: (queryConfig: QueryConfig, walletAddress: string) => [
             'userChainedSpeedMarkets',
-            networkId,
+            queryConfig,
             walletAddress,
         ],
-        SpeedMarketsTransactions: (networkId: NetworkId, walletAddress: string) => [
+        SpeedMarketsTransactions: (queryConfig: QueryConfig, walletAddress: string) => [
             'userSpeedMarketsTransactions',
-            networkId,
+            queryConfig,
             walletAddress,
         ],
-        ChainedSpeedMarketsTransactions: (networkId: NetworkId, walletAddress: string) => [
+        ChainedSpeedMarketsTransactions: (queryConfig: QueryConfig, walletAddress: string) => [
             'userChainedSpeedMarketsTransactions',
-            networkId,
+            queryConfig,
             walletAddress,
         ],
-        ResolvedSpeedMarkets: (networkId: NetworkId, walletAddress: string) => [
+        ResolvedSpeedMarkets: (queryConfig: QueryConfig, walletAddress: string) => [
             'userResolvedSpeedMarkets',
-            networkId,
+            queryConfig,
             walletAddress,
         ],
         ResolvedChainedSpeedMarkets: (queryConfig: QueryConfig, walletAddress: string) => [

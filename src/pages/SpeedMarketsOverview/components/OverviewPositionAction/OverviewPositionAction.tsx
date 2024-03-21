@@ -23,9 +23,11 @@ import { FlexDivCentered } from 'styles/common';
 import { UserOpenPositions } from 'types/market';
 import { getPriceId, getPriceServiceEndpoint, priceParser } from 'utils/pyth';
 import { refetchActiveSpeedMarkets } from 'utils/queryConnector';
-import snxJSConnector from 'utils/snxJSConnector';
 import { delay } from 'utils/timer';
-import { useChainId } from 'wagmi';
+import { useChainId, useClient, useWalletClient } from 'wagmi';
+import { getContract } from 'viem';
+import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
+import { ViemContract } from 'types/viem';
 
 type OverviewPositionActionProps = {
     position: UserOpenPositions;
@@ -43,6 +45,8 @@ const OverviewPositionAction: React.FC<OverviewPositionActionProps> = ({
     const { t } = useTranslation();
 
     const networkId = useChainId();
+    const client = useClient();
+    const walletClient = useWalletClient();
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -56,70 +60,65 @@ const OverviewPositionAction: React.FC<OverviewPositionActionProps> = ({
             timeout: CONNECTION_TIMEOUT_MS,
         });
 
-        const { speedMarketsAMMContract, signer } = snxJSConnector as any;
-        if (speedMarketsAMMContract) {
-            setIsSubmitting(true);
-            const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
+        setIsSubmitting(true);
+        const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
 
-            const speedMarketsAMMContractWithSigner = speedMarketsAMMContract.connect(signer);
-            try {
-                let tx: ethers.ContractTransaction;
-                if (isAdmin) {
-                    tx = await speedMarketsAMMContractWithSigner.resolveMarketManually(
-                        position.market,
-                        Number(priceParser(position.finalPrice || 0))
-                    );
-                } else {
-                    const pythContract = new ethers.Contract(
-                        PYTH_CONTRACT_ADDRESS[networkId],
-                        PythInterfaceAbi as any,
-                        (snxJSConnector as any).provider
-                    );
+        const speedMarketsAMMContractWithSigner = getContract({
+            abi: speedMarketsAMMContract.abi,
+            address: speedMarketsAMMContract.addresses[networkId] as any,
+            client: walletClient.data as any,
+        }) as ViemContract;
+        try {
+            let tx: ethers.ContractTransaction;
+            if (isAdmin) {
+                tx = await speedMarketsAMMContractWithSigner.write.resolveMarketManually([
+                    position.market,
+                    Number(priceParser(position.finalPrice || 0)),
+                ]);
+            } else {
+                const pythContract = getContract({
+                    abi: PythInterfaceAbi,
+                    address: PYTH_CONTRACT_ADDRESS[networkId],
+                    client: client,
+                }) as ViemContract;
 
-                    const [priceFeedUpdateVaa, publishTime] = await priceConnection.getVaa(
-                        getPriceId(networkId, position.currencyKey),
-                        millisecondsToSeconds(position.maturityDate)
-                    );
+                const [priceFeedUpdateVaa, publishTime] = await priceConnection.getVaa(
+                    getPriceId(networkId, position.currencyKey),
+                    millisecondsToSeconds(position.maturityDate)
+                );
 
-                    // check if price feed is not too late
-                    if (
-                        maxPriceDelayForResolvingSec &&
-                        differenceInSeconds(secondsToMilliseconds(publishTime), position.maturityDate) >
-                            maxPriceDelayForResolvingSec
-                    ) {
-                        await delay(800);
-                        toast.update(
-                            id,
-                            getErrorToastOptions(t('speed-markets.user-positions.errors.price-stale'), id)
-                        );
-                        setIsSubmitting(false);
-                        return;
-                    }
-
-                    const priceUpdateData = ['0x' + Buffer.from(priceFeedUpdateVaa, 'base64').toString('hex')];
-                    const updateFee = await pythContract.getUpdateFee(priceUpdateData);
-
-                    tx = await speedMarketsAMMContractWithSigner.resolveMarket(position.market, priceUpdateData, {
-                        value: updateFee,
-                    });
+                // check if price feed is not too late
+                if (
+                    maxPriceDelayForResolvingSec &&
+                    differenceInSeconds(secondsToMilliseconds(publishTime), position.maturityDate) >
+                        maxPriceDelayForResolvingSec
+                ) {
+                    await delay(800);
+                    toast.update(id, getErrorToastOptions(t('speed-markets.user-positions.errors.price-stale'), id));
+                    setIsSubmitting(false);
+                    return;
                 }
 
-                const txResult = await tx.wait();
+                const priceUpdateData = ['0x' + Buffer.from(priceFeedUpdateVaa, 'base64').toString('hex')];
+                const updateFee = await pythContract.read.getUpdateFee([priceUpdateData]);
 
-                if (txResult && txResult.transactionHash) {
-                    toast.update(
-                        id,
-                        getSuccessToastOptions(t(`speed-markets.user-positions.confirmation-message`), id)
-                    );
-                    refetchActiveSpeedMarkets(false, networkId);
-                }
-            } catch (e) {
-                console.log(e);
-                await delay(800);
-                toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
+                tx = await speedMarketsAMMContractWithSigner.write.resolveMarket([position.market, priceUpdateData], {
+                    value: updateFee,
+                });
             }
-            setIsSubmitting(false);
+
+            const txResult = await tx.wait();
+
+            if (txResult && txResult.transactionHash) {
+                toast.update(id, getSuccessToastOptions(t(`speed-markets.user-positions.confirmation-message`), id));
+                refetchActiveSpeedMarkets(false, { networkId, client });
+            }
+        } catch (e) {
+            console.log(e);
+            await delay(800);
+            toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
         }
+        setIsSubmitting(false);
     };
 
     return (

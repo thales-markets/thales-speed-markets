@@ -2,17 +2,20 @@ import { ZERO_ADDRESS } from 'constants/network';
 import QUERY_KEYS from 'constants/queryKeys';
 import { BigNumber } from 'ethers';
 import { UseQueryOptions, useQuery } from '@tanstack/react-query';
-import { NetworkId, bigNumberFormatter, coinFormatter } from 'thales-utils';
+import { bigNumberFormatter, coinFormatter } from 'thales-utils';
 import { AmmChainedSpeedMarketsLimits } from 'types/market';
-import snxJSConnector from 'utils/snxJSConnector';
+import { getContract } from 'viem';
+import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
+import { QueryConfig } from 'types/network';
+import { ViemContract } from 'types/viem';
 
 const useChainedAmmSpeedMarketsLimitsQuery = (
-    networkId: NetworkId,
+    queryConfig: QueryConfig,
     walletAddress?: string,
     options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
     return useQuery<AmmChainedSpeedMarketsLimits>({
-        queryKey: QUERY_KEYS.Markets.ChainedSpeedMarketsLimits(networkId, walletAddress),
+        queryKey: QUERY_KEYS.Markets.ChainedSpeedMarketsLimits(queryConfig, walletAddress),
         queryFn: async () => {
             const ammChainedSpeedMarketsLimits: AmmChainedSpeedMarketsLimits = {
                 minChainedMarkets: 0,
@@ -28,31 +31,40 @@ const useChainedAmmSpeedMarketsLimitsQuery = (
                 whitelistedAddress: false,
             };
 
-            const { speedMarketsDataContract } = snxJSConnector;
+            const speedMarketsDataContractLocal = getContract({
+                abi: speedMarketsDataContract.abi,
+                address: speedMarketsDataContract.addresses[queryConfig.networkId] as any,
+                client: queryConfig.client,
+            }) as ViemContract;
             if (speedMarketsDataContract) {
                 const [chainedAmmParams, ammParams] = await Promise.all([
-                    speedMarketsDataContract.read.getChainedSpeedMarketsAMMParameters([walletAddress || ZERO_ADDRESS]),
-                    speedMarketsDataContract.read.getSpeedMarketsAMMParameters([walletAddress || ZERO_ADDRESS]),
+                    speedMarketsDataContractLocal.read.getChainedSpeedMarketsAMMParameters([
+                        walletAddress || ZERO_ADDRESS,
+                    ]),
+                    speedMarketsDataContractLocal.read.getSpeedMarketsAMMParameters([walletAddress || ZERO_ADDRESS]),
                 ]);
 
                 ammChainedSpeedMarketsLimits.minChainedMarkets = Number(chainedAmmParams.minChainedMarkets);
                 ammChainedSpeedMarketsLimits.maxChainedMarkets = Number(chainedAmmParams.maxChainedMarkets);
 
                 ammChainedSpeedMarketsLimits.minBuyinAmount = Math.ceil(
-                    coinFormatter(chainedAmmParams.minBuyinAmount, networkId)
+                    coinFormatter(chainedAmmParams.minBuyinAmount, queryConfig.networkId)
                 );
-                ammChainedSpeedMarketsLimits.maxBuyinAmount = coinFormatter(chainedAmmParams.maxBuyinAmount, networkId);
+                ammChainedSpeedMarketsLimits.maxBuyinAmount = coinFormatter(
+                    chainedAmmParams.maxBuyinAmount,
+                    queryConfig.networkId
+                );
 
                 ammChainedSpeedMarketsLimits.maxProfitPerIndividualMarket = coinFormatter(
                     chainedAmmParams.maxProfitPerIndividualMarket,
-                    networkId
+                    queryConfig.networkId
                 );
 
                 ammChainedSpeedMarketsLimits.minTimeFrame = Number(chainedAmmParams.minTimeFrame);
                 ammChainedSpeedMarketsLimits.maxTimeFrame = Number(chainedAmmParams.maxTimeFrame);
                 ammChainedSpeedMarketsLimits.risk = {
-                    current: coinFormatter(chainedAmmParams.risk.current, networkId),
-                    max: coinFormatter(chainedAmmParams.risk.max, networkId),
+                    current: coinFormatter(chainedAmmParams.risk.current, queryConfig.networkId),
+                    max: coinFormatter(chainedAmmParams.risk.max, queryConfig.networkId),
                 };
                 ammChainedSpeedMarketsLimits.payoutMultipliers = chainedAmmParams.payoutMultipliers.map(
                     (payoutMultiplier: BigNumber) => bigNumberFormatter(payoutMultiplier)

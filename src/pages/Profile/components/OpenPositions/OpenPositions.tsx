@@ -86,7 +86,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
     );
 
     const userActiveChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
-        networkId,
+        { networkId, client },
         searchAddress || (address as string),
         {
             enabled: isAppReady && isConnected && !isOnlySpeedMarketsSupported(networkId),

@@ -1,19 +1,21 @@
-import { CRYPTO_CURRENCY_MAP, SYNTHS_MAP } from 'constants/currency';
 import QUERY_KEYS from 'constants/queryKeys';
 import { UseQueryOptions, useQuery } from '@tanstack/react-query';
-import { COLLATERAL_DECIMALS, Coins, NetworkId, bigNumberFormatter } from 'thales-utils';
+import { COLLATERAL_DECIMALS, bigNumberFormatter } from 'thales-utils';
 import { CollateralsBalance } from 'types/collateral';
 import { getBalance } from '@wagmi/core';
-import snxJSConnector from 'utils/snxJSConnector';
 import { wagmiConfig } from 'pages/Root/wagmi-config';
+import { getContract } from 'viem';
+import multipleCollateral from 'utils/contracts/multipleCollateralContract';
+import { QueryConfig } from 'types/network';
+import { ViemContract } from 'types/viem';
 
 const useMultipleCollateralBalanceQuery = (
     walletAddress: string,
-    networkId: NetworkId,
+    queryConfig: QueryConfig,
     options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
     return useQuery<CollateralsBalance>({
-        queryKey: QUERY_KEYS.WalletBalances.MultipleCollateral(walletAddress, networkId),
+        queryKey: QUERY_KEYS.WalletBalances.MultipleCollateral(walletAddress, queryConfig),
         queryFn: async () => {
             let collaterasBalance: CollateralsBalance = {
                 sUSD: 0,
@@ -28,9 +30,60 @@ const useMultipleCollateralBalanceQuery = (
                 USDC: 0,
             };
             try {
-                const multipleCollateral = snxJSConnector.multipleCollateral;
+                const multipleCollateralObject = {
+                    sUSD: getContract({
+                        abi: multipleCollateral.sUSD.abi,
+                        address: multipleCollateral.sUSD.addresses[queryConfig.networkId] as any,
+                        client: queryConfig.client,
+                    }) as ViemContract,
+                    DAI: getContract({
+                        abi: multipleCollateral.DAI.abi,
+                        address: multipleCollateral.DAI.addresses[queryConfig.networkId] as any,
+                        client: queryConfig.client,
+                    }) as ViemContract,
+                    USDC: getContract({
+                        abi: multipleCollateral.USDC.abi,
+                        address: multipleCollateral.USDC.addresses[queryConfig.networkId] as any,
+                        client: queryConfig.client,
+                    }) as ViemContract,
+                    USDCe: getContract({
+                        abi: multipleCollateral.USDCe.abi,
+                        address: multipleCollateral.USDCe.addresses[queryConfig.networkId] as any,
+                        client: queryConfig.client,
+                    }) as ViemContract,
+                    USDbC: getContract({
+                        abi: multipleCollateral.USDbC.abi,
+                        address: multipleCollateral.USDbC.addresses[queryConfig.networkId] as any,
+                        client: queryConfig.client,
+                    }) as ViemContract,
+                    USDT: getContract({
+                        abi: multipleCollateral.USDT.abi,
+                        address: multipleCollateral.USDT.addresses[queryConfig.networkId] as any,
+                        client: queryConfig.client,
+                    }) as ViemContract,
+                    OP: getContract({
+                        abi: multipleCollateral.OP.abi,
+                        address: multipleCollateral.OP.addresses[queryConfig.networkId] as any,
+                        client: queryConfig.client,
+                    }) as ViemContract,
+                    WETH: getContract({
+                        abi: multipleCollateral.WETH.abi,
+                        address: multipleCollateral.WETH.addresses[queryConfig.networkId] as any,
+                        client: queryConfig.client,
+                    }) as ViemContract,
+                    ETH: getContract({
+                        abi: multipleCollateral.ETH.abi,
+                        address: multipleCollateral.ETH.addresses[queryConfig.networkId] as any,
+                        client: queryConfig.client,
+                    }) as ViemContract,
+                    ARB: getContract({
+                        abi: multipleCollateral.ARB.abi,
+                        address: multipleCollateral.ARB.addresses[queryConfig.networkId] as any,
+                        client: queryConfig.client,
+                    }) as ViemContract,
+                };
 
-                if (!walletAddress || !networkId) {
+                if (!walletAddress || !queryConfig.networkId) {
                     return collaterasBalance;
                 }
 
@@ -46,34 +99,16 @@ const useMultipleCollateralBalanceQuery = (
                     ETHBalance,
                     ARBBalance,
                 ] = await Promise.all([
-                    multipleCollateral
-                        ? multipleCollateral[SYNTHS_MAP.sUSD as Coins]?.read.balanceOf([walletAddress])
-                        : undefined,
-                    multipleCollateral
-                        ? multipleCollateral[CRYPTO_CURRENCY_MAP.DAI as Coins]?.read.balanceOf([walletAddress])
-                        : undefined,
-                    multipleCollateral
-                        ? multipleCollateral[CRYPTO_CURRENCY_MAP.USDC as Coins]?.read.balanceOf([walletAddress])
-                        : undefined,
-                    multipleCollateral
-                        ? multipleCollateral[CRYPTO_CURRENCY_MAP.USDCe as Coins]?.read.balanceOf([walletAddress])
-                        : undefined,
-                    multipleCollateral
-                        ? multipleCollateral[CRYPTO_CURRENCY_MAP.USDbC as Coins]?.read.balanceOf([walletAddress])
-                        : undefined,
-                    multipleCollateral
-                        ? multipleCollateral[CRYPTO_CURRENCY_MAP.USDT as Coins]?.read.balanceOf([walletAddress])
-                        : undefined,
-                    multipleCollateral
-                        ? multipleCollateral[CRYPTO_CURRENCY_MAP.OP as Coins]?.read.balanceOf([walletAddress])
-                        : undefined,
-                    multipleCollateral
-                        ? multipleCollateral[CRYPTO_CURRENCY_MAP.WETH as Coins]?.read.balanceOf([walletAddress])
-                        : undefined,
+                    multipleCollateralObject.sUSD.read.balanceOf([walletAddress]),
+                    multipleCollateralObject.DAI.read.balanceOf([walletAddress]),
+                    multipleCollateralObject.USDC.read.balanceOf([walletAddress]),
+                    multipleCollateralObject.USDCe.read.balanceOf([walletAddress]),
+                    multipleCollateralObject.USDbC.read.balanceOf([walletAddress]),
+                    multipleCollateralObject.USDT.read.balanceOf([walletAddress]),
+                    multipleCollateralObject.OP.read.balanceOf([walletAddress]),
+                    multipleCollateralObject.WETH.read.balanceOf([walletAddress]),
                     getBalance(wagmiConfig, { address: walletAddress as any }) as any,
-                    multipleCollateral
-                        ? multipleCollateral[CRYPTO_CURRENCY_MAP.ARB as Coins]?.read.balanceOf([walletAddress])
-                        : undefined,
+                    multipleCollateralObject.ARB.read.balanceOf([walletAddress]),
                 ]);
                 collaterasBalance = {
                     sUSD: sUSDBalance ? bigNumberFormatter(sUSDBalance, COLLATERAL_DECIMALS.sUSD) : 0,

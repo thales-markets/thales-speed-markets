@@ -32,13 +32,15 @@ import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAsse
 import { refetchActiveSpeedMarkets, refetchPythPrice } from 'utils/queryConnector';
 import { resolveAllSpeedPositions } from 'utils/speedAmm';
 import UnresolvedPosition from '../UnresolvedPosition';
-import { useAccount, useChainId } from 'wagmi';
+import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 
 const UnresolvedPositions: React.FC = () => {
     const { t } = useTranslation();
 
     const networkId = useChainId();
     const { address } = useAccount();
+    const client = useClient();
+    const walletClient = useWalletClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
 
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
@@ -48,7 +50,7 @@ const UnresolvedPositions: React.FC = () => {
     const [isSubmittingSection, setIsSubmittingSection] = useState('');
     const [isLoadingEnabled, setIsLoadingEnabled] = useState(true);
 
-    const ammSpeedMarketsLimitsQuery = useAmmSpeedMarketsLimitsQuery(networkId, address, {
+    const ammSpeedMarketsLimitsQuery = useAmmSpeedMarketsLimitsQuery({ networkId, client }, address, {
         enabled: isAppReady,
     });
 
@@ -56,9 +58,12 @@ const UnresolvedPositions: React.FC = () => {
         return ammSpeedMarketsLimitsQuery.isSuccess ? ammSpeedMarketsLimitsQuery.data : null;
     }, [ammSpeedMarketsLimitsQuery]);
 
-    const activeSpeedMarketsDataQuery = useActiveSpeedMarketsDataQuery(networkId, {
-        enabled: isAppReady,
-    });
+    const activeSpeedMarketsDataQuery = useActiveSpeedMarketsDataQuery(
+        { networkId, client },
+        {
+            enabled: isAppReady,
+        }
+    );
 
     const activeSpeedMarketsData = useMemo(
         () =>
@@ -124,7 +129,7 @@ const UnresolvedPositions: React.FC = () => {
         const openMatured = openSpeedMarketsData.filter((marketData) => marketData.maturityDate < Date.now());
         if (openMatured.length) {
             setIsLoadingEnabled(false);
-            refetchActiveSpeedMarkets(false, networkId);
+            refetchActiveSpeedMarkets(false, { networkId, client });
         }
         // Refresh current prices
         if (openSpeedMarketsData.length) {
@@ -152,7 +157,7 @@ const UnresolvedPositions: React.FC = () => {
 
     const handleResolveAll = async (positions: UserOpenPositions[], isAdmin: boolean) => {
         setIsSubmitting(true);
-        await resolveAllSpeedPositions(positions, isAdmin, networkId);
+        await resolveAllSpeedPositions(positions, isAdmin, { networkId, client: walletClient.data });
         setIsSubmitting(false);
         setIsSubmittingSection('');
     };

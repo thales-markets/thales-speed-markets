@@ -37,7 +37,7 @@ import SelectBuyin from './components/SelectBuyin';
 import SelectPosition from './components/SelectPosition';
 import { SelectedPosition } from './components/SelectPosition/SelectPosition';
 import SelectTime from './components/SelectTime';
-import { useChainId } from 'wagmi';
+import { useChainId, useClient } from 'wagmi';
 import { useAccount } from 'wagmi';
 
 const SpeedMarkets: React.FC = () => {
@@ -47,6 +47,7 @@ const SpeedMarkets: React.FC = () => {
 
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const networkId = useChainId();
+    const client = useClient();
     const { isConnected } = useAccount();
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
@@ -64,7 +65,7 @@ const SpeedMarkets: React.FC = () => {
     const [isResetTriggered, setIsResetTriggered] = useState(false);
     const [skew, setSkew] = useState({ [Positions.UP]: 0, [Positions.DOWN]: 0 });
 
-    const ammSpeedMarketsLimitsQuery = useAmmSpeedMarketsLimitsQuery(networkId, undefined, {
+    const ammSpeedMarketsLimitsQuery = useAmmSpeedMarketsLimitsQuery({ networkId, client }, undefined, {
         enabled: isAppReady,
     });
 
@@ -72,7 +73,7 @@ const SpeedMarkets: React.FC = () => {
         return ammSpeedMarketsLimitsQuery.isSuccess ? ammSpeedMarketsLimitsQuery.data : null;
     }, [ammSpeedMarketsLimitsQuery]);
 
-    const ammChainedSpeedMarketsLimitsQuery = useAmmChainedSpeedMarketsLimitsQuery(networkId, undefined, {
+    const ammChainedSpeedMarketsLimitsQuery = useAmmChainedSpeedMarketsLimitsQuery({ networkId, client }, undefined, {
         enabled: isAppReady && isChainedSupported,
     });
 

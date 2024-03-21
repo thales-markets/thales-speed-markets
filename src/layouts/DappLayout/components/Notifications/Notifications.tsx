@@ -42,7 +42,7 @@ const Notifications: React.FC = () => {
     }, [userActiveSpeedMarketsDataQuery]);
 
     const userActiveChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
-        networkId,
+        { networkId, client },
         address as string,
         {
             enabled: isAppReady && isConnected && isNetworkSupported,

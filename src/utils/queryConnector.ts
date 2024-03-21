@@ -30,22 +30,22 @@ export const refetchBalances = (walletAddress: string, queryConfig: QueryConfig)
         queryKey: QUERY_KEYS.WalletBalances.StableCoinBalance(walletAddress, queryConfig),
     });
     queryConnector.queryClient.invalidateQueries({
-        queryKey: QUERY_KEYS.WalletBalances.MultipleCollateral(walletAddress, queryConfig.networkId),
+        queryKey: QUERY_KEYS.WalletBalances.MultipleCollateral(walletAddress, queryConfig),
     });
 };
 
-export const refetchSpeedMarketsLimits = (isChained: boolean, networkId: NetworkId, walletAddress?: string) => {
+export const refetchSpeedMarketsLimits = (isChained: boolean, queryConfig: QueryConfig, walletAddress?: string) => {
     queryConnector.queryClient.invalidateQueries({
         queryKey: isChained
-            ? QUERY_KEYS.Markets.ChainedSpeedMarketsLimits(networkId, walletAddress)
-            : QUERY_KEYS.Markets.SpeedMarketsLimits(networkId, walletAddress),
+            ? QUERY_KEYS.Markets.ChainedSpeedMarketsLimits(queryConfig, walletAddress)
+            : QUERY_KEYS.Markets.SpeedMarketsLimits(queryConfig, walletAddress),
     });
 };
 
 export const refetchUserSpeedMarkets = (isChained: boolean, queryConfig: QueryConfig, walletAddress: string) => {
     queryConnector.queryClient.invalidateQueries({
         queryKey: isChained
-            ? QUERY_KEYS.User.ChainedSpeedMarkets(queryConfig.networkId, walletAddress)
+            ? QUERY_KEYS.User.ChainedSpeedMarkets(queryConfig, walletAddress)
             : QUERY_KEYS.User.SpeedMarkets(queryConfig, walletAddress),
     });
 };
@@ -58,15 +58,15 @@ export const refetchUserResolvedSpeedMarkets = (
     queryConnector.queryClient.invalidateQueries({
         queryKey: isChained
             ? QUERY_KEYS.User.ResolvedChainedSpeedMarkets(queryConfig, walletAddress)
-            : QUERY_KEYS.User.ResolvedSpeedMarkets(queryConfig.networkId, walletAddress),
+            : QUERY_KEYS.User.ResolvedSpeedMarkets(queryConfig, walletAddress),
     });
 };
 
-export const refetchActiveSpeedMarkets = (isChained: boolean, networkId: NetworkId) => {
+export const refetchActiveSpeedMarkets = (isChained: boolean, queryConfig: QueryConfig) => {
     queryConnector.queryClient.invalidateQueries({
         queryKey: isChained
-            ? QUERY_KEYS.Markets.ActiveChainedSpeedMarkets(networkId)
-            : QUERY_KEYS.Markets.ActiveSpeedMarkets(networkId),
+            ? QUERY_KEYS.Markets.ActiveChainedSpeedMarkets(queryConfig)
+            : QUERY_KEYS.Markets.ActiveSpeedMarkets(queryConfig),
     });
 };
 

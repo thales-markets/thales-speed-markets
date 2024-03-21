@@ -17,11 +17,12 @@ import {
     getCollaterals,
 } from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
-import { useAccount, useChainId } from 'wagmi';
+import { useAccount, useChainId, useClient } from 'wagmi';
 
 const UserCollaterals: React.FC = () => {
     const dispatch = useDispatch();
     const networkId = useChainId();
+    const client = useClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const { isConnected, address } = useAccount();
     const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
@@ -29,9 +30,13 @@ const UserCollaterals: React.FC = () => {
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-    const multipleCollateralBalances = useMultipleCollateralBalanceQuery(address as string, networkId, {
-        enabled: isAppReady && isConnected,
-    });
+    const multipleCollateralBalances = useMultipleCollateralBalanceQuery(
+        address as string,
+        { networkId, client },
+        {
+            enabled: isAppReady && isConnected,
+        }
+    );
 
     const multipleCollateralBalancesData =
         multipleCollateralBalances.isSuccess && multipleCollateralBalances.data

@@ -14,8 +14,7 @@ import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import { BoldText, FlexDivCentered, FlexDivColumnCentered, FlexDivRowCentered, FlexDivStart } from 'styles/common';
 import { buildReferrerLink } from 'utils/routes';
-import snxJSConnector from 'utils/snxJSConnector';
-import { useAccount } from 'wagmi';
+import { useAccount, useSignMessage } from 'wagmi';
 
 type ReferralModalProps = {
     onClose: () => void;
@@ -33,7 +32,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
     const { openConnectModal } = useConnectModal();
 
     const { isConnected, address } = useAccount();
-
+    const { signMessageAsync } = useSignMessage();
     const [referralPage, setReferralPage] = useState<number>(Pages.Markets);
     const [referrerID, setReferrerID] = useState('');
     const [savedReferrerID, setSavedReferrerID] = useState('');
@@ -80,7 +79,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
     }, [referrerIDQuery.isSuccess, referrerIDQuery.data, referralPage]);
 
     const generateLinkHandler = useCallback(async () => {
-        const signature = await (snxJSConnector as any).signer.signMessage(referrerID);
+        const signature = await signMessageAsync({ message: referrerID });
         const response = await fetch(`${LINKS.API}/update-refferer-id`, {
             method: 'POST',
             headers: {
@@ -106,7 +105,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
                 getSuccessToastOptions('', 'customId')
             );
         }
-    }, [referrerID, address, savedReferrerID, t, referralPage]);
+    }, [referrerID, address, savedReferrerID, t, referralPage, signMessageAsync]);
 
     const copyLink = () => {
         navigator.clipboard.writeText(referralLink);

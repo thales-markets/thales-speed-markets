@@ -28,12 +28,14 @@ import { ChainedSpeedMarket } from 'types/market';
 import { getPriceId } from 'utils/pyth';
 import { refetchActiveSpeedMarkets, refetchPythPrice } from 'utils/queryConnector';
 import { resolveAllChainedMarkets } from 'utils/speedAmm';
-import { useAccount, useChainId } from 'wagmi';
+import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 
 const UnresolvedChainedPositions: React.FC = () => {
     const { t } = useTranslation();
 
     const networkId = useChainId();
+    const client = useClient();
+    const walletClient = useWalletClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const { address } = useAccount();
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
@@ -42,7 +44,7 @@ const UnresolvedChainedPositions: React.FC = () => {
     const [isSubmittingSection, setIsSubmittingSection] = useState('');
     const [isLoadingEnabled, setIsLoadingEnabled] = useState(true);
 
-    const ammChainedSpeedMarketsLimitsQuery = useAmmChainedSpeedMarketsLimitsQuery(networkId, address, {
+    const ammChainedSpeedMarketsLimitsQuery = useAmmChainedSpeedMarketsLimitsQuery({ networkId, client }, address, {
         enabled: isAppReady,
     });
 
@@ -50,9 +52,12 @@ const UnresolvedChainedPositions: React.FC = () => {
         return ammChainedSpeedMarketsLimitsQuery.isSuccess ? ammChainedSpeedMarketsLimitsQuery.data : null;
     }, [ammChainedSpeedMarketsLimitsQuery]);
 
-    const activeChainedSpeedMarketsDataQuery = useActiveChainedSpeedMarketsDataQuery(networkId, {
-        enabled: isAppReady,
-    });
+    const activeChainedSpeedMarketsDataQuery = useActiveChainedSpeedMarketsDataQuery(
+        { networkId, client },
+        {
+            enabled: isAppReady,
+        }
+    );
 
     const activeChainedSpeedMarketsData = useMemo(
         () =>
@@ -158,7 +163,7 @@ const UnresolvedChainedPositions: React.FC = () => {
         if (openMatured.length) {
             if (!mountedRef.current) return null;
             setIsLoadingEnabled(false);
-            refetchActiveSpeedMarkets(true, networkId);
+            refetchActiveSpeedMarkets(true, { networkId, client: walletClient.data });
         }
         // Check if missing price is available
         if (unknownPriceSpeedMarketsData.length) {
@@ -176,7 +181,7 @@ const UnresolvedChainedPositions: React.FC = () => {
 
     const handleResolveAll = async (positions: ChainedSpeedMarket[], isAdmin: boolean) => {
         setIsSubmitting(true);
-        await resolveAllChainedMarkets(positions, isAdmin, networkId);
+        await resolveAllChainedMarkets(positions, isAdmin, { networkId, client: walletClient.data });
         if (!mountedRef.current) return null;
         setIsSubmitting(false);
         setIsSubmittingSection('');

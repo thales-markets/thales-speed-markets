@@ -23,9 +23,13 @@ const ClosedPositions: React.FC<{ isChained: boolean }> = ({ isChained }) => {
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const { isConnected, address } = useAccount();
 
-    const userResolvedSpeedMarketsDataQuery = useUserResolvedSpeedMarketsDataQuery(networkId, address as string, {
-        enabled: isAppReady && isConnected && !isChained,
-    });
+    const userResolvedSpeedMarketsDataQuery = useUserResolvedSpeedMarketsDataQuery(
+        { networkId, client },
+        address as string,
+        {
+            enabled: isAppReady && isConnected && !isChained,
+        }
+    );
 
     const lastTenUserResolvedPositions = useMemo(
         () =>

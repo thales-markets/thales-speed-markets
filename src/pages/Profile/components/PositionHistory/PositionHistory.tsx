@@ -31,7 +31,7 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
     const { isConnected, address } = useAccount();
 
     const closedSpeedMarketsDataQuery = useUserResolvedSpeedMarketsDataQuery(
-        networkId,
+        { networkId, client },
         searchAddress || (address as string),
         {
             enabled: isAppReady && isConnected,
