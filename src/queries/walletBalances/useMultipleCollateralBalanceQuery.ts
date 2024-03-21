@@ -87,6 +87,8 @@ const useMultipleCollateralBalanceQuery = (
                     return collaterasBalance;
                 }
 
+                console.log(multipleCollateralObject);
+
                 const [
                     sUSDBalance,
                     DAIBalance,
@@ -99,16 +101,34 @@ const useMultipleCollateralBalanceQuery = (
                     ETHBalance,
                     ARBBalance,
                 ] = await Promise.all([
-                    multipleCollateralObject.sUSD.read.balanceOf([walletAddress]),
-                    multipleCollateralObject.DAI.read.balanceOf([walletAddress]),
-                    multipleCollateralObject.USDC.read.balanceOf([walletAddress]),
-                    multipleCollateralObject.USDCe.read.balanceOf([walletAddress]),
-                    multipleCollateralObject.USDbC.read.balanceOf([walletAddress]),
-                    multipleCollateralObject.USDT.read.balanceOf([walletAddress]),
-                    multipleCollateralObject.OP.read.balanceOf([walletAddress]),
-                    multipleCollateralObject.WETH.read.balanceOf([walletAddress]),
+                    multipleCollateralObject.sUSD.address !== 'TBD'
+                        ? multipleCollateralObject.sUSD.read.balanceOf([walletAddress])
+                        : 0,
+                    multipleCollateralObject.DAI.address !== 'TBD'
+                        ? multipleCollateralObject.DAI.read.balanceOf([walletAddress])
+                        : 0,
+                    multipleCollateralObject.USDC.address !== 'TBD'
+                        ? multipleCollateralObject.USDC.read.balanceOf([walletAddress])
+                        : 0,
+                    multipleCollateralObject.USDCe.address !== 'TBD'
+                        ? multipleCollateralObject.USDCe.read.balanceOf([walletAddress])
+                        : 0,
+                    multipleCollateralObject.USDbC.address !== 'TBD'
+                        ? multipleCollateralObject.USDbC.read.balanceOf([walletAddress])
+                        : 0,
+                    multipleCollateralObject.USDT.address !== 'TBD'
+                        ? multipleCollateralObject.USDT.read.balanceOf([walletAddress])
+                        : 0,
+                    multipleCollateralObject.OP.address !== 'TBD'
+                        ? multipleCollateralObject.OP.read.balanceOf([walletAddress])
+                        : 0,
+                    multipleCollateralObject.WETH.address !== 'TBD'
+                        ? multipleCollateralObject.WETH.read.balanceOf([walletAddress])
+                        : 0,
                     getBalance(wagmiConfig, { address: walletAddress as any }) as any,
-                    multipleCollateralObject.ARB.read.balanceOf([walletAddress]),
+                    multipleCollateralObject.ARB.address !== 'TBD'
+                        ? multipleCollateralObject.ARB.read.balanceOf([walletAddress])
+                        : 0,
                 ]);
                 collaterasBalance = {
                     sUSD: sUSDBalance ? bigNumberFormatter(sUSDBalance, COLLATERAL_DECIMALS.sUSD) : 0,

@@ -66,7 +66,7 @@ const ChainedSpeedMarketFlexCard: React.FC<SharePositionData> = ({
                 {positions.map((position, index) => {
                     return (
                         <DirectionRow key={index} isLast={index === positions.length - 1}>
-                            <Text width={8} isBold>
+                            <Text width={8} $isBold>
                                 {index + 1}
                             </Text>
                             <FlexDivCentered>
@@ -79,21 +79,21 @@ const ChainedSpeedMarketFlexCard: React.FC<SharePositionData> = ({
                                         className="icon icon--caret-down"
                                     />
                                 )}
-                                <Text width={50} isBold padding="0 0 0 5px">
+                                <Text width={50} $isBold padding="0 0 0 5px">
                                     {position}
                                 </Text>
                             </FlexDivCentered>
-                            <Text width={90} isCenter={!(strikePrices && strikePrices[index])}>
+                            <Text width={90} $isCenter={!(strikePrices && strikePrices[index])}>
                                 {strikePrices && strikePrices[index]
                                     ? `${currencyKey} ${formatCurrencyWithSign(USD_SIGN, strikePrices[index])}`
                                     : '-'}
                             </Text>
-                            <Text width={90} isCenter={!(finalPrices && finalPrices[index])}>
+                            <Text width={90} $isCenter={!(finalPrices && finalPrices[index])}>
                                 {finalPrices && finalPrices[index]
                                     ? `${currencyKey} ${formatCurrencyWithSign(USD_SIGN, finalPrices[index])}`
                                     : '-'}
                             </Text>
-                            <Text width={20} isCenter={userStatusByDirection[index] === undefined}>
+                            <Text width={20} $isCenter={userStatusByDirection[index] === undefined}>
                                 {userStatusByDirection[index] === undefined ? (
                                     '-'
                                 ) : userStatusByDirection[index] ? (
@@ -106,7 +106,7 @@ const ChainedSpeedMarketFlexCard: React.FC<SharePositionData> = ({
                     );
                 })}
                 <FlexDivRow>
-                    <Text isUppercase>{`${t('common.flex-card.buy-in')}: ${formatCurrency(buyIn)} ${
+                    <Text $isUppercase>{`${t('common.flex-card.buy-in')}: ${formatCurrency(buyIn)} ${
                         FIAT_CURRENCY_MAP.USD
                     }`}</Text>
                     <Text>{`${t('speed-markets.chained.roi', {
@@ -228,18 +228,18 @@ const DirectionRow = styled(FlexDivRow)<{ isLast?: boolean }>`
 
 const Text = styled.span<{
     width?: number;
-    isBold?: boolean;
-    isUppercase?: boolean;
+    $isBold?: boolean;
+    $isUppercase?: boolean;
     padding?: string;
-    isCenter?: boolean;
+    $isCenter?: boolean;
 }>`
     font-size: 13px;
-    font-weight: ${(props) => (props.isBold ? 700 : 400)};
+    font-weight: ${(props) => (props.$isBold ? 700 : 400)};
     line-height: 230%;
     color: ${(props) => props.theme.textColor.primary};
-    text-transform: ${(props) => (props.isUppercase ? 'uppercase' : 'capitalize')};
+    text-transform: ${(props) => (props.$isUppercase ? 'uppercase' : 'capitalize')};
     width: ${(props) => (props.width ? `${props.width}px` : 'initial')};
-    text-align: ${(props) => (props.isCenter ? 'center' : 'left')};
+    text-align: ${(props) => (props.$isCenter ? 'center' : 'left')};
     padding: ${(props) => (props.padding ? props.padding : '0')};
 `;
 

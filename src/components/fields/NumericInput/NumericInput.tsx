@@ -127,7 +127,7 @@ const NumericInput: React.FC<NumericInputProps> = ({
                     {currencyLabel && (
                         <CurrencyLabel
                             className={disabled ? 'currency-label disabled' : 'currency-label'}
-                            hasSeparator={onMaxButton}
+                            $hasSeparator={onMaxButton}
                         >
                             {currencyLabel}
                         </CurrencyLabel>
@@ -135,7 +135,7 @@ const NumericInput: React.FC<NumericInputProps> = ({
                     {currencyComponent && (
                         <CurrencyComponentContainer
                             className={disabled && !enableCurrencyComponentOnly ? 'disabled' : ''}
-                            hasSeparator={onMaxButton}
+                            $hasSeparator={onMaxButton}
                         >
                             {currencyComponent}
                         </CurrencyComponentContainer>
@@ -156,8 +156,8 @@ const RightContainer = styled(FlexDivCentered)`
     bottom: 6px;
 `;
 
-const CurrencyLabel = styled.label<{ hasSeparator?: boolean }>`
-    border-left: ${(props) => (props.hasSeparator ? `2px solid ${props.theme.input.borderColor.primary}` : 'none')};
+const CurrencyLabel = styled.label<{ $hasSeparator?: boolean }>`
+    border-left: ${(props) => (props.$hasSeparator ? `2px solid ${props.theme.input.borderColor.primary}` : 'none')};
     font-weight: bold;
     font-size: 13px;
     line-height: 20px;
@@ -220,8 +220,8 @@ const StyledBalanceIcon = styled(BalanceIcon)`
     }
 `;
 
-const CurrencyComponentContainer = styled(FlexDivCentered)<{ hasSeparator?: boolean }>`
-    ${(props) => (props.hasSeparator ? `border-left: 2px solid ${props.theme.input.borderColor.primary};` : '')}
+const CurrencyComponentContainer = styled(FlexDivCentered)<{ $hasSeparator?: boolean }>`
+    ${(props) => (props.$hasSeparator ? `border-left: 2px solid ${props.theme.input.borderColor.primary};` : '')}
     line-height: 15px;
     padding-right: 2px;
     &.disabled {

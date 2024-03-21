@@ -96,7 +96,7 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
                 return (
                     <Amount
                         key={index}
-                        isSelected={buyinAmount === amount || (value > 0 && value === amount)}
+                        $isSelected={buyinAmount === amount || (value > 0 && value === amount)}
                         onClick={() => {
                             onChange(amount);
                             setBuyinAmount(amount);
@@ -113,14 +113,14 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
 
 const Container = styled(FlexDivRow)``;
 
-const Amount = styled(FlexDivCentered)<{ isSelected: boolean }>`
+const Amount = styled(FlexDivCentered)<{ $isSelected: boolean }>`
     width: 70px;
     height: 31px;
     border-radius: 8px;
     background: ${(props) =>
-        props.isSelected ? props.theme.button.background.primary : props.theme.button.background.tertiary};
+        props.$isSelected ? props.theme.button.background.primary : props.theme.button.background.tertiary};
     color: ${(props) =>
-        props.isSelected ? props.theme.button.textColor.primary : props.theme.button.textColor.secondary};
+        props.$isSelected ? props.theme.button.textColor.primary : props.theme.button.textColor.secondary};
     cursor: pointer;
     font-weight: 600;
     font-size: 13px;

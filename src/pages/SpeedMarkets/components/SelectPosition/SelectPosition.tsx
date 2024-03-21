@@ -62,15 +62,15 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
                 // Single
                 <>
                     <PositionWrapper onClick={() => onChange(selected[0] === Positions.UP ? undefined : Positions.UP)}>
-                        <LabelUp isSelected={selected[0] !== undefined ? selected[0] === Positions.UP : undefined}>
+                        <LabelUp $isSelected={selected[0] !== undefined ? selected[0] === Positions.UP : undefined}>
                             {Positions.UP}
                         </LabelUp>
                         <PositionSymbolUp
-                            isSelected={selected[0] !== undefined ? selected[0] === Positions.UP : undefined}
+                            $isSelected={selected[0] !== undefined ? selected[0] === Positions.UP : undefined}
                         >
                             <Icon className="icon icon--caret-up" />
                             {discount > 0 && (
-                                <Skew isDiscount={skew[Positions.UP] > 0 ? false : discount > 0 ? true : undefined}>
+                                <Skew $isDiscount={skew[Positions.UP] > 0 ? false : discount > 0 ? true : undefined}>
                                     {skew[Positions.UP] > 0 ? '-' : discount > 0 ? '+' : ''}
                                     {formatPercentage(skew[Positions.UP] || discount)}
                                 </Skew>
@@ -107,17 +107,17 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
                         onClick={() => onChange(selected[0] === Positions.DOWN ? undefined : Positions.DOWN)}
                     >
                         <PositionSymbolDown
-                            isSelected={selected[0] !== undefined ? selected[0] === Positions.DOWN : undefined}
+                            $isSelected={selected[0] !== undefined ? selected[0] === Positions.DOWN : undefined}
                         >
                             <Icon className="icon icon--caret-down" />
                             {discount > 0 && (
-                                <Skew isDiscount={skew[Positions.DOWN] > 0 ? false : discount > 0 ? true : undefined}>
+                                <Skew $isDiscount={skew[Positions.DOWN] > 0 ? false : discount > 0 ? true : undefined}>
                                     {skew[Positions.DOWN] > 0 ? '-' : discount > 0 ? '+' : ''}
                                     {formatPercentage(skew[Positions.DOWN] || discount)}
                                 </Skew>
                             )}
                         </PositionSymbolDown>
-                        <LabelDown isSelected={selected[0] !== undefined ? selected[0] === Positions.DOWN : undefined}>
+                        <LabelDown $isSelected={selected[0] !== undefined ? selected[0] === Positions.DOWN : undefined}>
                             {Positions.DOWN}
                         </LabelDown>
                     </PositionWrapper>
@@ -164,10 +164,10 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
                                                 )
                                             }
                                         >
-                                            <LabelUp isColumn isSelected={isUpSelected}>
+                                            <LabelUp isColumn $isSelected={isUpSelected}>
                                                 {Positions.UP}
                                             </LabelUp>
-                                            <PositionSymbolUp isSelected={isUpSelected}>
+                                            <PositionSymbolUp $isSelected={isUpSelected}>
                                                 <Icon className="icon icon--caret-up" />
                                             </PositionSymbolUp>
                                         </PositionWrapper>
@@ -185,10 +185,10 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
                                                 )
                                             }
                                         >
-                                            <PositionSymbolDown isSelected={isDownSelected}>
+                                            <PositionSymbolDown $isSelected={isDownSelected}>
                                                 <Icon className="icon icon--caret-down" />
                                             </PositionSymbolDown>
-                                            <LabelDown isColumn isSelected={isDownSelected}>
+                                            <LabelDown $isColumn $isSelected={isDownSelected}>
                                                 {Positions.DOWN}
                                             </LabelDown>
                                         </PositionWrapper>

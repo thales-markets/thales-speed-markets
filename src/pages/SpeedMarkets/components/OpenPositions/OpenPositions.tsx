@@ -218,7 +218,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
                 </LoaderContainer>
             ) : (
                 <>
-                    <PositionsWrapper noPositions={noPositions} isChained={isChained}>
+                    <PositionsWrapper $noPositions={noPositions} $isChained={isChained}>
                         {isChained && !noPositions
                             ? sortedUserOpenChainedSpeedMarketsData.map((position, index) => (
                                   <ChainedPosition
@@ -280,13 +280,13 @@ const Wrapper = styled.div`
     margin-top: 20px;
 `;
 
-const PositionsWrapper = styled.div<{ noPositions?: boolean; isChained?: boolean }>`
+const PositionsWrapper = styled.div<{ $noPositions?: boolean; $isChained?: boolean }>`
     display: flex;
     flex-direction: column;
-    gap: ${(props) => (props.isChained ? '16' : '6')}px;
+    gap: ${(props) => (props.$isChained ? '16' : '6')}px;
     overflow-y: auto;
-    max-height: ${(props) => (props.isChained ? '624' : '560')}px;
-    ${(props) => (props.noPositions ? 'filter: blur(10px);' : '')}
+    max-height: ${(props) => (props.$isChained ? '624' : '560')}px;
+    ${(props) => (props.$noPositions ? 'filter: blur(10px);' : '')}
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         flex-direction: row;
         overflow: auto;

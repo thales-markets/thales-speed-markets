@@ -55,13 +55,13 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
         <Position>
             <Icon className={`currency-icon currency-icon--${position.currencyKey.toLowerCase()}`} />
             <AlignedFlex>
-                <FlexContainer firstChildWidth="130px">
+                <FlexContainer $firstChildWidth="130px">
                     <Label>{position.currencyKey}</Label>
                     <Value>{position.strikePrice}</Value>
                 </FlexContainer>
 
                 <Separator />
-                <FlexContainer secondChildWidth="140px">
+                <FlexContainer $secondChildWidth="140px">
                     <Label>{isSpeedMarketMatured ? t('profile.final-price') : t('profile.current-price')}</Label>
                     <Value>
                         {isSpeedMarketMatured ? (
@@ -166,16 +166,16 @@ const AlignedFlex = styled.div`
     }
 `;
 
-const FlexContainer = styled(AlignedFlex)<{ firstChildWidth?: string; secondChildWidth?: string }>`
+const FlexContainer = styled(AlignedFlex)<{ $firstChildWidth?: string; $secondChildWidth?: string }>`
     gap: 4px;
     flex: 1;
     justify-content: center;
     &:first-child {
-        min-width: ${(props) => (props.firstChildWidth ? props.firstChildWidth : '195px')};
-        max-width: ${(props) => (props.firstChildWidth ? props.firstChildWidth : '195px')};
+        min-width: ${(props) => (props.$firstChildWidth ? props.$firstChildWidth : '195px')};
+        max-width: ${(props) => (props.$firstChildWidth ? props.$firstChildWidth : '195px')};
     }
     &:nth-child(3) {
-        ${(props) => (props.secondChildWidth ? `min-width: ${props.secondChildWidth};` : '')};
+        ${(props) => (props.$secondChildWidth ? `min-width: ${props.$secondChildWidth};` : '')};
     }
 
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {

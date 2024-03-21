@@ -36,12 +36,12 @@ const Button: React.FC<ButtonProps> = ({
             height={height}
             padding={padding}
             margin={margin}
-            textColor={textColor}
-            backgroundColor={backgroundColor}
-            borderColor={borderColor}
+            $textColor={textColor}
+            $backgroundColor={backgroundColor}
+            $borderColor={borderColor}
             onClick={onClick}
             disabled={disabled}
-            fontSize={fontSize}
+            $fontSize={fontSize}
             style={additionalStyles}
         >
             {children}
@@ -54,10 +54,10 @@ const Wrapper = styled.button<{
     height?: string;
     padding?: string;
     margin?: string;
-    textColor?: string;
-    backgroundColor?: string;
-    borderColor?: string;
-    fontSize?: string;
+    $textColor?: string;
+    $backgroundColor?: string;
+    $borderColor?: string;
+    $fontSize?: string;
 }>`
     display: flex;
     text-transform: uppercase;
@@ -65,14 +65,14 @@ const Wrapper = styled.button<{
     justify-content: center;
     width: ${(props) => props.width || 'auto'};
     min-height: ${(props) => props.height || '34px'};
-    border: 1px solid ${(props) => props.borderColor || props.theme.button.background.primary};
+    border: 1px solid ${(props) => props.$borderColor || props.theme.button.background.primary};
     border-radius: 30px;
     font-weight: 700;
-    font-size: ${(props) => props.fontSize || '18px'};
+    font-size: ${(props) => props.$fontSize || '18px'};
     line-height: 100%;
     cursor: pointer;
-    color: ${(props) => props.textColor || props.theme.button.textColor.primary};
-    background-color: ${(props) => props.backgroundColor || props.theme.button.background.primary};
+    color: ${(props) => props.$textColor || props.theme.button.textColor.primary};
+    background-color: ${(props) => props.$backgroundColor || props.theme.button.background.primary};
     margin: ${(props) => props.margin || ''};
     padding: ${(props) => props.padding || '0 30px'};
     outline: none;

@@ -46,7 +46,7 @@ const NetworkSwitch: React.FC<NetworkSwitchProps> = ({
         <NetworkInfoContainer>
             <OutsideClickHandler onOutsideClick={() => isDropdownOpen && setIsDropdownOpen(false)}>
                 <SelectedNetworkContainer cursor={'pointer'}>
-                    <NetworkItem selectedItem={true} onClick={() => setIsDropdownOpen(!isDropdownOpen)} noHover>
+                    <NetworkItem $selectedItem={true} onClick={() => setIsDropdownOpen(!isDropdownOpen)} $noHover>
                         {React.createElement(selectedNetwork.icon, {
                             style: { marginRight: 5 },
                         })}
@@ -142,22 +142,22 @@ const SelectedNetworkContainer = styled.div<{ cursor: string }>`
     }
 `;
 
-const NetworkItem = styled.div<{ selectedItem?: boolean; noHover?: boolean }>`
+const NetworkItem = styled.div<{ $selectedItem?: boolean; $noHover?: boolean }>`
     display: flex;
     align-items: center;
     width: 100%;
-    padding: ${(props) => (props.selectedItem ? '4px 13px' : '6px')};
+    padding: ${(props) => (props.$selectedItem ? '4px 13px' : '6px')};
     font-size: 13px;
     border-radius: 8px;
     &:hover {
-        background: ${(props) => (props.noHover ? '' : props.theme.background.primary)};
+        background: ${(props) => (props.$noHover ? '' : props.theme.background.primary)};
     }
     svg {
         width: 16px;
         height: 16px;
     }
     @media (max-width: 500px) {
-        ${(props) => (props.selectedItem ? 'padding: 4px 7px' : '')}
+        ${(props) => (props.$selectedItem ? 'padding: 4px 7px' : '')}
     }
 `;
 

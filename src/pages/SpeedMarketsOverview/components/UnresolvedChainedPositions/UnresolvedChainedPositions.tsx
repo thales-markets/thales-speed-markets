@@ -246,7 +246,7 @@ const UnresolvedChainedPositions: React.FC = () => {
                         <SimpleLoader />
                     </LoaderContainer>
                 ) : (
-                    <PositionsWrapper hasPositions={positions.length > 0} isChained>
+                    <PositionsWrapper $hasPositions={positions.length > 0} $isChained>
                         {positions.length > 0 ? (
                             positions.map((position, index) => (
                                 <ChainedPosition

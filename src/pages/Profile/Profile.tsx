@@ -228,12 +228,15 @@ const Profile: React.FC = () => {
                     <Nav>
                         <NavItem
                             onClick={() => onTabClickHandler(NavItems.MyPositions)}
-                            active={view === NavItems.MyPositions}
+                            $active={view === NavItems.MyPositions}
                         >
                             {t('profile.tabs.my-positions')}
                             {totalNotifications > 0 && <Notification>{totalNotifications}</Notification>}
                         </NavItem>
-                        <NavItem onClick={() => onTabClickHandler(NavItems.History)} active={view === NavItems.History}>
+                        <NavItem
+                            onClick={() => onTabClickHandler(NavItems.History)}
+                            $active={view === NavItems.History}
+                        >
                             {t('profile.tabs.history')}
                         </NavItem>
                     </Nav>

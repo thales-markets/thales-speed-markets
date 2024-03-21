@@ -289,7 +289,7 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                     {deltaTimesMinutes.map((deltaMinutes, index) => (
                         <DeltaTime
                             key={'minutes' + index}
-                            isSelected={isDeltaSelected && selectedDeltaSec === minutesToSeconds(deltaMinutes)}
+                            $isSelected={isDeltaSelected && selectedDeltaSec === minutesToSeconds(deltaMinutes)}
                             onClick={() => onDeltaTimeClickHandler(0, deltaMinutes)}
                         >{`${deltaMinutes}m`}</DeltaTime>
                     ))}
@@ -301,18 +301,18 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                         {deltaTimesMinutes.map((deltaMinutes, index) => (
                             <DeltaTime
                                 key={'minutes' + index}
-                                isSelected={isDeltaSelected && selectedDeltaSec === minutesToSeconds(deltaMinutes)}
+                                $isSelected={isDeltaSelected && selectedDeltaSec === minutesToSeconds(deltaMinutes)}
                                 onClick={() => onDeltaTimeClickHandler(0, deltaMinutes)}
                             >{`${deltaMinutes}m`}</DeltaTime>
                         ))}
                         {deltaTimesHours.map((deltaHours, index) => (
                             <DeltaTime
                                 key={'hours' + index}
-                                isSelected={isDeltaSelected && selectedDeltaSec === hoursToSeconds(deltaHours)}
+                                $isSelected={isDeltaSelected && selectedDeltaSec === hoursToSeconds(deltaHours)}
                                 onClick={() => onDeltaTimeClickHandler(deltaHours, 0)}
                             >{`${deltaHours}h`}</DeltaTime>
                         ))}
-                        <Time isSelected={!isDeltaSelected} onClick={onSwitchTimeClickHandler}>
+                        <Time $isSelected={!isDeltaSelected} onClick={onSwitchTimeClickHandler}>
                             <Icon className="icon icon--clock" />
                         </Time>
                     </Row>
@@ -446,16 +446,16 @@ const InputWrapper = styled.div`
     width: 100%;
 `;
 
-const Time = styled(FlexDivCentered)<{ isSelected: boolean }>`
+const Time = styled(FlexDivCentered)<{ $isSelected: boolean }>`
     width: 70px;
     height: 31px;
     border-radius: 8px;
     background: ${(props) =>
-        props.isSelected ? props.theme.button.background.primary : props.theme.button.background.tertiary};
+        props.$isSelected ? props.theme.button.background.primary : props.theme.button.background.tertiary};
     color: ${(props) =>
-        props.isSelected ? props.theme.button.textColor.primary : props.theme.button.textColor.secondary};
+        props.$isSelected ? props.theme.button.textColor.primary : props.theme.button.textColor.secondary};
     cursor: pointer;
-    font-weight: ${(props) => (props.isSelected ? '600' : '300')};
+    font-weight: ${(props) => (props.$isSelected ? '600' : '300')};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         width: 60px;
     }

@@ -62,30 +62,30 @@ const PositionSymbol = styled(FlexDivCentered)<{ size?: number }>`
     border-radius: 50%;
 `;
 
-export const PositionSymbolUp = styled(PositionSymbol)<{ isSelected?: boolean }>`
+export const PositionSymbolUp = styled(PositionSymbol)<{ $isSelected?: boolean }>`
     border: 3px solid
         ${(props) =>
-            props.isSelected === undefined
+            props.$isSelected === undefined
                 ? props.theme.borderColor.primary
-                : props.isSelected
+                : props.$isSelected
                 ? props.theme.positionColor.up
                 : props.theme.borderColor.primary};
     color: ${(props) =>
-        props.isSelected === undefined || props.isSelected
+        props.$isSelected === undefined || props.$isSelected
             ? props.theme.positionColor.up
             : props.theme.borderColor.primary};
 `;
 
-export const PositionSymbolDown = styled(PositionSymbol)<{ isSelected?: boolean }>`
+export const PositionSymbolDown = styled(PositionSymbol)<{ $isSelected?: boolean }>`
     border: 3px solid
         ${(props) =>
-            props.isSelected === undefined
+            props.$isSelected === undefined
                 ? props.theme.borderColor.primary
-                : props.isSelected
+                : props.$isSelected
                 ? props.theme.positionColor.down
                 : props.theme.borderColor.primary};
     color: ${(props) =>
-        props.isSelected === undefined || props.isSelected
+        props.$isSelected === undefined || props.$isSelected
             ? props.theme.positionColor.down
             : props.theme.borderColor.primary};
 `;
@@ -112,24 +112,24 @@ const Label = styled.span`
     text-transform: capitalize;
 `;
 
-export const LabelUp = styled(Label)<{ isSelected?: boolean; isColumn?: boolean }>`
+export const LabelUp = styled(Label)<{ $isSelected?: boolean; isColumn?: boolean }>`
     color: ${(props) =>
-        props.isSelected === undefined
+        props.$isSelected === undefined
             ? props.theme.textColor.primary
-            : props.isSelected
+            : props.$isSelected
             ? props.theme.positionColor.up
             : props.theme.borderColor.primary};
     ${(props) => (props.isColumn ? 'margin-bottom: 2px;' : 'margin-right: 7px;')}
 `;
 
-export const LabelDown = styled(Label)<{ isSelected?: boolean; isColumn?: boolean }>`
+export const LabelDown = styled(Label)<{ $isSelected?: boolean; $isColumn?: boolean }>`
     color: ${(props) =>
-        props.isSelected === undefined
+        props.$isSelected === undefined
             ? props.theme.textColor.primary
-            : props.isSelected
+            : props.$isSelected
             ? props.theme.positionColor.down
             : props.theme.borderColor.primary};
-    ${(props) => (props.isColumn ? 'margin-top: 2px;' : 'margin-left: 7px;')}
+    ${(props) => (props.$isColumn ? 'margin-top: 2px;' : 'margin-left: 7px;')}
 `;
 
 export const Separator = styled.div`
@@ -141,13 +141,13 @@ export const Separator = styled.div`
     margin: 0 14px;
 `;
 
-export const Skew = styled.div<{ isDiscount?: boolean }>`
+export const Skew = styled.div<{ $isDiscount?: boolean }>`
     position: absolute;
-    ${(props) => (!props.isDiscount ? 'bottom: -21px;' : '')}
+    ${(props) => (!props.$isDiscount ? 'bottom: -21px;' : '')}
     color: ${(props) =>
-        props.isDiscount === undefined
+        props.$isDiscount === undefined
             ? props.theme.textColor.secondary
-            : props.isDiscount
+            : props.$isDiscount
             ? props.theme.textColor.quaternary
             : props.theme.textColor.tertiary};
     font-size: 13px;
@@ -155,7 +155,7 @@ export const Skew = styled.div<{ isDiscount?: boolean }>`
     white-space: nowrap;
 
     ${(props) =>
-        props.isDiscount
+        props.$isDiscount
             ? `
                 top: -10px;
                 right: -30px;

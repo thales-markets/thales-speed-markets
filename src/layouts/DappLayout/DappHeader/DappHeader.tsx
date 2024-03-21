@@ -21,7 +21,7 @@ const DappHeader: React.FC = () => {
     const [openReferralModal, setOpenReferralModal] = useState(false);
 
     return (
-        <Container maxWidth={getMaxWidth()}>
+        <Container $maxWidth={getMaxWidth()}>
             <LeftContainer>
                 <FlexDivRow>
                     {isMobile && <Icon className="sidebar-icon icon--nav-menu" onClick={sidebarMenuClickHandler} />}
@@ -73,9 +73,9 @@ const getMaxWidth = () => {
     return '1440px';
 };
 
-const Container = styled(FlexDivRowCentered)<{ maxWidth: string }>`
+const Container = styled(FlexDivRowCentered)<{ $maxWidth: string }>`
     width: 100%;
-    max-width: ${(props) => props.maxWidth};
+    max-width: ${(props) => props.$maxWidth};
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 25px;

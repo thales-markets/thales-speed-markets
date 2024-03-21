@@ -25,12 +25,12 @@ const ClosedPosition: React.FC<ClosedPositionProps> = ({ position }) => {
         <Position>
             <Icon className={`currency-icon currency-icon--${position.currencyKey.toLowerCase()}`} />
             <AlignedFlex>
-                <FlexContainer firstChildWidth="130px">
+                <FlexContainer $firstChildWidth="130px">
                     <Label>{position.currencyKey}</Label>
                     <Value>{position.strikePrice}</Value>
                 </FlexContainer>
                 <Separator />
-                <FlexContainer secondChildWidth="140px">
+                <FlexContainer $secondChildWidth="140px">
                     <Label>{t('profile.final-price')}</Label>
                     <Value>{formatCurrencyWithSign(USD_SIGN, position.finalPrice || 0)}</Value>
                 </FlexContainer>
@@ -56,7 +56,7 @@ const ClosedPosition: React.FC<ClosedPositionProps> = ({ position }) => {
                 <FlexContainer>
                     <Label>{t('common.result')}</Label>
                     <Value
-                        isUpperCase
+                        $isUpperCase
                         color={position.isUserWinner ? theme.textColor.quaternary : theme.error.textColor.primary}
                     >
                         {position.isUserWinner ? t('common.won') : t('common.loss')}
@@ -126,16 +126,16 @@ const AlignedFlex = styled.div`
     }
 `;
 
-const FlexContainer = styled(AlignedFlex)<{ firstChildWidth?: string; secondChildWidth?: string }>`
+const FlexContainer = styled(AlignedFlex)<{ $firstChildWidth?: string; $secondChildWidth?: string }>`
     gap: 4px;
     flex: 1;
     justify-content: center;
     &:first-child {
-        min-width: ${(props) => (props.firstChildWidth ? props.firstChildWidth : '195px')};
-        max-width: ${(props) => (props.firstChildWidth ? props.firstChildWidth : '195px')};
+        min-width: ${(props) => (props.$firstChildWidth ? props.$firstChildWidth : '195px')};
+        max-width: ${(props) => (props.$firstChildWidth ? props.$firstChildWidth : '195px')};
     }
     &:nth-child(3) {
-        ${(props) => (props.secondChildWidth ? `min-width: ${props.secondChildWidth};` : '')};
+        ${(props) => (props.$secondChildWidth ? `min-width: ${props.$secondChildWidth};` : '')};
     }
 
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
@@ -153,10 +153,10 @@ const Label = styled.span`
     white-space: nowrap;
 `;
 
-const Value = styled(Label)<{ color?: string; isUpperCase?: boolean }>`
+const Value = styled(Label)<{ color?: string; $isUpperCase?: boolean }>`
     color: ${(props) => props.color || props.theme.textColor.primary};
     white-space: nowrap;
-    ${(props) => (props.isUpperCase ? 'text-transform: uppercase;' : '')}
+    ${(props) => (props.$isUpperCase ? 'text-transform: uppercase;' : '')}
 `;
 
 const Separator = styled.div`

@@ -221,7 +221,7 @@ const UnresolvedPositions: React.FC = () => {
                         <SimpleLoader />
                     </LoaderContainer>
                 ) : (
-                    <PositionsWrapper hasPositions={positions.length > 0}>
+                    <PositionsWrapper $hasPositions={positions.length > 0}>
                         {positions.length > 0 ? (
                             positions.map((position, index) => (
                                 <UnresolvedPosition

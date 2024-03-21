@@ -105,7 +105,7 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
 
     const getChainedPositions = () =>
         chainedPositions.map((pos, index) => (
-            <PositionText isUp={pos === Positions.UP} key={index}>{`${pos}${
+            <PositionText $isUp={pos === Positions.UP} key={index}>{`${pos}${
                 index !== chainedPositions.length - 1 ? ', ' : ''
             }`}</PositionText>
         ));
@@ -133,8 +133,8 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
                         <>
                             {!isMobile && !isChained && (
                                 <SentanceTextValue
-                                    uppercase={!!positionTypeFormatted}
-                                    lowercase={!positionTypeFormatted}
+                                    $uppercase={!!positionTypeFormatted}
+                                    $lowercase={!positionTypeFormatted}
                                 >
                                     {positionTypeFormatted
                                         ? positionTypeFormatted
@@ -154,7 +154,7 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
             </FlexDivCentered>
             {isChained && (
                 <FlexDivCentered>
-                    <SentanceTextValue uppercase={!!positionTypeFormatted} lowercase={!positionTypeFormatted}>
+                    <SentanceTextValue $uppercase={!!positionTypeFormatted} $lowercase={!positionTypeFormatted}>
                         <TextLabel>{t('speed-markets.chained.follows')}&nbsp;</TextLabel>
                         {isAllChainedMarketsSelected
                             ? getChainedPositions()
@@ -169,27 +169,27 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
                     </TextLabel>
                     {isChained ? (
                         <>
-                            <SentanceTextValue lowercase>{deltaTimeFormatted}</SentanceTextValue>
+                            <SentanceTextValue $lowercase>{deltaTimeFormatted}</SentanceTextValue>
                             <TextLabel>{` ${t('speed-markets.chained.between-rounds')}`}</TextLabel>
                             {!isMobile && (
-                                <SentanceTextValue lowercase>{fullDateFromDeltaTimeFormatted}</SentanceTextValue>
+                                <SentanceTextValue $lowercase>{fullDateFromDeltaTimeFormatted}</SentanceTextValue>
                             )}
                         </>
                     ) : (
-                        <SentanceTextValue lowercase>{timeFormatted}</SentanceTextValue>
+                        <SentanceTextValue $lowercase>{timeFormatted}</SentanceTextValue>
                     )}
                 </Text>
             </FlexDivCentered>
             {isChained && isMobile && (
                 <FlexDivCentered>
-                    <SentanceTextValue lowercase>{fullDateFromDeltaTimeFormatted}</SentanceTextValue>
+                    <SentanceTextValue $lowercase>{fullDateFromDeltaTimeFormatted}</SentanceTextValue>
                 </FlexDivCentered>
             )}
             <FlexDivCentered>
                 <Text>
                     <TextLabel>{t('speed-markets.amm-trading.you-win')}</TextLabel>
                     {hasCollateralConversion && <TextLabel>{` ${t('speed-markets.amm-trading.at-least')}`}</TextLabel>}
-                    <SentanceTextValue isProfit={true}>
+                    <SentanceTextValue $isProfit>
                         {Number(priceProfit) > 0 && Number(paidAmount) > 0
                             ? potentialWinFormatted
                             : '( ' + t('speed-markets.amm-trading.based-amount') + ' )'}
@@ -207,8 +207,8 @@ const SentanceTextValue = styled(TextValue)`
     padding-left: 5px;
 `;
 
-const PositionText = styled(TextValue)<{ isUp: boolean }>`
-    color: ${(props) => (props.isUp ? props.theme.positionColor.up : props.theme.positionColor.down)};
+const PositionText = styled(TextValue)<{ $isUp: boolean }>`
+    color: ${(props) => (props.$isUp ? props.theme.positionColor.up : props.theme.positionColor.down)};
     text-transform: uppercase;
 `;
 

@@ -809,7 +809,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             : {};
 
     return (
-        <Container isChained={isChained}>
+        <Container $isChained={isChained}>
             {!isMobile && getTradingDetails()}
             <FinalizeTrade>
                 <ColumnSpaceBetween ref={inputWrapperRef}>
@@ -970,11 +970,11 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     );
 };
 
-const Container = styled(FlexDivRow)<{ isChained: boolean }>`
+const Container = styled(FlexDivRow)<{ $isChained: boolean }>`
     position: relative;
     z-index: 4;
-    height: ${(props) => (props.isChained ? '98' : '78')}px;
-    margin-bottom: ${(props) => (props.isChained ? '48' : '68')}px;
+    height: ${(props) => (props.$isChained ? '98' : '78')}px;
+    margin-bottom: ${(props) => (props.$isChained ? '48' : '68')}px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         min-width: initial;
         height: 100%;

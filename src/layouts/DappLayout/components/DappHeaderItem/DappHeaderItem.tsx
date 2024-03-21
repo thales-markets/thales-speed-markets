@@ -54,7 +54,7 @@ const DappHeaderItem: React.FC<DappHeaderItemProps> = ({
                     className={`sidebar-icon icon--${iconName}`}
                     style={iconName == 'optimism' ? { color: 'white' } : {}}
                 />
-                <Text marginLeft={iconName === 'wizard' ? '25px' : ''}>{label}</Text>
+                <Text $marginLeft={iconName === 'wizard' ? '25px' : ''}>{label}</Text>
             </MenuItem>
         </SPAAnchor>
     );
@@ -99,7 +99,7 @@ const MenuItem = styled.li<{ margin?: string }>`
     }
 `;
 
-const Text = styled.span<{ marginLeft?: string }>`
+const Text = styled.span<{ $marginLeft?: string }>`
     z-index: 0;
     position: relative;
     font-style: normal;
@@ -109,7 +109,7 @@ const Text = styled.span<{ marginLeft?: string }>`
     letter-spacing: 0.35px;
     white-space: nowrap;
     display: none;
-    margin-left: ${(props) => (props.marginLeft ? props.marginLeft : '20px')};
+    margin-left: ${(props) => (props.$marginLeft ? props.$marginLeft : '20px')};
     text-transform: uppercase;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         display: none;

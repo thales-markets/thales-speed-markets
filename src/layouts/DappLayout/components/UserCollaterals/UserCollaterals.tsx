@@ -116,7 +116,7 @@ const UserCollaterals: React.FC = () => {
             <OutsideClickHandler onOutsideClick={() => isDropdownOpen && setIsDropdownOpen(false)}>
                 <Wrapper>
                     <SwapWrapper
-                        clickable={isConnected && isMultiCollateralSupported}
+                        $clickable={isConnected && isMultiCollateralSupported}
                         onClick={() =>
                             isConnected &&
                             (isMultiCollateralSupported
@@ -137,7 +137,7 @@ const UserCollaterals: React.FC = () => {
                             {collateralsWithBalance.map((coin, index) => (
                                 <BalanceWrapper
                                     key={index}
-                                    clickable={isConnected}
+                                    $clickable={isConnected}
                                     onClick={() => onCollateralClickHandler(coin.name)}
                                 >
                                     {assetIcon(coin.name)}
@@ -168,11 +168,11 @@ const Wrapper = styled(FlexDivRow)`
     }
 `;
 
-const SwapWrapper = styled.div<{ clickable: boolean }>`
+const SwapWrapper = styled.div<{ $clickable: boolean }>`
     display: flex;
     align-items: center;
     width: 100%;
-    cursor: ${(props) => (props.clickable ? 'pointer' : 'default')};
+    cursor: ${(props) => (props.$clickable ? 'pointer' : 'default')};
     padding: 4px 13px;
     @media (max-width: 500px) {
         padding: 4px 7px;
@@ -198,13 +198,13 @@ const Dropdown = styled.div`
     }
 `;
 
-const BalanceWrapper = styled.div<{ clickable: boolean }>`
+const BalanceWrapper = styled.div<{ $clickable: boolean }>`
     display: -webkit-flex;
     flex-direction: row;
     align-items: center;
     text-align: center;
     padding: 6px;
-    cursor: ${(props) => (props.clickable ? 'pointer' : 'default')};
+    cursor: ${(props) => (props.$clickable ? 'pointer' : 'default')};
     border-radius: 8px;
     &:hover {
         background: ${(props) => props.theme.background.primary};

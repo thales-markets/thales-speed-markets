@@ -23,7 +23,7 @@ const UserWallet: React.FC = () => {
             <Wrapper>
                 <UserCollaterals />
                 <WalletContainer
-                    connected={isConnected}
+                    $connected={isConnected}
                     onClick={() => {
                         isConnected ? openAccountModal?.() : openConnectModal?.();
                     }}
@@ -60,10 +60,10 @@ const Wrapper = styled.div`
     }
 `;
 
-const WalletContainer = styled.div<{ connected: boolean }>`
+const WalletContainer = styled.div<{ $connected: boolean }>`
     width: 100%;
     min-width: 120px;
-    cursor: ${(props) => (props.connected ? 'text' : 'pointer')};
+    cursor: ${(props) => (props.$connected ? 'text' : 'pointer')};
     padding: 4px 13px;
     display: flex;
     justify-content: center;
@@ -77,7 +77,7 @@ const WalletContainer = styled.div<{ connected: boolean }>`
     text-align: center;
     @media (max-width: 500px) {
         min-width: fit-content;
-        max-width: ${(props) => (props.connected ? '100px' : '120px')};
+        max-width: ${(props) => (props.$connected ? '100px' : '120px')};
         padding: 4px 7px;
     }
 `;

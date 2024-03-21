@@ -22,7 +22,7 @@ const SelectAsset: React.FC<SelectAssetProps> = ({ selectedAsset, allAssets, onC
             {allAssets.map((currentAsset, index) => (
                 <Asset
                     key={index}
-                    isSelected={asset === currentAsset || selectedAsset === currentAsset}
+                    $isSelected={asset === currentAsset || selectedAsset === currentAsset}
                     onClick={() => {
                         onChange(currentAsset);
                         setAsset(currentAsset);
@@ -46,14 +46,14 @@ const Container = styled(FlexDivCentered)`
     }
 `;
 
-const Asset = styled(FlexDivCentered)<{ isSelected: boolean }>`
+const Asset = styled(FlexDivCentered)<{ $isSelected: boolean }>`
     width: 190px;
     height: 36px;
     border-radius: 8px;
     background: ${(props) =>
-        props.isSelected ? props.theme.button.background.primary : props.theme.button.background.tertiary};
+        props.$isSelected ? props.theme.button.background.primary : props.theme.button.background.tertiary};
     color: ${(props) =>
-        props.isSelected ? props.theme.button.textColor.primary : props.theme.button.textColor.secondary};
+        props.$isSelected ? props.theme.button.textColor.primary : props.theme.button.textColor.secondary};
     cursor: pointer;
     font-size: 18px;
     line-height: 90%;

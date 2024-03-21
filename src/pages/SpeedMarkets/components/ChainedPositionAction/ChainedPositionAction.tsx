@@ -341,14 +341,14 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 ) : (
                     <ResultsContainer>
                         <Label>{t('common.result')}</Label>
-                        <Value isUpperCase color={theme.error.textColor.primary}>
+                        <Value $isUpperCase color={theme.error.textColor.primary}>
                             {t('common.loss')}
                         </Value>
                     </ResultsContainer>
                 );
             } else {
                 return (
-                    <ResultsContainer minWidth="180px">
+                    <ResultsContainer $minWidth="180px">
                         <Label>{t('speed-markets.user-positions.results')}</Label>
                         <TimeRemaining fontSize={13} end={position.maturityDate} showFullCounter showSecondsCounter />
                     </ResultsContainer>
@@ -359,7 +359,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 <ResultsContainer>
                     <Label>{t('common.result')}</Label>
                     <Value
-                        isUpperCase
+                        $isUpperCase
                         color={position.isUserWinner ? theme.textColor.quaternary : theme.error.textColor.primary}
                     >
                         {position.isUserWinner ? t('common.won') : t('common.loss')}

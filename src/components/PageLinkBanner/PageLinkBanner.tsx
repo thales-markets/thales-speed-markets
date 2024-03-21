@@ -21,7 +21,7 @@ const PageLinkBanner: React.FC<PageLinkBannerProps> = ({ link }) => {
             <Content>
                 <Text>
                     {t('common.banner.page-link.thales-markets')}{' '}
-                    <Text noWrap>
+                    <Text $noWrap>
                         <Trans
                             i18nKey="common.banner.page-link.try"
                             components={
@@ -50,13 +50,13 @@ const Content = styled(FlexDivCentered)`
     }
 `;
 
-const Text = styled.span<{ noWrap?: boolean }>`
+const Text = styled.span<{ $noWrap?: boolean }>`
     color: ${(props) => props.theme.button.textColor.primary};
     text-align: center;
     font-size: 13px;
     font-weight: 400;
     line-height: 100%;
-    ${(props) => (props.noWrap ? 'white-space: nowrap;' : '')}
+    ${(props) => (props.$noWrap ? 'white-space: nowrap;' : '')}
 `;
 
 const BoldText = styled(Text)`

@@ -22,16 +22,16 @@ const CurrentPrice: React.FC<CurrentPriceProps> = ({ asset, currentPrice, isPric
                     if (isNaN(parseInt(letter))) {
                         skipIndexes.push(index + 1);
                         return (
-                            <Price isUp={isPriceUp} key={`priceLetter${index}`}>
+                            <Price $isUp={isPriceUp} key={`priceLetter${index}`}>
                                 {letter}
                             </Price>
                         );
                     } else {
                         return (
                             <PriceNumber
-                                priceLength={currentPriceFormatted.length}
-                                skipIndexes={skipIndexes}
-                                isUp={isPriceUp}
+                                $priceLength={currentPriceFormatted.length}
+                                $skipIndexes={skipIndexes}
+                                $isUp={isPriceUp}
                                 key={`priceNumber${index}`}
                             >
                                 <i>1</i>
@@ -43,7 +43,7 @@ const CurrentPrice: React.FC<CurrentPriceProps> = ({ asset, currentPrice, isPric
                     }
                 })}
             </AnimatedPrice>
-            <Icon className="icon icon--arrow" isUp={isPriceUp} />
+            <Icon className="icon icon--arrow" $isUp={isPriceUp} />
         </Container>
     );
 };
@@ -63,28 +63,28 @@ const AnimatedPrice = styled.div`
     overflow: hidden;
 `;
 
-const Icon = styled.i<{ isUp?: boolean }>`
-    font-size: ${(props) => (props.isUp !== undefined ? '22' : '28')}px;
+const Icon = styled.i<{ $isUp?: boolean }>`
+    font-size: ${(props) => (props.$isUp !== undefined ? '22' : '28')}px;
     ${(props) =>
-        props.isUp !== undefined
-            ? `color: ${props.isUp ? props.theme.positionColor.up : props.theme.positionColor.down};`
+        props.$isUp !== undefined
+            ? `color: ${props.$isUp ? props.theme.positionColor.up : props.theme.positionColor.down};`
             : ''}
     ${(props) =>
-        props.isUp !== undefined ? (props.isUp ? 'transform: rotate(-90deg);' : 'transform: rotate(90deg);') : ''}
+        props.$isUp !== undefined ? (props.$isUp ? 'transform: rotate(-90deg);' : 'transform: rotate(90deg);') : ''}
     
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        font-size: ${(props) => (props.isUp !== undefined ? '18' : '22')}px;
+        font-size: ${(props) => (props.$isUp !== undefined ? '18' : '22')}px;
     }
 `;
 
-const Price = styled.span<{ isUp?: boolean }>`
+const Price = styled.span<{ $isUp?: boolean }>`
     font-style: normal;
     font-weight: 700;
     font-size: 22px;
     line-height: 100%;
     color: ${(props) =>
-        props.isUp !== undefined
-            ? props.isUp
+        props.$isUp !== undefined
+            ? props.$isUp
                 ? props.theme.positionColor.up
                 : props.theme.positionColor.down
             : props.theme.textColor.primary};
@@ -135,13 +135,13 @@ const getPriceNumberStyle = () => {
     `;
 };
 
-const PriceNumber = styled(Price)<{ priceLength: number; skipIndexes: number[] }>`
+const PriceNumber: any = styled(Price)<{ $priceLength: number; $skipIndexes: number[] }>`
     position: relative;
     display: inline-block;
     transform: translate3d(0, 400%, 0);
     animation: countdown 1s forwards;
 
-    ${(props) => getPriceAnimation(props.priceLength, props.skipIndexes)};
+    ${(props) => getPriceAnimation(props.$priceLength, props.$skipIndexes)};
 
     i {
         position: absolute;

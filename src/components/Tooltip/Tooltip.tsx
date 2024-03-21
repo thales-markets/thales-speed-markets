@@ -44,11 +44,11 @@ const Tooltip: React.FC<TooltipProps> = ({
             ) : (
                 <InfoIcon
                     color={iconColor}
-                    iconFontSize={iconFontSize}
-                    marginLeft={marginLeft}
+                    $iconFontSize={iconFontSize}
+                    $marginLeft={marginLeft}
                     top={top}
                     style={customIconStyling}
-                    mobileIconFontSize={mobileIconFontSize}
+                    $mobileIconFontSize={mobileIconFontSize}
                 />
             )}
         </ReactTooltip>
@@ -56,17 +56,17 @@ const Tooltip: React.FC<TooltipProps> = ({
 };
 
 const InfoIcon = styled.i<{
-    iconFontSize?: number;
-    marginLeft?: number;
+    $iconFontSize?: number;
+    $marginLeft?: number;
     top?: number;
     color?: string;
-    mobileIconFontSize?: number;
+    $mobileIconFontSize?: number;
 }>`
-    font-size: ${(props) => props.iconFontSize || 15}px;
+    font-size: ${(props) => props.$iconFontSize || 15}px;
     font-weight: normal;
     cursor: pointer;
     position: relative;
-    margin-left: ${(props) => (props.marginLeft !== undefined ? props.marginLeft : 4)}px;
+    margin-left: ${(props) => (props.$marginLeft !== undefined ? props.$marginLeft : 4)}px;
     top: ${(props) => props.top || 0}px;
     color: ${(props) => props.color || 'white'};
     &:before {
@@ -75,7 +75,7 @@ const InfoIcon = styled.i<{
     }
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         font-size: ${(props) =>
-            props.mobileIconFontSize ? props.mobileIconFontSize : props.iconFontSize ? props.iconFontSize : 15}px;
+            props.$mobileIconFontSize ? props.$mobileIconFontSize : props.$iconFontSize ? props.$iconFontSize : 15}px;
     }
 `;
 

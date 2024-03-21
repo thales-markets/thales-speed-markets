@@ -253,14 +253,14 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
             return (
                 <ResultsContainer>
                     <Label>{t('common.result')}</Label>
-                    <Value isUpperCase color={theme.error.textColor.primary}>
+                    <Value $isUpperCase color={theme.error.textColor.primary}>
                         {t('common.loss')}
                     </Value>
                 </ResultsContainer>
             );
         } else {
             return (
-                <ResultsContainer minWidth="180px">
+                <ResultsContainer $minWidth="180px">
                     <Label>{t('speed-markets.user-positions.results')}</Label>
                     <TimeRemaining fontSize={13} end={position.maturityDate} showFullCounter showSecondsCounter />
                 </ResultsContainer>
@@ -315,22 +315,22 @@ const additionalButtonStyle: CSSProperties = {
     border: 'none',
 };
 
-export const ResultsContainer = styled(FlexDivCentered)<{ minWidth?: string }>`
+export const ResultsContainer = styled(FlexDivCentered)<{ $minWidth?: string }>`
     gap: 4px;
     font-weight: 700;
     font-size: 13px;
     line-height: 100%;
     white-space: nowrap;
-    min-width: ${(props) => (props.minWidth ? props.minWidth : '174px')};
+    min-width: ${(props) => (props.$minWidth ? props.$minWidth : '174px')};
 `;
 
 export const Label = styled.span<{ color?: string }>`
     color: ${(props) => (props.color ? props.color : props.theme.textColor.secondary)};
 `;
 
-export const Value = styled.span<{ color?: string; isUpperCase?: boolean }>`
+export const Value = styled.span<{ color?: string; $isUpperCase?: boolean }>`
     color: ${(props) => props.color || props.theme.textColor.primary};
-    ${(props) => (props.isUpperCase ? 'text-transform: uppercase;' : '')}
+    ${(props) => (props.$isUpperCase ? 'text-transform: uppercase;' : '')}
     font-weight: bold;
     line-height: 100%;
 `;
