@@ -75,15 +75,16 @@ const useUserSpeedMarketsTransactionsQuery = (
                 const sides = [SIDE_TO_POSITION_MAP[marketData.direction]];
                 const payout = coinFormatter(marketData.buyinAmount, queryConfig.networkId) * SPEED_MARKETS_QUOTE;
 
-                const createdAt = !marketData.createdAt.isZero()
-                    ? secondsToMilliseconds(Number(marketData.createdAt))
-                    : secondsToMilliseconds(Number(marketData.strikeTime)) - hoursToMilliseconds(1);
-                const lpFee = !marketData.lpFee.isZero()
-                    ? bigNumberFormatter(marketData.lpFee)
-                    : getFeesFromHistory(createdAt).lpFee;
-                const safeBoxImpact = !marketData.safeBoxImpact.isZero()
-                    ? bigNumberFormatter(marketData.safeBoxImpact)
-                    : getFeesFromHistory(createdAt).safeBoxImpact;
+                const createdAt =
+                    marketData.createdAt != 0
+                        ? secondsToMilliseconds(Number(marketData.createdAt))
+                        : secondsToMilliseconds(Number(marketData.strikeTime)) - hoursToMilliseconds(1);
+                const lpFee =
+                    marketData.lpFee != 0 ? bigNumberFormatter(marketData.lpFee) : getFeesFromHistory(createdAt).lpFee;
+                const safeBoxImpact =
+                    marketData.safeBoxImpact != 0
+                        ? bigNumberFormatter(marketData.safeBoxImpact)
+                        : getFeesFromHistory(createdAt).safeBoxImpact;
                 const fees = lpFee + safeBoxImpact;
 
                 const userData: TradeWithMarket = {

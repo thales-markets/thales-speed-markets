@@ -63,15 +63,16 @@ const useActiveSpeedMarketsDataQuery = (
                 const payout = coinFormatter(marketData.buyinAmount, queryConfig.networkId) * SPEED_MARKETS_QUOTE;
 
                 const maturityDate = secondsToMilliseconds(Number(marketData.strikeTime));
-                const createdAt = !marketData.createdAt.isZero()
-                    ? secondsToMilliseconds(Number(marketData.createdAt))
-                    : maturityDate - hoursToMilliseconds(1);
-                const lpFee = !marketData.lpFee.isZero()
-                    ? bigNumberFormatter(marketData.lpFee)
-                    : getFeesFromHistory(createdAt).lpFee;
-                const safeBoxImpact = !marketData.safeBoxImpact.isZero()
-                    ? bigNumberFormatter(marketData.safeBoxImpact)
-                    : getFeesFromHistory(createdAt).safeBoxImpact;
+                const createdAt =
+                    marketData.createdAt != 0
+                        ? secondsToMilliseconds(Number(marketData.createdAt))
+                        : maturityDate - hoursToMilliseconds(1);
+                const lpFee =
+                    marketData.lpFee != 0 ? bigNumberFormatter(marketData.lpFee) : getFeesFromHistory(createdAt).lpFee;
+                const safeBoxImpact =
+                    marketData.safeBoxImpact != 0
+                        ? bigNumberFormatter(marketData.safeBoxImpact)
+                        : getFeesFromHistory(createdAt).safeBoxImpact;
                 const fees = lpFee + safeBoxImpact;
 
                 const userData: UserOpenPositions = {
@@ -106,12 +107,12 @@ const useActiveSpeedMarketsDataQuery = (
                 const side = SIDE_TO_POSITION_MAP[marketData.direction];
                 const payout = coinFormatter(marketData.buyinAmount, queryConfig.networkId) * SPEED_MARKETS_QUOTE;
 
-                const lpFee = !marketData.lpFee.isZero()
-                    ? bigNumberFormatter(marketData.lpFee)
-                    : getFeesFromHistory(Date.now()).lpFee;
-                const safeBoxImpact = !marketData.safeBoxImpact.isZero()
-                    ? bigNumberFormatter(marketData.safeBoxImpact)
-                    : getFeesFromHistory(Date.now()).safeBoxImpact;
+                const lpFee =
+                    marketData.lpFee != 0 ? bigNumberFormatter(marketData.lpFee) : getFeesFromHistory(Date.now()).lpFee;
+                const safeBoxImpact =
+                    marketData.safeBoxImpact != 0
+                        ? bigNumberFormatter(marketData.safeBoxImpact)
+                        : getFeesFromHistory(Date.now()).safeBoxImpact;
                 const fees = lpFee + safeBoxImpact;
 
                 const userData: UserOpenPositions = {

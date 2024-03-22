@@ -161,17 +161,18 @@ const useProfileDataQuery = (
                 allSpeedMarkets.flat().forEach((marketData: any) => {
                     const isChained = !!marketData.directions;
 
-                    const createdAt = !marketData.createdAt.isZero()
-                        ? secondsToMilliseconds(Number(marketData.createdAt))
-                        : secondsToMilliseconds(Number(marketData.strikeTime)) - hoursToMilliseconds(1);
+                    const createdAt =
+                        marketData.createdAt != 0
+                            ? secondsToMilliseconds(Number(marketData.createdAt))
+                            : secondsToMilliseconds(Number(marketData.strikeTime)) - hoursToMilliseconds(1);
                     const lpFee = isChained
                         ? 0
-                        : !marketData.lpFee.isZero()
+                        : marketData.lpFee != 0
                         ? bigNumberFormatter(marketData.lpFee)
                         : getFeesFromHistory(createdAt).lpFee;
                     const safeBoxImpact = isChained
                         ? bigNumberFormatter(marketData.safeBoxImpact)
-                        : !marketData.safeBoxImpact.isZero()
+                        : marketData.safeBoxImpact != 0
                         ? bigNumberFormatter(marketData.safeBoxImpact)
                         : getFeesFromHistory(createdAt).safeBoxImpact;
                     const fees = lpFee + safeBoxImpact;
