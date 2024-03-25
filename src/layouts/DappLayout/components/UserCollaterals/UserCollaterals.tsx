@@ -18,9 +18,10 @@ import {
     getAssetIcon,
     getCoinBalance,
     getCollateral,
-    getCollateralIndexByBalance,
+    getPositiveCollateralIndexByBalance,
     getCollateralIndexForNetwork,
     getCollaterals,
+    isStableCurrency,
 } from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
 
@@ -66,7 +67,7 @@ const UserCollaterals: React.FC = () => {
                           col.name ===
                           getCollateral(
                               networkId,
-                              getCollateralIndexByBalance(multipleCollateralBalances.data, networkId)
+                              getPositiveCollateralIndexByBalance(multipleCollateralBalances.data, networkId)
                           )
                   ) || currentCollateralWithBalance
                 : currentCollateralWithBalance
@@ -76,7 +77,7 @@ const UserCollaterals: React.FC = () => {
 
     useEffect(() => {
         if (isMultiCollateralSupported && multipleCollateralBalances?.data) {
-            const collateralIndexWithPositiveBalance = getCollateralIndexByBalance(
+            const collateralIndexWithPositiveBalance = getPositiveCollateralIndexByBalance(
                 multipleCollateralBalances.data,
                 networkId
             );
@@ -84,7 +85,10 @@ const UserCollaterals: React.FC = () => {
                 (el) => el.name === getCollateral(networkId, collateralIndexWithPositiveBalance)
             );
 
-            if (positiveCollateral && positiveCollateral.balance >= 1) {
+            if (
+                positiveCollateral &&
+                positiveCollateral.balance > (isStableCurrency(positiveCollateral.name) ? 1 : 0)
+            ) {
                 setCollateral(positiveCollateral);
                 dispatch(setSelectedCollateralIndex(getCollateralIndexForNetwork(networkId, positiveCollateral.name)));
             }
