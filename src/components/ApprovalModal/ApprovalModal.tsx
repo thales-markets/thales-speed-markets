@@ -3,19 +3,19 @@ import Button from 'components/Button';
 import Modal from 'components/Modal';
 import Checkbox from 'components/fields/Checkbox';
 import NumericInput from 'components/fields/NumericInput/NumericInput';
-import { BigNumber, ethers } from 'ethers';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { FlexDivCentered, FlexDivColumnCentered, FlexDivRow } from 'styles/common';
 import { Coins, bigNumberFormatter, coinParser } from 'thales-utils';
+import { maxUint256 } from 'viem';
 import { useAccount, useChainId } from 'wagmi';
 
 type ApprovalModalProps = {
     defaultAmount: number | string;
     tokenSymbol: string;
     isAllowing: boolean;
-    onSubmit: (approveAmount: BigNumber) => void;
+    onSubmit: (approveAmount: bigint) => void;
     onClose: () => void;
 };
 
@@ -29,7 +29,7 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({ defaultAmount, tokenSymbo
 
     const { openConnectModal } = useConnectModal();
 
-    const maxApproveAmount = bigNumberFormatter(ethers.constants.MaxUint256);
+    const maxApproveAmount = bigNumberFormatter(maxUint256);
     const isAmountEntered = Number(amount) > 0;
     const isButtonDisabled = !isConnected || isAllowing || (!approveAll && (!isAmountEntered || !isAmountValid));
 
@@ -45,7 +45,7 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({ defaultAmount, tokenSymbo
         return (
             <Button
                 disabled={isButtonDisabled}
-                onClick={() => onSubmit(approveAll ? ethers.constants.MaxUint256 : amountConverted)}
+                onClick={() => onSubmit(approveAll ? maxUint256 : amountConverted)}
                 additionalStyles={{ textTransform: 'none' }}
             >
                 {!isAllowing

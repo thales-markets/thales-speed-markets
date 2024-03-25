@@ -5,7 +5,6 @@ import { ReactComponent as PolygonLogo } from 'assets/images/polygon-circle-logo
 import { ReactComponent as ZkSyncLogo } from 'assets/images/zksync-circle-logo.svg';
 import { L1_TO_L2_NETWORK_MAPPER, SUPPORTED_NETWORKS, SUPPORTED_NETWORKS_PARAMS } from 'constants/network';
 import ROUTES from 'constants/routes';
-import { BigNumber } from 'ethers';
 import { FunctionComponent, SVGProps } from 'react';
 import { NetworkId } from 'thales-utils';
 import { NetworkParams, SupportedNetwork } from '../types/network';
@@ -20,7 +19,7 @@ export const isNetworkSupported = (networkId: SupportedNetwork): boolean => {
 export const getIsMultiCollateralSupported = (networkId: SupportedNetwork): boolean =>
     getCollaterals(networkId).length > 1;
 
-export const checkAllowance = async (amount: BigNumber, token: any, walletAddress: string, spender: string) => {
+export const checkAllowance = async (amount: bigint, token: any, walletAddress: string, spender: string) => {
     try {
         const allowedAmount = await token.read.allowance([walletAddress, spender]);
         return allowedAmount >= amount;

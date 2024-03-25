@@ -15,7 +15,6 @@ import { USD_SIGN } from 'constants/currency';
 import { ZERO_ADDRESS } from 'constants/network';
 import { CONNECTION_TIMEOUT_MS, PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
 import { differenceInSeconds, millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
-import { BigNumberish } from 'ethers';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -117,7 +116,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
         }
     }, [position.value, networkId, address, isConnected, hasAllowance, isAllowing, isDefaultCollateral, client]);
 
-    const handleAllowance = async (approveAmount: BigNumberish) => {
+    const handleAllowance = async (approveAmount: bigint) => {
         const erc20Instance = getContract({
             abi: erc20Contract.abi,
             address: erc20Contract.addresses[networkId] as any,

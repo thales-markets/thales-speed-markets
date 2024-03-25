@@ -23,7 +23,6 @@ import { PYTH_CONTRACT_ADDRESS, PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import { millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
 import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
-import { BigNumber, ethers } from 'ethers';
 import useDebouncedEffect from 'hooks/useDebouncedEffect';
 import useInterval from 'hooks/useInterval';
 import SharePositionModal from 'pages/SpeedMarkets/components/SharePositionModal';
@@ -461,7 +460,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
         const getAllowance = async () => {
             try {
-                const parsedAmount: BigNumber = coinParser(
+                const parsedAmount: bigint = coinParser(
                     isStableCurrency(selectedCollateral)
                         ? roundNumberToDecimals(totalPaidAmount).toString()
                         : roundNumberToDecimals(totalPaidAmount, COLLATERAL_DECIMALS[selectedCollateral]).toString(),
@@ -500,7 +499,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         selectedCollateral,
     ]);
 
-    const handleAllowance = async (approveAmount: BigNumber) => {
+    const handleAllowance = async (approveAmount: bigint) => {
         if (!collateralAddress) {
             return;
         }
@@ -638,7 +637,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         }) as ViemContract;
 
         try {
-            const tx: ethers.ContractTransaction = await collateralWithSigner.write.mintForUser([address]);
+            const tx = await collateralWithSigner.write.mintForUser([address]);
 
             if (tx) {
                 toast.update(
