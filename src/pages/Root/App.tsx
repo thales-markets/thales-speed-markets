@@ -8,6 +8,7 @@ import { Redirect, Route, Router, Switch } from 'react-router-dom';
 import { setAppReady } from 'redux/modules/app';
 import { setIsMobile } from 'redux/modules/ui';
 import { createGlobalStyle } from 'styled-components';
+import { SupportedNetwork } from 'types/network';
 import { isMobile } from 'utils/device';
 import { getSupportedNetworksByRoute, isNetworkSupported } from 'utils/network';
 import queryConnector from 'utils/queryConnector';
@@ -17,8 +18,8 @@ import { useAccount, useChainId, useDisconnect, useSwitchChain } from 'wagmi';
 const DappLayout = lazy(() => import(/* webpackChunkName: "DappLayout" */ 'layouts/DappLayout'));
 
 const SpeedMarkets = lazy(() => import(/* webpackChunkName: "SpeedMarkets" */ '../SpeedMarkets'));
-const SpeedMarketsOverview = lazy(() =>
-    import(/* webpackChunkName: "SpeedMarketsOverview" */ '../SpeedMarketsOverview')
+const SpeedMarketsOverview = lazy(
+    () => import(/* webpackChunkName: "SpeedMarketsOverview" */ '../SpeedMarketsOverview')
 );
 const Profile = lazy(() => import(/* webpackChunkName: "Profile" */ '../Profile'));
 
@@ -39,12 +40,12 @@ const App = () => {
 
     useEffect(() => {
         if (window.ethereum) {
-            window.ethereum.on('chainChanged', (chainIdParam) => {
-                const chainId = Number.isInteger(chainIdParam) ? chainIdParam : parseInt(chainIdParam, 16);
+            window.ethereum.on('chainChanged', (chainIdParam: string) => {
+                const chainId = Number.isInteger(chainIdParam) ? Number(chainIdParam) : parseInt(chainIdParam, 16);
 
                 if (!address && isNetworkSupported(chainId)) {
                     // when wallet disconnected reflect network change from browser wallet to dApp
-                    switchChain({ chainId });
+                    switchChain({ chainId: chainId as SupportedNetwork });
                 }
             });
         }

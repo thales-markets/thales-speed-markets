@@ -17,17 +17,18 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsMobile } from 'redux/modules/ui';
-import { RootState } from 'types/ui';
 import styled, { CSSProperties } from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
 import { UserOpenPositions } from 'types/market';
+import { SupportedNetwork } from 'types/network';
+import { RootState } from 'types/ui';
+import { ViemContract } from 'types/viem';
+import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
 import { getPriceId, getPriceServiceEndpoint, priceParser } from 'utils/pyth';
 import { refetchActiveSpeedMarkets } from 'utils/queryConnector';
 import { delay } from 'utils/timer';
+import { Client, getContract } from 'viem';
 import { useChainId, useClient, useWalletClient } from 'wagmi';
-import { getContract } from 'viem';
-import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
-import { ViemContract } from 'types/viem';
 
 type OverviewPositionActionProps = {
     position: UserOpenPositions;
@@ -44,7 +45,7 @@ const OverviewPositionAction: React.FC<OverviewPositionActionProps> = ({
 }) => {
     const { t } = useTranslation();
 
-    const networkId = useChainId();
+    const networkId = useChainId() as SupportedNetwork;
     const client = useClient();
     const walletClient = useWalletClient();
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
@@ -65,8 +66,8 @@ const OverviewPositionAction: React.FC<OverviewPositionActionProps> = ({
 
         const speedMarketsAMMContractWithSigner = getContract({
             abi: speedMarketsAMMContract.abi,
-            address: speedMarketsAMMContract.addresses[networkId] as any,
-            client: walletClient.data as any,
+            address: speedMarketsAMMContract.addresses[networkId],
+            client: walletClient.data as Client,
         }) as ViemContract;
         try {
             let tx: ethers.ContractTransaction;
@@ -79,7 +80,7 @@ const OverviewPositionAction: React.FC<OverviewPositionActionProps> = ({
                 const pythContract = getContract({
                     abi: PythInterfaceAbi,
                     address: PYTH_CONTRACT_ADDRESS[networkId],
-                    client: client,
+                    client: client as Client,
                 }) as ViemContract;
 
                 const [priceFeedUpdateVaa, publishTime] = await priceConnection.getVaa(

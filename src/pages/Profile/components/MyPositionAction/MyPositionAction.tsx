@@ -26,6 +26,7 @@ import styled, { CSSProperties, useTheme } from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
 import { coinParser, formatCurrencyWithSign, roundNumberToDecimals } from 'thales-utils';
 import { UserOpenPositions } from 'types/market';
+import { SupportedNetwork } from 'types/network';
 import { UserPosition } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
 import { ViemContract } from 'types/viem';
@@ -42,7 +43,7 @@ import {
     refetchUserSpeedMarkets,
 } from 'utils/queryConnector';
 import { delay } from 'utils/timer';
-import { getContract } from 'viem';
+import { Client, getContract } from 'viem';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 
 const ONE_HUNDRED_AND_THREE_PERCENT = 1.03;
@@ -63,7 +64,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 
-    const networkId = useChainId();
+    const networkId = useChainId() as SupportedNetwork;
     const client = useClient();
     const walletClient = useWalletClient();
     const { isConnected, address } = useAccount();
@@ -93,8 +94,8 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
 
         const erc20Instance = getContract({
             abi: erc20Contract.abi,
-            address: erc20Contract.addresses[networkId] as any,
-            client: client,
+            address: erc20Contract.addresses[networkId],
+            client: client as Client,
         }) as any;
         const addressToApprove = speedMarketsAMMContract.addresses[networkId];
 
@@ -120,8 +121,8 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     const handleAllowance = async (approveAmount: BigNumberish) => {
         const erc20Instance = getContract({
             abi: erc20Contract.abi,
-            address: erc20Contract.addresses[networkId] as any,
-            client: client,
+            address: erc20Contract.addresses[networkId],
+            client: client as Client,
         }) as ViemContract;
         const addressToApprove = speedMarketsAMMContract.addresses[networkId];
 
@@ -157,7 +158,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
             const pythContract = getContract({
                 abi: PythInterfaceAbi,
                 address: PYTH_CONTRACT_ADDRESS[networkId],
-                client,
+                client: client as Client,
             });
 
             const [priceFeedUpdateVaa, publishTime] = await priceConnection.getVaa(

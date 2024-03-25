@@ -53,7 +53,13 @@ import {
     truncToDecimals,
 } from 'thales-utils';
 import { AmmChainedSpeedMarketsLimits, AmmSpeedMarketsLimits } from 'types/market';
+import { SupportedNetwork } from 'types/network';
 import { RootState } from 'types/ui';
+import { ViemContract } from 'types/viem';
+import chainedSpeedMarketsAMMContract from 'utils/contracts/chainedSpeedMarketsAMMContract';
+import erc20Contract from 'utils/contracts/collateralContract';
+import multipleCollateral from 'utils/contracts/multipleCollateralContract';
+import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
 import { getCoinBalance, getCollateral, getCollaterals, getDefaultCollateral, isStableCurrency } from 'utils/currency';
 import { checkAllowance, getIsMultiCollateralSupported } from 'utils/network';
 import { getPriceId, getPriceServiceEndpoint } from 'utils/pyth';
@@ -61,14 +67,9 @@ import { refetchBalances, refetchSpeedMarketsLimits, refetchUserSpeedMarkets } f
 import { getReferralWallet } from 'utils/referral';
 import { getFeeByTimeThreshold, getTransactionForSpeedAMM } from 'utils/speedAmm';
 import { delay } from 'utils/timer';
-import { SelectedPosition } from '../SelectPosition/SelectPosition';
+import { Client, getContract, parseUnits, stringToHex } from 'viem';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
-import { getContract, parseUnits, stringToHex } from 'viem';
-import chainedSpeedMarketsAMMContract from 'utils/contracts/chainedSpeedMarketsAMMContract';
-import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
-import { ViemContract } from 'types/viem';
-import multipleCollateral from 'utils/contracts/multipleCollateralContract';
-import erc20Contract from 'utils/contracts/collateralContract';
+import { SelectedPosition } from '../SelectPosition/SelectPosition';
 
 type AmmSpeedTradingProps = {
     isChained: boolean;
@@ -107,7 +108,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     const { openConnectModal } = useConnectModal();
 
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const networkId = useChainId();
+    const networkId = useChainId() as SupportedNetwork;
     const client = useClient();
     const walletClient = useWalletClient();
     const { isConnected, address } = useAccount();
@@ -452,8 +453,8 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         }
         const erc20Instance = getContract({
             abi: erc20Contract.abi,
-            address: collateralAddress as any,
-            client: client,
+            address: collateralAddress,
+            client: client as Client,
         }) as any;
         const addressToApprove = isChained
             ? chainedSpeedMarketsAMMContract.addresses[networkId]
@@ -561,7 +562,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             const pythContract = getContract({
                 abi: PythInterfaceAbi,
                 address: PYTH_CONTRACT_ADDRESS[networkId],
-                client,
+                client: client as Client,
             });
             const priceUpdateData = ['0x' + latestPriceUpdate.binary.data[0]];
             const updateFee = await pythContract.read.getUpdateFee([priceUpdateData]);

@@ -12,8 +12,8 @@ import {
 } from 'components/ToastMessage/ToastMessage';
 import Tooltip from 'components/Tooltip';
 import { USD_SIGN } from 'constants/currency';
-import { ZERO_ADDRESS } from 'constants/network';
 import { ONE_HUNDRED_AND_THREE_PERCENT } from 'constants/market';
+import { ZERO_ADDRESS } from 'constants/network';
 import { CONNECTION_TIMEOUT_MS, PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
 import { differenceInSeconds, millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
 import { BigNumber, ethers } from 'ethers';
@@ -45,14 +45,15 @@ import {
     refetchUserSpeedMarkets,
 } from 'utils/queryConnector';
 
-import { getUserLostAtSideIndex } from 'utils/speedAmm';
-import { delay } from 'utils/timer';
-import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
-import { getContract } from 'viem';
+import { SupportedNetwork } from 'types/network';
+import { ViemContract } from 'types/viem';
+import chainedSpeedMarketsAMMContract from 'utils/contracts/chainedSpeedMarketsAMMContract';
 import erc20Contract from 'utils/contracts/collateralContract';
 import multipleCollateral from 'utils/contracts/multipleCollateralContract';
-import chainedSpeedMarketsAMMContract from 'utils/contracts/chainedSpeedMarketsAMMContract';
-import { ViemContract } from 'types/viem';
+import { getUserLostAtSideIndex } from 'utils/speedAmm';
+import { delay } from 'utils/timer';
+import { Client, getContract } from 'viem';
+import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 
 type ChainedPositionActionProps = {
     position: ChainedSpeedMarket;
@@ -76,7 +77,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 
-    const networkId = useChainId();
+    const networkId = useChainId() as SupportedNetwork;
     const client = useClient();
     const walletClient = useWalletClient();
     const { isConnected, address } = useAccount();
@@ -110,8 +111,8 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
 
         const erc20Instance = getContract({
             abi: erc20Contract.abi,
-            address: erc20Contract.addresses[networkId] as any,
-            client,
+            address: erc20Contract.addresses[networkId],
+            client: client as Client,
         }) as any;
         const addressToApprove = chainedSpeedMarketsAMMContract.addresses[networkId];
 
@@ -151,8 +152,8 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
     const handleAllowance = async (approveAmount: BigNumber) => {
         const erc20Instance = getContract({
             abi: erc20Contract.abi,
-            address: collateralAddress as any,
-            client: client,
+            address: collateralAddress,
+            client: client as Client,
         }) as any;
         const addressToApprove = chainedSpeedMarketsAMMContract?.addresses[networkId];
 
@@ -208,7 +209,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 const pythContract = getContract({
                     abi: PythInterfaceAbi,
                     address: PYTH_CONTRACT_ADDRESS[networkId],
-                    client,
+                    client: client as Client,
                 }) as ViemContract;
 
                 let promises = [];

@@ -1,8 +1,9 @@
 import { NetworkId } from 'thales-utils';
 import { NetworkParams, SupportedNetwork } from 'types/network';
-import { Chain } from 'viem';
+import { Address, Chain } from 'viem';
 
-export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
+export const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000' as Address;
+export const TBD_ADDRESS = '0xTBD' as Address;
 
 export const SUPPORTED_NETWORKS: Record<SupportedNetwork, string> = {
     [NetworkId.OptimismMainnet]: 'OPTIMISTIC',

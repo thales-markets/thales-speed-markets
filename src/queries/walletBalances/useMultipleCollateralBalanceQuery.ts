@@ -1,13 +1,14 @@
-import QUERY_KEYS from 'constants/queryKeys';
 import { UseQueryOptions, useQuery } from '@tanstack/react-query';
+import { getBalance } from '@wagmi/core';
+import { TBD_ADDRESS } from 'constants/network';
+import QUERY_KEYS from 'constants/queryKeys';
+import { wagmiConfig } from 'pages/Root/wagmiConfig';
 import { COLLATERAL_DECIMALS, bigNumberFormatter } from 'thales-utils';
 import { CollateralsBalance } from 'types/collateral';
-import { getBalance } from '@wagmi/core';
-import { wagmiConfig } from 'pages/Root/wagmi-config';
-import { getContract } from 'viem';
-import multipleCollateral from 'utils/contracts/multipleCollateralContract';
 import { QueryConfig } from 'types/network';
 import { ViemContract } from 'types/viem';
+import multipleCollateral from 'utils/contracts/multipleCollateralContract';
+import { getContract } from 'viem';
 
 const useMultipleCollateralBalanceQuery = (
     walletAddress: string,
@@ -101,32 +102,32 @@ const useMultipleCollateralBalanceQuery = (
                     ETHBalance,
                     ARBBalance,
                 ] = await Promise.all([
-                    multipleCollateralObject.sUSD.address !== 'TBD'
+                    multipleCollateralObject.sUSD.address !== TBD_ADDRESS
                         ? multipleCollateralObject.sUSD.read.balanceOf([walletAddress])
                         : 0,
-                    multipleCollateralObject.DAI.address !== 'TBD'
+                    multipleCollateralObject.DAI.address !== TBD_ADDRESS
                         ? multipleCollateralObject.DAI.read.balanceOf([walletAddress])
                         : 0,
-                    multipleCollateralObject.USDC.address !== 'TBD'
+                    multipleCollateralObject.USDC.address !== TBD_ADDRESS
                         ? multipleCollateralObject.USDC.read.balanceOf([walletAddress])
                         : 0,
-                    multipleCollateralObject.USDCe.address !== 'TBD'
+                    multipleCollateralObject.USDCe.address !== TBD_ADDRESS
                         ? multipleCollateralObject.USDCe.read.balanceOf([walletAddress])
                         : 0,
-                    multipleCollateralObject.USDbC.address !== 'TBD'
+                    multipleCollateralObject.USDbC.address !== TBD_ADDRESS
                         ? multipleCollateralObject.USDbC.read.balanceOf([walletAddress])
                         : 0,
-                    multipleCollateralObject.USDT.address !== 'TBD'
+                    multipleCollateralObject.USDT.address !== TBD_ADDRESS
                         ? multipleCollateralObject.USDT.read.balanceOf([walletAddress])
                         : 0,
-                    multipleCollateralObject.OP.address !== 'TBD'
+                    multipleCollateralObject.OP.address !== TBD_ADDRESS
                         ? multipleCollateralObject.OP.read.balanceOf([walletAddress])
                         : 0,
-                    multipleCollateralObject.WETH.address !== 'TBD'
+                    multipleCollateralObject.WETH.address !== TBD_ADDRESS
                         ? multipleCollateralObject.WETH.read.balanceOf([walletAddress])
                         : 0,
                     getBalance(wagmiConfig, { address: walletAddress as any }) as any,
-                    multipleCollateralObject.ARB.address !== 'TBD'
+                    multipleCollateralObject.ARB.address !== TBD_ADDRESS
                         ? multipleCollateralObject.ARB.read.balanceOf([walletAddress])
                         : 0,
                 ]);

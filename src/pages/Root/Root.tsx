@@ -1,5 +1,7 @@
 import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
 import '@rainbow-me/rainbowkit/styles.css';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { Buffer as buffer } from 'buffer';
 import UnexpectedError from 'components/UnexpectedError';
 import WalletDisclaimer from 'components/WalletDisclaimer';
 import { PLAUSIBLE } from 'constants/analytics';
@@ -9,13 +11,12 @@ import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Provider } from 'react-redux';
 import { Store } from 'redux';
+import queryConnector from 'utils/queryConnector';
 import { getDefaultTheme } from 'utils/style';
 import { WagmiProvider } from 'wagmi';
 import App from './App';
-import { wagmiConfig } from './wagmi-config';
-import { QueryClientProvider } from '@tanstack/react-query';
-import queryConnector from 'utils/queryConnector';
-import { Buffer as buffer } from 'buffer';
+import { wagmiConfig } from './wagmiConfig';
+
 window.Buffer = window.Buffer || buffer;
 
 interface RootProps {

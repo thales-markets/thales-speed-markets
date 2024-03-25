@@ -1,4 +1,4 @@
-import { ReactComponent as BalanceIcon } from 'assets/images/balance-icon.svg';
+import BalanceIcon from 'assets/images/balance-icon.svg?react';
 import InlineLoader from 'components/InlineLoader';
 import Tooltip from 'components/Tooltip';
 import React, { ChangeEvent } from 'react';

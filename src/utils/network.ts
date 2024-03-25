@@ -1,8 +1,8 @@
-import { ReactComponent as ArbitrumLogo } from 'assets/images/arbitrum-circle-logo.svg';
-import { ReactComponent as BaseLogo } from 'assets/images/base-circle-logo.svg';
-import { ReactComponent as OpLogo } from 'assets/images/optimism-circle-logo.svg';
-import { ReactComponent as PolygonLogo } from 'assets/images/polygon-circle-logo.svg';
-import { ReactComponent as ZkSyncLogo } from 'assets/images/zksync-circle-logo.svg';
+import ArbitrumLogo from 'assets/images/arbitrum-circle-logo.svg?react';
+import BaseLogo from 'assets/images/base-circle-logo.svg?react';
+import OpLogo from 'assets/images/optimism-circle-logo.svg?react';
+import PolygonLogo from 'assets/images/polygon-circle-logo.svg?react';
+import ZkSyncLogo from 'assets/images/zksync-circle-logo.svg?react';
 import { L1_TO_L2_NETWORK_MAPPER, SUPPORTED_NETWORKS, SUPPORTED_NETWORKS_PARAMS } from 'constants/network';
 import ROUTES from 'constants/routes';
 import { BigNumber } from 'ethers';

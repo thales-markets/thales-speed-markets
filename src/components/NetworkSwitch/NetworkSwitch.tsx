@@ -72,13 +72,6 @@ const NetworkSwitch: React.FC<NetworkSwitchProps> = ({
                                                     network.id,
                                                     () => {
                                                         switchChain?.(network.id);
-                                                        // Trigger App.js init
-                                                        // do not use updateNetworkSettings(networkId) as it will trigger queries before provider in App.js is initialized
-                                                        // dispatch(
-                                                        //     switchToNetworkId({
-                                                        //         networkId: Number(network.id) as SupportedNetwork,
-                                                        //     })
-                                                        // );
                                                     }
                                                 );
                                             }
