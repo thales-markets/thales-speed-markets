@@ -43,7 +43,7 @@ type SwitchContainerProps = {
 };
 
 type CircleProps = {
-    $active: boolean;
+    active: boolean;
     size?: string;
     background?: string;
     $backgroundGradient?: boolean;
@@ -90,7 +90,7 @@ const SwitchInput: React.FC<SwitchProps> = ({
                 onClick={() => (!disabled && handleClick ? handleClick() : null)}
             >
                 <Circle
-                    $active={active}
+                    active={active}
                     size={dotSize}
                     background={dotBackground}
                     $backgroundGradient={dotGradient}
@@ -143,13 +143,13 @@ const SwitchContainer = styled.div<SwitchContainerProps>`
 `;
 
 const Circle = styled.div<CircleProps>`
-    width: ${(props: any) => props.size || '15px'};
-    height: ${(props: any) => props.size || '15px'};
+    width: ${(props) => props.size || '15px'};
+    height: ${(props) => props.size || '15px'};
     border-radius: 60%;
     position: absolute;
-    background-color: ${(props: any) => props.background || props.theme.textColor.primary};
-    ${(props: any) =>
-        props?.active ? `right: ${props.circlePosition || '5px'};` : `left: ${props.circlePosition || '5px'};`};
+    background-color: ${(props) => props.background || props.theme.textColor.primary};
+    ${(props) =>
+        props?.active ? `right: ${props.$circlePosition || '5px'};` : `left: ${props.$circlePosition || '5px'};`};
 `;
 
 export default SwitchInput;

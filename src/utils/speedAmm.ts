@@ -167,7 +167,7 @@ export const resolveAllSpeedPositions = async (
 
     const speedMarketsAMMContractWithSigner = getContract({
         abi: speedMarketsAMMContract.abi,
-        address: speedMarketsAMMContract.addresses[queryConfig.networkId] as any,
+        address: speedMarketsAMMContract.addresses[queryConfig.networkId],
         client: queryConfig.client,
     }) as ViemContract;
 
@@ -255,7 +255,7 @@ export const resolveAllChainedMarkets = async (
 
     const chainedSpeedMarketsAMMContractWithSigner = getContract({
         abi: chainedSpeedMarketsAMMContract.abi,
-        address: chainedSpeedMarketsAMMContract.addresses[queryConfig.networkId] as any,
+        address: chainedSpeedMarketsAMMContract.addresses[queryConfig.networkId],
         client: queryConfig.client,
     }) as ViemContract;
 

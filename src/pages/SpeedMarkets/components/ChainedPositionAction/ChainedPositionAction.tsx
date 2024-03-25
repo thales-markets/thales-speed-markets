@@ -112,7 +112,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
             abi: erc20Contract.abi,
             address: erc20Contract.addresses[networkId],
             client: client as Client,
-        }) as any;
+        });
         const addressToApprove = chainedSpeedMarketsAMMContract.addresses[networkId];
 
         const getAllowance = async () => {
@@ -153,7 +153,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
             abi: erc20Contract.abi,
             address: collateralAddress,
             client: client as Client,
-        }) as any;
+        });
         const addressToApprove = chainedSpeedMarketsAMMContract?.addresses[networkId];
 
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
@@ -185,8 +185,8 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
 
         const chainedSpeedMarketsAMMContractWithSigner = getContract({
             abi: chainedSpeedMarketsAMMContract.abi,
-            address: chainedSpeedMarketsAMMContract.addresses[networkId] as any,
-            client: walletClient.data as any,
+            address: chainedSpeedMarketsAMMContract.addresses[networkId],
+            client: walletClient.data as Client,
         }) as ViemContract;
         try {
             let tx;

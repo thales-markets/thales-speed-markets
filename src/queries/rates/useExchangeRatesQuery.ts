@@ -5,6 +5,7 @@ import { bigNumberFormatter, parseBytes32String } from 'thales-utils';
 import priceFeedContract from 'utils/contracts/priceFeedContract';
 import { getContract } from 'viem';
 import { QueryConfig } from 'types/network';
+import { ViemContract } from 'types/viem';
 export type Rates = Record<string, number>;
 
 const useExchangeRatesQuery = (
@@ -17,10 +18,10 @@ const useExchangeRatesQuery = (
             const exchangeRates: Rates = {};
 
             const priceFeedContractLocal = getContract({
-                address: priceFeedContract.addresses[queryConfig.networkId] as any,
+                address: priceFeedContract.addresses[queryConfig.networkId],
                 abi: priceFeedContract.abi,
                 client: queryConfig.client,
-            }) as any;
+            }) as ViemContract;
 
             if (priceFeedContractLocal) {
                 const [currencies, rates] = await Promise.all([
@@ -40,8 +41,6 @@ const useExchangeRatesQuery = (
                     }
                 });
             }
-
-            console.log(exchangeRates);
 
             return exchangeRates;
         },

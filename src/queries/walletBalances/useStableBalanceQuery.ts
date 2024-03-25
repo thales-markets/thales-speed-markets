@@ -20,7 +20,7 @@ const useStableBalanceQuery = (
                 console.log('lets try stable: ');
                 const collateral = getContract({
                     abi: erc20Contract.abi,
-                    address: erc20Contract.addresses[queryConfig.networkId] as any,
+                    address: erc20Contract.addresses[queryConfig.networkId],
                     client: queryConfig.client,
                 }) as ViemContract;
                 const collateralKey = getDefaultCollateral(queryConfig.networkId);

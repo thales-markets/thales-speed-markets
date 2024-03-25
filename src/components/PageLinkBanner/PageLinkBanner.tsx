@@ -24,12 +24,10 @@ const PageLinkBanner: React.FC<PageLinkBannerProps> = ({ link }) => {
                     <Text $noWrap>
                         <Trans
                             i18nKey="common.banner.page-link.try"
-                            components={
-                                {
-                                    bold: <BoldText />,
-                                    value: t('common.thales-markets'),
-                                } as any
-                            }
+                            components={{
+                                bold: <BoldText />,
+                            }}
+                            values={{ value: t('common.thales-markets') }}
                         />
                     </Text>
                 </Text>

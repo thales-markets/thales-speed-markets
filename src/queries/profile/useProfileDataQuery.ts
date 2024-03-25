@@ -26,17 +26,17 @@ const useProfileDataQuery = (
 
             const speedMarketsAMMContractLocal = getContract({
                 abi: speedMarketsAMMContract.abi,
-                address: speedMarketsAMMContract.addresses[queryConfig.networkId] as any,
+                address: speedMarketsAMMContract.addresses[queryConfig.networkId],
                 client: queryConfig.client,
             }) as ViemContract;
             const speedMarketsDataContractLocal = getContract({
                 abi: speedMarketsDataContract.abi,
-                address: speedMarketsDataContract.addresses[queryConfig.networkId] as any,
+                address: speedMarketsDataContract.addresses[queryConfig.networkId],
                 client: queryConfig.client,
             }) as ViemContract;
             const chainedSpeedMarketsAMMContractLocal = getContract({
                 abi: chainedSpeedMarketsAMMContract.abi,
-                address: chainedSpeedMarketsAMMContract.addresses[queryConfig.networkId] as any,
+                address: chainedSpeedMarketsAMMContract.addresses[queryConfig.networkId],
                 client: queryConfig.client,
             }) as ViemContract;
 

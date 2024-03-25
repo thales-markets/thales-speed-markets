@@ -454,7 +454,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             abi: erc20Contract.abi,
             address: collateralAddress,
             client: client as Client,
-        }) as any;
+        });
         const addressToApprove = isChained
             ? chainedSpeedMarketsAMMContract.addresses[networkId]
             : speedMarketsAMMContract.addresses[networkId];
@@ -507,8 +507,8 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
         const erc20Instance = getContract({
             abi: erc20Contract.abi,
-            address: collateralAddress as any,
-            client: walletClient.data as any,
+            address: collateralAddress,
+            client: walletClient.data as Client,
         }) as ViemContract;
         const addressToApprove = isChained
             ? chainedSpeedMarketsAMMContract.addresses[networkId]
@@ -543,8 +543,8 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             abi: !isChained ? speedMarketsAMMContract.abi : chainedSpeedMarketsAMMContract.abi,
             address: !isChained
                 ? speedMarketsAMMContract.addresses[networkId]
-                : (chainedSpeedMarketsAMMContract.addresses[networkId] as any),
-            client: walletClient.data as any,
+                : chainedSpeedMarketsAMMContract.addresses[networkId],
+            client: walletClient.data as Client,
         });
 
         try {
@@ -633,8 +633,8 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
         const collateralWithSigner = getContract({
             abi: erc20Contract.abi,
-            address: erc20Contract.addresses[networkId] as any,
-            client: walletClient.data as any,
+            address: erc20Contract.addresses[networkId],
+            client: walletClient.data as Client,
         }) as ViemContract;
 
         try {

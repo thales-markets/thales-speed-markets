@@ -25,13 +25,13 @@ const useActiveChainedSpeedMarketsDataQuery = (
 
             const speedMarketsDataContractLocal = getContract({
                 abi: speedMarketsDataContract.abi,
-                address: speedMarketsDataContract.addresses[queryConfig.networkId] as any,
+                address: speedMarketsDataContract.addresses[queryConfig.networkId],
                 client: queryConfig.client,
             }) as ViemContract;
 
             const chainedMarketsAMMContract = getContract({
                 abi: chainedSpeedMarketsAMMContract.abi,
-                address: chainedSpeedMarketsAMMContract.addresses[queryConfig.networkId] as any,
+                address: chainedSpeedMarketsAMMContract.addresses[queryConfig.networkId],
                 client: queryConfig.client,
             }) as ViemContract;
 

@@ -95,7 +95,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
             abi: erc20Contract.abi,
             address: erc20Contract.addresses[networkId],
             client: client as Client,
-        }) as any;
+        }) as ViemContract;
         const addressToApprove = speedMarketsAMMContract.addresses[networkId];
 
         const getAllowance = async () => {
@@ -112,7 +112,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                 console.log(e);
             }
         };
-        if (isConnected && erc20Instance.provider) {
+        if (isConnected) {
             getAllowance();
         }
     }, [position.value, networkId, address, isConnected, hasAllowance, isAllowing, isDefaultCollateral, client]);
@@ -184,8 +184,8 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
 
             const speedMarketsAMMContractWithSigner = getContract({
                 abi: speedMarketsAMMContract.abi,
-                address: speedMarketsAMMContract.addresses[networkId] as any,
-                client: walletClient.data as any,
+                address: speedMarketsAMMContract.addresses[networkId],
+                client: walletClient.data as Client,
             }) as ViemContract;
 
             const tx = isDefaultCollateral

@@ -8,7 +8,7 @@ import { CollateralsBalance } from 'types/collateral';
 import { QueryConfig } from 'types/network';
 import { ViemContract } from 'types/viem';
 import multipleCollateral from 'utils/contracts/multipleCollateralContract';
-import { getContract } from 'viem';
+import { Address, getContract } from 'viem';
 
 const useMultipleCollateralBalanceQuery = (
     walletAddress: string,
@@ -34,52 +34,52 @@ const useMultipleCollateralBalanceQuery = (
                 const multipleCollateralObject = {
                     sUSD: getContract({
                         abi: multipleCollateral.sUSD.abi,
-                        address: multipleCollateral.sUSD.addresses[queryConfig.networkId] as any,
+                        address: multipleCollateral.sUSD.addresses[queryConfig.networkId],
                         client: queryConfig.client,
                     }) as ViemContract,
                     DAI: getContract({
                         abi: multipleCollateral.DAI.abi,
-                        address: multipleCollateral.DAI.addresses[queryConfig.networkId] as any,
+                        address: multipleCollateral.DAI.addresses[queryConfig.networkId],
                         client: queryConfig.client,
                     }) as ViemContract,
                     USDC: getContract({
                         abi: multipleCollateral.USDC.abi,
-                        address: multipleCollateral.USDC.addresses[queryConfig.networkId] as any,
+                        address: multipleCollateral.USDC.addresses[queryConfig.networkId],
                         client: queryConfig.client,
                     }) as ViemContract,
                     USDCe: getContract({
                         abi: multipleCollateral.USDCe.abi,
-                        address: multipleCollateral.USDCe.addresses[queryConfig.networkId] as any,
+                        address: multipleCollateral.USDCe.addresses[queryConfig.networkId],
                         client: queryConfig.client,
                     }) as ViemContract,
                     USDbC: getContract({
                         abi: multipleCollateral.USDbC.abi,
-                        address: multipleCollateral.USDbC.addresses[queryConfig.networkId] as any,
+                        address: multipleCollateral.USDbC.addresses[queryConfig.networkId],
                         client: queryConfig.client,
                     }) as ViemContract,
                     USDT: getContract({
                         abi: multipleCollateral.USDT.abi,
-                        address: multipleCollateral.USDT.addresses[queryConfig.networkId] as any,
+                        address: multipleCollateral.USDT.addresses[queryConfig.networkId],
                         client: queryConfig.client,
                     }) as ViemContract,
                     OP: getContract({
                         abi: multipleCollateral.OP.abi,
-                        address: multipleCollateral.OP.addresses[queryConfig.networkId] as any,
+                        address: multipleCollateral.OP.addresses[queryConfig.networkId],
                         client: queryConfig.client,
                     }) as ViemContract,
                     WETH: getContract({
                         abi: multipleCollateral.WETH.abi,
-                        address: multipleCollateral.WETH.addresses[queryConfig.networkId] as any,
+                        address: multipleCollateral.WETH.addresses[queryConfig.networkId],
                         client: queryConfig.client,
                     }) as ViemContract,
                     ETH: getContract({
                         abi: multipleCollateral.ETH.abi,
-                        address: multipleCollateral.ETH.addresses[queryConfig.networkId] as any,
+                        address: multipleCollateral.ETH.addresses[queryConfig.networkId],
                         client: queryConfig.client,
                     }) as ViemContract,
                     ARB: getContract({
                         abi: multipleCollateral.ARB.abi,
-                        address: multipleCollateral.ARB.addresses[queryConfig.networkId] as any,
+                        address: multipleCollateral.ARB.addresses[queryConfig.networkId],
                         client: queryConfig.client,
                     }) as ViemContract,
                 };
@@ -87,8 +87,6 @@ const useMultipleCollateralBalanceQuery = (
                 if (!walletAddress || !queryConfig.networkId) {
                     return collaterasBalance;
                 }
-
-                console.log(multipleCollateralObject);
 
                 const [
                     sUSDBalance,
@@ -126,7 +124,7 @@ const useMultipleCollateralBalanceQuery = (
                     multipleCollateralObject.WETH.address !== TBD_ADDRESS
                         ? multipleCollateralObject.WETH.read.balanceOf([walletAddress])
                         : 0,
-                    getBalance(wagmiConfig, { address: walletAddress as any }) as any,
+                    getBalance(wagmiConfig, { address: walletAddress as Address }),
                     multipleCollateralObject.ARB.address !== TBD_ADDRESS
                         ? multipleCollateralObject.ARB.read.balanceOf([walletAddress])
                         : 0,

@@ -32,7 +32,7 @@ const useChainedAmmSpeedMarketsLimitsQuery = (
 
             const speedMarketsDataContractLocal = getContract({
                 abi: speedMarketsDataContract.abi,
-                address: speedMarketsDataContract.addresses[queryConfig.networkId] as any,
+                address: speedMarketsDataContract.addresses[queryConfig.networkId],
                 client: queryConfig.client,
             }) as ViemContract;
             if (speedMarketsDataContract) {
