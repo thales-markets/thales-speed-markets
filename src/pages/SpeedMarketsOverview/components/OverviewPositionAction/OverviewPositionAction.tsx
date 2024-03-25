@@ -11,7 +11,6 @@ import {
 import { CONNECTION_TIMEOUT_MS, PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
 import { differenceInSeconds, millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
 import { ScreenSizeBreakpoint } from 'enums/ui';
-import { ethers } from 'ethers';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -70,7 +69,7 @@ const OverviewPositionAction: React.FC<OverviewPositionActionProps> = ({
             client: walletClient.data as Client,
         }) as ViemContract;
         try {
-            let tx: ethers.ContractTransaction;
+            let tx;
             if (isAdmin) {
                 tx = await speedMarketsAMMContractWithSigner.write.resolveMarketManually([
                     position.market,
@@ -108,9 +107,7 @@ const OverviewPositionAction: React.FC<OverviewPositionActionProps> = ({
                 });
             }
 
-            const txResult = await tx.wait();
-
-            if (txResult && txResult.transactionHash) {
+            if (tx) {
                 toast.update(id, getSuccessToastOptions(t(`speed-markets.user-positions.confirmation-message`), id));
                 refetchActiveSpeedMarkets(false, { networkId, client });
             }

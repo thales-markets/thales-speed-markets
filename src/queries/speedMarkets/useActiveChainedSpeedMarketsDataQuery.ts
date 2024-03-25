@@ -3,7 +3,7 @@ import { ZERO_ADDRESS } from 'constants/network';
 import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { secondsToMilliseconds } from 'date-fns';
-import { parseBytes32String } from 'ethers/lib/utils.js';
+import { parseBytes32String } from 'thales-utils';
 import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { bigNumberFormatter, coinFormatter, roundNumberToDecimals } from 'thales-utils';
 import { ChainedSpeedMarket } from 'types/market';

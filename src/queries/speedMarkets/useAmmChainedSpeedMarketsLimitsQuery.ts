@@ -1,6 +1,5 @@
 import { ZERO_ADDRESS } from 'constants/network';
 import QUERY_KEYS from 'constants/queryKeys';
-import { BigNumber } from 'ethers';
 import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { bigNumberFormatter, coinFormatter } from 'thales-utils';
 import { AmmChainedSpeedMarketsLimits } from 'types/market';
@@ -67,7 +66,7 @@ const useChainedAmmSpeedMarketsLimitsQuery = (
                     max: coinFormatter(chainedAmmParams.risk.max, queryConfig.networkId),
                 };
                 ammChainedSpeedMarketsLimits.payoutMultipliers = chainedAmmParams.payoutMultipliers.map(
-                    (payoutMultiplier: BigNumber) => bigNumberFormatter(payoutMultiplier)
+                    (payoutMultiplier: bigint) => bigNumberFormatter(payoutMultiplier)
                 );
                 ammChainedSpeedMarketsLimits.maxPriceDelayForResolvingSec = Number(
                     ammParams.maximumPriceDelayForResolving

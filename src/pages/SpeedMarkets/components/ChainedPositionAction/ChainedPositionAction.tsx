@@ -16,7 +16,6 @@ import { ONE_HUNDRED_AND_THREE_PERCENT } from 'constants/market';
 import { ZERO_ADDRESS } from 'constants/network';
 import { CONNECTION_TIMEOUT_MS, PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
 import { differenceInSeconds, millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
-import { BigNumber, ethers } from 'ethers';
 import {
     CollateralSelectorContainer,
     InLabel,
@@ -149,7 +148,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
         client,
     ]);
 
-    const handleAllowance = async (approveAmount: BigNumber) => {
+    const handleAllowance = async (approveAmount: bigint) => {
         const erc20Instance = getContract({
             abi: erc20Contract.abi,
             address: collateralAddress,
@@ -161,13 +160,9 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
         try {
             setIsAllowing(true);
 
-            const tx = (await erc20Instance.write.approve(
-                addressToApprove,
-                approveAmount
-            )) as ethers.ContractTransaction;
+            const tx = await erc20Instance.write.approve([addressToApprove, approveAmount]);
             setOpenApprovalModal(false);
-            const txResult = await tx.wait();
-            if (txResult && txResult.transactionHash) {
+            if (tx) {
                 toast.update(id, getSuccessToastOptions(t(`common.transaction.successful`), id));
                 setAllowance(true);
                 setIsAllowing(false);
@@ -194,7 +189,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
             client: walletClient.data as any,
         }) as ViemContract;
         try {
-            let tx: ethers.ContractTransaction;
+            let tx;
             const fetchUntilFinalPriceEndIndex = getUserLostAtSideIndex(position) + 1;
             if (isAdmin) {
                 const manualFinalPrices: number[] = position.finalPrices
@@ -246,7 +241,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 }
 
                 const updateFees = await Promise.all(promises);
-                const totalUpdateFee = updateFees.reduce((a: BigNumber, b: BigNumber) => a.add(b), BigNumber.from(0));
+                const totalUpdateFee = updateFees.reduce((a: bigint, b: bigint) => a + b, BigInt(0));
 
                 const isEth = collateralAddress === ZERO_ADDRESS;
 

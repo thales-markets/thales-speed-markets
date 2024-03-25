@@ -11,7 +11,6 @@ import { ZERO_ADDRESS } from 'constants/network';
 import { CONNECTION_TIMEOUT_MS, PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
 import { millisecondsToSeconds, secondsToMinutes } from 'date-fns';
 import { Positions } from 'enums/market';
-import { BigNumber, ethers } from 'ethers';
 import i18n from 'i18n';
 import { toast } from 'react-toastify';
 import { QueryConfig } from 'types/network';
@@ -31,12 +30,12 @@ export const getTransactionForSpeedAMM = async (
     deltaTimeSec: number,
     strikeTimeSec: number,
     sides: number[],
-    buyInAmount: BigNumber,
+    buyInAmount: bigint,
     pythPriceUpdateData: string[],
     pythUpdateFee: any,
     collateralAddress: string,
     referral: string | null,
-    skewImpact?: BigNumber
+    skewImpact?: bigint
 ) => {
     let tx;
     const isEth = collateralAddress === ZERO_ADDRESS;
@@ -55,7 +54,7 @@ export const getTransactionForSpeedAMM = async (
                     isEth,
                     referral ? referral : ZERO_ADDRESS,
                 ],
-                { value: isEth ? buyInAmount.add(pythUpdateFee) : pythUpdateFee }
+                { value: isEth ? buyInAmount + pythUpdateFee : pythUpdateFee }
             );
         } else {
             tx = await speedMarketsAMMContractWithSigner.write.createNewMarketWithDifferentCollateral(
@@ -71,7 +70,7 @@ export const getTransactionForSpeedAMM = async (
                     referral ? referral : ZERO_ADDRESS,
                     skewImpact,
                 ],
-                { value: isEth ? buyInAmount.add(pythUpdateFee) : pythUpdateFee }
+                { value: isEth ? buyInAmount + pythUpdateFee : pythUpdateFee }
             );
         }
     } else {
@@ -181,7 +180,7 @@ export const resolveAllSpeedPositions = async (
               .map((position) => Number(priceParser(position.finalPrice || 0)))
         : [];
     const priceUpdateDataArray: string[] = [];
-    let totalUpdateFee = BigNumber.from(0);
+    let totalUpdateFee = BigInt(0);
 
     for (const position of positions) {
         if (isAdmin) {
@@ -204,7 +203,7 @@ export const resolveAllSpeedPositions = async (
 
             marketsToResolve.push(position.market);
             priceUpdateDataArray.push(priceUpdateData[0]);
-            totalUpdateFee = totalUpdateFee.add(updateFee);
+            totalUpdateFee = totalUpdateFee + updateFee;
         } catch (e) {
             console.log(`Can't fetch VAA from Pyth API for market ${position.market}`, e);
         }
@@ -212,7 +211,7 @@ export const resolveAllSpeedPositions = async (
 
     if (marketsToResolve.length > 0) {
         try {
-            const tx: ethers.ContractTransaction = isAdmin
+            const tx = isAdmin
                 ? await speedMarketsAMMContractWithSigner.write.resolveMarketManuallyBatch([
                       marketsToResolve,
                       manualFinalPrices,
@@ -224,9 +223,7 @@ export const resolveAllSpeedPositions = async (
                       }
                   );
 
-            const txResult = await tx.wait();
-
-            if (txResult && txResult.transactionHash) {
+            if (tx) {
                 toast.update(id, getSuccessToastOptions(i18n.t(`speed-markets.overview.confirmation-message`), id));
                 await delay(5000);
                 refetchActiveSpeedMarkets(false, { networkId: queryConfig.networkId, client: queryConfig.client });
@@ -278,7 +275,7 @@ export const resolveAllChainedMarkets = async (
         : [];
 
     const priceUpdateDataArray: string[][][] = [];
-    let totalUpdateFee = BigNumber.from(0);
+    let totalUpdateFee = BigInt(0);
 
     // Fetch prices for non-admin resolve
     for (let index = 0; index < positions.length; index++) {
@@ -312,9 +309,7 @@ export const resolveAllChainedMarkets = async (
             priceUpdateDataArray.push(priceUpdateDataPerMarket);
 
             const updateFees = await Promise.all(promises);
-            totalUpdateFee = totalUpdateFee.add(
-                updateFees.reduce((a: BigNumber, b: BigNumber) => a.add(b), BigNumber.from(0))
-            );
+            totalUpdateFee = totalUpdateFee + updateFees.reduce((a: bigint, b: bigint) => a + b, BigInt(0));
             marketsToResolve.push(position.address);
         } catch (e) {
             console.log(`Can't fetch VAA from Pyth API for marekt ${position.address}`, e);

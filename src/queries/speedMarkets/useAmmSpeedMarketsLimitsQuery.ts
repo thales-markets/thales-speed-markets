@@ -2,11 +2,10 @@ import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
 import { ZERO_ADDRESS } from 'constants/network';
 import { SIDE_TO_POSITION_MAP } from 'constants/market';
 import QUERY_KEYS from 'constants/queryKeys';
-import { BigNumber, ethers } from 'ethers';
 import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { bigNumberFormatter, coinFormatter } from 'thales-utils';
 import { AmmSpeedMarketsLimits } from 'types/market';
-import { getContract } from 'viem';
+import { getContract, stringToHex } from 'viem';
 import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
 import { QueryConfig } from 'types/network';
 import { ViemContract } from 'types/viem';
@@ -53,16 +52,16 @@ const useAmmSpeedMarketsLimitsQuery = (
             ] = await Promise.all([
                 speedMarketsDataContractLocal.read.getSpeedMarketsAMMParameters([walletAddress || ZERO_ADDRESS]),
                 speedMarketsDataContractLocal.read.getRiskPerAsset([
-                    ethers.utils.formatBytes32String(CRYPTO_CURRENCY_MAP.ETH),
+                    stringToHex(CRYPTO_CURRENCY_MAP.ETH, { size: 32 }),
                 ]),
                 speedMarketsDataContractLocal.read.getRiskPerAsset([
-                    ethers.utils.formatBytes32String(CRYPTO_CURRENCY_MAP.BTC),
+                    stringToHex(CRYPTO_CURRENCY_MAP.BTC, { size: 32 }),
                 ]),
                 speedMarketsDataContractLocal.read.getDirectionalRiskPerAsset([
-                    ethers.utils.formatBytes32String(CRYPTO_CURRENCY_MAP.ETH),
+                    stringToHex(CRYPTO_CURRENCY_MAP.ETH, { size: 32 }),
                 ]),
                 speedMarketsDataContractLocal.read.getDirectionalRiskPerAsset([
-                    ethers.utils.formatBytes32String(CRYPTO_CURRENCY_MAP.BTC),
+                    stringToHex(CRYPTO_CURRENCY_MAP.BTC, { size: 32 }),
                 ]),
             ]);
 
@@ -103,10 +102,10 @@ const useAmmSpeedMarketsLimitsQuery = (
                     max: coinFormatter(risk.max, queryConfig.networkId),
                 });
             });
-            ammSpeedMarketsLimits.timeThresholdsForFees = ammParams.timeThresholdsForFees.map((time: BigNumber) =>
+            ammSpeedMarketsLimits.timeThresholdsForFees = ammParams.timeThresholdsForFees.map((time: bigint) =>
                 Number(time)
             );
-            ammSpeedMarketsLimits.lpFees = ammParams.lpFees.map((lpFee: BigNumber) => bigNumberFormatter(lpFee));
+            ammSpeedMarketsLimits.lpFees = ammParams.lpFees.map((lpFee: bigint) => bigNumberFormatter(lpFee));
             ammSpeedMarketsLimits.defaultLPFee = bigNumberFormatter(ammParams.lpFee);
             ammSpeedMarketsLimits.maxSkewImpact = bigNumberFormatter(ammParams.maxSkewImpact);
             ammSpeedMarketsLimits.safeBoxImpact = bigNumberFormatter(ammParams.safeBoxImpact);
