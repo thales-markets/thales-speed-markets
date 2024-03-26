@@ -1,3 +1,4 @@
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import Loader from 'components/Loader';
 import UnsupportedNetwork from 'components/UnsupportedNetwork';
 import ROUTES from 'constants/routes';
@@ -135,7 +136,7 @@ const App = () => {
                     </Route>
                 </Switch>
             </Router>
-            {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+            <ReactQueryDevtools initialIsOpen={false} buttonPosition={'bottom-left'} />
 
             <GlobalStyle />
         </ThemeProvider>
