@@ -16,8 +16,8 @@ import {
 import { TradeWithMarket } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
-import { getDirections } from '../styled-components';
 import { useAccount, useChainId, useClient } from 'wagmi';
+import { getDirections } from '../styled-components';
 
 type TransactionHistoryProps = {
     searchAddress: string;

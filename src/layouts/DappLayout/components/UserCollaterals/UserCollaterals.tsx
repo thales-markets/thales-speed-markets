@@ -12,10 +12,10 @@ import {
     getAssetIcon,
     getCoinBalance,
     getCollateral,
-    getPositiveCollateralIndexByBalance,
     getCollateralIndexForNetwork,
     getCollaterals,
-    isStableCurrency,
+    getMinBalanceThreshold,
+    getPositiveCollateralIndexByBalance,
 } from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
 import { useAccount, useChainId, useClient } from 'wagmi';
@@ -58,7 +58,7 @@ const UserCollaterals: React.FC = () => {
     const currentCollateralWithBalance = { name: currentCollateral, balance: currentCollateralBalance };
 
     const defaultCollateral =
-        isMultiCollateralSupported && currentCollateralBalance < 1
+        isMultiCollateralSupported && currentCollateralBalance <= getMinBalanceThreshold(currentCollateral)
             ? multipleCollateralBalances?.data
                 ? collateralsWithBalance.find(
                       (col) =>
@@ -74,7 +74,11 @@ const UserCollaterals: React.FC = () => {
     const [collateral, setCollateral] = useState(defaultCollateral);
 
     useEffect(() => {
-        if (isMultiCollateralSupported && multipleCollateralBalances?.data) {
+        if (
+            isMultiCollateralSupported &&
+            multipleCollateralBalances?.data &&
+            currentCollateralBalance <= getMinBalanceThreshold(currentCollateral)
+        ) {
             const collateralIndexWithPositiveBalance = getPositiveCollateralIndexByBalance(
                 multipleCollateralBalances.data,
                 networkId
@@ -83,15 +87,20 @@ const UserCollaterals: React.FC = () => {
                 (el) => el.name === getCollateral(networkId, collateralIndexWithPositiveBalance)
             );
 
-            if (
-                positiveCollateral &&
-                positiveCollateral.balance > (isStableCurrency(positiveCollateral.name) ? 1 : 0)
-            ) {
+            if (positiveCollateral) {
                 setCollateral(positiveCollateral);
                 dispatch(setSelectedCollateralIndex(getCollateralIndexForNetwork(networkId, positiveCollateral.name)));
             }
         }
-    }, [multipleCollateralBalances.data, dispatch, isMultiCollateralSupported, networkId, collateralsWithBalance]);
+    }, [
+        multipleCollateralBalances.data,
+        dispatch,
+        isMultiCollateralSupported,
+        networkId,
+        collateralsWithBalance,
+        currentCollateral,
+        currentCollateralBalance,
+    ]);
 
     useEffect(() => {
         if (!isMultiCollateralSupported) {

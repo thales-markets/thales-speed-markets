@@ -30,8 +30,8 @@ type TimeInputProps = {
     inputFontSize?: string;
     width?: string;
     height?: string;
+    zIndex?: number;
     enableCurrencyComponentOnly?: boolean;
-    validationMargin?: string;
 };
 
 const INVALID_CHARS = ['-', '+', 'e', '.'];
@@ -59,8 +59,8 @@ const TimeInput: React.FC<TimeInputProps> = ({
     inputFontSize,
     width,
     height,
+    zIndex,
     enableCurrencyComponentOnly,
-    validationMargin,
     ...rest
 }) => {
     const { t } = useTranslation();
@@ -85,77 +85,75 @@ const TimeInput: React.FC<TimeInputProps> = ({
     };
 
     return (
-        <ValidationTooltip
-            open={showValidation}
-            title={validationMessage || ''}
-            placement="bottom"
-            margin={validationMargin}
-        >
-            <FieldContainer margin={margin}>
-                {label && (
-                    <FieldLabel>
-                        {label}
-                        {tooltip && <Tooltip overlay={tooltip} />}:
-                    </FieldLabel>
+        <FieldContainer margin={margin} zIndex={zIndex}>
+            {label && (
+                <FieldLabel>
+                    {label}
+                    {tooltip && <Tooltip overlay={tooltip} />}:
+                </FieldLabel>
+            )}
+            {balance && (
+                <BalanceContainer>
+                    <StyledBalanceIcon />
+                    {isBalanceLoading ? <InlineLoader /> : balance}
+                </BalanceContainer>
+            )}
+            {info && (
+                <InfoWrapper>
+                    <InfoText>{info}</InfoText>
+                </InfoWrapper>
+            )}
+            <StyledInput
+                {...rest}
+                value={value}
+                type="number"
+                onChange={(e) => handleOnChange(e, min, max)}
+                placeholder={placeholder}
+                disabled={disabled}
+                className={showValidation ? 'error' : ''}
+                onKeyDown={(e) => {
+                    if (INVALID_CHARS.includes(e.key)) {
+                        e.preventDefault();
+                    }
+                }}
+                min={min || '0'}
+                max={max || 'any'}
+                step={step || 'any'}
+                title=""
+                padding={inputPadding}
+                fontSize={inputFontSize}
+                width={width}
+                height={height}
+            />
+            <RightContainer>
+                {onMaxButton && (
+                    <MaxButton disabled={disabled} onClick={onMaxButton}>
+                        {t('common.max')}
+                    </MaxButton>
                 )}
-                {balance && (
-                    <BalanceContainer>
-                        <StyledBalanceIcon />
-                        {isBalanceLoading ? <InlineLoader /> : balance}
-                    </BalanceContainer>
+                {currencyLabel && (
+                    <CurrencyLabel
+                        className={disabled ? 'currency-label disabled' : 'currency-label'}
+                        $hasSeparator={onMaxButton}
+                    >
+                        {currencyLabel}
+                    </CurrencyLabel>
                 )}
-                {info && (
-                    <InfoWrapper>
-                        <InfoText>{info}</InfoText>
-                    </InfoWrapper>
+                {currencyComponent && (
+                    <CurrencyComponentContainer
+                        className={disabled && !enableCurrencyComponentOnly ? 'disabled' : ''}
+                        $hasSeparator={onMaxButton}
+                    >
+                        {currencyComponent}
+                    </CurrencyComponentContainer>
                 )}
-                <StyledInput
-                    {...rest}
-                    value={value}
-                    type="number"
-                    onChange={(e) => handleOnChange(e, min, max)}
-                    placeholder={placeholder}
-                    disabled={disabled}
-                    className={showValidation ? 'error' : ''}
-                    onKeyDown={(e) => {
-                        if (INVALID_CHARS.includes(e.key)) {
-                            e.preventDefault();
-                        }
-                    }}
-                    min={min || '0'}
-                    max={max || 'any'}
-                    step={step || 'any'}
-                    title=""
-                    padding={inputPadding}
-                    fontSize={inputFontSize}
-                    width={width}
-                    height={height}
-                />
-                <RightContainer>
-                    {onMaxButton && (
-                        <MaxButton disabled={disabled} onClick={onMaxButton}>
-                            {t('common.max')}
-                        </MaxButton>
-                    )}
-                    {currencyLabel && (
-                        <CurrencyLabel
-                            className={disabled ? 'currency-label disabled' : 'currency-label'}
-                            $hasSeparator={onMaxButton}
-                        >
-                            {currencyLabel}
-                        </CurrencyLabel>
-                    )}
-                    {currencyComponent && (
-                        <CurrencyComponentContainer
-                            className={disabled && !enableCurrencyComponentOnly ? 'disabled' : ''}
-                            $hasSeparator={onMaxButton}
-                        >
-                            {currencyComponent}
-                        </CurrencyComponentContainer>
-                    )}
-                </RightContainer>
-            </FieldContainer>
-        </ValidationTooltip>
+            </RightContainer>
+            {showValidation && validationMessage && (
+                <Validation>
+                    <ValidationText>{validationMessage}</ValidationText>
+                </Validation>
+            )}
+        </FieldContainer>
     );
 };
 
@@ -201,20 +199,21 @@ const MaxButton = styled.button`
     }
 `;
 
-const ValidationTooltip = styled((props: any) => <Tooltip classes={{ popper: props.className }} {...props} />)<{
-    margin?: string;
-}>`
-    & .MuiTooltip-tooltip {
-        margin: ${(props) => (props.margin ? props.margin : '-10px 0 0 0')};
-        padding: 2px 0;
-        font-weight: 600;
-        font-size: 13px;
-        line-height: 15px;
-        color: ${(props) => props.theme.input.textColor.quaternary};
-        background-color: ${(props) => props.theme.background.primary};
-        text-align: center;
-        max-width: 320px;
-    }
+const Validation = styled.div`
+    position: absolute;
+    bottom: -7px;
+    width: 212%;
+    color: ${(props) => props.theme.input.textColor.quaternary};
+    text-align: center;
+    white-space: nowrap;
+`;
+
+const ValidationText = styled.span`
+    padding: 2px 4px;
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 15px;
+    background-color: ${(props) => props.theme.background.primary};
 `;
 
 const BalanceContainer = styled(FlexDivCentered)`

@@ -367,10 +367,12 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                                 value={exactTimeHours}
                                 onChange={(_, value) => setExactTimeHours(value)}
                                 showValidation={!!errorMessage}
+                                validationMessage={errorMessage}
                                 min="1"
                                 max="12"
                                 margin="0"
                                 inputPadding="5px 10px"
+                                zIndex={2}
                             />
                             <TimeSeparator>:</TimeSeparator>
                             <TimeInput
@@ -381,6 +383,7 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                                 max="59"
                                 margin="0"
                                 inputPadding="5px 10px"
+                                zIndex={1}
                             />
                             <Column>
                                 <Button

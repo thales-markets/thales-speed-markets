@@ -34,13 +34,15 @@ export const isStableCurrency = (currencyKey: Coins) => {
     return STABLE_COINS.includes(currencyKey);
 };
 
+export const getMinBalanceThreshold = (coin: Coins) => (isStableCurrency(coin) ? 1 : 0);
+
 export const getPositiveCollateralIndexByBalance = (
     balancesObject: CollateralsBalance,
     networkId: SupportedNetwork
 ) => {
     let index = 0;
     for (const [key, value] of Object.entries(balancesObject)) {
-        if (value && value > (isStableCurrency(key as Coins) ? 1 : 0)) {
+        if (value && value > getMinBalanceThreshold(key as Coins)) {
             const collateralIndex = COLLATERALS[networkId].indexOf(key as Coins);
             index = collateralIndex !== -1 ? collateralIndex : 0;
             break;

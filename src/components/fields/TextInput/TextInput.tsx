@@ -1,8 +1,8 @@
 import Tooltip from 'components/Tooltip';
 import React from 'react';
 import styled from 'styled-components';
-import { FieldContainer, FieldLabel, Input } from '../common';
 import { FlexDivCentered } from 'styles/common';
+import { FieldContainer, FieldLabel, Input } from '../common';
 
 type TextInputProps = {
     value: string;
@@ -41,43 +41,44 @@ const TextInput: React.FC<TextInputProps> = ({
     ...rest
 }) => {
     return (
-        <ValidationTooltip open={showValidation} title={validationMessage || ''} placement="bottom">
-            <FieldContainer width={width} margin={margin}>
-                {label && (
-                    <FieldLabel>
-                        {label}
-                        {tooltip && <Tooltip overlay={tooltip} />}:
-                    </FieldLabel>
+        <FieldContainer width={width} margin={margin}>
+            {label && (
+                <FieldLabel>
+                    {label}
+                    {tooltip && <Tooltip overlay={tooltip} />}:
+                </FieldLabel>
+            )}
+            <StyledInput
+                {...rest}
+                readOnly={!onChange}
+                value={value}
+                type="text"
+                onChange={onChange}
+                placeholder={placeholder}
+                disabled={disabled}
+                className={showValidation ? 'error' : ''}
+                title=""
+                padding={inputPadding}
+                fontSize={inputFontSize}
+                width={width}
+                height={height}
+            />
+            <RightContainer>
+                {onIconClick && (
+                    <Icon
+                        className={
+                            disabled ? `${iconClass || 'icon icon--search'} disabled` : iconClass || 'icon icon--search'
+                        }
+                        onClick={onIconClick}
+                    />
                 )}
-                <StyledInput
-                    {...rest}
-                    readOnly={!onChange}
-                    value={value}
-                    type="text"
-                    onChange={onChange}
-                    placeholder={placeholder}
-                    disabled={disabled}
-                    className={showValidation ? 'error' : ''}
-                    title=""
-                    padding={inputPadding}
-                    fontSize={inputFontSize}
-                    width={width}
-                    height={height}
-                />
-                <RightContainer>
-                    {onIconClick && (
-                        <Icon
-                            className={
-                                disabled
-                                    ? `${iconClass || 'icon icon--search'} disabled`
-                                    : iconClass || 'icon icon--search'
-                            }
-                            onClick={onIconClick}
-                        />
-                    )}
-                </RightContainer>
-            </FieldContainer>
-        </ValidationTooltip>
+            </RightContainer>
+            {showValidation && (
+                <Validation>
+                    <ValidationText>{validationMessage}</ValidationText>
+                </Validation>
+            )}
+        </FieldContainer>
     );
 };
 
@@ -105,18 +106,20 @@ const Icon = styled.i`
     }
 `;
 
-const ValidationTooltip = styled((props: any) => <Tooltip classes={{ popper: props.className }} {...props} />)`
-    & .MuiTooltip-tooltip {
-        margin: -10px 0 0 0;
-        padding: 2px 4px;
-        font-weight: 600;
-        font-size: 13px;
-        line-height: 15px;
-        color: ${(props) => props.theme.input.textColor.quaternary};
-        background-color: ${(props) => props.theme.background.primary};
-        text-align: center;
-        max-width: 320px;
-    }
+const Validation = styled.div`
+    position: absolute;
+    bottom: -7px;
+    width: 100%;
+    color: ${(props) => props.theme.input.textColor.quaternary};
+    text-align: center;
+`;
+
+const ValidationText = styled.span`
+    padding: 2px 4px;
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 15px;
+    background-color: ${(props) => props.theme.background.primary};
 `;
 
 export default TextInput;
