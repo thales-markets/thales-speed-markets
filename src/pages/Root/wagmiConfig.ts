@@ -1,4 +1,7 @@
-import { createConfig, http } from 'wagmi';
+import { connectorsForWallets } from '@rainbow-me/rainbowkit';
+import { RPC_LIST } from 'constants/network';
+import { NetworkId } from 'thales-utils';
+import { createConfig, fallback, http } from 'wagmi';
 import {
     arbitrum,
     base,
@@ -10,7 +13,18 @@ import {
     zkSync,
     zkSyncSepoliaTestnet,
 } from 'wagmi/chains';
-import { coinbaseWallet, walletConnect } from 'wagmi/connectors';
+import {
+    braveWallet,
+    coinbaseWallet,
+    imTokenWallet,
+    injectedWallet,
+    ledgerWallet,
+    metaMaskWallet,
+    rabbyWallet,
+    rainbowWallet,
+    trustWallet,
+    walletConnectWallet,
+} from '@rainbow-me/rainbowkit/wallets';
 
 export const wagmiConfig = createConfig({
     chains: [
@@ -24,20 +38,47 @@ export const wagmiConfig = createConfig({
         optimismSepolia,
         optimismGoerli,
     ],
-    connectors: [
-        coinbaseWallet({ appName: 'Speedmarkets' }),
-        walletConnect({ projectId: import.meta.env.VITE_APP_WALLET_CONNECT_PROJECT_ID || '' }),
-    ],
+    connectors: connectorsForWallets(
+        [
+            {
+                groupName: 'Recommended',
+                wallets: [
+                    metaMaskWallet,
+                    walletConnectWallet, // ensure all WalletConnect-based wallets are supported
+                    rabbyWallet,
+                    braveWallet,
+                    ledgerWallet,
+                    trustWallet,
+                    injectedWallet, //  ensure all injected wallets are supported
+                    coinbaseWallet,
+                    rainbowWallet,
+                    imTokenWallet,
+                ],
+            },
+        ],
+        {
+            appName: 'Speed Markets',
+            projectId: import.meta.env.VITE_APP_WALLET_CONNECT_PROJECT_ID || '',
+        }
+    ),
     transports: {
-        [optimism.id]: http(),
-        [arbitrum.id]: http(),
-        [base.id]: http(),
-        [polygon.id]: http(),
-        [zkSync.id]: http(),
-        [zkSyncSepoliaTestnet.id]: http(),
-        [blastSepolia.id]: http(),
-        [optimismSepolia.id]: http(),
-        [optimismGoerli.id]: http(),
+        [optimism.id]: fallback([
+            http(RPC_LIST.CHAINNODE[NetworkId.OptimismMainnet]),
+            http(RPC_LIST.INFURA[NetworkId.OptimismMainnet]),
+            http(),
+        ]),
+        [arbitrum.id]: fallback([
+            http(RPC_LIST.CHAINNODE[NetworkId.Arbitrum]),
+            http(RPC_LIST.INFURA[NetworkId.Arbitrum]),
+            http(),
+        ]),
+        [base.id]: fallback([http(RPC_LIST.CHAINNODE[NetworkId.Base]), http(RPC_LIST.ANKR[NetworkId.Base]), http()]),
+        [polygon.id]: fallback([http(RPC_LIST.INFURA[NetworkId.PolygonMainnet]), http()]),
+        [zkSync.id]: fallback([http()]),
+        [zkSyncSepoliaTestnet.id]: fallback([http()]),
+        [blastSepolia.id]: fallback([http()]),
+        [optimismSepolia.id]: fallback([http()]),
+        [optimismGoerli.id]: fallback([http()]),
     },
 });
 

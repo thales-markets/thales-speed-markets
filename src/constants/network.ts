@@ -105,3 +105,26 @@ export const SUPPORTED_NETWORKS_PARAMS: Record<number, NetworkParams> = {
         },
     },
 };
+
+export const RPC_LIST = {
+    INFURA: {
+        [NetworkId.OptimismMainnet]:
+            'https://optimism-mainnet.infura.io/v3/' + import.meta.env.VITE_APP_INFURA_PROJECT_ID,
+        [NetworkId.Arbitrum]: 'https://arbitrum-mainnet.infura.io/v3/' + import.meta.env.VITE_APP_INFURA_PROJECT_ID,
+        [NetworkId.PolygonMainnet]:
+            'https://polygon-mainnet.infura.io/v3/' + import.meta.env.VITE_APP_INFURA_PROJECT_ID,
+    },
+    CHAINNODE: {
+        [NetworkId.OptimismMainnet]:
+            'https://optimism-mainnet.chainnodes.org/' + import.meta.env.VITE_APP_CHAINNODE_PROJECT_ID,
+        [NetworkId.Arbitrum]: 'https://arbitrum-one.chainnodes.org/' + import.meta.env.VITE_APP_CHAINNODE_PROJECT_ID,
+        [NetworkId.PolygonMainnet]:
+            'https://polygon-mainnet.chainnodes.org/' + import.meta.env.VITE_APP_CHAINNODE_PROJECT_ID,
+        [NetworkId.Base]: 'https://base-mainnet.chainnodes.org/' + import.meta.env.VITE_APP_CHAINNODE_PROJECT_ID,
+    },
+    ANKR: {
+        [NetworkId.OptimismMainnet]: 'https://rpc.ankr.com/optimism/' + import.meta.env.VITE_APP_ANKR_PROJECT_ID,
+        [NetworkId.Arbitrum]: 'https://rpc.ankr.com/arbitrum/' + import.meta.env.VITE_APP_ANKR_PROJECT_ID,
+        [NetworkId.Base]: 'https://rpc.ankr.com/base/' + import.meta.env.VITE_APP_ANKR_PROJECT_ID,
+    },
+};
