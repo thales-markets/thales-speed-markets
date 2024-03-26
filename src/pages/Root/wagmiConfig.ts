@@ -44,12 +44,12 @@ export const wagmiConfig = createConfig({
                 groupName: 'Recommended',
                 wallets: [
                     metaMaskWallet,
-                    walletConnectWallet, // ensure all WalletConnect-based wallets are supported
+                    walletConnectWallet,
                     rabbyWallet,
                     braveWallet,
                     ledgerWallet,
                     trustWallet,
-                    injectedWallet, //  ensure all injected wallets are supported
+                    injectedWallet,
                     coinbaseWallet,
                     rainbowWallet,
                     imTokenWallet,

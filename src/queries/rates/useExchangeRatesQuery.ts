@@ -13,7 +13,7 @@ const useExchangeRatesQuery = (
     options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
     return useQuery<Rates>({
-        queryKey: QUERY_KEYS.Rates.ExchangeRates(queryConfig),
+        queryKey: QUERY_KEYS.Rates.ExchangeRates(queryConfig.networkId),
         queryFn: async () => {
             const exchangeRates: Rates = {};
 

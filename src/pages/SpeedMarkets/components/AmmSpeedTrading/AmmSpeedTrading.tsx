@@ -610,8 +610,8 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
             if (txReceipt) {
                 toast.update(id, getSuccessToastOptions(t(`common.buy.confirmation-message`), id));
-                refetchUserSpeedMarkets(isChained, { networkId, client }, address as string);
-                refetchSpeedMarketsLimits(isChained, { networkId, client });
+                refetchUserSpeedMarkets(isChained, networkId, address as string);
+                refetchSpeedMarketsLimits(isChained, networkId);
                 PLAUSIBLE.trackEvent(
                     isChained ? PLAUSIBLE_KEYS.chainedSpeedMarketsBuy : PLAUSIBLE_KEYS.speedMarketsBuy,
                     {
@@ -656,7 +656,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                     id,
                     getSuccessToastOptions(t(`common.mint.confirmation-message`, { token: selectedCollateral }), id)
                 );
-                refetchBalances(address as string, { networkId, client });
+                refetchBalances(address as string, networkId);
             }
         } catch (e) {
             console.log(e);

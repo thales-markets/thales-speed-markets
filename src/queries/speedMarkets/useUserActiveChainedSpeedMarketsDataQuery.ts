@@ -18,7 +18,7 @@ const useUserActiveChainedSpeedMarketsDataQuery = (
     options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
     return useQuery<ChainedSpeedMarket[]>({
-        queryKey: QUERY_KEYS.User.ChainedSpeedMarkets(queryConfig, walletAddress),
+        queryKey: QUERY_KEYS.User.ChainedSpeedMarkets(queryConfig.networkId, walletAddress),
         queryFn: async () => {
             const userChainedSpeedMarketsData: ChainedSpeedMarket[] = [];
 

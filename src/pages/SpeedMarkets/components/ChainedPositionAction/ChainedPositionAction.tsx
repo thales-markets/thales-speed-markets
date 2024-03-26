@@ -269,10 +269,10 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
             if (txReceipt) {
                 toast.update(id, getSuccessToastOptions(t(`speed-markets.user-positions.confirmation-message`), id));
                 if (isOverview) {
-                    refetchActiveSpeedMarkets(true, { networkId, client });
+                    refetchActiveSpeedMarkets(true, networkId);
                 } else {
-                    refetchUserSpeedMarkets(true, { networkId, client }, address ?? '');
-                    refetchUserResolvedSpeedMarkets(true, { networkId, client }, address ?? '');
+                    refetchUserSpeedMarkets(true, networkId, address ?? '');
+                    refetchUserResolvedSpeedMarkets(true, networkId, address ?? '');
                 }
             }
         } catch (e) {

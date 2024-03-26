@@ -129,7 +129,7 @@ const UnresolvedPositions: React.FC = () => {
         const openMatured = openSpeedMarketsData.filter((marketData) => marketData.maturityDate < Date.now());
         if (openMatured.length) {
             setIsLoadingEnabled(false);
-            refetchActiveSpeedMarkets(false, { networkId, client });
+            refetchActiveSpeedMarkets(false, networkId);
         }
         // Refresh current prices
         if (openSpeedMarketsData.length) {

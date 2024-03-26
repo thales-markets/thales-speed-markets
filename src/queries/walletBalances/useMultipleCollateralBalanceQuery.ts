@@ -16,7 +16,7 @@ const useMultipleCollateralBalanceQuery = (
     options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
     return useQuery<CollateralsBalance>({
-        queryKey: QUERY_KEYS.WalletBalances.MultipleCollateral(walletAddress, queryConfig),
+        queryKey: QUERY_KEYS.WalletBalances.MultipleCollateral(walletAddress, queryConfig.networkId),
         queryFn: async () => {
             let collaterasBalance: CollateralsBalance = {
                 sUSD: 0,

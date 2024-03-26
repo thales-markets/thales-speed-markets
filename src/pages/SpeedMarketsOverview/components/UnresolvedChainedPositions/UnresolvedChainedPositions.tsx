@@ -163,7 +163,7 @@ const UnresolvedChainedPositions: React.FC = () => {
         if (openMatured.length) {
             if (!mountedRef.current) return null;
             setIsLoadingEnabled(false);
-            refetchActiveSpeedMarkets(true, { networkId, client: walletClient.data });
+            refetchActiveSpeedMarkets(true, networkId);
         }
         // Check if missing price is available
         if (unknownPriceSpeedMarketsData.length) {

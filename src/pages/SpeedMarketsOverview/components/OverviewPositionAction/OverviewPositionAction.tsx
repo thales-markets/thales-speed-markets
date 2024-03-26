@@ -114,7 +114,7 @@ const OverviewPositionAction: React.FC<OverviewPositionActionProps> = ({
 
             if (txReceipt) {
                 toast.update(id, getSuccessToastOptions(t(`speed-markets.user-positions.confirmation-message`), id));
-                refetchActiveSpeedMarkets(false, { networkId, client });
+                refetchActiveSpeedMarkets(false, networkId);
             }
         } catch (e) {
             console.log(e);
