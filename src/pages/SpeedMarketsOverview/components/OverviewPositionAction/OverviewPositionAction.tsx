@@ -27,6 +27,7 @@ import { getPriceId, getPriceServiceEndpoint, priceParser } from 'utils/pyth';
 import { refetchActiveSpeedMarkets } from 'utils/queryConnector';
 import { delay } from 'utils/timer';
 import { Client, getContract } from 'viem';
+import { waitForTransactionReceipt } from 'viem/actions';
 import { useChainId, useClient, useWalletClient } from 'wagmi';
 
 type OverviewPositionActionProps = {
@@ -69,9 +70,9 @@ const OverviewPositionAction: React.FC<OverviewPositionActionProps> = ({
             client: walletClient.data as Client,
         }) as ViemContract;
         try {
-            let tx;
+            let hash;
             if (isAdmin) {
-                tx = await speedMarketsAMMContractWithSigner.write.resolveMarketManually([
+                hash = await speedMarketsAMMContractWithSigner.write.resolveMarketManually([
                     position.market,
                     Number(priceParser(position.finalPrice || 0)),
                 ]);
@@ -102,12 +103,16 @@ const OverviewPositionAction: React.FC<OverviewPositionActionProps> = ({
                 const priceUpdateData = ['0x' + Buffer.from(priceFeedUpdateVaa, 'base64').toString('hex')];
                 const updateFee = await pythContract.read.getUpdateFee([priceUpdateData]);
 
-                tx = await speedMarketsAMMContractWithSigner.write.resolveMarket([position.market, priceUpdateData], {
+                hash = await speedMarketsAMMContractWithSigner.write.resolveMarket([position.market, priceUpdateData], {
                     value: updateFee,
                 });
             }
 
-            if (tx) {
+            const txReceipt = await waitForTransactionReceipt(client as Client, {
+                hash,
+            });
+
+            if (txReceipt) {
                 toast.update(id, getSuccessToastOptions(t(`speed-markets.user-positions.confirmation-message`), id));
                 refetchActiveSpeedMarkets(false, { networkId, client });
             }

@@ -43,6 +43,7 @@ import {
 } from 'utils/queryConnector';
 import { delay } from 'utils/timer';
 import { Client, getContract } from 'viem';
+import { waitForTransactionReceipt } from 'viem/actions';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 
 const ONE_HUNDRED_AND_THREE_PERCENT = 1.03;
@@ -129,10 +130,12 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
         try {
             setIsAllowing(true);
 
-            const tx = await erc20Instance.write.approve([addressToApprove, approveAmount]);
+            const hash = await erc20Instance.write.approve([addressToApprove, approveAmount]);
             setOpenApprovalModal(false);
-
-            if (tx) {
+            const txReceipt = await waitForTransactionReceipt(client as Client, {
+                hash,
+            });
+            if (txReceipt) {
                 toast.update(id, getSuccessToastOptions(t(`common.transaction.successful`), id));
                 setAllowance(true);
                 setIsAllowing(false);
@@ -188,7 +191,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                 client: walletClient.data as Client,
             }) as ViemContract;
 
-            const tx = isDefaultCollateral
+            const hash = isDefaultCollateral
                 ? await speedMarketsAMMContractWithSigner.write.resolveMarket([position.market, priceUpdateData], {
                       value: updateFee,
                   })
@@ -197,7 +200,11 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                       { value: updateFee }
                   );
 
-            if (tx) {
+            const txReceipt = await waitForTransactionReceipt(client as Client, {
+                hash,
+            });
+
+            if (txReceipt) {
                 toast.update(id, getSuccessToastOptions(t(`speed-markets.user-positions.confirmation-message`), id));
                 refetchUserNotifications(address as string, networkId);
                 refetchUserSpeedMarkets(false, { networkId, client }, address as string);

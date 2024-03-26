@@ -80,7 +80,6 @@ export const getTransactionForSpeedAMM = async (
                 { value: pythUpdateFee }
             );
         } else {
-            console.log('lets try');
             tx = await speedMarketsAMMContractWithSigner.write.createNewMarket(
                 [
                     asset,

@@ -1,8 +1,12 @@
 import Loader from 'components/Loader';
 import UnsupportedNetwork from 'components/UnsupportedNetwork';
 import ROUTES from 'constants/routes';
+import DappLayout from 'layouts/DappLayout';
 import ThemeProvider from 'layouts/Theme';
-import { Suspense, lazy, useEffect } from 'react';
+import Profile from 'pages/Profile';
+import SpeedMarkets from 'pages/SpeedMarkets';
+import SpeedMarketsOverview from 'pages/SpeedMarketsOverview';
+import { Suspense, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { Redirect, Route, Router, Switch } from 'react-router-dom';
 import { setAppReady } from 'redux/modules/app';
@@ -14,14 +18,6 @@ import { getSupportedNetworksByRoute, isNetworkSupported } from 'utils/network';
 import queryConnector from 'utils/queryConnector';
 import { history } from 'utils/routes';
 import { useAccount, useChainId, useDisconnect, useSwitchChain } from 'wagmi';
-
-const DappLayout = lazy(() => import(/* webpackChunkName: "DappLayout" */ 'layouts/DappLayout'));
-
-const SpeedMarkets = lazy(() => import(/* webpackChunkName: "SpeedMarkets" */ '../SpeedMarkets'));
-const SpeedMarketsOverview = lazy(
-    () => import(/* webpackChunkName: "SpeedMarketsOverview" */ '../SpeedMarketsOverview')
-);
-const Profile = lazy(() => import(/* webpackChunkName: "Profile" */ '../Profile'));
 
 const App = () => {
     const dispatch = useDispatch();

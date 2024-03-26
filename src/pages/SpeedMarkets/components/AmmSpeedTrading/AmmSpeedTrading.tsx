@@ -69,6 +69,7 @@ import { delay } from 'utils/timer';
 import { Client, getContract, parseUnits, stringToHex } from 'viem';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 import { SelectedPosition } from '../SelectPosition/SelectPosition';
+import { waitForTransactionReceipt } from 'viem/actions';
 
 type AmmSpeedTradingProps = {
     isChained: boolean;
@@ -518,10 +519,12 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         try {
             setIsAllowing(true);
 
-            const tx = await erc20Instance.write.approve([addressToApprove, approveAmount]);
+            const hash = await erc20Instance.write.approve([addressToApprove, approveAmount]);
             setOpenApprovalModal(false);
-            const txResult = await tx.wait();
-            if (txResult && txResult.transactionHash) {
+            const txReceipt = await waitForTransactionReceipt(client as Client, {
+                hash,
+            });
+            if (txReceipt) {
                 toast.update(id, getSuccessToastOptions(t(`common.transaction.successful`), id));
                 setIsAllowing(false);
             }
@@ -586,7 +589,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             const skewImpactBigNum = positionType ? parseUnits(skewImpact[positionType].toString(), 18) : undefined;
             const isNonDefaultCollateral = selectedCollateral !== defaultCollateral;
 
-            const tx = await getTransactionForSpeedAMM(
+            const hash = await getTransactionForSpeedAMM(
                 speedMarketsAMMContractWithSigner,
                 isNonDefaultCollateral,
                 asset,
@@ -601,7 +604,11 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 skewImpactBigNum as any
             );
 
-            if (tx) {
+            const txReceipt = await waitForTransactionReceipt(client as Client, {
+                hash,
+            });
+
+            if (txReceipt) {
                 toast.update(id, getSuccessToastOptions(t(`common.buy.confirmation-message`), id));
                 refetchUserSpeedMarkets(isChained, { networkId, client }, address as string);
                 refetchSpeedMarketsLimits(isChained, { networkId, client });
@@ -638,9 +645,13 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         }) as ViemContract;
 
         try {
-            const tx = await collateralWithSigner.write.mintForUser([address]);
+            const hash = await collateralWithSigner.write.mintForUser([address]);
 
-            if (tx) {
+            const txReceipt = await waitForTransactionReceipt(client as Client, {
+                hash,
+            });
+
+            if (txReceipt) {
                 toast.update(
                     id,
                     getSuccessToastOptions(t(`common.mint.confirmation-message`, { token: selectedCollateral }), id)

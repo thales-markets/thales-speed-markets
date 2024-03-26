@@ -17,7 +17,6 @@ const useStableBalanceQuery = (
         queryKey: QUERY_KEYS.WalletBalances.StableCoinBalance(walletAddress ?? '', queryConfig),
         queryFn: async () => {
             try {
-                console.log('lets try stable: ');
                 const collateral = getContract({
                     abi: erc20Contract.abi,
                     address: erc20Contract.addresses[queryConfig.networkId],

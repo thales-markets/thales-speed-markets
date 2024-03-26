@@ -53,6 +53,7 @@ import { getUserLostAtSideIndex } from 'utils/speedAmm';
 import { delay } from 'utils/timer';
 import { Client, getContract } from 'viem';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
+import { waitForTransactionReceipt } from 'viem/actions';
 
 type ChainedPositionActionProps = {
     position: ChainedSpeedMarket;
@@ -160,9 +161,12 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
         try {
             setIsAllowing(true);
 
-            const tx = await erc20Instance.write.approve([addressToApprove, approveAmount]);
+            const hash = await erc20Instance.write.approve([addressToApprove, approveAmount]);
             setOpenApprovalModal(false);
-            if (tx) {
+            const txReceipt = await waitForTransactionReceipt(client as Client, {
+                hash,
+            });
+            if (txReceipt) {
                 toast.update(id, getSuccessToastOptions(t(`common.transaction.successful`), id));
                 setAllowance(true);
                 setIsAllowing(false);
@@ -189,14 +193,14 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
             client: walletClient.data as Client,
         }) as ViemContract;
         try {
-            let tx;
+            let hash;
             const fetchUntilFinalPriceEndIndex = getUserLostAtSideIndex(position) + 1;
             if (isAdmin) {
                 const manualFinalPrices: number[] = position.finalPrices
                     .slice(0, fetchUntilFinalPriceEndIndex)
                     .map((finalPrice) => Number(priceParser(finalPrice)));
 
-                tx = await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarketManually([
+                hash = await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarketManually([
                     position.address,
                     manualFinalPrices,
                 ]);
@@ -245,7 +249,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
 
                 const isEth = collateralAddress === ZERO_ADDRESS;
 
-                tx = isDefaultCollateral
+                hash = isDefaultCollateral
                     ? await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarket(
                           [position.address, priceUpdateDataArray],
                           {
@@ -258,7 +262,11 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                       );
             }
 
-            if (tx) {
+            const txReceipt = await waitForTransactionReceipt(client as Client, {
+                hash,
+            });
+
+            if (txReceipt) {
                 toast.update(id, getSuccessToastOptions(t(`speed-markets.user-positions.confirmation-message`), id));
                 if (isOverview) {
                     refetchActiveSpeedMarkets(true, { networkId, client });
