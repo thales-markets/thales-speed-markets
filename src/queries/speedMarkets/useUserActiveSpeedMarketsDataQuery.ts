@@ -24,7 +24,7 @@ const useUserActiveSpeedMarketsDataQuery = (
     options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
     return useQuery<UserOpenPositions[]>({
-        queryKey: QUERY_KEYS.User.SpeedMarkets(queryConfig, walletAddress),
+        queryKey: QUERY_KEYS.User.SpeedMarkets(queryConfig.networkId, walletAddress),
         queryFn: async () => {
             const userSpeedMarketsData: UserOpenPositions[] = [];
 

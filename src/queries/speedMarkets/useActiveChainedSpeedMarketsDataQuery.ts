@@ -19,7 +19,7 @@ const useActiveChainedSpeedMarketsDataQuery = (
 ) => {
     return useQuery<ChainedSpeedMarket[]>({
         ...options,
-        queryKey: QUERY_KEYS.Markets.ActiveChainedSpeedMarkets(queryConfig),
+        queryKey: QUERY_KEYS.Markets.ActiveChainedSpeedMarkets(queryConfig.networkId),
         queryFn: async () => {
             const chainedSpeedMarketsData: ChainedSpeedMarket[] = [];
 

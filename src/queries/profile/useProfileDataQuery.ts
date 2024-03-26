@@ -20,7 +20,7 @@ const useProfileDataQuery = (
     options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
     return useQuery<UserProfileData>({
-        queryKey: QUERY_KEYS.Profile.Data(walletAddress, queryConfig),
+        queryKey: QUERY_KEYS.Profile.Data(walletAddress, queryConfig.networkId),
         queryFn: async () => {
             let [profit, volume, numberOfTrades, gain, investment] = [0, 0, 0, 0, 0];
 

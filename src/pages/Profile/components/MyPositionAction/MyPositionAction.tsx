@@ -207,9 +207,9 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
             if (txReceipt) {
                 toast.update(id, getSuccessToastOptions(t(`speed-markets.user-positions.confirmation-message`), id));
                 refetchUserNotifications(address as string, networkId);
-                refetchUserSpeedMarkets(false, { networkId, client }, address as string);
-                refetchUserResolvedSpeedMarkets(false, { networkId, client }, address as string);
-                refetchUserProfileQueries(address as string, { networkId, client });
+                refetchUserSpeedMarkets(false, networkId, address as string);
+                refetchUserResolvedSpeedMarkets(false, networkId, address as string);
+                refetchUserProfileQueries(address as string, networkId);
             }
         } catch (e) {
             console.log(e);

@@ -23,7 +23,7 @@ import { getDefaultCollateral } from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
 import { resolveAllChainedMarkets, resolveAllSpeedPositions } from 'utils/speedAmm';
 import OpenPosition from '../OpenPosition';
-import { useChainId, useAccount, useClient } from 'wagmi';
+import { useChainId, useAccount, useClient, useWalletClient } from 'wagmi';
 
 type OpenPositionsProps = {
     isChained?: boolean;
@@ -37,6 +37,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
 
     const networkId = useChainId();
     const client = useClient();
+    const walletClient = useWalletClient();
     const { isConnected, address } = useAccount();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
@@ -161,9 +162,9 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
     const handleSubmit = async () => {
         setIsSubmitting(true);
         if (isChained) {
-            await resolveAllChainedMarkets(claimableChainedPositions, false, { networkId, client });
+            await resolveAllChainedMarkets(claimableChainedPositions, false, { networkId, client: walletClient.data });
         } else {
-            await resolveAllSpeedPositions(claimableSpeedPositions, false, { networkId, client });
+            await resolveAllSpeedPositions(claimableSpeedPositions, false, { networkId, client: walletClient.data });
         }
         setIsSubmitting(false);
     };

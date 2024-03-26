@@ -24,7 +24,7 @@ const useUserChainedSpeedMarketsTransactionsQuery = (
     options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
     return useQuery<TradeWithMarket[]>({
-        queryKey: QUERY_KEYS.User.ChainedSpeedMarketsTransactions(queryConfig, walletAddress),
+        queryKey: QUERY_KEYS.User.ChainedSpeedMarketsTransactions(queryConfig.networkId, walletAddress),
         queryFn: async () => {
             const userTransactions: TradeWithMarket[] = [];
 

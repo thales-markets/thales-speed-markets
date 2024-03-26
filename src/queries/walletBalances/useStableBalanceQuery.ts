@@ -14,7 +14,7 @@ const useStableBalanceQuery = (
     options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
     return useQuery<any>({
-        queryKey: QUERY_KEYS.WalletBalances.StableCoinBalance(walletAddress ?? '', queryConfig),
+        queryKey: QUERY_KEYS.WalletBalances.StableCoinBalance(walletAddress ?? '', queryConfig.networkId),
         queryFn: async () => {
             try {
                 const collateral = getContract({
