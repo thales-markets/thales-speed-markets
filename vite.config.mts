@@ -1,5 +1,5 @@
 import react from '@vitejs/plugin-react';
-import { PluginOption, defineConfig, splitVendorChunkPlugin } from 'vite';
+import { PluginOption, defineConfig } from 'vite';
 import eslint from 'vite-plugin-eslint';
 import svgr from 'vite-plugin-svgr';
 import tsconfigPaths from 'vite-tsconfig-paths';
@@ -16,7 +16,6 @@ const plugins = (mode: string): PluginOption[] => {
             emitWarning: true,
             useEslintrc: true,
         }),
-        splitVendorChunkPlugin(),
     ];
 };
 
@@ -30,25 +29,10 @@ export default defineConfig(({ mode }) => {
         build: {
             rollupOptions: {
                 output: {
-                    manualChunks(id: string) {
-                        // Creating a chunk to rainbowkit deps. Reducing the vendor chunk size
-                        // if (
-                        //     id.includes('@rainbow-me/rainbowkit') ||
-                        //     id.includes('@vanilla') ||
-                        //     id.includes('clsx') ||
-                        //     id.includes('qrcode') ||
-                        //     id.includes('react-remove-scroll') ||
-                        //     id.includes('ua-parser-js')
-                        // ) {
-                        //     return '@rainbow-me/rainbowkit';
-                        // }
-                        // if (id.includes('lightweight-charts')) {
-                        //     return 'lightweight-charts';
-                        // }
-                        // Reducing the index (src) chunk size
-                        // if (id.includes('src/constants/currency.ts')) {
-                        //     return 'currency';
-                        // }
+                    manualChunks: {
+                        rainbowkit: ['@rainbow-me/rainbowkit'],
+                        lightweightCharts: ['lightweight-charts'],
+                        lottie: ['lottie-react'],
                     },
                 },
             },

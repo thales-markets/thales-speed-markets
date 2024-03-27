@@ -3,7 +3,6 @@
     "version": "0.1.0",
     "private": true,
     "dependencies": {
-        "@metamask/detect-provider": "^1.2.0",
         "@pythnetwork/pyth-evm-js": "^1.33.0",
         "@pythnetwork/pyth-sdk-solidity": "^2.4.1",
         "@rainbow-me/rainbowkit": "^2.0.0",
@@ -42,9 +41,6 @@
         "viem": "^2.7.19",
         "wagmi": "^2.5.7",
         "web-vitals": "^1.1.0"
-    },
-    "overrides": {
-        "typescript": "^5.0.4"
     },
     "devDependencies": {
         "@tanstack/react-query-devtools": "^5.28.8",
