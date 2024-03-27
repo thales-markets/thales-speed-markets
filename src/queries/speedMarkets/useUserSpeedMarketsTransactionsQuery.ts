@@ -47,7 +47,7 @@ const useUserSpeedMarketsTransactionsQuery = (
             const [activeMarkets, maturedMarkets] = await Promise.all([
                 speedMarketsAMMContractLocal.read.activeMarketsPerUser([
                     0,
-                    Number(ammParams.numActiveMarketsPerUser),
+                    ammParams.numActiveMarketsPerUser,
                     walletAddress,
                 ]),
                 speedMarketsAMMContractLocal.read.maturedMarketsPerUser([index, pageSize, walletAddress]),

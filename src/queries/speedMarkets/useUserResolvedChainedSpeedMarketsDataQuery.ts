@@ -41,7 +41,7 @@ const useUserResolvedChainedSpeedMarketsDataQuery = (
 
             const ammParams = await speedMarketDataContract.read.getChainedSpeedMarketsAMMParameters([walletAddress]);
 
-            const pageSize = Math.min(ammParams.numMaturedMarketsPerUser, MAX_NUMBER_OF_SPEED_MARKETS_TO_FETCH);
+            const pageSize = Math.min(Number(ammParams.numMaturedMarketsPerUser), MAX_NUMBER_OF_SPEED_MARKETS_TO_FETCH);
             const index = Number(ammParams.numMaturedMarketsPerUser) - pageSize;
             const maturedMarkets = await chainedSpeedMarketAMMContract.read.maturedMarketsPerUser([
                 index,

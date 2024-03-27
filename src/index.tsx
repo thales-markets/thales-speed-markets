@@ -5,7 +5,6 @@ import Root from './pages/Root';
 import store from './redux/store';
 import reportWebVitals from './reportWebVitals';
 import './styles/currencies.css';
-import './styles/datepicker.css';
 import './styles/fonts.css';
 import './styles/icons.css';
 import './styles/main.css';
