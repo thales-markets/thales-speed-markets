@@ -1,11 +1,3 @@
-.react-datepicker-wrapper {
-    width: 100%;
-}
-
-.react-datepicker-popper {
-    z-index: 4 !important;
-}
-
 .select-override {
     z-index: 3;
 }
