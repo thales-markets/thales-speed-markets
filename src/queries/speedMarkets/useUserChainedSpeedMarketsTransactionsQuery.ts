@@ -40,13 +40,11 @@ const useUserChainedSpeedMarketsTransactionsQuery = (
                 client: queryConfig.client,
             }) as ViemContract;
 
-            // const { chainedSpeedMarketsAMMContract, speedMarketsDataContract } = snxJSConnector;
-
             const ammParams = await speedMarketsDataContractLocal.read.getChainedSpeedMarketsAMMParameters([
                 walletAddress,
             ]);
 
-            const pageSize = Math.min(ammParams.numMaturedMarketsPerUser, MAX_NUMBER_OF_SPEED_MARKETS_TO_FETCH);
+            const pageSize = Math.min(Number(ammParams.numMaturedMarketsPerUser), MAX_NUMBER_OF_SPEED_MARKETS_TO_FETCH);
             const index = Number(ammParams.numMaturedMarketsPerUser) - pageSize;
             const [activeMarkets, maturedMarkets] = await Promise.all([
                 chainedMarketsAMMContract.read.activeMarketsPerUser([
