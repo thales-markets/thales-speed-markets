@@ -31,12 +31,19 @@ export default defineConfig(({ mode }) => {
             rollupOptions: {
                 output: {
                     manualChunks(id: string) {
-                        // Creating a chunk to lightweight charts deps. Reducing the vendor chunk size
+                        // Creating a chunk to rainbowkit deps. Reducing the vendor chunk size
+                        if (
+                            id.includes('@rainbow-me/rainbowkit') ||
+                            id.includes('@vanilla') ||
+                            id.includes('clsx') ||
+                            id.includes('qrcode') ||
+                            id.includes('react-remove-scroll') ||
+                            id.includes('ua-parser-js')
+                        ) {
+                            return '@rainbow-me/rainbowkit';
+                        }
                         if (id.includes('lightweight-charts')) {
                             return 'lightweight-charts';
-                        }
-                        if (id.includes('@rainbow-me/rainbowkit')) {
-                            return '@rainbow-me/rainbowkit';
                         }
                         // Reducing the index (src) chunk size
                         // if (id.includes('src/constants/currency.ts')) {
