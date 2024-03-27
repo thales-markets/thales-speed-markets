@@ -60,7 +60,6 @@ export default defineConfig(({ mode }) => {
                         webgl: ['react-unity-webgl'],
                         typescript: ['typescript'],
                         cookie: ['universal-cookie'],
-                        viem: ['viem'],
                         wagmi: ['wagmi'],
                         vitals: ['web-vitals'],
                     },
