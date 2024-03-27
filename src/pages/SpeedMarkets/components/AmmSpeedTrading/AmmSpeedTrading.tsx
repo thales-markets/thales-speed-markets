@@ -43,6 +43,7 @@ import {
     COLLATERAL_DECIMALS,
     NetworkId,
     bigNumberFormatter,
+    ceilNumberToDecimals,
     coinParser,
     formatCurrency,
     formatCurrencyWithKey,
@@ -464,12 +465,12 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             try {
                 const parsedAmount: bigint = coinParser(
                     isStableCurrency(selectedCollateral)
-                        ? roundNumberToDecimals(totalPaidAmount).toString()
-                        : roundNumberToDecimals(totalPaidAmount, COLLATERAL_DECIMALS[selectedCollateral]).toString(),
+                        ? ceilNumberToDecimals(totalPaidAmount).toString()
+                        : ceilNumberToDecimals(totalPaidAmount, COLLATERAL_DECIMALS[selectedCollateral]).toString(),
                     networkId,
                     selectedCollateral
                 );
-                const allowance = await checkAllowance(
+                const allowance: boolean = await checkAllowance(
                     parsedAmount,
                     erc20Instance,
                     address as string,
@@ -968,8 +969,8 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 <ApprovalModal
                     defaultAmount={
                         isStableCurrency(selectedCollateral)
-                            ? roundNumberToDecimals(totalPaidAmount)
-                            : roundNumberToDecimals(totalPaidAmount, COLLATERAL_DECIMALS[selectedCollateral])
+                            ? ceilNumberToDecimals(totalPaidAmount)
+                            : ceilNumberToDecimals(totalPaidAmount, COLLATERAL_DECIMALS[selectedCollateral])
                     }
                     tokenSymbol={selectedCollateral}
                     isAllowing={isAllowing}
