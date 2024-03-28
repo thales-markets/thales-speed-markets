@@ -50,10 +50,16 @@ const App = () => {
         }
     }, [dispatch, address, switchChain, disconnect]);
 
+    window.onload = () => {
+        console.log('onload');
+    };
+
     useEffect(() => {
         const handlePageResized = () => {
             dispatch(setIsMobile(isMobile()));
         };
+
+        handlePageResized();
 
         if (typeof window !== 'undefined') {
             window.addEventListener('resize', handlePageResized);
