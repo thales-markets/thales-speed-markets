@@ -41,7 +41,7 @@ const ethereumSwitchChain = async (chainId: string) => {
 const changeNetwork = async (network: NetworkParams, callback: VoidFunction, isMobile: boolean): Promise<void> => {
     if (hasEthereumInjected()) {
         try {
-            isMobile ? await ethereumSwitchChain(network.chainId) : callback();
+            isMobile && window.ethereum.isMetaMask ? await ethereumSwitchChain(network.chainId) : callback();
         } catch (switchError: any) {
             if (network && switchError.code === 4902) {
                 try {
@@ -50,7 +50,7 @@ const changeNetwork = async (network: NetworkParams, callback: VoidFunction, isM
                         params: [network],
                     });
 
-                    isMobile ? await ethereumSwitchChain(network.chainId) : callback();
+                    isMobile && window.ethereum.isMetaMask ? await ethereumSwitchChain(network.chainId) : callback();
                 } catch (addError) {
                     console.log(addError);
                 }
