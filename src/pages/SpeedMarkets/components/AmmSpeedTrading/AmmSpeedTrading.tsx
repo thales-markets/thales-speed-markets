@@ -817,8 +817,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
               }
             : {};
 
-    console.log('collateralBalance: ', collateralBalance);
-
     return (
         <Container $isChained={isChained}>
             {!isMobile && getTradingDetails()}
