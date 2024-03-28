@@ -45,7 +45,6 @@ import {
     bigNumberFormatter,
     ceilNumberToDecimals,
     coinParser,
-    formatCurrency,
     formatCurrencyWithKey,
     formatCurrencyWithSign,
     formatPercentage,
@@ -86,7 +85,6 @@ type AmmSpeedTradingProps = {
     currentPrice: number;
     setSkewImpact: React.Dispatch<{ [Positions.UP]: number; [Positions.DOWN]: number }>;
     resetData: React.Dispatch<void>;
-    showWalletBalance?: boolean;
 };
 
 const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
@@ -103,7 +101,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     currentPrice,
     setSkewImpact,
     resetData,
-    showWalletBalance,
 }) => {
     const { t } = useTranslation();
     const { openConnectModal } = useConnectModal();
@@ -841,11 +838,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                             maxAmount: convertFromStable(maxBuyinAmount),
                             fee: totalFee ? formatPercentage(totalFee) : '...',
                         })}
-                        balance={
-                            showWalletBalance && isConnected
-                                ? `${t('common.balance')}: ${formatCurrency(collateralBalance)}`
-                                : undefined
-                        }
                         currencyComponent={
                             isMultiCollateralSupported ? (
                                 <CollateralSelector
