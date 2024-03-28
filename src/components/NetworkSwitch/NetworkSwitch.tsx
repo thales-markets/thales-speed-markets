@@ -1,18 +1,14 @@
 import { DEFAULT_NETWORK } from 'constants/network';
 import React, { useMemo, useState } from 'react';
 import OutsideClickHandler from 'react-outside-click-handler';
-import { useSelector } from 'react-redux';
-import { getIsMobile } from 'redux/modules/ui';
 import styled from 'styled-components';
 import { SupportedNetwork } from 'types/network';
-import { RootState } from 'types/ui';
 import { SUPPORTED_NETWORK_IDS_MAP } from 'utils/network';
 import { useChainId, useSwitchChain } from 'wagmi';
 
 const NetworkSwitch: React.FC = () => {
     const { switchChain } = useSwitchChain();
     const networkId = useChainId();
-    const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const selectedNetwork = useMemo(
         () => SUPPORTED_NETWORK_IDS_MAP[networkId] || SUPPORTED_NETWORK_IDS_MAP[DEFAULT_NETWORK.networkId],
@@ -48,8 +44,7 @@ const NetworkSwitch: React.FC = () => {
                                                 network.id,
                                                 () => {
                                                     switchChain?.({ chainId: network.id as SupportedNetwork });
-                                                },
-                                                isMobile
+                                                }
                                             );
                                         }}
                                     >

@@ -29,19 +29,10 @@ export const checkAllowance = async (amount: bigint, token: any, walletAddress: 
 
 const hasEthereumInjected = () => !!window.ethereum;
 
-const ethereumSwitchChain = async (chainId: string) => {
-    if (hasEthereumInjected()) {
-        await (window.ethereum as any).request({
-            method: 'wallet_switchEthereumChain',
-            params: [{ chainId }],
-        });
-    }
-};
-
-const changeNetwork = async (network: NetworkParams, callback: VoidFunction, isMobile: boolean): Promise<void> => {
+const changeNetwork = async (network: NetworkParams, callback: VoidFunction): Promise<void> => {
     if (hasEthereumInjected()) {
         try {
-            isMobile && window.ethereum.isMetaMask ? await ethereumSwitchChain(network.chainId) : callback();
+            callback();
         } catch (switchError: any) {
             if (network && switchError.code === 4902) {
                 try {
@@ -50,7 +41,7 @@ const changeNetwork = async (network: NetworkParams, callback: VoidFunction, isM
                         params: [network],
                     });
 
-                    isMobile && window.ethereum.isMetaMask ? await ethereumSwitchChain(network.chainId) : callback();
+                    callback();
                 } catch (addError) {
                     console.log(addError);
                 }
@@ -66,7 +57,7 @@ const changeNetwork = async (network: NetworkParams, callback: VoidFunction, isM
 type DropdownNetwork = {
     name: string;
     icon: FunctionComponent<SVGProps<SVGSVGElement>>;
-    changeNetwork: (networkId: number, callback: VoidFunction, isMobile: boolean) => Promise<void>;
+    changeNetwork: (networkId: number, callback: VoidFunction) => Promise<void>;
     order: number;
 };
 
@@ -74,40 +65,40 @@ export const SUPPORTED_NETWORK_IDS_MAP: Record<number, DropdownNetwork> = {
     [NetworkId.OptimismMainnet]: {
         name: 'Optimism',
         icon: OpLogo,
-        changeNetwork: async (networkId: number, callback: VoidFunction, isMobile: boolean) => {
-            await changeNetwork(SUPPORTED_NETWORKS_PARAMS[networkId], callback, isMobile);
+        changeNetwork: async (networkId: number, callback: VoidFunction) => {
+            await changeNetwork(SUPPORTED_NETWORKS_PARAMS[networkId], callback);
         },
         order: 1,
     },
     [NetworkId.PolygonMainnet]: {
         name: 'Polygon',
         icon: PolygonLogo,
-        changeNetwork: async (networkId: number, callback: VoidFunction, isMobile: boolean) => {
-            await changeNetwork(SUPPORTED_NETWORKS_PARAMS[networkId], callback, isMobile);
+        changeNetwork: async (networkId: number, callback: VoidFunction) => {
+            await changeNetwork(SUPPORTED_NETWORKS_PARAMS[networkId], callback);
         },
         order: 4,
     },
     [NetworkId.Arbitrum]: {
         name: 'Arbitrum',
         icon: ArbitrumLogo,
-        changeNetwork: async (networkId: number, callback: VoidFunction, isMobile: boolean) => {
-            await changeNetwork(SUPPORTED_NETWORKS_PARAMS[networkId], callback, isMobile);
+        changeNetwork: async (networkId: number, callback: VoidFunction) => {
+            await changeNetwork(SUPPORTED_NETWORKS_PARAMS[networkId], callback);
         },
         order: 2,
     },
     [NetworkId.Base]: {
         name: 'Base',
         icon: BaseLogo,
-        changeNetwork: async (networkId: number, callback: VoidFunction, isMobile: boolean) => {
-            await changeNetwork(SUPPORTED_NETWORKS_PARAMS[networkId], callback, isMobile);
+        changeNetwork: async (networkId: number, callback: VoidFunction) => {
+            await changeNetwork(SUPPORTED_NETWORKS_PARAMS[networkId], callback);
         },
         order: 3,
     },
     [NetworkId.ZkSync]: {
         name: 'ZkSync',
         icon: ZkSyncLogo,
-        changeNetwork: async (networkId: number, callback: VoidFunction, isMobile: boolean) => {
-            await changeNetwork(SUPPORTED_NETWORKS_PARAMS[networkId], callback, isMobile);
+        changeNetwork: async (networkId: number, callback: VoidFunction) => {
+            await changeNetwork(SUPPORTED_NETWORKS_PARAMS[networkId], callback);
         },
         order: 5,
     },

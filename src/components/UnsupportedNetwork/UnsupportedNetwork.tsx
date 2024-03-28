@@ -9,12 +9,9 @@ import { TEST_NETWORKS } from 'constants/network';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
-import { getIsMobile } from 'redux/modules/ui';
 import styled from 'styled-components';
 import { NetworkId } from 'thales-utils';
 import { SupportedNetwork } from 'types/network';
-import { RootState } from 'types/ui';
 import { SUPPORTED_NETWORK_IDS_MAP } from 'utils/network';
 import { useSwitchChain } from 'wagmi';
 
@@ -25,7 +22,6 @@ type UnsupportedNetworkProps = {
 const UnsupportedNetwork: React.FC<UnsupportedNetworkProps> = ({ supportedNetworks }) => {
     const { t } = useTranslation();
     const { switchChain } = useSwitchChain();
-    const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const supportedMainnetNetworks = supportedNetworks?.filter(
         (supportedNetwork) => !TEST_NETWORKS.includes(supportedNetwork)
@@ -71,10 +67,8 @@ const UnsupportedNetwork: React.FC<UnsupportedNetworkProps> = ({ supportedNetwor
                 padding="0 18px"
                 additionalStyles={{ textTransform: 'none' }}
                 onClick={() =>
-                    SUPPORTED_NETWORK_IDS_MAP[networkId].changeNetwork(
-                        networkId,
-                        () => switchChain?.({ chainId: networkId as SupportedNetwork }),
-                        isMobile
+                    SUPPORTED_NETWORK_IDS_MAP[networkId].changeNetwork(networkId, () =>
+                        switchChain?.({ chainId: networkId as SupportedNetwork })
                     )
                 }
             >

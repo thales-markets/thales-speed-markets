@@ -38,16 +38,20 @@ const App = () => {
     useEffect(() => {
         if (window.ethereum) {
             window.ethereum.on('chainChanged', (chainIdParam: string) => {
-                const chainId = Number.isInteger(chainIdParam) ? Number(chainIdParam) : parseInt(chainIdParam, 16);
+                const ethereumChainId = Number.isInteger(chainIdParam)
+                    ? Number(chainIdParam)
+                    : parseInt(chainIdParam, 16);
 
-                if (!isNetworkSupported(chainId)) {
+                if (!isNetworkSupported(ethereumChainId)) {
                     // when network changed from browser wallet disconnect wallet otherwise wallet is unusable (e.g. wallet options doesn't react)
                     disconnect();
                 }
-                switchChain({ chainId: chainId as SupportedNetwork });
+                if (networkId !== ethereumChainId) {
+                    switchChain({ chainId: ethereumChainId as SupportedNetwork });
+                }
             });
         }
-    }, [dispatch, address, switchChain, disconnect]);
+    }, [dispatch, address, switchChain, disconnect, networkId]);
 
     useEffect(() => {
         const handlePageResized = () => {
