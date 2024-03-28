@@ -29,13 +29,9 @@ export const checkAllowance = async (amount: bigint, token: any, walletAddress: 
     }
 };
 
-const changeNetwork = async (network?: NetworkParams, callback?: VoidFunction, chainId?: string): Promise<void> => {
+const changeNetwork = async (network?: NetworkParams, callback?: VoidFunction): Promise<void> => {
     if (hasEthereumInjected()) {
         try {
-            await (window.ethereum as any).request({
-                method: 'wallet_switchEthereumChain',
-                params: [{ chainId: network?.chainId || chainId }],
-            });
             callback && callback();
         } catch (switchError: any) {
             if (network && switchError.code === 4902) {
@@ -44,10 +40,7 @@ const changeNetwork = async (network?: NetworkParams, callback?: VoidFunction, c
                         method: 'wallet_addEthereumChain',
                         params: [network],
                     });
-                    await (window.ethereum as any).request({
-                        method: 'wallet_switchEthereumChain',
-                        params: [{ chainId: network.chainId }],
-                    });
+
                     callback && callback();
                 } catch (addError) {
                     console.log(addError);

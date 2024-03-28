@@ -2,43 +2,17 @@ import { DEFAULT_NETWORK } from 'constants/network';
 import React, { useMemo, useState } from 'react';
 import OutsideClickHandler from 'react-outside-click-handler';
 import styled from 'styled-components';
+import { SupportedNetwork } from 'types/network';
 import { SUPPORTED_NETWORK_IDS_MAP } from 'utils/network';
 import { useChainId, useSwitchChain } from 'wagmi';
 
-type NetworkSwitchProps = {
-    selectedNetworkId?: number;
-    setSelectedNetworkId?: any;
-    supportedNetworks?: number[];
-};
-
-const NetworkSwitch: React.FC<NetworkSwitchProps> = ({
-    selectedNetworkId,
-    setSelectedNetworkId,
-    supportedNetworks,
-}) => {
+const NetworkSwitch: React.FC = () => {
     const { switchChain } = useSwitchChain();
     const networkId = useChainId();
 
-    const filteredSupportedNetworks: Record<number, any> = useMemo(
-        () =>
-            supportedNetworks
-                ? Object.keys(SUPPORTED_NETWORK_IDS_MAP)
-                      .filter((key) => supportedNetworks.includes(Number(key)))
-                      .reduce((obj, key) => {
-                          return Object.assign(obj, {
-                              [key]: SUPPORTED_NETWORK_IDS_MAP[Number(key)],
-                          });
-                      }, {})
-                : SUPPORTED_NETWORK_IDS_MAP,
-        [supportedNetworks]
-    );
-
-    // TODO: add support for testnets
     const selectedNetwork = useMemo(
-        () =>
-            filteredSupportedNetworks[selectedNetworkId || networkId] ||
-            filteredSupportedNetworks[DEFAULT_NETWORK.networkId],
-        [networkId, selectedNetworkId, filteredSupportedNetworks]
+        () => SUPPORTED_NETWORK_IDS_MAP[networkId] || SUPPORTED_NETWORK_IDS_MAP[DEFAULT_NETWORK.networkId],
+        [networkId]
     );
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -55,9 +29,9 @@ const NetworkSwitch: React.FC<NetworkSwitchProps> = ({
                     </NetworkItem>
                     {isDropdownOpen && (
                         <NetworkDropDown>
-                            {Object.keys(filteredSupportedNetworks)
+                            {Object.keys(SUPPORTED_NETWORK_IDS_MAP)
                                 .map((key) => {
-                                    return { id: Number(key), ...filteredSupportedNetworks[Number(key)] };
+                                    return { id: Number(key), ...SUPPORTED_NETWORK_IDS_MAP[Number(key)] };
                                 })
                                 .sort((a, b) => a.order - b.order)
                                 .map((network, index) => (
@@ -65,24 +39,21 @@ const NetworkSwitch: React.FC<NetworkSwitchProps> = ({
                                         key={index}
                                         onClick={async () => {
                                             setIsDropdownOpen(!isDropdownOpen);
-                                            if (setSelectedNetworkId) {
-                                                setSelectedNetworkId(Number(network.id));
-                                            } else {
-                                                await filteredSupportedNetworks[network.id].changeNetwork(
-                                                    network.id,
-                                                    () => {
-                                                        switchChain?.(network.id);
-                                                    }
-                                                );
-                                            }
+
+                                            await SUPPORTED_NETWORK_IDS_MAP[network.id].changeNetwork(
+                                                network.id,
+                                                () => {
+                                                    switchChain?.({ chainId: network.id as SupportedNetwork });
+                                                }
+                                            );
                                         }}
                                     >
-                                        {React.createElement(filteredSupportedNetworks[network.id].icon, {
+                                        {React.createElement(SUPPORTED_NETWORK_IDS_MAP[network.id].icon, {
                                             height: '18px',
                                             width: '18px',
                                             style: { marginRight: 5 },
                                         })}
-                                        {filteredSupportedNetworks[network.id].name}
+                                        {SUPPORTED_NETWORK_IDS_MAP[network.id].name}
                                     </NetworkItem>
                                 ))}
                         </NetworkDropDown>

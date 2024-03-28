@@ -11,7 +11,9 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { NetworkId } from 'thales-utils';
+import { SupportedNetwork } from 'types/network';
 import { SUPPORTED_NETWORK_IDS_MAP } from 'utils/network';
+import { useSwitchChain } from 'wagmi';
 
 type UnsupportedNetworkProps = {
     supportedNetworks: NetworkId[];
@@ -19,6 +21,7 @@ type UnsupportedNetworkProps = {
 
 const UnsupportedNetwork: React.FC<UnsupportedNetworkProps> = ({ supportedNetworks }) => {
     const { t } = useTranslation();
+    const { switchChain } = useSwitchChain();
 
     const supportedMainnetNetworks = supportedNetworks?.filter(
         (supportedNetwork) => !TEST_NETWORKS.includes(supportedNetwork)
@@ -63,7 +66,11 @@ const UnsupportedNetwork: React.FC<UnsupportedNetworkProps> = ({ supportedNetwor
                 width="250px"
                 padding="0 18px"
                 additionalStyles={{ textTransform: 'none' }}
-                onClick={() => SUPPORTED_NETWORK_IDS_MAP[networkId].changeNetwork(networkId)}
+                onClick={() =>
+                    SUPPORTED_NETWORK_IDS_MAP[networkId].changeNetwork(networkId, () =>
+                        switchChain?.({ chainId: networkId as SupportedNetwork })
+                    )
+                }
             >
                 {logo}
                 <ButtonText>{text}</ButtonText>
