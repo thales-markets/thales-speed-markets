@@ -1,4 +1,4 @@
-import ElectionsBanner from 'components/ElectionsBanner';
+import Banner from 'components/Banner';
 import { LINKS } from 'constants/links';
 import useWidgetBotScript from 'hooks/useWidgetBotScript';
 import queryString from 'query-string';
@@ -66,7 +66,7 @@ const DappLayout: React.FC<DappLayoutProps> = ({ children }) => {
 
     return (
         <Background id="main-content">
-            {networkId === NetworkId.Arbitrum && <ElectionsBanner />}
+            {networkId === NetworkId.Arbitrum && <Banner />}
             <Wrapper>
                 <DappSidebar />
                 <DappHeader />

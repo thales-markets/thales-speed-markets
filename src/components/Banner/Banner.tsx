@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { FlexDiv } from 'styles/common';
 import SPAAnchor from '../SPAAnchor';
 
-const ElectionsBanner: React.FC = () => {
+const Banner: React.FC = () => {
     const { t } = useTranslation();
     return (
         <SPAAnchor href={'https://dune.com/leifu/arb-incentive-program-dashboard'}>
@@ -42,4 +42,4 @@ const Label = styled.span`
     text-transform: uppercase;
 `;
 
-export default ElectionsBanner;
+export default Banner;
