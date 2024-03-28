@@ -112,9 +112,13 @@ const OverviewPositionAction: React.FC<OverviewPositionActionProps> = ({
                 hash,
             });
 
-            if (txReceipt) {
+            if (txReceipt.status === 'success') {
                 toast.update(id, getSuccessToastOptions(t(`speed-markets.user-positions.confirmation-message`), id));
                 refetchActiveSpeedMarkets(false, networkId);
+            } else {
+                console.log('Transaction status', txReceipt.status);
+                await delay(800);
+                toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
             }
         } catch (e) {
             console.log(e);

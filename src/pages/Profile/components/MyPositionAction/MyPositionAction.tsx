@@ -135,7 +135,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
             const txReceipt = await waitForTransactionReceipt(client as Client, {
                 hash,
             });
-            if (txReceipt) {
+            if (txReceipt.status === 'success') {
                 toast.update(id, getSuccessToastOptions(t(`common.transaction.successful`), id));
                 setAllowance(true);
                 setIsAllowing(false);
@@ -204,12 +204,16 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                 hash,
             });
 
-            if (txReceipt) {
+            if (txReceipt.status === 'success') {
                 toast.update(id, getSuccessToastOptions(t(`speed-markets.user-positions.confirmation-message`), id));
                 refetchUserNotifications(address as string, networkId);
                 refetchUserSpeedMarkets(false, networkId, address as string);
                 refetchUserResolvedSpeedMarkets(false, networkId, address as string);
                 refetchUserProfileQueries(address as string, networkId);
+            } else {
+                console.log('Transaction status', txReceipt.status);
+                await delay(800);
+                toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
             }
         } catch (e) {
             console.log(e);

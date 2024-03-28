@@ -166,10 +166,15 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
             const txReceipt = await waitForTransactionReceipt(client as Client, {
                 hash,
             });
-            if (txReceipt) {
+            if (txReceipt.status === 'success') {
                 toast.update(id, getSuccessToastOptions(t(`common.transaction.successful`), id));
                 setAllowance(true);
                 setIsAllowing(false);
+            } else {
+                console.log('Transaction status', txReceipt.status);
+                toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
+                setIsAllowing(false);
+                setOpenApprovalModal(false);
             }
         } catch (e) {
             console.log(e);
@@ -266,7 +271,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 hash,
             });
 
-            if (txReceipt) {
+            if (txReceipt.status === 'success') {
                 toast.update(id, getSuccessToastOptions(t(`speed-markets.user-positions.confirmation-message`), id));
                 if (isOverview) {
                     refetchActiveSpeedMarkets(true, networkId);
@@ -274,6 +279,10 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                     refetchUserSpeedMarkets(true, networkId, address ?? '');
                     refetchUserResolvedSpeedMarkets(true, networkId, address ?? '');
                 }
+            } else {
+                console.log('Transaction status', txReceipt.status);
+                await delay(800);
+                toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
             }
         } catch (e) {
             console.log(e);
