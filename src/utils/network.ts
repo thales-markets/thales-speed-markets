@@ -3,14 +3,12 @@ import BaseLogo from 'assets/images/base-circle-logo.svg?react';
 import OpLogo from 'assets/images/optimism-circle-logo.svg?react';
 import PolygonLogo from 'assets/images/polygon-circle-logo.svg?react';
 import ZkSyncLogo from 'assets/images/zksync-circle-logo.svg?react';
-import { L1_TO_L2_NETWORK_MAPPER, SUPPORTED_NETWORKS, SUPPORTED_NETWORKS_PARAMS } from 'constants/network';
+import { SUPPORTED_NETWORKS, SUPPORTED_NETWORKS_PARAMS } from 'constants/network';
 import ROUTES from 'constants/routes';
 import { FunctionComponent, SVGProps } from 'react';
 import { NetworkId } from 'thales-utils';
 import { NetworkParams, SupportedNetwork } from '../types/network';
 import { getCollaterals } from './currency';
-
-const hasEthereumInjected = () => !!window.ethereum;
 
 export const isNetworkSupported = (networkId: SupportedNetwork): boolean => {
     return !!SUPPORTED_NETWORKS[networkId];
@@ -29,10 +27,21 @@ export const checkAllowance = async (amount: bigint, token: any, walletAddress: 
     }
 };
 
-const changeNetwork = async (network?: NetworkParams, callback?: VoidFunction): Promise<void> => {
+const hasEthereumInjected = () => !!window.ethereum;
+
+const ethereumSwitchChain = async (chainId: string) => {
+    if (hasEthereumInjected()) {
+        await (window.ethereum as any).request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId }],
+        });
+    }
+};
+
+const changeNetwork = async (network: NetworkParams, callback: VoidFunction, isMobile: boolean): Promise<void> => {
     if (hasEthereumInjected()) {
         try {
-            callback && callback();
+            isMobile ? await ethereumSwitchChain(network.chainId) : callback();
         } catch (switchError: any) {
             if (network && switchError.code === 4902) {
                 try {
@@ -41,7 +50,7 @@ const changeNetwork = async (network?: NetworkParams, callback?: VoidFunction): 
                         params: [network],
                     });
 
-                    callback && callback();
+                    isMobile ? await ethereumSwitchChain(network.chainId) : callback();
                 } catch (addError) {
                     console.log(addError);
                 }
@@ -50,14 +59,14 @@ const changeNetwork = async (network?: NetworkParams, callback?: VoidFunction): 
             }
         }
     } else {
-        callback && callback();
+        callback();
     }
 };
 
 type DropdownNetwork = {
     name: string;
     icon: FunctionComponent<SVGProps<SVGSVGElement>>;
-    changeNetwork: (networkId: number, callback?: VoidFunction) => Promise<void>;
+    changeNetwork: (networkId: number, callback: VoidFunction, isMobile: boolean) => Promise<void>;
     order: number;
 };
 
@@ -65,46 +74,40 @@ export const SUPPORTED_NETWORK_IDS_MAP: Record<number, DropdownNetwork> = {
     [NetworkId.OptimismMainnet]: {
         name: 'Optimism',
         icon: OpLogo,
-        changeNetwork: async (networkId: number, callback?: VoidFunction) => {
-            const switchTo = L1_TO_L2_NETWORK_MAPPER[networkId] ?? 10;
-            const optimismNetworkParms = SUPPORTED_NETWORKS_PARAMS[switchTo];
-            await changeNetwork(optimismNetworkParms, callback);
+        changeNetwork: async (networkId: number, callback: VoidFunction, isMobile: boolean) => {
+            await changeNetwork(SUPPORTED_NETWORKS_PARAMS[networkId], callback, isMobile);
         },
         order: 1,
     },
     [NetworkId.PolygonMainnet]: {
         name: 'Polygon',
         icon: PolygonLogo,
-        changeNetwork: async (networkId: number, callback?: VoidFunction) => {
-            const polygonNetworkParams = SUPPORTED_NETWORKS_PARAMS[networkId];
-            await changeNetwork(polygonNetworkParams, callback);
+        changeNetwork: async (networkId: number, callback: VoidFunction, isMobile: boolean) => {
+            await changeNetwork(SUPPORTED_NETWORKS_PARAMS[networkId], callback, isMobile);
         },
         order: 4,
     },
     [NetworkId.Arbitrum]: {
         name: 'Arbitrum',
         icon: ArbitrumLogo,
-        changeNetwork: async (networkId: number, callback?: VoidFunction) => {
-            const arbNetworkParams = SUPPORTED_NETWORKS_PARAMS[networkId];
-            await changeNetwork(arbNetworkParams, callback);
+        changeNetwork: async (networkId: number, callback: VoidFunction, isMobile: boolean) => {
+            await changeNetwork(SUPPORTED_NETWORKS_PARAMS[networkId], callback, isMobile);
         },
         order: 2,
     },
     [NetworkId.Base]: {
         name: 'Base',
         icon: BaseLogo,
-        changeNetwork: async (networkId: number, callback?: VoidFunction) => {
-            const baseNetworkParams = SUPPORTED_NETWORKS_PARAMS[networkId];
-            await changeNetwork(baseNetworkParams, callback);
+        changeNetwork: async (networkId: number, callback: VoidFunction, isMobile: boolean) => {
+            await changeNetwork(SUPPORTED_NETWORKS_PARAMS[networkId], callback, isMobile);
         },
         order: 3,
     },
     [NetworkId.ZkSync]: {
         name: 'ZkSync',
         icon: ZkSyncLogo,
-        changeNetwork: async (networkId: number, callback?: VoidFunction) => {
-            const baseNetworkParams = SUPPORTED_NETWORKS_PARAMS[networkId];
-            await changeNetwork(baseNetworkParams, callback);
+        changeNetwork: async (networkId: number, callback: VoidFunction, isMobile: boolean) => {
+            await changeNetwork(SUPPORTED_NETWORKS_PARAMS[networkId], callback, isMobile);
         },
         order: 5,
     },

@@ -13,7 +13,6 @@ import { Redirect, Route, Router, Switch } from 'react-router-dom';
 import { setAppReady } from 'redux/modules/app';
 import { setIsMobile } from 'redux/modules/ui';
 import { createGlobalStyle } from 'styled-components';
-import { SupportedNetwork } from 'types/network';
 import { isMobile } from 'utils/device';
 import { getSupportedNetworksByRoute, isNetworkSupported } from 'utils/network';
 import queryConnector from 'utils/queryConnector';
@@ -40,19 +39,13 @@ const App = () => {
             window.ethereum.on('chainChanged', (chainIdParam: string) => {
                 const chainId = Number.isInteger(chainIdParam) ? Number(chainIdParam) : parseInt(chainIdParam, 16);
 
-                if (!address && isNetworkSupported(chainId)) {
-                    // when wallet disconnected reflect network change from browser wallet to dApp
-                    switchChain({ chainId: chainId as SupportedNetwork });
+                if (!isNetworkSupported(chainId)) {
+                    // when network changed from browser wallet disconnect wallet otherwise wallet is unusable (e.g. wallet options doesn't react)
+                    disconnect();
                 }
             });
         }
-    }, [dispatch, address, switchChain]);
-
-    useEffect(() => {
-        if (!isNetworkSupported(networkId)) {
-            disconnect();
-        }
-    }, [disconnect, networkId]);
+    }, [dispatch, address, switchChain, disconnect]);
 
     useEffect(() => {
         const handlePageResized = () => {

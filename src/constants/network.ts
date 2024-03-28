@@ -41,13 +41,6 @@ export const DEFAULT_NETWORK: { name: string; networkId: SupportedNetwork } = {
     networkId: NetworkId.OptimismMainnet,
 };
 
-type NetworkMapper = Record<number, number>;
-
-export const L1_TO_L2_NETWORK_MAPPER: NetworkMapper = {
-    1: 10,
-    42: 69,
-};
-
 export const SUPPORTED_NETWORKS_PARAMS: Record<number, NetworkParams> = {
     [NetworkId.OptimismMainnet]: {
         chainId: '0xA',
