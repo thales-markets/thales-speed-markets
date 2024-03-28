@@ -1,4 +1,3 @@
-import Tooltip from 'components/Tooltip';
 import React, { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -10,22 +9,14 @@ type NumericInputProps = {
     label?: string;
     placeholder?: string;
     disabled?: boolean;
-    step?: string;
-    max?: string;
     onChange: (e: ChangeEvent<HTMLInputElement>, value: string) => void;
     showValidation?: boolean;
     validationMessage?: string;
     currencyComponent?: any;
     currencyLabel?: string;
-    tooltip?: string;
     onMaxButton?: any;
-    info?: string;
     inputPadding?: string;
     margin?: string;
-    inputFontSize?: string;
-    width?: string;
-    height?: string;
-    enableCurrencyComponentOnly?: boolean;
 };
 
 const INVALID_CHARS = ['-', '+', 'e'];
@@ -36,23 +27,14 @@ const NumericInput: React.FC<NumericInputProps> = ({
     label,
     placeholder,
     disabled,
-    step,
-    max,
     onChange,
     showValidation,
     validationMessage,
     currencyComponent,
     currencyLabel,
-    tooltip,
     onMaxButton,
-    info,
     inputPadding,
     margin,
-    inputFontSize,
-    width,
-    height,
-    enableCurrencyComponentOnly,
-    ...rest
 }) => {
     const { t } = useTranslation();
 
@@ -72,19 +54,8 @@ const NumericInput: React.FC<NumericInputProps> = ({
 
     return (
         <FieldContainer margin={margin}>
-            {label && (
-                <FieldLabel>
-                    {label}
-                    {tooltip && <Tooltip overlay={tooltip} iconFontSize={14} />}:
-                </FieldLabel>
-            )}
-            {info && (
-                <InfoWrapper>
-                    <InfoText>{info}</InfoText>
-                </InfoWrapper>
-            )}
+            {label && <FieldLabel>{label}</FieldLabel>}
             <StyledInput
-                {...rest}
                 value={value}
                 type="number"
                 onChange={handleOnChange}
@@ -97,13 +68,8 @@ const NumericInput: React.FC<NumericInputProps> = ({
                     }
                 }}
                 min="0"
-                max={max || 'any'}
-                step={step || 'any'}
                 title=""
                 padding={inputPadding}
-                fontSize={inputFontSize}
-                width={width}
-                height={height}
             />
             <RightContainer>
                 {onMaxButton && (
@@ -120,10 +86,7 @@ const NumericInput: React.FC<NumericInputProps> = ({
                     </CurrencyLabel>
                 )}
                 {currencyComponent && (
-                    <CurrencyComponentContainer
-                        className={disabled && !enableCurrencyComponentOnly ? 'disabled' : ''}
-                        $hasSeparator={onMaxButton}
-                    >
+                    <CurrencyComponentContainer className={disabled ? 'disabled' : ''} $hasSeparator={onMaxButton}>
                         {currencyComponent}
                     </CurrencyComponentContainer>
                 )}
@@ -202,26 +165,6 @@ const CurrencyComponentContainer = styled(FlexDivCentered)<{ $hasSeparator?: boo
         opacity: 0.4;
         cursor: default;
     }
-`;
-
-const InfoWrapper = styled.div`
-    position: absolute;
-    top: -8px;
-    left: 0;
-    right: 0;
-    margin-left: auto;
-    margin-right: auto;
-    width: fit-content;
-    background: ${(props) => props.theme.background.primary};
-    padding: 0 5px;
-    z-index: 1;
-`;
-
-const InfoText = styled.span`
-    font-size: 13px;
-    line-height: 16px;
-    color: ${(props) => props.theme.textColor.secondary};
-    text-transform: uppercase;
 `;
 
 export default NumericInput;

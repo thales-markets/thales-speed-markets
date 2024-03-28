@@ -1,83 +1,31 @@
-import Tooltip from 'components/Tooltip';
 import React from 'react';
 import styled from 'styled-components';
-import { FlexDivCentered } from 'styles/common';
-import { FieldContainer, FieldLabel, Input } from '../common';
+import { FieldContainer, Input } from '../common';
 
 type TextInputProps = {
     value: string;
-    label?: string;
     placeholder?: string;
-    disabled?: boolean;
     onChange?: any;
-    showValidation?: boolean;
-    validationMessage?: string;
-    tooltip?: string;
     inputPadding?: string;
     margin?: string;
-    inputFontSize?: string;
     width?: string;
     height?: string;
-    iconClass?: string;
-    onIconClick?: () => void;
 };
 
-const TextInput: React.FC<TextInputProps> = ({
-    value,
-    label,
-    placeholder,
-    disabled,
-    onChange,
-    showValidation,
-    validationMessage,
-    tooltip,
-    inputPadding,
-    margin,
-    inputFontSize,
-    width,
-    height,
-    iconClass,
-    onIconClick,
-    ...rest
-}) => {
+const TextInput: React.FC<TextInputProps> = ({ value, placeholder, onChange, inputPadding, margin, width, height }) => {
     return (
         <FieldContainer width={width} margin={margin}>
-            {label && (
-                <FieldLabel>
-                    {label}
-                    {tooltip && <Tooltip overlay={tooltip} />}:
-                </FieldLabel>
-            )}
             <StyledInput
-                {...rest}
                 readOnly={!onChange}
                 value={value}
                 type="text"
                 onChange={onChange}
                 placeholder={placeholder}
-                disabled={disabled}
-                className={showValidation ? 'error' : ''}
                 title=""
                 padding={inputPadding}
-                fontSize={inputFontSize}
                 width={width}
                 height={height}
             />
-            <RightContainer>
-                {onIconClick && (
-                    <Icon
-                        className={
-                            disabled ? `${iconClass || 'icon icon--search'} disabled` : iconClass || 'icon icon--search'
-                        }
-                        onClick={onIconClick}
-                    />
-                )}
-            </RightContainer>
-            {showValidation && (
-                <Validation>
-                    <ValidationText>{validationMessage}</ValidationText>
-                </Validation>
-            )}
         </FieldContainer>
     );
 };
@@ -87,39 +35,6 @@ const StyledInput = styled(Input)<{ padding?: string; readOnly: boolean }>`
     &:focus {
         ${(props) => (props.readOnly ? `border: 1px solid ${props.theme.input.borderColor.primary};` : '')}
     }
-`;
-
-const RightContainer = styled(FlexDivCentered)`
-    position: absolute;
-    right: 0;
-    bottom: 10px;
-`;
-
-const Icon = styled.i`
-    font-size: 15px;
-    color: ${(props) => props.theme.borderColor.secondary};
-    padding-right: 10px;
-    cursor: pointer;
-    &.disabled {
-        opacity: 0.4;
-        cursor: default;
-    }
-`;
-
-const Validation = styled.div`
-    position: absolute;
-    bottom: -7px;
-    width: 100%;
-    color: ${(props) => props.theme.input.textColor.quaternary};
-    text-align: center;
-`;
-
-const ValidationText = styled.span`
-    padding: 2px 4px;
-    font-weight: 600;
-    font-size: 13px;
-    line-height: 15px;
-    background-color: ${(props) => props.theme.background.primary};
 `;
 
 export default TextInput;
