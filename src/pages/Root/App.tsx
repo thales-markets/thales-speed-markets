@@ -13,6 +13,7 @@ import { Redirect, Route, Router, Switch } from 'react-router-dom';
 import { setAppReady } from 'redux/modules/app';
 import { setIsMobile } from 'redux/modules/ui';
 import { createGlobalStyle } from 'styled-components';
+import { SupportedNetwork } from 'types/network';
 import { isMobile } from 'utils/device';
 import { getSupportedNetworksByRoute, isNetworkSupported } from 'utils/network';
 import queryConnector from 'utils/queryConnector';
@@ -43,6 +44,7 @@ const App = () => {
                     // when network changed from browser wallet disconnect wallet otherwise wallet is unusable (e.g. wallet options doesn't react)
                     disconnect();
                 }
+                switchChain({ chainId: chainId as SupportedNetwork });
             });
         }
     }, [dispatch, address, switchChain, disconnect]);
