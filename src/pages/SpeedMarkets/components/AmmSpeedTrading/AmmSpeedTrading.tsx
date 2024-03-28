@@ -48,7 +48,6 @@ import {
     formatCurrencyWithKey,
     formatCurrencyWithSign,
     formatPercentage,
-    roundNumberToDecimals,
     truncToDecimals,
 } from 'thales-utils';
 import { AmmChainedSpeedMarketsLimits, AmmSpeedMarketsLimits } from 'types/market';
@@ -67,9 +66,9 @@ import { getReferralWallet } from 'utils/referral';
 import { getFeeByTimeThreshold, getTransactionForSpeedAMM } from 'utils/speedAmm';
 import { delay } from 'utils/timer';
 import { Client, getContract, parseUnits, stringToHex } from 'viem';
+import { waitForTransactionReceipt } from 'viem/actions';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 import { SelectedPosition } from '../SelectPosition/SelectPosition';
-import { waitForTransactionReceipt } from 'viem/actions';
 
 type AmmSpeedTradingProps = {
     isChained: boolean;
@@ -274,11 +273,11 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         )[0];
 
         if (riskPerUp && riskPerDown) {
-            skewPerPosition[Positions.UP] = roundNumberToDecimals(
+            skewPerPosition[Positions.UP] = ceilNumberToDecimals(
                 (riskPerUp.current / riskPerUp.max) * ammSpeedMarketsLimits?.maxSkewImpact,
                 4
             );
-            skewPerPosition[Positions.DOWN] = roundNumberToDecimals(
+            skewPerPosition[Positions.DOWN] = ceilNumberToDecimals(
                 (riskPerDown.current / riskPerDown.max) * ammSpeedMarketsLimits?.maxSkewImpact,
                 4
             );
@@ -522,9 +521,14 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             const txReceipt = await waitForTransactionReceipt(client as Client, {
                 hash,
             });
-            if (txReceipt) {
+            if (txReceipt.status === 'success') {
                 toast.update(id, getSuccessToastOptions(t(`common.transaction.successful`), id));
                 setIsAllowing(false);
+            } else {
+                console.log('Transaction status', txReceipt.status);
+                toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
+                setIsAllowing(false);
+                setOpenApprovalModal(false);
             }
         } catch (e) {
             console.log(e);
@@ -606,7 +610,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 hash,
             });
 
-            if (txReceipt) {
+            if (txReceipt.status === 'success') {
                 toast.update(id, getSuccessToastOptions(t(`common.buy.confirmation-message`), id));
                 refetchUserSpeedMarkets(isChained, networkId, address as string);
                 refetchSpeedMarketsLimits(isChained, networkId);
@@ -622,6 +626,10 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 );
                 resetData();
                 setPaidAmount('');
+            } else {
+                console.log('Transaction status', txReceipt.status);
+                await delay(800);
+                toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
             }
         } catch (e) {
             console.log(e);
@@ -649,12 +657,16 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 hash,
             });
 
-            if (txReceipt) {
+            if (txReceipt.status === 'success') {
                 toast.update(
                     id,
                     getSuccessToastOptions(t(`common.mint.confirmation-message`, { token: selectedCollateral }), id)
                 );
                 refetchBalances(address as string, networkId);
+            } else {
+                console.log('Transaction status', txReceipt.status);
+                await delay(800);
+                toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
             }
         } catch (e) {
             console.log(e);

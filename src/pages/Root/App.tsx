@@ -34,25 +34,26 @@ const App = () => {
     useEffect(() => {
         dispatch(setAppReady());
     }, [dispatch]);
-
+    console.log('networkId', networkId);
     useEffect(() => {
         if (window.ethereum) {
             window.ethereum.on('chainChanged', (chainIdParam: string) => {
-                const chainId = Number.isInteger(chainIdParam) ? Number(chainIdParam) : parseInt(chainIdParam, 16);
+                console.log('chainChanged');
+                const ethereumChainId = Number.isInteger(chainIdParam)
+                    ? Number(chainIdParam)
+                    : parseInt(chainIdParam, 16);
 
-                if (!address && isNetworkSupported(chainId)) {
-                    // when wallet disconnected reflect network change from browser wallet to dApp
-                    switchChain({ chainId: chainId as SupportedNetwork });
+                if (!isNetworkSupported(ethereumChainId)) {
+                    // when network changed from browser wallet disconnect wallet otherwise wallet is unusable (e.g. wallet options doesn't react)
+                    disconnect();
+                }
+                console.log('networkId', networkId, 'ethereumChainId', ethereumChainId);
+                if (networkId !== ethereumChainId) {
+                    switchChain({ chainId: ethereumChainId as SupportedNetwork });
                 }
             });
         }
-    }, [dispatch, address, switchChain]);
-
-    useEffect(() => {
-        if (!isNetworkSupported(networkId)) {
-            disconnect();
-        }
-    }, [disconnect, networkId]);
+    }, [dispatch, address, switchChain, disconnect, networkId]);
 
     useEffect(() => {
         const handlePageResized = () => {
