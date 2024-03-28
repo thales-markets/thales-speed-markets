@@ -1,7 +1,8 @@
 import React from 'react';
-import Select, { components } from 'react-select';
+import Select, { CSSObjectWithLabel, ControlProps, GroupBase, OptionProps, components } from 'react-select';
 
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
+import { ThemeInterface } from 'types/ui';
 
 type SelectOption = { value: number | string; label: string };
 
@@ -9,88 +10,87 @@ type SelectInputProps = {
     options: Array<SelectOption>;
     handleChange: (value: number | undefined | null) => void;
     defaultValue?: number;
-    width?: number | string;
-    height?: number;
-    fontSize?: number;
-    isDisabled?: boolean;
 };
 
-const SelectInput: React.FC<SelectInputProps> = ({ options, handleChange, defaultValue, isDisabled }) => {
-    // const theme: ThemeInterface = useTheme();
+const SelectInput: React.FC<SelectInputProps> = ({ options, handleChange, defaultValue }) => {
+    const theme: ThemeInterface = useTheme();
     const defaultOption = options[defaultValue ? defaultValue : 0];
 
-    // const customStyled = {
-    //     container: (base: CSSObject) => ({ ...base, width: '100%' }),
-    //     menu: (base: CSSObject, props: MenuProps<OptionTypeBase, boolean, GroupBase<OptionTypeBase>>) => ({
-    //         ...base,
-    //         width: '100%',
-    //         color: props.selectProps.menuColor,
-    //         backgroundColor: theme.background.secondary,
-    //         border: `1px solid ${theme.borderColor.primary}`,
-    //         marginTop: 5,
-    //         borderRadius: 8,
-    //         overflow: 'auto',
-    //         fontSize: fontSize || 16,
-    //     }),
-    //     menuList: (base: CSSObject) => ({
-    //         ...base,
-    //         padding: '4px',
-    //     }),
-    //     option: (base: CSSObject, props: OptionProps<OptionTypeBase, boolean, GroupBase<OptionTypeBase>>) => ({
-    //         ...base,
-    //         color: theme.textColor.primary,
-    //         backgroundColor: props?.isFocused ? theme.background.primary : 'transparent',
-    //         cursor: 'pointer',
-    //         borderRadius: 8,
-    //     }),
-    //     control: (base: CSSObject, props: ControlProps<OptionTypeBase, boolean, GroupBase<OptionTypeBase>>) => ({
-    //         ...base,
-    //         backgroundColor: theme.background.secondary,
-    //         borderColor: theme.borderColor.primary,
-    //         color: theme.textColor.secondary,
-    //         borderRadius: '8px',
-    //         width: width,
-    //         minHeight: height || 38,
-    //         cursor: 'pointer',
-    //         boxShadow: 'none',
-    //         '&:hover': {
-    //             border: `1px solid ${theme.borderColor.quaternary}`,
-    //             boxShadow: 'none',
-    //         },
-    //         opacity: props.isDisabled ? 0.4 : 1,
-    //         fontSize: fontSize || 16,
-    //         lineHeight: 20,
-    //     }),
-    //     placeholder: (base: CSSObject) => ({
-    //         ...base,
-    //         color: theme.textColor.primary,
-    //     }),
-    //     singleValue: (base: CSSObject) => ({
-    //         ...base,
-    //         color: theme.textColor.primary,
-    //     }),
-    //     indicatorSeparator: () => ({
-    //         display: 'none',
-    //     }),
-    //     dropdownIndicator: (base: CSSObject) => ({
-    //         ...base,
-    //         color: theme.textColor.quaternary,
-    //         [':hover']: {
-    //             ...base[':hover'],
-    //             color: theme.textColor.quaternary,
-    //         },
-    //     }),
-    // };
+    const customStyled = {
+        container: (base: CSSObjectWithLabel) => ({ ...base, width: '100%' }),
+        valueContainer: (base: CSSObjectWithLabel) => ({ ...base, height: '100%' }),
+        menu: (base: CSSObjectWithLabel) => ({
+            ...base,
+            width: '100%',
+            // color: props.selectProps.menuColor,
+            backgroundColor: theme.background.secondary,
+            border: `1px solid ${theme.borderColor.primary}`,
+            marginTop: 5,
+            borderRadius: 8,
+            overflow: 'auto',
+            fontSize: 16,
+        }),
+        menuList: (base: CSSObjectWithLabel) => ({
+            ...base,
+            padding: '4px',
+        }),
+        option: (base: CSSObjectWithLabel, props: OptionProps<SelectOption, boolean, GroupBase<SelectOption>>) => ({
+            ...base,
+            color: theme.textColor.primary,
+            backgroundColor: props?.isFocused ? theme.background.primary : 'transparent',
+            cursor: 'pointer',
+            borderRadius: 8,
+        }),
+        control: (base: CSSObjectWithLabel, props: ControlProps<SelectOption, boolean, GroupBase<SelectOption>>) => ({
+            ...base,
+            backgroundColor: theme.background.secondary,
+            borderColor: theme.borderColor.primary,
+            color: theme.textColor.secondary,
+            borderRadius: '8px',
+            // width: width,
+            minHeight: 38,
+            height: 38,
+            cursor: 'pointer',
+            boxShadow: 'none',
+            '&:hover': {
+                border: `1px solid ${theme.borderColor.quaternary}`,
+                boxShadow: 'none',
+            },
+            opacity: props.isDisabled ? 0.4 : 1,
+            fontSize: 16,
+            lineHeight: 20,
+        }),
+        placeholder: (base: CSSObjectWithLabel) => ({
+            ...base,
+            color: theme.textColor.primary,
+        }),
+        singleValue: (base: CSSObjectWithLabel) => ({
+            ...base,
+            color: theme.textColor.primary,
+        }),
+        indicatorSeparator: () => ({
+            display: 'none',
+        }),
+        dropdownIndicator: (base: CSSObjectWithLabel) => ({
+            ...base,
+
+            color: theme.textColor.quaternary,
+            [':hover']: {
+                ...base[':hover'],
+                color: theme.textColor.quaternary,
+            },
+        }),
+    };
 
     return (
         <Select
             components={{ DropdownIndicator }}
             options={options}
+            defaultValue={defaultOption}
             value={defaultOption}
             isSearchable={false}
-            isDisabled={isDisabled}
-            defaultValue={defaultOption}
             onChange={(props: any) => handleChange(Number((props as SelectOption).value))}
+            styles={customStyled}
         />
     );
 };

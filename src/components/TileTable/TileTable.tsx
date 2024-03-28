@@ -87,6 +87,8 @@ const TileTable: React.FC<Properties> = ({
                         lastColumnRenderer ? row.cells.length - 1 : row.cells.length
                     );
 
+                    console.log('row: ', row.asset);
+
                     return wrapInAnchor(
                         <FlexDiv key={index}>
                             {firstColumnRenderer && firstColumnRenderer(row)}

@@ -136,7 +136,6 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
                 </Step>
                 <RowWrapper>
                     <SelectInput
-                        width="100%"
                         options={referralPageOptions}
                         handleChange={(value) => handleReferralPageChange(value)}
                         defaultValue={referralPage}

@@ -1,64 +1,33 @@
-import Tooltip from 'components/Tooltip';
 import React, { ChangeEvent } from 'react';
-import { useTranslation } from 'react-i18next';
+
 import styled from 'styled-components';
-import { FlexDivCentered } from 'styles/common';
-import { FieldContainer, FieldLabel, Input } from '../common';
+import { FieldContainer, Input } from '../common';
 
 type TimeInputProps = {
     value: string | number;
-    label?: string;
-    placeholder?: string;
-    disabled?: boolean;
-    step?: string;
     min?: string;
     max?: string;
     onChange: (e: ChangeEvent<HTMLInputElement>, value: string) => void;
     showValidation?: boolean;
     validationMessage?: string;
-    currencyComponent?: any;
-    currencyLabel?: string;
-    tooltip?: string;
-    onMaxButton?: any;
-    info?: string;
     inputPadding?: string;
     margin?: string;
-    inputFontSize?: string;
-    width?: string;
-    height?: string;
     zIndex?: number;
-    enableCurrencyComponentOnly?: boolean;
 };
 
 const INVALID_CHARS = ['-', '+', 'e', '.'];
 
 const TimeInput: React.FC<TimeInputProps> = ({
     value,
-    label,
-    placeholder,
-    disabled,
-    step,
     min,
     max,
     onChange,
     showValidation,
     validationMessage,
-    currencyComponent,
-    currencyLabel,
-    tooltip,
-    onMaxButton,
-    info,
     inputPadding,
     margin,
-    inputFontSize,
-    width,
-    height,
     zIndex,
-    enableCurrencyComponentOnly,
-    ...rest
 }) => {
-    const { t } = useTranslation();
-
     const handleOnChange = (e: ChangeEvent<HTMLInputElement>, min?: string, max?: string) => {
         const { value } = e.target;
         let trimmedValue = value;
@@ -80,24 +49,10 @@ const TimeInput: React.FC<TimeInputProps> = ({
 
     return (
         <FieldContainer margin={margin} zIndex={zIndex}>
-            {label && (
-                <FieldLabel>
-                    {label}
-                    {tooltip && <Tooltip overlay={tooltip} />}:
-                </FieldLabel>
-            )}
-            {info && (
-                <InfoWrapper>
-                    <InfoText>{info}</InfoText>
-                </InfoWrapper>
-            )}
             <StyledInput
-                {...rest}
                 value={value}
                 type="number"
                 onChange={(e) => handleOnChange(e, min, max)}
-                placeholder={placeholder}
-                disabled={disabled}
                 className={showValidation ? 'error' : ''}
                 onKeyDown={(e) => {
                     if (INVALID_CHARS.includes(e.key)) {
@@ -106,36 +61,10 @@ const TimeInput: React.FC<TimeInputProps> = ({
                 }}
                 min={min || '0'}
                 max={max || 'any'}
-                step={step || 'any'}
                 title=""
                 padding={inputPadding}
-                fontSize={inputFontSize}
-                width={width}
-                height={height}
             />
-            <RightContainer>
-                {onMaxButton && (
-                    <MaxButton disabled={disabled} onClick={onMaxButton}>
-                        {t('common.max')}
-                    </MaxButton>
-                )}
-                {currencyLabel && (
-                    <CurrencyLabel
-                        className={disabled ? 'currency-label disabled' : 'currency-label'}
-                        $hasSeparator={onMaxButton}
-                    >
-                        {currencyLabel}
-                    </CurrencyLabel>
-                )}
-                {currencyComponent && (
-                    <CurrencyComponentContainer
-                        className={disabled && !enableCurrencyComponentOnly ? 'disabled' : ''}
-                        $hasSeparator={onMaxButton}
-                    >
-                        {currencyComponent}
-                    </CurrencyComponentContainer>
-                )}
-            </RightContainer>
+
             {showValidation && validationMessage && (
                 <Validation>
                     <ValidationText>{validationMessage}</ValidationText>
@@ -148,43 +77,6 @@ const TimeInput: React.FC<TimeInputProps> = ({
 const StyledInput = styled(Input)<{ padding?: string }>`
     padding: ${(props) => props.padding || '5px 120px 5px 10px'};
     text-align: center;
-`;
-
-const RightContainer = styled(FlexDivCentered)`
-    position: absolute;
-    right: 0;
-    bottom: 6px;
-`;
-
-const CurrencyLabel = styled.label<{ $hasSeparator?: boolean }>`
-    border-left: ${(props) => (props.$hasSeparator ? `2px solid ${props.theme.input.borderColor.primary}` : 'none')};
-    font-weight: bold;
-    font-size: 13px;
-    line-height: 20px;
-    color: ${(props) => props.theme.input.textColor.primary};
-    padding-left: 8px;
-    padding-right: 12px;
-    pointer-events: none;
-    &.disabled {
-        opacity: 0.4;
-        cursor: default;
-    }
-`;
-
-const MaxButton = styled.button`
-    background: transparent;
-    border: none;
-    font-weight: 700;
-    font-size: 13px;
-    line-height: 20px;
-    color: ${(props) => props.theme.button.textColor.quaternary};
-    text-transform: uppercase;
-    cursor: pointer;
-    padding-right: 8px;
-    &:disabled {
-        opacity: 0.4;
-        cursor: default;
-    }
 `;
 
 const Validation = styled.div`
@@ -202,36 +94,6 @@ const ValidationText = styled.span`
     font-size: 13px;
     line-height: 15px;
     background-color: ${(props) => props.theme.background.primary};
-`;
-
-const CurrencyComponentContainer = styled(FlexDivCentered)<{ $hasSeparator?: boolean }>`
-    ${(props) => (props.$hasSeparator ? `border-left: 2px solid ${props.theme.input.borderColor.primary};` : '')}
-    line-height: 15px;
-    padding-right: 2px;
-    &.disabled {
-        opacity: 0.4;
-        cursor: default;
-    }
-`;
-
-const InfoWrapper = styled.div`
-    position: absolute;
-    top: -8px;
-    left: 0;
-    right: 0;
-    margin-left: auto;
-    margin-right: auto;
-    width: fit-content;
-    background: ${(props) => props.theme.background.primary};
-    padding: 0 5px;
-    z-index: 1;
-`;
-
-const InfoText = styled.span`
-    font-size: 13px;
-    line-height: 16px;
-    color: ${(props) => props.theme.textColor.secondary};
-    text-transform: uppercase;
 `;
 
 export default TimeInput;
