@@ -1,4 +1,5 @@
 import { EvmPriceServiceConnection, PriceFeed } from '@pythnetwork/pyth-evm-js';
+import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { USD_SIGN } from 'constants/currency';
 import { SIDE_TO_POSITION_MAP, SPEED_MARKETS_QUOTE } from 'constants/market';
 import { ZERO_ADDRESS } from 'constants/network';
@@ -7,15 +8,15 @@ import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
 import { Positions } from 'enums/market';
 import { reject } from 'lodash';
-import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { bigNumberFormatter, coinFormatter, formatCurrencyWithSign, parseBytes32String } from 'thales-utils';
 import { UserOpenPositions } from 'types/market';
+import { QueryConfig } from 'types/network';
+import { ViemContract } from 'types/viem';
+import { getContarctAbi } from 'utils/contracts/abi';
+import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
+import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
 import { getBenchmarksPriceFeeds, getPriceId, getPriceServiceEndpoint } from 'utils/pyth';
 import { getFeesFromHistory } from 'utils/speedAmm';
-import { QueryConfig } from 'types/network';
-import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
-import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
-import { ViemContract } from 'types/viem';
 import { getContract } from 'viem';
 
 const useUserActiveSpeedMarketsDataQuery = (
@@ -29,13 +30,13 @@ const useUserActiveSpeedMarketsDataQuery = (
             const userSpeedMarketsData: UserOpenPositions[] = [];
 
             const speedMarketsDataContractLocal = getContract({
-                abi: speedMarketsDataContract.abi,
+                abi: getContarctAbi(speedMarketsDataContract, queryConfig.networkId),
                 address: speedMarketsDataContract.addresses[queryConfig.networkId],
                 client: queryConfig.client,
             }) as ViemContract;
 
             const speedMarketsAMMContractLocal = getContract({
-                abi: speedMarketsAMMContract.abi,
+                abi: getContarctAbi(speedMarketsAMMContract, queryConfig.networkId),
                 address: speedMarketsAMMContract.addresses[queryConfig.networkId],
                 client: queryConfig.client,
             }) as ViemContract;

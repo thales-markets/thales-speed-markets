@@ -1,17 +1,17 @@
+import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { SIDE_TO_POSITION_MAP } from 'constants/market';
 import { ZERO_ADDRESS } from 'constants/network';
 import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { secondsToMilliseconds } from 'date-fns';
-import { parseBytes32String } from 'thales-utils';
-import { UseQueryOptions, useQuery } from '@tanstack/react-query';
-import { bigNumberFormatter, coinFormatter, roundNumberToDecimals } from 'thales-utils';
+import { bigNumberFormatter, coinFormatter, parseBytes32String, roundNumberToDecimals } from 'thales-utils';
 import { ChainedSpeedMarket } from 'types/market';
 import { QueryConfig } from 'types/network';
-import { getContract } from 'viem';
+import { ViemContract } from 'types/viem';
+import { getContarctAbi } from 'utils/contracts/abi';
 import chainedSpeedMarketsAMMContract from 'utils/contracts/chainedSpeedMarketsAMMContract';
 import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
-import { ViemContract } from 'types/viem';
+import { getContract } from 'viem';
 
 const useActiveChainedSpeedMarketsDataQuery = (
     queryConfig: QueryConfig,
@@ -24,7 +24,7 @@ const useActiveChainedSpeedMarketsDataQuery = (
             const chainedSpeedMarketsData: ChainedSpeedMarket[] = [];
 
             const speedMarketsDataContractLocal = getContract({
-                abi: speedMarketsDataContract.abi,
+                abi: getContarctAbi(speedMarketsDataContract, queryConfig.networkId),
                 address: speedMarketsDataContract.addresses[queryConfig.networkId],
                 client: queryConfig.client,
             }) as ViemContract;

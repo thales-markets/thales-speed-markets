@@ -1,12 +1,13 @@
+import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { ZERO_ADDRESS } from 'constants/network';
 import QUERY_KEYS from 'constants/queryKeys';
-import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { bigNumberFormatter, coinFormatter } from 'thales-utils';
 import { AmmChainedSpeedMarketsLimits } from 'types/market';
-import { getContract } from 'viem';
-import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
 import { QueryConfig } from 'types/network';
 import { ViemContract } from 'types/viem';
+import { getContarctAbi } from 'utils/contracts/abi';
+import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
+import { getContract } from 'viem';
 
 const useChainedAmmSpeedMarketsLimitsQuery = (
     queryConfig: QueryConfig,
@@ -31,7 +32,7 @@ const useChainedAmmSpeedMarketsLimitsQuery = (
             };
 
             const speedMarketsDataContractLocal = getContract({
-                abi: speedMarketsDataContract.abi,
+                abi: getContarctAbi(speedMarketsDataContract, queryConfig.networkId),
                 address: speedMarketsDataContract.addresses[queryConfig.networkId],
                 client: queryConfig.client,
             }) as ViemContract;

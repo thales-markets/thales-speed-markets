@@ -1,14 +1,15 @@
-import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
-import { ZERO_ADDRESS } from 'constants/network';
-import { SIDE_TO_POSITION_MAP } from 'constants/market';
-import QUERY_KEYS from 'constants/queryKeys';
 import { UseQueryOptions, useQuery } from '@tanstack/react-query';
+import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
+import { SIDE_TO_POSITION_MAP } from 'constants/market';
+import { ZERO_ADDRESS } from 'constants/network';
+import QUERY_KEYS from 'constants/queryKeys';
 import { bigNumberFormatter, coinFormatter } from 'thales-utils';
 import { AmmSpeedMarketsLimits } from 'types/market';
-import { getContract, stringToHex } from 'viem';
-import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
 import { QueryConfig } from 'types/network';
 import { ViemContract } from 'types/viem';
+import { getContarctAbi } from 'utils/contracts/abi';
+import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
+import { getContract, stringToHex } from 'viem';
 
 const MAX_BUYIN_COLLATERAL_CONVERSION_BUFFER = 10;
 
@@ -36,9 +37,9 @@ const useAmmSpeedMarketsLimitsQuery = (
                 safeBoxImpact: 0,
                 whitelistedAddress: false,
             };
-            // const { speedMarketsDataContract } = snxJSConnector;
+
             const speedMarketsDataContractLocal = getContract({
-                abi: speedMarketsDataContract.abi,
+                abi: getContarctAbi(speedMarketsDataContract, queryConfig.networkId),
                 address: speedMarketsDataContract.addresses[queryConfig.networkId],
                 client: queryConfig.client,
             }) as ViemContract;

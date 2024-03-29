@@ -13,6 +13,7 @@ import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
 import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
 import chainedSpeedMarketsAMMContract from 'utils/contracts/chainedSpeedMarketsAMMContract';
 import { ViemContract } from 'types/viem';
+import { getContarctAbi } from 'utils/contracts/abi';
 
 const useProfileDataQuery = (
     queryConfig: QueryConfig,
@@ -25,12 +26,12 @@ const useProfileDataQuery = (
             let [profit, volume, numberOfTrades, gain, investment] = [0, 0, 0, 0, 0];
 
             const speedMarketsAMMContractLocal = getContract({
-                abi: speedMarketsAMMContract.abi,
+                abi: getContarctAbi(speedMarketsAMMContract, queryConfig.networkId),
                 address: speedMarketsAMMContract.addresses[queryConfig.networkId],
                 client: queryConfig.client,
             }) as ViemContract;
             const speedMarketsDataContractLocal = getContract({
-                abi: speedMarketsDataContract.abi,
+                abi: getContarctAbi(speedMarketsDataContract, queryConfig.networkId),
                 address: speedMarketsDataContract.addresses[queryConfig.networkId],
                 client: queryConfig.client,
             }) as ViemContract;

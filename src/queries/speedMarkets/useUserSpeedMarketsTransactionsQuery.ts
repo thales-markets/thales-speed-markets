@@ -1,3 +1,4 @@
+import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import {
     BATCH_NUMBER_OF_SPEED_MARKETS,
     MAX_NUMBER_OF_SPEED_MARKETS_TO_FETCH,
@@ -8,15 +9,15 @@ import {
 import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
-import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { bigNumberFormatter, coinFormatter, parseBytes32String } from 'thales-utils';
-import { TradeWithMarket } from 'types/profile';
-import { getFeesFromHistory } from 'utils/speedAmm';
 import { QueryConfig } from 'types/network';
-import { getContract } from 'viem';
-import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
+import { TradeWithMarket } from 'types/profile';
 import { ViemContract } from 'types/viem';
+import { getContarctAbi } from 'utils/contracts/abi';
+import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
 import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
+import { getFeesFromHistory } from 'utils/speedAmm';
+import { getContract } from 'viem';
 
 const useUserSpeedMarketsTransactionsQuery = (
     queryConfig: QueryConfig,
@@ -29,13 +30,13 @@ const useUserSpeedMarketsTransactionsQuery = (
             const userTransactions: TradeWithMarket[] = [];
 
             const speedMarketsAMMContractLocal = getContract({
-                abi: speedMarketsAMMContract.abi,
+                abi: getContarctAbi(speedMarketsAMMContract, queryConfig.networkId),
                 address: speedMarketsAMMContract.addresses[queryConfig.networkId],
                 client: queryConfig.client,
             }) as ViemContract;
 
             const speedMarketsDataContractLocal = getContract({
-                abi: speedMarketsDataContract.abi,
+                abi: getContarctAbi(speedMarketsDataContract, queryConfig.networkId),
                 address: speedMarketsDataContract.addresses[queryConfig.networkId],
                 client: queryConfig.client,
             }) as ViemContract;

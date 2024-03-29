@@ -22,6 +22,7 @@ import { UserOpenPositions } from 'types/market';
 import { SupportedNetwork } from 'types/network';
 import { RootState } from 'types/ui';
 import { ViemContract } from 'types/viem';
+import { getContarctAbi } from 'utils/contracts/abi';
 import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
 import { getPriceId, getPriceServiceEndpoint, priceParser } from 'utils/pyth';
 import { refetchActiveSpeedMarkets } from 'utils/queryConnector';
@@ -65,7 +66,7 @@ const OverviewPositionAction: React.FC<OverviewPositionActionProps> = ({
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
 
         const speedMarketsAMMContractWithSigner = getContract({
-            abi: speedMarketsAMMContract.abi,
+            abi: getContarctAbi(speedMarketsAMMContract, networkId),
             address: speedMarketsAMMContract.addresses[networkId],
             client: walletClient.data as Client,
         }) as ViemContract;

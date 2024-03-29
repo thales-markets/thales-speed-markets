@@ -29,6 +29,7 @@ import { SupportedNetwork } from 'types/network';
 import { UserPosition } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
 import { ViemContract } from 'types/viem';
+import { getContarctAbi } from 'utils/contracts/abi';
 import erc20Contract from 'utils/contracts/collateralContract';
 import multipleCollateral from 'utils/contracts/multipleCollateralContract';
 import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
@@ -186,7 +187,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
             const isEth = collateralAddress === ZERO_ADDRESS;
 
             const speedMarketsAMMContractWithSigner = getContract({
-                abi: speedMarketsAMMContract.abi,
+                abi: getContarctAbi(speedMarketsAMMContract, networkId),
                 address: speedMarketsAMMContract.addresses[networkId],
                 client: walletClient.data as Client,
             }) as ViemContract;

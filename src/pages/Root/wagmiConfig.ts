@@ -1,4 +1,16 @@
 import { connectorsForWallets } from '@rainbow-me/rainbowkit';
+import {
+    braveWallet,
+    coinbaseWallet,
+    imTokenWallet,
+    injectedWallet,
+    ledgerWallet,
+    metaMaskWallet,
+    rabbyWallet,
+    rainbowWallet,
+    trustWallet,
+    walletConnectWallet,
+} from '@rainbow-me/rainbowkit/wallets';
 import { RPC_LIST } from 'constants/network';
 import { NetworkId } from 'thales-utils';
 import { createConfig, fallback, http } from 'wagmi';
@@ -13,18 +25,6 @@ import {
     zkSync,
     zkSyncSepoliaTestnet,
 } from 'wagmi/chains';
-import {
-    braveWallet,
-    coinbaseWallet,
-    imTokenWallet,
-    injectedWallet,
-    ledgerWallet,
-    metaMaskWallet,
-    rabbyWallet,
-    rainbowWallet,
-    trustWallet,
-    walletConnectWallet,
-} from '@rainbow-me/rainbowkit/wallets';
 
 export const wagmiConfig = createConfig({
     chains: [
@@ -78,11 +78,11 @@ export const wagmiConfig = createConfig({
             http(RPC_LIST.INFURA[NetworkId.PolygonMainnet]),
             http(),
         ]),
-        [zkSync.id]: fallback([http()]),
-        [zkSyncSepoliaTestnet.id]: fallback([http()]),
-        [blastSepolia.id]: fallback([http()]),
-        [optimismSepolia.id]: fallback([http()]),
-        [optimismGoerli.id]: fallback([http()]),
+        [zkSync.id]: http(),
+        [zkSyncSepoliaTestnet.id]: http(),
+        [blastSepolia.id]: http(),
+        [optimismSepolia.id]: http(),
+        [optimismGoerli.id]: http(),
     },
 });
 

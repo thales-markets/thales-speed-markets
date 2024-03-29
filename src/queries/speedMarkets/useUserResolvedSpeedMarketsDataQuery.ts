@@ -1,3 +1,4 @@
+import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { USD_SIGN } from 'constants/currency';
 import {
     BATCH_NUMBER_OF_SPEED_MARKETS,
@@ -9,15 +10,15 @@ import {
 import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
-import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { bigNumberFormatter, coinFormatter, formatCurrencyWithSign, parseBytes32String } from 'thales-utils';
 import { UserClosedPositions } from 'types/market';
-import { getFeesFromHistory } from 'utils/speedAmm';
 import { QueryConfig } from 'types/network';
-import { getContract } from 'viem';
 import { ViemContract } from 'types/viem';
+import { getContarctAbi } from 'utils/contracts/abi';
 import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
 import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
+import { getFeesFromHistory } from 'utils/speedAmm';
+import { getContract } from 'viem';
 
 const useUserResolvedSpeedMarketsDataQuery = (
     queryConfig: QueryConfig,
@@ -30,13 +31,13 @@ const useUserResolvedSpeedMarketsDataQuery = (
             const userClosedSpeedMarketsData: UserClosedPositions[] = [];
 
             const speedMarketsAMMContractLocal = getContract({
-                abi: speedMarketsAMMContract.abi,
+                abi: getContarctAbi(speedMarketsAMMContract, queryConfig.networkId),
                 address: speedMarketsAMMContract.addresses[queryConfig.networkId],
                 client: queryConfig.client,
             }) as ViemContract;
 
             const speedMarketsDataContractLocal = getContract({
-                abi: speedMarketsDataContract.abi,
+                abi: getContarctAbi(speedMarketsDataContract, queryConfig.networkId),
                 address: speedMarketsDataContract.addresses[queryConfig.networkId],
                 client: queryConfig.client,
             }) as ViemContract;

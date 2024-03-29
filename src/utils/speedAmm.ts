@@ -13,13 +13,14 @@ import { millisecondsToSeconds, secondsToMinutes } from 'date-fns';
 import { Positions } from 'enums/market';
 import i18n from 'i18n';
 import { toast } from 'react-toastify';
-import { QueryConfig } from 'types/network';
 import { ChainedSpeedMarket, UserOpenPositions } from 'types/market';
+import { QueryConfig } from 'types/network';
+import { ViemContract } from 'types/viem';
 import { getPriceId, getPriceServiceEndpoint, priceParser } from 'utils/pyth';
 import { refetchActiveSpeedMarkets } from 'utils/queryConnector';
 import { delay } from 'utils/timer';
 import { getContract } from 'viem';
-import { ViemContract } from 'types/viem';
+import { getContarctAbi } from './contracts/abi';
 import chainedSpeedMarketsAMMContract from './contracts/chainedSpeedMarketsAMMContract';
 import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
 
@@ -165,7 +166,7 @@ export const resolveAllSpeedPositions = async (
     const id = toast.loading(getDefaultToastContent(i18n.t('common.progress')), getLoadingToastOptions());
 
     const speedMarketsAMMContractWithSigner = getContract({
-        abi: speedMarketsAMMContract.abi,
+        abi: getContarctAbi(speedMarketsAMMContract, queryConfig.networkId),
         address: speedMarketsAMMContract.addresses[queryConfig.networkId],
         client: queryConfig.client,
     }) as ViemContract;
