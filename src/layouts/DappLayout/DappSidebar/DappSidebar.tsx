@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { getIsMobile } from 'redux/modules/ui';
 import DappHeaderItem from '../components/DappHeaderItem';
 import { ScreenSizeBreakpoint } from '../../../enums/ui';
-import OutsideClickHandler from 'react-outside-click-handler';
+import OutsideClickHandler from 'components/OutsideClick/OutsideClick';
 import { useAccount, useChainId } from 'wagmi';
 
 const DappSidebar: React.FC = () => {
@@ -28,10 +28,12 @@ const DappSidebar: React.FC = () => {
 
     return (
         <OutsideClickHandler
-            onOutsideClick={(e) => {
-                isMobile && e.target instanceof HTMLElement && !e.target.className.includes('icon--nav-menu')
-                    ? removeCollapse()
-                    : {};
+            onOutsideClick={(e: any) => {
+                if (e && isMobile) {
+                    e.target instanceof HTMLElement && !e.target.className.includes('icon--nav-menu')
+                        ? removeCollapse()
+                        : {};
+                }
             }}
         >
             <SidebarHtml id="sidebar">

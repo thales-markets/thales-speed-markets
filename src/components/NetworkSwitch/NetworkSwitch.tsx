@@ -1,6 +1,6 @@
+import OutsideClickHandler from 'components/OutsideClick/OutsideClick';
 import { DEFAULT_NETWORK } from 'constants/network';
 import React, { useMemo, useState } from 'react';
-import OutsideClickHandler from 'react-outside-click-handler';
 import styled from 'styled-components';
 import { SupportedNetwork } from 'types/network';
 import { isMobile } from 'utils/device';

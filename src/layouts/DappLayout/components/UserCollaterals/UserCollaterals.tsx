@@ -1,6 +1,6 @@
 import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipleCollateralBalanceQuery';
 import React, { useEffect, useMemo, useState } from 'react';
-import OutsideClickHandler from 'react-outside-click-handler';
+import OutsideClickHandler from 'components/OutsideClick/OutsideClick';
 import { useDispatch, useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getSelectedCollateralIndex, setSelectedCollateralIndex } from 'redux/modules/wallet';
@@ -117,6 +117,7 @@ const UserCollaterals: React.FC = () => {
 
     const onCollateralClickHandler = (coinType: Coins) => {
         dispatch(setSelectedCollateralIndex(getCollateralIndexForNetwork(networkId, coinType)));
+        setIsDropdownOpen(false);
     };
 
     const assetIcon = (type: string) => {
