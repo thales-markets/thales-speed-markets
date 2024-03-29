@@ -50,7 +50,11 @@ const changeNetwork = async (network: NetworkParams, callback: VoidFunction): Pr
             }
         }
     } else {
-        callback();
+        try {
+            callback();
+        } catch (e) {
+            console.log('callback error', e);
+        }
     }
 };
 

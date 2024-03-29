@@ -31,6 +31,10 @@ const App = () => {
     queryConnector.setQueryClient();
 
     useEffect(() => {
+        console.log(networkId);
+    }, [networkId]);
+
+    useEffect(() => {
         dispatch(setAppReady());
     }, [dispatch]);
 

@@ -3,6 +3,7 @@ import React, { useMemo, useState } from 'react';
 import OutsideClickHandler from 'react-outside-click-handler';
 import styled from 'styled-components';
 import { SupportedNetwork } from 'types/network';
+import { isMobile } from 'utils/device';
 import { SUPPORTED_NETWORK_IDS_MAP } from 'utils/network';
 import { useChainId, useSwitchChain } from 'wagmi';
 
@@ -20,6 +21,7 @@ const NetworkSwitch: React.FC = () => {
         <NetworkInfoContainer>
             <OutsideClickHandler onOutsideClick={() => isDropdownOpen && setIsDropdownOpen(false)}>
                 <SelectedNetworkContainer cursor={'pointer'}>
+                    {isMobile() ? window.ethereum + ' ' + networkId : ''}
                     <NetworkItem $selectedItem={true} onClick={() => setIsDropdownOpen(!isDropdownOpen)} $noHover>
                         {React.createElement(selectedNetwork.icon, {
                             style: { marginRight: 5 },
@@ -31,7 +33,10 @@ const NetworkSwitch: React.FC = () => {
                         <NetworkDropDown>
                             {Object.keys(SUPPORTED_NETWORK_IDS_MAP)
                                 .map((key) => {
-                                    return { id: Number(key), ...SUPPORTED_NETWORK_IDS_MAP[Number(key)] };
+                                    return {
+                                        id: Number(key) as SupportedNetwork,
+                                        ...SUPPORTED_NETWORK_IDS_MAP[Number(key)],
+                                    };
                                 })
                                 .sort((a, b) => a.order - b.order)
                                 .map((network, index) => (
@@ -43,7 +48,7 @@ const NetworkSwitch: React.FC = () => {
                                             await SUPPORTED_NETWORK_IDS_MAP[network.id].changeNetwork(
                                                 network.id,
                                                 () => {
-                                                    switchChain?.({ chainId: network.id as SupportedNetwork });
+                                                    switchChain?.({ chainId: network.id });
                                                 }
                                             );
                                         }}
