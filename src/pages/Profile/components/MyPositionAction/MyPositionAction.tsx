@@ -37,6 +37,7 @@ import { getCollateral, getCollaterals, getDefaultCollateral } from 'utils/curre
 import { checkAllowance, getIsMultiCollateralSupported } from 'utils/network';
 import { getPriceId, getPriceServiceEndpoint } from 'utils/pyth';
 import {
+    refetchBalances,
     refetchUserNotifications,
     refetchUserProfileQueries,
     refetchUserResolvedSpeedMarkets,
@@ -211,6 +212,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                 refetchUserSpeedMarkets(false, networkId, address as string);
                 refetchUserResolvedSpeedMarkets(false, networkId, address as string);
                 refetchUserProfileQueries(address as string, networkId);
+                refetchBalances(address as string, networkId);
             } else {
                 console.log('Transaction status', txReceipt.status);
                 await delay(800);

@@ -40,6 +40,7 @@ import { checkAllowance, getIsMultiCollateralSupported } from 'utils/network';
 import { getPriceId, getPriceServiceEndpoint, priceParser } from 'utils/pyth';
 import {
     refetchActiveSpeedMarkets,
+    refetchBalances,
     refetchUserResolvedSpeedMarkets,
     refetchUserSpeedMarkets,
 } from 'utils/queryConnector';
@@ -52,8 +53,8 @@ import multipleCollateral from 'utils/contracts/multipleCollateralContract';
 import { getUserLostAtSideIndex } from 'utils/speedAmm';
 import { delay } from 'utils/timer';
 import { Client, getContract } from 'viem';
-import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 import { waitForTransactionReceipt } from 'viem/actions';
+import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 
 type ChainedPositionActionProps = {
     position: ChainedSpeedMarket;
@@ -278,6 +279,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 } else {
                     refetchUserSpeedMarkets(true, networkId, address ?? '');
                     refetchUserResolvedSpeedMarkets(true, networkId, address ?? '');
+                    refetchBalances(address as string, networkId);
                 }
             } else {
                 console.log('Transaction status', txReceipt.status);
