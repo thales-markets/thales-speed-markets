@@ -3,12 +3,13 @@ import React, { useMemo, useState } from 'react';
 import OutsideClickHandler from 'react-outside-click-handler';
 import styled from 'styled-components';
 import { SupportedNetwork } from 'types/network';
+import { isMobile } from 'utils/device';
 import { SUPPORTED_NETWORK_IDS_MAP } from 'utils/network';
 import { useChainId, useConfig, useSwitchChain } from 'wagmi';
 
 const NetworkSwitch: React.FC = () => {
     const config = useConfig();
-    const networkId = useChainId({ config });
+    const networkId = useChainId();
     const { switchChain } = useSwitchChain();
 
     const selectedNetwork = useMemo(
@@ -47,10 +48,15 @@ const NetworkSwitch: React.FC = () => {
                                             await SUPPORTED_NETWORK_IDS_MAP[network.id].changeNetwork(
                                                 network.id,
                                                 () => {
-                                                    config.state.chainId = network.id;
                                                     switchChain?.({ chainId: network.id });
                                                 }
                                             );
+                                            if (isMobile() && config.state.chainId !== network.id) {
+                                                config.setState((state) => ({
+                                                    ...state,
+                                                    chainId: network.id,
+                                                }));
+                                            }
                                         }}
                                     >
                                         {React.createElement(SUPPORTED_NETWORK_IDS_MAP[network.id].icon, {
