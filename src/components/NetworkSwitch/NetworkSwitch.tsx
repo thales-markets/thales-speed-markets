@@ -3,7 +3,6 @@ import React, { useMemo, useState } from 'react';
 import OutsideClickHandler from 'react-outside-click-handler';
 import styled from 'styled-components';
 import { SupportedNetwork } from 'types/network';
-import { isMobile } from 'utils/device';
 import { SUPPORTED_NETWORK_IDS_MAP } from 'utils/network';
 import { useChainId, useSwitchChain } from 'wagmi';
 
@@ -21,7 +20,6 @@ const NetworkSwitch: React.FC = () => {
         <NetworkInfoContainer>
             <OutsideClickHandler onOutsideClick={() => isDropdownOpen && setIsDropdownOpen(false)}>
                 <SelectedNetworkContainer cursor={'pointer'}>
-                    {isMobile() ? '' + window.ethereum + ' ' + networkId : ''}
                     <NetworkItem $selectedItem={true} onClick={() => setIsDropdownOpen(!isDropdownOpen)} $noHover>
                         {React.createElement(selectedNetwork.icon, {
                             style: { marginRight: 5 },

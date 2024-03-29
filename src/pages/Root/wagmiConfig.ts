@@ -43,10 +43,10 @@ const wallets = [
 
 export const wagmiConfig = createConfig({
     chains: [
+        polygon,
         optimism,
         arbitrum,
         base,
-        polygon,
         zkSync,
         zkSyncSepoliaTestnet,
         blastSepolia,
