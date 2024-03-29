@@ -32,6 +32,10 @@ const hasEthereumInjected = () => !!window.ethereum;
 const changeNetwork = async (network: NetworkParams, callback: VoidFunction): Promise<void> => {
     if (hasEthereumInjected()) {
         try {
+            await (window.ethereum as any).request({
+                method: 'wallet_switchEthereumChain',
+                params: [{ chainId: network.chainId }],
+            });
             callback();
         } catch (switchError: any) {
             if (network && switchError.code === 4902) {

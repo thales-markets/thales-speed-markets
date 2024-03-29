@@ -21,7 +21,7 @@ const NetworkSwitch: React.FC = () => {
         <NetworkInfoContainer>
             <OutsideClickHandler onOutsideClick={() => isDropdownOpen && setIsDropdownOpen(false)}>
                 <SelectedNetworkContainer cursor={'pointer'}>
-                    {isMobile() ? window.ethereum + ' ' + networkId : ''}
+                    {isMobile() ? '' + window.ethereum + ' ' + networkId : ''}
                     <NetworkItem $selectedItem={true} onClick={() => setIsDropdownOpen(!isDropdownOpen)} $noHover>
                         {React.createElement(selectedNetwork.icon, {
                             style: { marginRight: 5 },

@@ -42,6 +42,7 @@ const App = () => {
 
     useEffect(() => {
         if (window.ethereum) {
+            setLog('window.ethereum');
             window.ethereum.on('chainChanged', (chainIdParam: string) => {
                 const ethereumChainId = Number.isInteger(chainIdParam)
                     ? Number(chainIdParam)
