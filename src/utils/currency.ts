@@ -23,7 +23,8 @@ export const getSynthAsset = (currencyKey: string) =>
 
 export const getDefaultCollateral = (networkId: SupportedNetwork) => COLLATERALS[networkId][0];
 
-export const getCollateral = (networkId: SupportedNetwork, index: number) => COLLATERALS[networkId][index];
+export const getCollateral = (networkId: SupportedNetwork, index: number) =>
+    index < COLLATERALS[networkId].length ? COLLATERALS[networkId][index] : getDefaultCollateral(networkId);
 
 export const getCollaterals = (networkId: SupportedNetwork) => COLLATERALS[networkId];
 
