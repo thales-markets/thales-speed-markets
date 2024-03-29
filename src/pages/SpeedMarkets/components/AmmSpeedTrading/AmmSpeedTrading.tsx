@@ -614,6 +614,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 toast.update(id, getSuccessToastOptions(t(`common.buy.confirmation-message`), id));
                 refetchUserSpeedMarkets(isChained, networkId, address as string);
                 refetchSpeedMarketsLimits(isChained, networkId);
+                refetchBalances(address as string, networkId);
                 PLAUSIBLE.trackEvent(
                     isChained ? PLAUSIBLE_KEYS.chainedSpeedMarketsBuy : PLAUSIBLE_KEYS.speedMarketsBuy,
                     {
