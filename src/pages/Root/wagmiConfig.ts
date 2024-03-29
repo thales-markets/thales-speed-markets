@@ -13,6 +13,7 @@ import {
 } from '@rainbow-me/rainbowkit/wallets';
 import { RPC_LIST } from 'constants/network';
 import { NetworkId } from 'thales-utils';
+import { isMobile } from 'utils/device';
 import { createConfig, fallback, http } from 'wagmi';
 import {
     arbitrum,
@@ -25,6 +26,20 @@ import {
     zkSync,
     zkSyncSepoliaTestnet,
 } from 'wagmi/chains';
+
+const wallets = [
+    metaMaskWallet,
+    walletConnectWallet,
+    rabbyWallet,
+    braveWallet,
+    ledgerWallet,
+    trustWallet,
+    coinbaseWallet,
+    rainbowWallet,
+    imTokenWallet,
+];
+
+!isMobile() && wallets.push(injectedWallet);
 
 export const wagmiConfig = createConfig({
     chains: [
@@ -42,18 +57,7 @@ export const wagmiConfig = createConfig({
         [
             {
                 groupName: 'Recommended',
-                wallets: [
-                    metaMaskWallet,
-                    walletConnectWallet,
-                    rabbyWallet,
-                    braveWallet,
-                    ledgerWallet,
-                    trustWallet,
-                    injectedWallet,
-                    coinbaseWallet,
-                    rainbowWallet,
-                    imTokenWallet,
-                ],
+                wallets,
             },
         ],
         {
