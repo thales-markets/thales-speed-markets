@@ -7,7 +7,7 @@ import ThemeProvider from 'layouts/Theme';
 import Profile from 'pages/Profile';
 import SpeedMarkets from 'pages/SpeedMarkets';
 import SpeedMarketsOverview from 'pages/SpeedMarketsOverview';
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Redirect, Route, Router, Switch } from 'react-router-dom';
 import { setAppReady } from 'redux/modules/app';
@@ -30,6 +30,8 @@ const App = () => {
 
     queryConnector.setQueryClient();
 
+    const [log, setLog] = useState('');
+
     useEffect(() => {
         console.log(networkId);
     }, [networkId]);
@@ -50,6 +52,7 @@ const App = () => {
                     disconnect();
                 }
                 switchChain({ chainId: ethereumChainId as SupportedNetwork });
+                setLog('onChainChanged' + ethereumChainId.toString());
             });
         }
     }, [dispatch, address, switchChain, disconnect]);
@@ -86,6 +89,7 @@ const App = () => {
                         <Route exact path={ROUTES.Markets.SpeedMarkets}>
                             <Suspense fallback={<Loader />}>
                                 <DappLayout>
+                                    <span style={{ color: 'white' }}>{log + ' ' + networkId}</span>
                                     <SpeedMarkets />
                                 </DappLayout>
                             </Suspense>
