@@ -31,48 +31,54 @@ const useChainedAmmSpeedMarketsLimitsQuery = (
                 whitelistedAddress: false,
             };
 
-            const speedMarketsDataContractLocal = getContract({
-                abi: getContarctAbi(speedMarketsDataContract, queryConfig.networkId),
-                address: speedMarketsDataContract.addresses[queryConfig.networkId],
-                client: queryConfig.client,
-            }) as ViemContract;
-            if (speedMarketsDataContract) {
-                const [chainedAmmParams, ammParams] = await Promise.all([
-                    speedMarketsDataContractLocal.read.getChainedSpeedMarketsAMMParameters([
-                        walletAddress || ZERO_ADDRESS,
-                    ]),
-                    speedMarketsDataContractLocal.read.getSpeedMarketsAMMParameters([walletAddress || ZERO_ADDRESS]),
-                ]);
+            try {
+                const speedMarketsDataContractLocal = getContract({
+                    abi: getContarctAbi(speedMarketsDataContract, queryConfig.networkId),
+                    address: speedMarketsDataContract.addresses[queryConfig.networkId],
+                    client: queryConfig.client,
+                }) as ViemContract;
+                if (speedMarketsDataContract) {
+                    const [chainedAmmParams, ammParams] = await Promise.all([
+                        speedMarketsDataContractLocal.read.getChainedSpeedMarketsAMMParameters([
+                            walletAddress || ZERO_ADDRESS,
+                        ]),
+                        speedMarketsDataContractLocal.read.getSpeedMarketsAMMParameters([
+                            walletAddress || ZERO_ADDRESS,
+                        ]),
+                    ]);
 
-                ammChainedSpeedMarketsLimits.minChainedMarkets = Number(chainedAmmParams.minChainedMarkets);
-                ammChainedSpeedMarketsLimits.maxChainedMarkets = Number(chainedAmmParams.maxChainedMarkets);
+                    ammChainedSpeedMarketsLimits.minChainedMarkets = Number(chainedAmmParams.minChainedMarkets);
+                    ammChainedSpeedMarketsLimits.maxChainedMarkets = Number(chainedAmmParams.maxChainedMarkets);
 
-                ammChainedSpeedMarketsLimits.minBuyinAmount = Math.ceil(
-                    coinFormatter(chainedAmmParams.minBuyinAmount, queryConfig.networkId)
-                );
-                ammChainedSpeedMarketsLimits.maxBuyinAmount = coinFormatter(
-                    chainedAmmParams.maxBuyinAmount,
-                    queryConfig.networkId
-                );
+                    ammChainedSpeedMarketsLimits.minBuyinAmount = Math.ceil(
+                        coinFormatter(chainedAmmParams.minBuyinAmount, queryConfig.networkId)
+                    );
+                    ammChainedSpeedMarketsLimits.maxBuyinAmount = coinFormatter(
+                        chainedAmmParams.maxBuyinAmount,
+                        queryConfig.networkId
+                    );
 
-                ammChainedSpeedMarketsLimits.maxProfitPerIndividualMarket = coinFormatter(
-                    chainedAmmParams.maxProfitPerIndividualMarket,
-                    queryConfig.networkId
-                );
+                    ammChainedSpeedMarketsLimits.maxProfitPerIndividualMarket = coinFormatter(
+                        chainedAmmParams.maxProfitPerIndividualMarket,
+                        queryConfig.networkId
+                    );
 
-                ammChainedSpeedMarketsLimits.minTimeFrame = Number(chainedAmmParams.minTimeFrame);
-                ammChainedSpeedMarketsLimits.maxTimeFrame = Number(chainedAmmParams.maxTimeFrame);
-                ammChainedSpeedMarketsLimits.risk = {
-                    current: coinFormatter(chainedAmmParams.risk.current, queryConfig.networkId),
-                    max: coinFormatter(chainedAmmParams.risk.max, queryConfig.networkId),
-                };
-                ammChainedSpeedMarketsLimits.payoutMultipliers = chainedAmmParams.payoutMultipliers.map(
-                    (payoutMultiplier: bigint) => bigNumberFormatter(payoutMultiplier)
-                );
-                ammChainedSpeedMarketsLimits.maxPriceDelayForResolvingSec = Number(
-                    ammParams.maximumPriceDelayForResolving
-                );
-                ammChainedSpeedMarketsLimits.whitelistedAddress = ammParams.isAddressWhitelisted;
+                    ammChainedSpeedMarketsLimits.minTimeFrame = Number(chainedAmmParams.minTimeFrame);
+                    ammChainedSpeedMarketsLimits.maxTimeFrame = Number(chainedAmmParams.maxTimeFrame);
+                    ammChainedSpeedMarketsLimits.risk = {
+                        current: coinFormatter(chainedAmmParams.risk.current, queryConfig.networkId),
+                        max: coinFormatter(chainedAmmParams.risk.max, queryConfig.networkId),
+                    };
+                    ammChainedSpeedMarketsLimits.payoutMultipliers = chainedAmmParams.payoutMultipliers.map(
+                        (payoutMultiplier: bigint) => bigNumberFormatter(payoutMultiplier)
+                    );
+                    ammChainedSpeedMarketsLimits.maxPriceDelayForResolvingSec = Number(
+                        ammParams.maximumPriceDelayForResolving
+                    );
+                    ammChainedSpeedMarketsLimits.whitelistedAddress = ammParams.isAddressWhitelisted;
+                }
+            } catch (e) {
+                console.log(e);
             }
 
             return ammChainedSpeedMarketsLimits;

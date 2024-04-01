@@ -38,79 +38,84 @@ const useAmmSpeedMarketsLimitsQuery = (
                 whitelistedAddress: false,
             };
 
-            const speedMarketsDataContractLocal = getContract({
-                abi: getContarctAbi(speedMarketsDataContract, queryConfig.networkId),
-                address: speedMarketsDataContract.addresses[queryConfig.networkId],
-                client: queryConfig.client,
-            }) as ViemContract;
+            try {
+                const speedMarketsDataContractLocal = getContract({
+                    abi: getContarctAbi(speedMarketsDataContract, queryConfig.networkId),
+                    address: speedMarketsDataContract.addresses[queryConfig.networkId],
+                    client: queryConfig.client,
+                }) as ViemContract;
 
-            const [
-                ammParams,
-                riskForETH,
-                riskForBTC,
-                directionalRiskForETH,
-                directionalRiskForBTC,
-            ] = await Promise.all([
-                speedMarketsDataContractLocal.read.getSpeedMarketsAMMParameters([walletAddress || ZERO_ADDRESS]),
-                speedMarketsDataContractLocal.read.getRiskPerAsset([
-                    stringToHex(CRYPTO_CURRENCY_MAP.ETH, { size: 32 }),
-                ]),
-                speedMarketsDataContractLocal.read.getRiskPerAsset([
-                    stringToHex(CRYPTO_CURRENCY_MAP.BTC, { size: 32 }),
-                ]),
-                speedMarketsDataContractLocal.read.getDirectionalRiskPerAsset([
-                    stringToHex(CRYPTO_CURRENCY_MAP.ETH, { size: 32 }),
-                ]),
-                speedMarketsDataContractLocal.read.getDirectionalRiskPerAsset([
-                    stringToHex(CRYPTO_CURRENCY_MAP.BTC, { size: 32 }),
-                ]),
-            ]);
+                const [
+                    ammParams,
+                    riskForETH,
+                    riskForBTC,
+                    directionalRiskForETH,
+                    directionalRiskForBTC,
+                ] = await Promise.all([
+                    speedMarketsDataContractLocal.read.getSpeedMarketsAMMParameters([walletAddress || ZERO_ADDRESS]),
+                    speedMarketsDataContractLocal.read.getRiskPerAsset([
+                        stringToHex(CRYPTO_CURRENCY_MAP.ETH, { size: 32 }),
+                    ]),
+                    speedMarketsDataContractLocal.read.getRiskPerAsset([
+                        stringToHex(CRYPTO_CURRENCY_MAP.BTC, { size: 32 }),
+                    ]),
+                    speedMarketsDataContractLocal.read.getDirectionalRiskPerAsset([
+                        stringToHex(CRYPTO_CURRENCY_MAP.ETH, { size: 32 }),
+                    ]),
+                    speedMarketsDataContractLocal.read.getDirectionalRiskPerAsset([
+                        stringToHex(CRYPTO_CURRENCY_MAP.BTC, { size: 32 }),
+                    ]),
+                ]);
 
-            ammSpeedMarketsLimits.minBuyinAmount = Math.ceil(
-                coinFormatter(ammParams.minBuyinAmount, queryConfig.networkId)
-            );
-            ammSpeedMarketsLimits.maxBuyinAmount =
-                coinFormatter(ammParams.maxBuyinAmount, queryConfig.networkId) - MAX_BUYIN_COLLATERAL_CONVERSION_BUFFER;
-            ammSpeedMarketsLimits.minimalTimeToMaturity = Number(ammParams.minimalTimeToMaturity);
-            ammSpeedMarketsLimits.maximalTimeToMaturity = Number(ammParams.maximalTimeToMaturity);
-            ammSpeedMarketsLimits.maxPriceDelaySec = Number(ammParams.maximumPriceDelay);
-            ammSpeedMarketsLimits.maxPriceDelayForResolvingSec = Number(ammParams.maximumPriceDelayForResolving);
-            ammSpeedMarketsLimits.risksPerAsset = [
-                {
-                    currency: CRYPTO_CURRENCY_MAP.ETH,
-                    current: coinFormatter(riskForETH.current, queryConfig.networkId),
-                    max: coinFormatter(riskForETH.max, queryConfig.networkId),
-                },
-                {
-                    currency: CRYPTO_CURRENCY_MAP.BTC,
-                    current: coinFormatter(riskForBTC.current, queryConfig.networkId),
-                    max: coinFormatter(riskForBTC.max, queryConfig.networkId),
-                },
-            ];
-            directionalRiskForETH.map((risk: any) => {
-                ammSpeedMarketsLimits.risksPerAssetAndDirection.push({
-                    currency: CRYPTO_CURRENCY_MAP.ETH,
-                    position: SIDE_TO_POSITION_MAP[risk.direction],
-                    current: coinFormatter(risk.current, queryConfig.networkId),
-                    max: coinFormatter(risk.max, queryConfig.networkId),
+                ammSpeedMarketsLimits.minBuyinAmount = Math.ceil(
+                    coinFormatter(ammParams.minBuyinAmount, queryConfig.networkId)
+                );
+                ammSpeedMarketsLimits.maxBuyinAmount =
+                    coinFormatter(ammParams.maxBuyinAmount, queryConfig.networkId) -
+                    MAX_BUYIN_COLLATERAL_CONVERSION_BUFFER;
+                ammSpeedMarketsLimits.minimalTimeToMaturity = Number(ammParams.minimalTimeToMaturity);
+                ammSpeedMarketsLimits.maximalTimeToMaturity = Number(ammParams.maximalTimeToMaturity);
+                ammSpeedMarketsLimits.maxPriceDelaySec = Number(ammParams.maximumPriceDelay);
+                ammSpeedMarketsLimits.maxPriceDelayForResolvingSec = Number(ammParams.maximumPriceDelayForResolving);
+                ammSpeedMarketsLimits.risksPerAsset = [
+                    {
+                        currency: CRYPTO_CURRENCY_MAP.ETH,
+                        current: coinFormatter(riskForETH.current, queryConfig.networkId),
+                        max: coinFormatter(riskForETH.max, queryConfig.networkId),
+                    },
+                    {
+                        currency: CRYPTO_CURRENCY_MAP.BTC,
+                        current: coinFormatter(riskForBTC.current, queryConfig.networkId),
+                        max: coinFormatter(riskForBTC.max, queryConfig.networkId),
+                    },
+                ];
+                directionalRiskForETH.map((risk: any) => {
+                    ammSpeedMarketsLimits.risksPerAssetAndDirection.push({
+                        currency: CRYPTO_CURRENCY_MAP.ETH,
+                        position: SIDE_TO_POSITION_MAP[risk.direction],
+                        current: coinFormatter(risk.current, queryConfig.networkId),
+                        max: coinFormatter(risk.max, queryConfig.networkId),
+                    });
                 });
-            });
-            directionalRiskForBTC.map((risk: any) => {
-                ammSpeedMarketsLimits.risksPerAssetAndDirection.push({
-                    currency: CRYPTO_CURRENCY_MAP.BTC,
-                    position: SIDE_TO_POSITION_MAP[risk.direction],
-                    current: coinFormatter(risk.current, queryConfig.networkId),
-                    max: coinFormatter(risk.max, queryConfig.networkId),
+                directionalRiskForBTC.map((risk: any) => {
+                    ammSpeedMarketsLimits.risksPerAssetAndDirection.push({
+                        currency: CRYPTO_CURRENCY_MAP.BTC,
+                        position: SIDE_TO_POSITION_MAP[risk.direction],
+                        current: coinFormatter(risk.current, queryConfig.networkId),
+                        max: coinFormatter(risk.max, queryConfig.networkId),
+                    });
                 });
-            });
-            ammSpeedMarketsLimits.timeThresholdsForFees = ammParams.timeThresholdsForFees.map((time: bigint) =>
-                Number(time)
-            );
-            ammSpeedMarketsLimits.lpFees = ammParams.lpFees.map((lpFee: bigint) => bigNumberFormatter(lpFee));
-            ammSpeedMarketsLimits.defaultLPFee = bigNumberFormatter(ammParams.lpFee);
-            ammSpeedMarketsLimits.maxSkewImpact = bigNumberFormatter(ammParams.maxSkewImpact);
-            ammSpeedMarketsLimits.safeBoxImpact = bigNumberFormatter(ammParams.safeBoxImpact);
-            ammSpeedMarketsLimits.whitelistedAddress = ammParams.isAddressWhitelisted;
+                ammSpeedMarketsLimits.timeThresholdsForFees = ammParams.timeThresholdsForFees.map((time: bigint) =>
+                    Number(time)
+                );
+                ammSpeedMarketsLimits.lpFees = ammParams.lpFees.map((lpFee: bigint) => bigNumberFormatter(lpFee));
+                ammSpeedMarketsLimits.defaultLPFee = bigNumberFormatter(ammParams.lpFee);
+                ammSpeedMarketsLimits.maxSkewImpact = bigNumberFormatter(ammParams.maxSkewImpact);
+                ammSpeedMarketsLimits.safeBoxImpact = bigNumberFormatter(ammParams.safeBoxImpact);
+                ammSpeedMarketsLimits.whitelistedAddress = ammParams.isAddressWhitelisted;
+            } catch (e) {
+                console.log(e);
+            }
 
             return ammSpeedMarketsLimits;
         },

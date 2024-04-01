@@ -25,114 +25,122 @@ const useActiveSpeedMarketsDataQuery = (
         queryFn: async () => {
             const activeSpeedMarketsData: UserOpenPositions[] = [];
 
-            const speedMarketsAMMContractLocal = getContract({
-                abi: getContarctAbi(speedMarketsAMMContract, queryConfig.networkId),
-                address: speedMarketsAMMContract.addresses[queryConfig.networkId],
-                client: queryConfig.client,
-            }) as ViemContract;
+            try {
+                const speedMarketsAMMContractLocal = getContract({
+                    abi: getContarctAbi(speedMarketsAMMContract, queryConfig.networkId),
+                    address: speedMarketsAMMContract.addresses[queryConfig.networkId],
+                    client: queryConfig.client,
+                }) as ViemContract;
 
-            const speedMarketsDataContractLocal = getContract({
-                abi: getContarctAbi(speedMarketsDataContract, queryConfig.networkId),
-                address: speedMarketsDataContract.addresses[queryConfig.networkId],
-                client: queryConfig.client,
-            }) as ViemContract;
+                const speedMarketsDataContractLocal = getContract({
+                    abi: getContarctAbi(speedMarketsDataContract, queryConfig.networkId),
+                    address: speedMarketsDataContract.addresses[queryConfig.networkId],
+                    client: queryConfig.client,
+                }) as ViemContract;
 
-            const priceConnection = new EvmPriceServiceConnection(getPriceServiceEndpoint(queryConfig.networkId), {
-                timeout: CONNECTION_TIMEOUT_MS,
-            });
+                const priceConnection = new EvmPriceServiceConnection(getPriceServiceEndpoint(queryConfig.networkId), {
+                    timeout: CONNECTION_TIMEOUT_MS,
+                });
 
-            const ammParams = await speedMarketsDataContractLocal.read.getSpeedMarketsAMMParameters([ZERO_ADDRESS]);
+                const ammParams = await speedMarketsDataContractLocal.read.getSpeedMarketsAMMParameters([ZERO_ADDRESS]);
 
-            const activeMarkets = await speedMarketsAMMContractLocal.read.activeMarkets([
-                0,
-                ammParams.numActiveMarkets,
-            ]);
-            const marketsDataArray = activeMarkets.length
-                ? await speedMarketsDataContractLocal.read.getMarketsData([activeMarkets])
-                : [];
-            const maturedMarkets: any = marketsDataArray
-                .map((marketData: any, index: number) => ({ ...marketData, market: activeMarkets[index] }))
-                .filter((market: any) => secondsToMilliseconds(Number(market.strikeTime)) < Date.now());
-            const openMarkets: any = marketsDataArray
-                .map((marketData: any, index: number) => ({ ...marketData, market: activeMarkets[index] }))
-                .filter((market: any) => secondsToMilliseconds(Number(market.strikeTime)) > Date.now());
+                const activeMarkets = await speedMarketsAMMContractLocal.read.activeMarkets([
+                    0,
+                    ammParams.numActiveMarkets,
+                ]);
+                const marketsDataArray = activeMarkets.length
+                    ? await speedMarketsDataContractLocal.read.getMarketsData([activeMarkets])
+                    : [];
+                const maturedMarkets: any = marketsDataArray
+                    .map((marketData: any, index: number) => ({ ...marketData, market: activeMarkets[index] }))
+                    .filter((market: any) => secondsToMilliseconds(Number(market.strikeTime)) < Date.now());
+                const openMarkets: any = marketsDataArray
+                    .map((marketData: any, index: number) => ({ ...marketData, market: activeMarkets[index] }))
+                    .filter((market: any) => secondsToMilliseconds(Number(market.strikeTime)) > Date.now());
 
-            // Matured markets - not resolved
-            for (let i = 0; i < maturedMarkets.length; i++) {
-                const marketData = maturedMarkets[i];
-                const side = SIDE_TO_POSITION_MAP[marketData.direction];
-                const payout = coinFormatter(marketData.buyinAmount, queryConfig.networkId) * SPEED_MARKETS_QUOTE;
+                // Matured markets - not resolved
+                for (let i = 0; i < maturedMarkets.length; i++) {
+                    const marketData = maturedMarkets[i];
+                    const side = SIDE_TO_POSITION_MAP[marketData.direction];
+                    const payout = coinFormatter(marketData.buyinAmount, queryConfig.networkId) * SPEED_MARKETS_QUOTE;
 
-                const maturityDate = secondsToMilliseconds(Number(marketData.strikeTime));
-                const createdAt =
-                    marketData.createdAt != 0
-                        ? secondsToMilliseconds(Number(marketData.createdAt))
-                        : maturityDate - hoursToMilliseconds(1);
-                const lpFee =
-                    marketData.lpFee != 0 ? bigNumberFormatter(marketData.lpFee) : getFeesFromHistory(createdAt).lpFee;
-                const safeBoxImpact =
-                    marketData.safeBoxImpact != 0
-                        ? bigNumberFormatter(marketData.safeBoxImpact)
-                        : getFeesFromHistory(createdAt).safeBoxImpact;
-                const fees = lpFee + safeBoxImpact;
+                    const maturityDate = secondsToMilliseconds(Number(marketData.strikeTime));
+                    const createdAt =
+                        marketData.createdAt != 0
+                            ? secondsToMilliseconds(Number(marketData.createdAt))
+                            : maturityDate - hoursToMilliseconds(1);
+                    const lpFee =
+                        marketData.lpFee != 0
+                            ? bigNumberFormatter(marketData.lpFee)
+                            : getFeesFromHistory(createdAt).lpFee;
+                    const safeBoxImpact =
+                        marketData.safeBoxImpact != 0
+                            ? bigNumberFormatter(marketData.safeBoxImpact)
+                            : getFeesFromHistory(createdAt).safeBoxImpact;
+                    const fees = lpFee + safeBoxImpact;
 
-                const userData: UserOpenPositions = {
-                    positionAddress: ZERO_ADDRESS,
-                    currencyKey: parseBytes32String(marketData.asset),
-                    strikePrice: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS).toString(),
-                    payout: payout,
-                    maturityDate,
-                    market: marketData.market,
-                    side,
-                    paid: coinFormatter(marketData.buyinAmount, queryConfig.networkId) * (1 + fees),
-                    value: payout,
-                    claimable: undefined,
-                    finalPrice: undefined,
-                    user: marketData.user,
-                };
+                    const userData: UserOpenPositions = {
+                        positionAddress: ZERO_ADDRESS,
+                        currencyKey: parseBytes32String(marketData.asset),
+                        strikePrice: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS).toString(),
+                        payout: payout,
+                        maturityDate,
+                        market: marketData.market,
+                        side,
+                        paid: coinFormatter(marketData.buyinAmount, queryConfig.networkId) * (1 + fees),
+                        value: payout,
+                        claimable: undefined,
+                        finalPrice: undefined,
+                        user: marketData.user,
+                    };
 
-                activeSpeedMarketsData.push(userData);
-            }
+                    activeSpeedMarketsData.push(userData);
+                }
 
-            // Fetch current prices
-            let prices: { [key: string]: number } = {};
-            if (openMarkets.length) {
-                const priceIds = SUPPORTED_ASSETS.map((asset) => getPriceId(queryConfig.networkId, asset));
-                prices = await getCurrentPrices(priceConnection, queryConfig.networkId, priceIds);
-            }
+                // Fetch current prices
+                let prices: { [key: string]: number } = {};
+                if (openMarkets.length) {
+                    const priceIds = SUPPORTED_ASSETS.map((asset) => getPriceId(queryConfig.networkId, asset));
+                    prices = await getCurrentPrices(priceConnection, queryConfig.networkId, priceIds);
+                }
 
-            // Open markets
-            for (let i = 0; i < openMarkets.length; i++) {
-                const marketData = openMarkets[i];
-                const currencyKey = parseBytes32String(marketData.asset);
-                const side = SIDE_TO_POSITION_MAP[marketData.direction];
-                const payout = coinFormatter(marketData.buyinAmount, queryConfig.networkId) * SPEED_MARKETS_QUOTE;
+                // Open markets
+                for (let i = 0; i < openMarkets.length; i++) {
+                    const marketData = openMarkets[i];
+                    const currencyKey = parseBytes32String(marketData.asset);
+                    const side = SIDE_TO_POSITION_MAP[marketData.direction];
+                    const payout = coinFormatter(marketData.buyinAmount, queryConfig.networkId) * SPEED_MARKETS_QUOTE;
 
-                const lpFee =
-                    marketData.lpFee != 0 ? bigNumberFormatter(marketData.lpFee) : getFeesFromHistory(Date.now()).lpFee;
-                const safeBoxImpact =
-                    marketData.safeBoxImpact != 0
-                        ? bigNumberFormatter(marketData.safeBoxImpact)
-                        : getFeesFromHistory(Date.now()).safeBoxImpact;
-                const fees = lpFee + safeBoxImpact;
+                    const lpFee =
+                        marketData.lpFee != 0
+                            ? bigNumberFormatter(marketData.lpFee)
+                            : getFeesFromHistory(Date.now()).lpFee;
+                    const safeBoxImpact =
+                        marketData.safeBoxImpact != 0
+                            ? bigNumberFormatter(marketData.safeBoxImpact)
+                            : getFeesFromHistory(Date.now()).safeBoxImpact;
+                    const fees = lpFee + safeBoxImpact;
 
-                const userData: UserOpenPositions = {
-                    positionAddress: ZERO_ADDRESS,
-                    currencyKey: currencyKey,
-                    strikePrice: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS).toString(),
-                    payout: payout,
-                    maturityDate: secondsToMilliseconds(Number(marketData.strikeTime)),
-                    market: marketData.market,
-                    side,
-                    paid: coinFormatter(marketData.buyinAmount, queryConfig.networkId) * (1 + fees),
-                    value: payout,
-                    claimable: false,
-                    finalPrice: 0,
-                    currentPrice: prices[currencyKey],
-                    user: marketData.user,
-                };
+                    const userData: UserOpenPositions = {
+                        positionAddress: ZERO_ADDRESS,
+                        currencyKey: currencyKey,
+                        strikePrice: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS).toString(),
+                        payout: payout,
+                        maturityDate: secondsToMilliseconds(Number(marketData.strikeTime)),
+                        market: marketData.market,
+                        side,
+                        paid: coinFormatter(marketData.buyinAmount, queryConfig.networkId) * (1 + fees),
+                        value: payout,
+                        claimable: false,
+                        finalPrice: 0,
+                        currentPrice: prices[currencyKey],
+                        user: marketData.user,
+                    };
 
-                activeSpeedMarketsData.push(userData);
+                    activeSpeedMarketsData.push(userData);
+                }
+            } catch (e) {
+                console.log(e);
             }
 
             return activeSpeedMarketsData;
