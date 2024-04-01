@@ -54,7 +54,6 @@ export default defineConfig(({ mode }) => {
                         errorBoundary: ['react-error-boundary'],
                         reactI18next: ['react-i18next'],
                         modal: ['react-modal'],
-                        outsideClick: ['react-outside-click-handler'],
                         redux: ['react-redux'],
                         select: ['react-select'],
                         webgl: ['react-unity-webgl'],
