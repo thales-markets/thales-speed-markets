@@ -156,7 +156,7 @@ const UserCollaterals: React.FC = () => {
                                 >
                                     {assetIcon(coin.name)}
                                     <BalanceTextWrapper>
-                                        <BalanceText>{formatCurrencyWithKey(coin.name, coin.balance, 2)}</BalanceText>
+                                        <BalanceText>{formatCurrencyWithKey(coin.name, coin.balance)}</BalanceText>
                                     </BalanceTextWrapper>
                                 </BalanceWrapper>
                             ))}
