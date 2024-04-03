@@ -1,5 +1,5 @@
 import react from '@vitejs/plugin-react';
-import { PluginOption, defineConfig } from 'vite';
+import { PluginOption, defineConfig, loadEnv } from 'vite';
 import checker from 'vite-plugin-checker';
 import eslint from 'vite-plugin-eslint';
 import svgr from 'vite-plugin-svgr';
@@ -24,7 +24,11 @@ const plugins = (mode: string): PluginOption[] => {
 };
 
 export default defineConfig(({ mode }) => {
+    const env = loadEnv(mode, process.cwd(), '');
     return {
+        define: {
+            'process.env': env,
+        },
         plugins: plugins(mode),
         server: {
             port: 3000, // To run the app on port 3000
