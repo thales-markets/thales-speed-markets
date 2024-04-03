@@ -8,6 +8,7 @@ import Profile from 'pages/Profile';
 import SpeedMarkets from 'pages/SpeedMarkets';
 import SpeedMarketsOverview from 'pages/SpeedMarketsOverview';
 import { Suspense, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Redirect, Route, Router, Switch } from 'react-router-dom';
 import { setAppReady } from 'redux/modules/app';
@@ -18,15 +19,21 @@ import { isMobile } from 'utils/device';
 import { getSupportedNetworksByRoute, isNetworkSupported } from 'utils/network';
 import queryConnector from 'utils/queryConnector';
 import { history } from 'utils/routes';
-import { useAccount, useChainId, useDisconnect, useSwitchChain } from 'wagmi';
+import { useAccount, useChainId, useDisconnect, useSwitchChain, useWalletClient } from 'wagmi';
+import enTranslation from '../../i18n/en.json';
 
 const App = () => {
     const dispatch = useDispatch();
-
     const networkId = useChainId();
+    const walletClient = useWalletClient();
     const { switchChain } = useSwitchChain();
     const { address } = useAccount();
     const { disconnect } = useDisconnect();
+
+    // particle context provider is overriding our i18n configuration and languages, so we need to add our localization after the initialization of particle context
+    // initialization of particle context is happening in Root
+    const { i18n } = useTranslation();
+    i18n.addResourceBundle('en', 'translation', enTranslation, true);
 
     queryConnector.setQueryClient();
 
@@ -48,7 +55,7 @@ const App = () => {
                 switchChain({ chainId: ethereumChainId as SupportedNetwork });
             });
         }
-    }, [dispatch, address, switchChain, disconnect]);
+    }, [dispatch, address, switchChain, disconnect, walletClient]);
 
     useEffect(() => {
         const handlePageResized = () => {
