@@ -1,7 +1,6 @@
 import TileTable from 'components/TileTable/TileTable';
 import { USD_SIGN } from 'constants/currency';
 import { millisecondsToSeconds } from 'date-fns';
-import { Positions } from 'enums/market';
 import { orderBy } from 'lodash';
 import ChainedPositionAction from 'pages/SpeedMarkets/components/ChainedPositionAction';
 import { ShareIcon } from 'pages/SpeedMarkets/components/OpenPosition/OpenPosition';
@@ -21,9 +20,10 @@ import { UserPosition } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getPriceId } from 'utils/pyth';
+import { isUserWinner } from 'utils/speedAmm';
+import { useAccount, useChainId, useClient } from 'wagmi';
 import MyPositionAction from '../MyPositionAction';
 import { getDirections } from '../styled-components';
-import { useAccount, useChainId, useClient } from 'wagmi';
 
 type ClaimablePositionsProps = {
     searchAddress: string;
@@ -112,10 +112,7 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
                 i === 0 ? strikePrice : finalPrices[i - 1]
             );
             const userWonStatuses = marketData.sides.map((side, i) =>
-                finalPrices[i] > 0 && strikePrices[i] > 0
-                    ? (side === Positions.UP && finalPrices[i] > strikePrices[i]) ||
-                      (side === Positions.DOWN && finalPrices[i] < strikePrices[i])
-                    : undefined
+                isUserWinner(side, strikePrices[i], finalPrices[i])
             );
             const canResolve =
                 userWonStatuses.some((status) => status === false) ||
@@ -132,7 +129,7 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
                 return {
                     positionAddress: marketData.positionAddress,
                     currencyKey: marketData.currencyKey,
-                    strikePrice: marketData.strikePriceNum || 0,
+                    strikePrice: marketData.strikePrice,
                     leftPrice: 0,
                     rightPrice: 0,
                     finalPrice: marketData.finalPrice || 0,

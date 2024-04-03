@@ -82,7 +82,7 @@ const useActiveSpeedMarketsDataQuery = (
                     const userData: UserOpenPositions = {
                         positionAddress: ZERO_ADDRESS,
                         currencyKey: parseBytes32String(marketData.asset),
-                        strikePrice: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS).toString(),
+                        strikePrice: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS),
                         payout: payout,
                         maturityDate,
                         market: marketData.market,
@@ -124,7 +124,7 @@ const useActiveSpeedMarketsDataQuery = (
                     const userData: UserOpenPositions = {
                         positionAddress: ZERO_ADDRESS,
                         currencyKey: currencyKey,
-                        strikePrice: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS).toString(),
+                        strikePrice: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS),
                         payout: payout,
                         maturityDate: secondsToMilliseconds(Number(marketData.strikeTime)),
                         market: marketData.market,

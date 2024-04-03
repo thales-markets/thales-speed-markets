@@ -2,10 +2,9 @@ import SPAAnchor from 'components/SPAAnchor/SPAAnchor';
 import Tooltip from 'components/Tooltip';
 import ROUTES from 'constants/routes';
 import { millisecondsToSeconds } from 'date-fns';
-import { Positions } from 'enums/market';
+import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
 import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveSpeedMarketsDataQuery';
-import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -16,6 +15,7 @@ import { RootState } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getPriceId } from 'utils/pyth';
 import { buildHref } from 'utils/routes';
+import { isUserWinner } from 'utils/speedAmm';
 import { useAccount, useChainId, useClient } from 'wagmi';
 
 const Notifications: React.FC = () => {
@@ -93,10 +93,7 @@ const Notifications: React.FC = () => {
                 i > 0 ? finalPrices[i - 1] : strikePrice
             );
             const userWonStatuses = marketData.sides.map((side, i) =>
-                finalPrices[i] > 0 && strikePrices[i] > 0
-                    ? (side === Positions.UP && finalPrices[i] > strikePrices[i]) ||
-                      (side === Positions.DOWN && finalPrices[i] < strikePrices[i])
-                    : undefined
+                isUserWinner(side, strikePrices[i], finalPrices[i])
             );
             const claimable = userWonStatuses.every((status) => status);
 

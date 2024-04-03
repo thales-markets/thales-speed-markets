@@ -67,7 +67,7 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
             return {
                 positionAddress: ZERO_ADDRESS,
                 currencyKey: marketData.currencyKey,
-                strikePrice: marketData.strikePriceNum,
+                strikePrice: marketData.strikePrice,
                 leftPrice: 0,
                 rightPrice: 0,
                 finalPrice: marketData.finalPrice,

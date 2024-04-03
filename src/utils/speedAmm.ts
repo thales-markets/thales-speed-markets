@@ -139,13 +139,15 @@ export const getFeesFromHistory = (txTimestampMilis: number) => {
     return { safeBoxImpact, lpFee };
 };
 
+export const isUserWinner = (position: Positions, strikePrice: number, finalPrice: number) =>
+    strikePrice > 0 && finalPrice > 0
+        ? (position === Positions.UP && finalPrice > strikePrice) ||
+          (position === Positions.DOWN && finalPrice < strikePrice)
+        : undefined;
+
 export const getUserLostAtSideIndex = (position: ChainedSpeedMarket) => {
     const userLostIndex = position.finalPrices.findIndex(
-        (finalPrice, i) =>
-            finalPrice > 0 &&
-            position.strikePrices[i] > 0 &&
-            ((position.sides[i] === Positions.UP && finalPrice <= position.strikePrices[i]) ||
-                (position.sides[i] === Positions.DOWN && finalPrice >= position.strikePrices[i]))
+        (finalPrice, i) => isUserWinner(position.sides[i], position.strikePrices[i], finalPrice) === false
     );
     return userLostIndex > -1 ? userLostIndex : position.sides.length - 1;
 };

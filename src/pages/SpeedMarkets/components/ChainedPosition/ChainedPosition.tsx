@@ -23,10 +23,11 @@ import { RootState, ThemeInterface } from 'types/ui';
 import { formatNumberShort } from 'utils/formatters/number';
 import { getPriceId } from 'utils/pyth';
 import { refetchPythPrice } from 'utils/queryConnector';
+import { isUserWinner } from 'utils/speedAmm';
 import { getColorPerPosition } from 'utils/style';
+import { useChainId } from 'wagmi';
 import ChainedPositionAction from '../ChainedPositionAction';
 import { AssetIcon, Icon, PositionSymbolDown, PositionSymbolUp } from '../SelectPosition/styled-components';
-import { useChainId } from 'wagmi';
 
 type ChainedPositionProps = {
     position: ChainedSpeedMarket;
@@ -86,12 +87,7 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                   i > 0 && i <= fetchLastFinalPriceIndex ? finalPrices[i - 1] : strikePrice
               )
             : position.strikePrices;
-    const userWonStatuses = position.sides.map((side, i) =>
-        finalPrices[i] > 0 && strikePrices[i] > 0
-            ? (side === Positions.UP && finalPrices[i] > strikePrices[i]) ||
-              (side === Positions.DOWN && finalPrices[i] < strikePrices[i])
-            : undefined
-    );
+    const userWonStatuses = position.sides.map((side, i) => isUserWinner(side, strikePrices[i], finalPrices[i]));
     const canResolve = position.isOpen
         ? userWonStatuses.some((status) => status === false) || userWonStatuses.every((status) => status !== undefined)
         : position.canResolve;

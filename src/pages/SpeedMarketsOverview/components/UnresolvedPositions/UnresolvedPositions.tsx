@@ -1,11 +1,10 @@
 import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
 import Button from 'components/Button';
 import SimpleLoader from 'components/SimpleLoader/SimpleLoader';
-import { CRYPTO_CURRENCY_MAP, USD_SIGN } from 'constants/currency';
+import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
 import { SPEED_MARKETS_OVERVIEW_SECTIONS as SECTIONS } from 'constants/market';
 import { CONNECTION_TIMEOUT_MS, SUPPORTED_ASSETS } from 'constants/pyth';
 import { millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
-import { Positions } from 'enums/market';
 import useInterval from 'hooks/useInterval';
 import {
     LoaderContainer,
@@ -17,22 +16,21 @@ import {
     getAdditionalButtonStyle,
     getDefaultButtonProps,
 } from 'pages/SpeedMarketsOverview/styled-components';
+import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import useActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useActiveSpeedMarketsDataQuery';
 import useAmmSpeedMarketsLimitsQuery from 'queries/speedMarkets/useAmmSpeedMarketsLimitsQuery';
-import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
-import { RootState } from 'types/ui';
-import { formatCurrencyWithSign } from 'thales-utils';
 import { UserOpenPositions } from 'types/market';
+import { RootState } from 'types/ui';
 import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAssetsAsObject } from 'utils/pyth';
 import { refetchActiveSpeedMarkets, refetchPythPrice } from 'utils/queryConnector';
-import { resolveAllSpeedPositions } from 'utils/speedAmm';
-import UnresolvedPosition from '../UnresolvedPosition';
+import { isUserWinner, resolveAllSpeedPositions } from 'utils/speedAmm';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
+import UnresolvedPosition from '../UnresolvedPosition';
 
 const UnresolvedPositions: React.FC = () => {
     const { t } = useTranslation();
@@ -85,15 +83,12 @@ const UnresolvedPositions: React.FC = () => {
 
     const maturedUnresolvedWithPrices = activeMatured.map((marketData, index) => {
         const finalPrice = pythPricesQueries[index].data || 0;
-        const claimable =
-            finalPrice > 0 &&
-            ((marketData.side === Positions.UP && finalPrice > Number(marketData.strikePrice)) ||
-                (marketData.side === Positions.DOWN && finalPrice < Number(marketData.strikePrice)));
+        const claimable = !!isUserWinner(marketData.side, marketData.strikePrice, finalPrice);
         return {
             ...marketData,
             claimable,
             finalPrice,
-            strikePrice: formatCurrencyWithSign(USD_SIGN, Number(marketData.strikePrice)),
+            strikePrice: marketData.strikePrice,
         };
     });
 
@@ -110,7 +105,7 @@ const UnresolvedPositions: React.FC = () => {
         .filter((marketData) => marketData.maturityDate > Date.now())
         .map((marketData) => ({
             ...marketData,
-            strikePrice: formatCurrencyWithSign(USD_SIGN, Number(marketData.strikePrice)),
+            strikePrice: marketData.strikePrice,
             currentPrice: currentPrices[marketData.currencyKey]
                 ? currentPrices[marketData.currencyKey]
                 : marketData.currentPrice,

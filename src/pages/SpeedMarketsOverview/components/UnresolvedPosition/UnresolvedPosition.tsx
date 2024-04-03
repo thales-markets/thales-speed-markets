@@ -39,7 +39,7 @@ const UnresolvedPosition: React.FC<UnresolvedPositionProps> = ({
                 <FlexContainer>
                     <Icon className={`currency-icon currency-icon--${position.currencyKey.toLowerCase()}`} />
                     <Label>{position.currencyKey}</Label>
-                    <Value>{position.strikePrice}</Value>
+                    <Value>{formatCurrencyWithSign(USD_SIGN, position.strikePrice)}</Value>
                 </FlexContainer>
                 <Separator />
                 <FlexContainer>

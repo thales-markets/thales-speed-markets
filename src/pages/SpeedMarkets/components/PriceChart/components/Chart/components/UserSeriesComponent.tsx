@@ -59,7 +59,7 @@ export const UserPositionAreaSeries: React.FC<{
                             // we are adding every tick on the x axis but are hiding the data from being drawn by setting hide: true
                             result.push({
                                 time: lastCandleTime + iterator * deltaTime,
-                                value: position.strikePriceNum,
+                                value: position.strikePrice,
                                 position,
                                 hide: true,
                             });
@@ -68,7 +68,7 @@ export const UserPositionAreaSeries: React.FC<{
                         // finally we can push the position that should be drawn and are passing hide:false to tell the chart to draw marker for this position
                         result.push({
                             time: millisecondsToSeconds(Number(position.maturityDate)),
-                            value: position.strikePriceNum,
+                            value: position.strikePrice,
                             position,
                             hide: false,
                         });
@@ -87,7 +87,7 @@ export const UserPositionAreaSeries: React.FC<{
                             if (it < candlestickData.length)
                                 result.push({
                                     time: candlestickData[it - 1].time,
-                                    value: position.strikePriceNum,
+                                    value: position.strikePrice,
                                     position,
                                     hide: false,
                                 });

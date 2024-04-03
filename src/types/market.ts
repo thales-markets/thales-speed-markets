@@ -15,8 +15,7 @@ export type MarketInfo = {
 export type UserOpenPositions = {
     positionAddress: string;
     currencyKey: string;
-    strikePrice: string;
-    strikePriceNum?: number;
+    strikePrice: number;
     payout: number;
     maturityDate: number;
     market: string;
@@ -31,8 +30,7 @@ export type UserOpenPositions = {
 
 export type UserClosedPositions = {
     currencyKey: string;
-    strikePrice: string;
-    strikePriceNum: number;
+    strikePrice: number;
     payout: number;
     maturityDate: number;
     market: string;

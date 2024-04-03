@@ -4,7 +4,6 @@ import Tooltip from 'components/Tooltip/Tooltip';
 import { USD_SIGN } from 'constants/currency';
 import { CONNECTION_TIMEOUT_MS, SUPPORTED_ASSETS } from 'constants/pyth';
 import { millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
-import { Positions } from 'enums/market';
 import useInterval from 'hooks/useInterval';
 import { orderBy } from 'lodash';
 import MaturityDate from 'pages/Profile/components/MaturityDate';
@@ -25,10 +24,10 @@ import { UserPosition } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAssetsAsObject } from 'utils/pyth';
+import { isUserWinner } from 'utils/speedAmm';
+import { useAccount, useChainId, useClient } from 'wagmi';
 import MyPositionAction from '../MyPositionAction/MyPositionAction';
 import { getDirections } from '../styled-components';
-import { useAccount, useChainId } from 'wagmi';
-import { useClient } from 'wagmi';
 
 type OpenPositionsProps = {
     searchAddress: string;
@@ -138,12 +137,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
             i === 0 ? strikePrice : finalPrices[i - 1]
         );
         const lastStrikePrice = [...strikePrices].reverse().find((strikePrice) => strikePrice);
-        const userWonStatuses = marketData.sides.map((side, i) =>
-            finalPrices[i] > 0 && strikePrices[i] > 0
-                ? (side === Positions.UP && finalPrices[i] > strikePrices[i]) ||
-                  (side === Positions.DOWN && finalPrices[i] < strikePrices[i])
-                : undefined
-        );
+        const userWonStatuses = marketData.sides.map((side, i) => isUserWinner(side, strikePrices[i], finalPrices[i]));
         const userLost = userWonStatuses.some((status) => status === false);
         return { ...marketData, strikePrices, userLost, lastStrikePrice };
     });
@@ -155,7 +149,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
                 return {
                     positionAddress: marketData.positionAddress,
                     currencyKey: marketData.currencyKey,
-                    strikePrice: marketData.strikePriceNum || 0,
+                    strikePrice: marketData.strikePrice,
                     leftPrice: 0,
                     rightPrice: 0,
                     finalPrice: marketData.finalPrice || 0,

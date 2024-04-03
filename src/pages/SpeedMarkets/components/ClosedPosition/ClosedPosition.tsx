@@ -27,7 +27,7 @@ const ClosedPosition: React.FC<ClosedPositionProps> = ({ position }) => {
             <AlignedFlex>
                 <FlexContainer $firstChildWidth="130px">
                     <Label>{position.currencyKey}</Label>
-                    <Value>{position.strikePrice}</Value>
+                    <Value>{formatCurrencyWithSign(USD_SIGN, position.strikePrice)}</Value>
                 </FlexContainer>
                 <Separator />
                 <FlexContainer $secondChildWidth="140px">
