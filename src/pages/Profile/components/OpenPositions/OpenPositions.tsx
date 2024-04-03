@@ -235,13 +235,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
                         },
                         {
                             title: t('profile.history.expires'),
-                            value: (
-                                <MaturityDate
-                                    maturityDateUnix={row.maturityDate}
-                                    showFullCounter
-                                    showDateWithTime={true}
-                                />
-                            ),
+                            value: <MaturityDate maturityDateUnix={row.maturityDate} showFullCounter />,
                         },
                         {
                             value: <MyPositionAction position={row} isProfileAction />,

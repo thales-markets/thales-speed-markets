@@ -14,10 +14,11 @@ import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
 import { useTheme } from 'styled-components';
-import { formatCurrency, formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
+import { formatCurrency, formatCurrencyWithSign } from 'thales-utils';
 import { SharePositionData } from 'types/flexCards';
 import { UserPosition } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
+import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getPriceId } from 'utils/pyth';
 import { isUserWinner } from 'utils/speedAmm';
@@ -212,7 +213,7 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
                         },
                         {
                             title: t('profile.history.expired'),
-                            value: formatShortDateWithTime(row.maturityDate),
+                            value: formatShortDateWithFullTime(row.maturityDate),
                         },
                         {
                             value: chainedPosition ? (

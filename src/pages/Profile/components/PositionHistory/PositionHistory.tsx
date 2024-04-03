@@ -9,12 +9,13 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { useTheme } from 'styled-components';
-import { formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
+import { formatCurrencyWithSign } from 'thales-utils';
 import { UserPosition } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
+import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
-import { getStatus } from '../styled-components';
 import { useAccount, useChainId, useClient } from 'wagmi';
+import { getStatus } from '../styled-components';
 
 type PositionHistoryProps = {
     searchAddress: string;
@@ -145,7 +146,7 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
                         },
                         {
                             title: t('profile.history.expired'),
-                            value: formatShortDateWithTime(row.maturityDate),
+                            value: formatShortDateWithFullTime(row.maturityDate),
                         },
                     ];
 

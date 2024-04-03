@@ -12,14 +12,10 @@ import { useSelector } from 'react-redux';
 import { getIsMobile } from 'redux/modules/ui';
 import styled, { useTheme } from 'styled-components';
 import { FlexDivCentered, FlexDivColumn, FlexDivColumnCentered, FlexDivSpaceBetween } from 'styles/common';
-import {
-    formatCurrencyWithSign,
-    formatHoursAndMinutesFromTimestamp,
-    formatShortDate,
-    formatShortDateWithTime,
-} from 'thales-utils';
+import { formatCurrencyWithSign, formatShortDate } from 'thales-utils';
 import { ChainedSpeedMarket } from 'types/market';
 import { RootState, ThemeInterface } from 'types/ui';
+import { formatHoursMinutesSecondsFromTimestamp, formatShortDateWithFullTime } from 'utils/formatters/date';
 import { formatNumberShort } from 'utils/formatters/number';
 import { getPriceId } from 'utils/pyth';
 import { refetchPythPrice } from 'utils/queryConnector';
@@ -167,7 +163,7 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                     <FlexContainer>
                         <Text>{t('speed-markets.user-positions.end-time')}</Text>
                         <Text isActiveColor>
-                            {formatShortDateWithTime(
+                            {formatShortDateWithFullTime(
                                 positionWithPrices.canResolve
                                     ? positionWithPrices.strikeTimes[statusDecisionIndex]
                                     : positionWithPrices.maturityDate
@@ -247,7 +243,7 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                                         {formatShortDate(positionWithPrices.strikeTimes[index])}
                                     </Text>
                                     <Text lineHeight="14px" padding="0 0 1px 0">
-                                        {formatHoursAndMinutesFromTimestamp(positionWithPrices.strikeTimes[index])}
+                                        {formatHoursMinutesSecondsFromTimestamp(positionWithPrices.strikeTimes[index])}
                                     </Text>
                                     {positionWithPrices.strikePrices[index] ? (
                                         <Text isActiveColor={!maturedStrikeTimes[index]}>

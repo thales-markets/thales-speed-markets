@@ -8,9 +8,10 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { FlexDiv } from 'styles/common';
-import { formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
+import { formatCurrencyWithSign } from 'thales-utils';
 import { SharePositionData, SharePositionType } from 'types/flexCards';
 import { getSynthName } from 'utils/currency';
+import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import SpeedMarketsFooter from '../SpeedMarketsFooter';
 
 const SpeedMarketFlexCard: React.FC<SharePositionData> = ({
@@ -55,7 +56,7 @@ const SpeedMarketFlexCard: React.FC<SharePositionData> = ({
                 </MarketDetailsItemContainer>
                 <MarketDetailsItemContainer type={type}>
                     <ItemName type={type}>{t('common.flex-card.strike-date')}</ItemName>
-                    <Value type={type}>{formatShortDateWithTime(strikeDate)}</Value>
+                    <Value type={type}>{formatShortDateWithFullTime(strikeDate)}</Value>
                 </MarketDetailsItemContainer>
                 <MarketDetailsItemContainer type={type}>
                     <ItemName type={type}>{t('common.flex-card.buy-in')}</ItemName>

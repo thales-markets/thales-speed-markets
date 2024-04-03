@@ -4,9 +4,10 @@ import { ScreenSizeBreakpoint } from 'enums/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
-import { formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
+import { formatCurrencyWithSign } from 'thales-utils';
 import { UserOpenPositions } from 'types/market';
 import { ThemeInterface } from 'types/ui';
+import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import { formatNumberShort } from 'utils/formatters/number';
 import { getColorPerPosition } from 'utils/style';
 import OverviewPositionAction from '../OverviewPositionAction';
@@ -66,7 +67,7 @@ const UnresolvedPosition: React.FC<UnresolvedPositionProps> = ({
                 <Separator />
                 <FlexContainer>
                     <Label>{t('speed-markets.user-positions.end-time')}</Label>
-                    <Value>{formatShortDateWithTime(position.maturityDate)}</Value>
+                    <Value>{formatShortDateWithFullTime(position.maturityDate)}</Value>
                 </FlexContainer>
                 <Separator />
                 <FlexContainer>
@@ -143,6 +144,9 @@ const FlexContainer = styled(AlignedFlex)`
     }
     &:nth-child(5) {
         min-width: 140px;
+    }
+    &:nth-child(7) {
+        min-width: 175px;
     }
 
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
