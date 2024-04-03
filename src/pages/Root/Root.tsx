@@ -16,6 +16,7 @@ import { getDefaultTheme } from 'utils/style';
 import { WagmiProvider } from 'wagmi';
 import App from './App';
 import { wagmiConfig } from './wagmiConfig';
+import { AuthCoreContextProvider } from '@particle-network/auth-core-modal';
 
 window.Buffer = window.Buffer || buffer;
 
@@ -33,17 +34,26 @@ const Root: React.FC<RootProps> = ({ store }) => {
         <ErrorBoundary fallback={<UnexpectedError theme={ThemeMap[theme]} />} onError={() => {}}>
             <QueryClientProvider client={queryConnector.queryClient}>
                 <Provider store={store}>
-                    <WagmiProvider config={wagmiConfig}>
-                        <RainbowKitProvider
-                            theme={customTheme}
-                            appInfo={{
-                                appName: 'SpeedMarkets',
-                                disclaimer: WalletDisclaimer,
-                            }}
-                        >
-                            <App />
-                        </RainbowKitProvider>
-                    </WagmiProvider>
+                    <AuthCoreContextProvider
+                        options={{
+                            projectId: '2b8c8b75-cc7a-4111-923f-0043b9fa908b',
+                            clientKey: 'cS3khABdBgfK4m8CzYcL1xcgVM6cuflmNY6dFxdY',
+                            appId: 'aab773d8-c4e9-43ae-aa57-0d898f3dbf46',
+                            language: 'en',
+                        }}
+                    >
+                        <WagmiProvider config={wagmiConfig}>
+                            <RainbowKitProvider
+                                theme={customTheme}
+                                appInfo={{
+                                    appName: 'SpeedMarkets',
+                                    disclaimer: WalletDisclaimer,
+                                }}
+                            >
+                                <App />
+                            </RainbowKitProvider>
+                        </WagmiProvider>
+                    </AuthCoreContextProvider>
                 </Provider>
             </QueryClientProvider>
         </ErrorBoundary>

@@ -14,6 +14,7 @@ import {
 import { RPC_LIST } from 'constants/network';
 import { NetworkId } from 'thales-utils';
 import { isMobile } from 'utils/device';
+import { particleGoogleWallet, particleTwitterWallet, particleWallet } from 'utils/particleWallet';
 import { createConfig, fallback, http } from 'wagmi';
 import {
     arbitrum,
@@ -37,6 +38,9 @@ const wallets = [
     coinbaseWallet,
     rainbowWallet,
     imTokenWallet,
+    particleWallet,
+    particleGoogleWallet,
+    particleTwitterWallet,
 ];
 
 !isMobile() && wallets.push(injectedWallet);
