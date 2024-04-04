@@ -17,8 +17,8 @@ const Banner: React.FC = () => {
 };
 
 const Container = styled(FlexDiv)`
-    position: absolute;
-    top: 0;
+    position: relative;
+    margin-bottom: -20px;
     width: 100%;
     align-items: center;
     justify-content: center;
