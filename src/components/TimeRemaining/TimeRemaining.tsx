@@ -53,10 +53,11 @@ const TimeRemaining: React.FC<TimeRemainingProps> = ({ end, fontSize, showFullCo
 
     useEffect(() => {
         const nowValue = Date.now();
-        const timeElapsedValue = nowValue >= Number(end);
-        const weekDiffValue = Math.abs(differenceInWeeks(nowValue, end));
 
+        const timeElapsedValue = nowValue >= Number(end);
         setTimeElapsed(timeElapsedValue);
+
+        const weekDiffValue = Math.abs(differenceInWeeks(nowValue, end));
         setWeekDiff(weekDiffValue);
 
         const showRemainingInWeeksValue = weekDiffValue > SHOW_WEEKS_THRESHOLD;
