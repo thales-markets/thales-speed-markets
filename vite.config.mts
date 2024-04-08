@@ -1,9 +1,30 @@
 import react from '@vitejs/plugin-react';
-import { PluginOption, defineConfig, loadEnv } from 'vite';
+import { ConfigEnv, PluginOption, defineConfig, Plugin, loadEnv } from 'vite';
 import checker from 'vite-plugin-checker';
 import eslint from 'vite-plugin-eslint';
 import svgr from 'vite-plugin-svgr';
 import tsconfigPaths from 'vite-tsconfig-paths';
+import path from 'path';
+import fs from 'fs';
+
+const particleWasmPlugin: Plugin | undefined = {
+    name: 'particle-wasm',
+    apply: (_, env: ConfigEnv) => {
+        return env.mode === 'development';
+    },
+    buildStart: () => {
+        const copiedPath = path.join(
+            __dirname,
+            './node_modules/@particle-network/thresh-sig/wasm/thresh_sig_wasm_bg.wasm' //@particle-network/thresh-sig dir
+        );
+        const dir = path.join(__dirname, 'node_modules/.vite/wasm');
+        const resultPath = path.join(dir, 'thresh_sig_wasm_bg.wasm');
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+        fs.copyFileSync(copiedPath, resultPath);
+    },
+};
 
 const plugins = (mode: string): PluginOption[] => {
     return [
@@ -20,6 +41,7 @@ const plugins = (mode: string): PluginOption[] => {
             emitWarning: true,
             useEslintrc: true,
         }),
+        particleWasmPlugin,
     ];
 };
 
