@@ -6,6 +6,10 @@ import styled from 'styled-components';
 import { truncateAddress } from 'thales-utils';
 import UserCollaterals from '../UserCollaterals';
 import { useAccount } from 'wagmi';
+import { useSelector } from 'react-redux';
+import { RootState } from 'types/ui';
+import { getIsBiconomy } from 'redux/modules/wallet';
+import biconomyConnector from 'utils/biconomyWallet';
 
 const TRUNCATE_ADDRESS_NUMBER_OF_CHARS = 5;
 
@@ -14,7 +18,8 @@ const UserWallet: React.FC = () => {
     const { openConnectModal } = useConnectModal();
     const { openAccountModal } = useAccountModal();
 
-    const { isConnected, address } = useAccount();
+    const { isConnected, address: walletAddress } = useAccount();
+    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
 
     const [walletText, setWalletText] = useState('');
 
@@ -30,9 +35,13 @@ const UserWallet: React.FC = () => {
                     onMouseOver={() => setWalletText(t('common.wallet.wallet-options'))}
                     onMouseLeave={() => setWalletText('')}
                 >
-                    {address
+                    {isConnected
                         ? walletText ||
-                          truncateAddress(address, TRUNCATE_ADDRESS_NUMBER_OF_CHARS, TRUNCATE_ADDRESS_NUMBER_OF_CHARS)
+                          truncateAddress(
+                              (isBiconomy ? biconomyConnector.address : walletAddress) as string,
+                              TRUNCATE_ADDRESS_NUMBER_OF_CHARS,
+                              TRUNCATE_ADDRESS_NUMBER_OF_CHARS
+                          )
                         : t('common.wallet.connect-your-wallet')}
                 </WalletContainer>
                 <NetworkSwitch />

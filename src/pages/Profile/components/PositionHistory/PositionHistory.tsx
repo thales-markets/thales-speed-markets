@@ -15,6 +15,8 @@ import { RootState, ThemeInterface } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getStatus } from '../styled-components';
 import { useAccount, useChainId, useClient } from 'wagmi';
+import biconomyConnector from 'utils/biconomyWallet';
+import { getIsBiconomy } from 'redux/modules/wallet';
 
 type PositionHistoryProps = {
     searchAddress: string;
@@ -28,11 +30,12 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
     const networkId = useChainId();
     const client = useClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const { isConnected, address } = useAccount();
+    const { isConnected, address: walletAddress } = useAccount();
+    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
 
     const closedSpeedMarketsDataQuery = useUserResolvedSpeedMarketsDataQuery(
         { networkId, client },
-        searchAddress || (address as string),
+        searchAddress || ((isBiconomy ? biconomyConnector.address : walletAddress) as string),
         {
             enabled: isAppReady && isConnected,
         }
@@ -48,7 +51,7 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
 
     const closedChainedSpeedMarketsDataQuery = useUserResolvedChainedSpeedMarketsDataQuery(
         { networkId, client },
-        searchAddress || (address as string),
+        searchAddress || ((isBiconomy ? biconomyConnector.address : walletAddress) as string),
         {
             enabled: isAppReady && isConnected && !isOnlySpeedMarketsSupported(networkId),
         }

@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsMobile } from 'redux/modules/ui';
-import { getSelectedCollateralIndex } from 'redux/modules/wallet';
+import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
 import styled, { CSSProperties, useTheme } from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
 import { coinParser, formatCurrencyWithSign, roundNumberToDecimals } from 'thales-utils';
@@ -29,6 +29,8 @@ import { SupportedNetwork } from 'types/network';
 import { UserPosition } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
 import { ViemContract } from 'types/viem';
+import { executeBiconomyTransaction } from 'utils/biconomy';
+import biconomyConnector from 'utils/biconomyWallet';
 import { getContarctAbi } from 'utils/contracts/abi';
 import erc20Contract from 'utils/contracts/collateralContract';
 import multipleCollateral from 'utils/contracts/multipleCollateralContract';
@@ -69,7 +71,8 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     const networkId = useChainId() as SupportedNetwork;
     const client = useClient();
     const walletClient = useWalletClient();
-    const { isConnected, address } = useAccount();
+    const { isConnected, address: walletAddress } = useAccount();
+    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
 
@@ -107,7 +110,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                 const allowance = await checkAllowance(
                     parsedAmount,
                     erc20Instance,
-                    address as string,
+                    (isBiconomy ? biconomyConnector.address : walletAddress) as string,
                     addressToApprove
                 );
                 setAllowance(allowance);
@@ -118,7 +121,17 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
         if (isConnected) {
             getAllowance();
         }
-    }, [position.value, networkId, address, isConnected, hasAllowance, isAllowing, isDefaultCollateral, client]);
+    }, [
+        position.value,
+        networkId,
+        walletAddress,
+        isBiconomy,
+        isConnected,
+        hasAllowance,
+        isAllowing,
+        isDefaultCollateral,
+        client,
+    ]);
 
     const handleAllowance = async (approveAmount: bigint) => {
         const erc20Instance = getContract({
@@ -131,8 +144,15 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
         try {
             setIsAllowing(true);
-
-            const hash = await erc20Instance.write.approve([addressToApprove, approveAmount]);
+            let hash;
+            if (isBiconomy) {
+                hash = await executeBiconomyTransaction(erc20Instance.address, erc20Instance, 'approve', [
+                    addressToApprove,
+                    approveAmount,
+                ]);
+            } else {
+                hash = await erc20Instance.write.approve([addressToApprove, approveAmount]);
+            }
             setOpenApprovalModal(false);
             const txReceipt = await waitForTransactionReceipt(client as Client, {
                 hash,
@@ -192,29 +212,56 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                 address: speedMarketsAMMContract.addresses[networkId],
                 client: walletClient.data as Client,
             }) as ViemContract;
-
-            const hash = isDefaultCollateral
-                ? await speedMarketsAMMContractWithSigner.write.resolveMarket([position.market, priceUpdateData], {
-                      value: updateFee,
-                  })
-                : await speedMarketsAMMContractWithSigner.write.resolveMarketWithOfframp(
-                      [position.market, priceUpdateData, collateralAddress, isEth],
-                      { value: updateFee }
-                  );
-
+            let hash;
+            if (isBiconomy) {
+                hash = isDefaultCollateral
+                    ? await executeBiconomyTransaction(
+                          collateralAddress,
+                          speedMarketsAMMContractWithSigner,
+                          'resolveMarket',
+                          [position.market, priceUpdateData],
+                          updateFee
+                      )
+                    : await executeBiconomyTransaction(
+                          collateralAddress,
+                          speedMarketsAMMContractWithSigner,
+                          'resolveMarketWithOfframp',
+                          [position.market, priceUpdateData, collateralAddress, isEth],
+                          updateFee
+                      );
+            } else {
+                hash = isDefaultCollateral
+                    ? await speedMarketsAMMContractWithSigner.write.resolveMarket([position.market, priceUpdateData], {
+                          value: updateFee,
+                      })
+                    : await speedMarketsAMMContractWithSigner.write.resolveMarketWithOfframp(
+                          [position.market, priceUpdateData, collateralAddress, isEth],
+                          { value: updateFee }
+                      );
+            }
             const txReceipt = await waitForTransactionReceipt(client as Client, {
                 hash,
             });
 
             if (txReceipt.status === 'success') {
                 toast.update(id, getSuccessToastOptions(t(`speed-markets.user-positions.confirmation-message`), id));
-                refetchUserNotifications(address as string, networkId);
-                refetchUserSpeedMarkets(false, networkId, address as string);
-                refetchUserResolvedSpeedMarkets(false, networkId, address as string);
-                refetchUserProfileQueries(address as string, networkId);
-                refetchBalances(address as string, networkId);
+                refetchUserNotifications((isBiconomy ? biconomyConnector.address : walletAddress) as string, networkId);
+                refetchUserSpeedMarkets(
+                    false,
+                    networkId,
+                    (isBiconomy ? biconomyConnector.address : walletAddress) as string
+                );
+                refetchUserResolvedSpeedMarkets(
+                    false,
+                    networkId,
+                    (isBiconomy ? biconomyConnector.address : walletAddress) as string
+                );
+                refetchUserProfileQueries(
+                    (isBiconomy ? biconomyConnector.address : walletAddress) as string,
+                    networkId
+                );
+                refetchBalances((isBiconomy ? biconomyConnector.address : walletAddress) as string, networkId);
             } else {
-                console.log('Transaction status', txReceipt.status);
                 await delay(800);
                 toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
             }

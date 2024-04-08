@@ -38,6 +38,8 @@ import {
     Title,
 } from './styled-components';
 import { useAccount, useChainId, useClient } from 'wagmi';
+import { getIsBiconomy } from 'redux/modules/wallet';
+import biconomyConnector from 'utils/biconomyWallet';
 
 enum NavItems {
     MyPositions = 'my-positions',
@@ -52,14 +54,15 @@ const Profile: React.FC = () => {
     const networkId = useChainId();
     const client = useClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const { address, isConnected } = useAccount();
+    const { address: walletAddress, isConnected } = useAccount();
+    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
 
     const [searchAddress, setSearchAddress] = useState<string>('');
     const [searchText, setSearchText] = useState<string>('');
 
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
         { networkId, client },
-        searchAddress || (address as string),
+        searchAddress || ((isBiconomy ? biconomyConnector.address : walletAddress) as string),
         {
             enabled: isAppReady && isConnected,
         }
@@ -71,7 +74,7 @@ const Profile: React.FC = () => {
 
     const userActiveChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
         { networkId, client },
-        searchAddress || (address as string),
+        searchAddress || ((isBiconomy ? biconomyConnector.address : walletAddress) as string),
         {
             enabled: isAppReady && isConnected,
         }
@@ -131,9 +134,13 @@ const Profile: React.FC = () => {
 
     const totalNotifications = speedMarketsNotifications + chainedSpeedMarketsNotifications;
 
-    const userProfileDataQuery = useProfileDataQuery({ networkId, client }, searchAddress || (address as string), {
-        enabled: isAppReady && isConnected,
-    });
+    const userProfileDataQuery = useProfileDataQuery(
+        { networkId, client },
+        searchAddress || ((isBiconomy ? biconomyConnector.address : walletAddress) as string),
+        {
+            enabled: isAppReady && isConnected,
+        }
+    );
     const profileData: UserProfileData =
         userProfileDataQuery.isSuccess && userProfileDataQuery.data
             ? userProfileDataQuery.data

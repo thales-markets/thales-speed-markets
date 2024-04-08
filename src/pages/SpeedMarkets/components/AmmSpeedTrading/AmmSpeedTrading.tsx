@@ -11,7 +11,7 @@ import {
 } from 'components/ToastMessage/ToastMessage';
 import Tooltip from 'components/Tooltip/Tooltip';
 import NumericInput from 'components/fields/NumericInput';
-import { PLAUSIBLE, PLAUSIBLE_KEYS } from 'constants/analytics';
+// import { PLAUSIBLE, PLAUSIBLE_KEYS } from 'constants/analytics';
 import { CRYPTO_CURRENCY_MAP, USD_SIGN } from 'constants/currency';
 import {
     ALTCOIN_CONVERSION_BUFFER_PERCENTAGE,
@@ -36,7 +36,7 @@ import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
-import { getSelectedCollateralIndex } from 'redux/modules/wallet';
+import { getSelectedCollateralIndex, getIsBiconomy } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivCentered, FlexDivColumn, FlexDivRow, FlexDivRowCentered } from 'styles/common';
 import {
@@ -69,6 +69,9 @@ import { Client, getContract, parseUnits, stringToHex } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 import { SelectedPosition } from '../SelectPosition/SelectPosition';
+import { executeBiconomyTransaction } from 'utils/biconomy';
+import biconomyConnector from 'utils/biconomyWallet';
+import { PLAUSIBLE, PLAUSIBLE_KEYS } from 'constants/analytics';
 
 type AmmSpeedTradingProps = {
     isChained: boolean;
@@ -99,7 +102,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     ammChainedSpeedMarketsLimits,
     currentPrice,
     setSkewImpact,
-    resetData,
 }) => {
     const { t } = useTranslation();
     const { openConnectModal } = useConnectModal();
@@ -108,7 +110,8 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     const networkId = useChainId() as SupportedNetwork;
     const client = useClient();
     const walletClient = useWalletClient();
-    const { isConnected, address } = useAccount();
+    const { isConnected, address: walletAddress } = useAccount();
+    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
 
     const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
@@ -188,17 +191,21 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         : erc20Contract.addresses[networkId];
 
     const referral =
-        address && getReferralWallet()?.toLowerCase() !== address?.toLowerCase() ? getReferralWallet() : null;
+        isConnected &&
+        (getReferralWallet()?.toLowerCase() !== walletAddress?.toLowerCase() ||
+            getReferralWallet()?.toLowerCase() !== biconomyConnector.address)
+            ? getReferralWallet()
+            : null;
 
     const stableBalanceQuery = useStableBalanceQuery(
-        address as string,
+        (isBiconomy ? biconomyConnector.address : walletAddress) as string,
         { networkId, client },
         {
             enabled: isAppReady && isConnected && !isMultiCollateralSupported,
         }
     );
     const multipleCollateralBalances = useMultipleCollateralBalanceQuery(
-        address as string,
+        (isBiconomy ? biconomyConnector.address : walletAddress) as string,
         { networkId, client },
         {
             enabled: isAppReady && isConnected && isMultiCollateralSupported,
@@ -453,6 +460,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             address: collateralAddress,
             client: client as Client,
         });
+        console.log(erc20Instance);
         const addressToApprove = isChained
             ? chainedSpeedMarketsAMMContract.addresses[networkId]
             : speedMarketsAMMContract.addresses[networkId];
@@ -469,7 +477,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 const allowance: boolean = await checkAllowance(
                     parsedAmount,
                     erc20Instance,
-                    address as string,
+                    (isBiconomy ? biconomyConnector.address : walletAddress) as string,
                     addressToApprove
                 );
 
@@ -491,7 +499,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         networkId,
         paidAmount,
         totalPaidAmount,
-        address,
+        walletAddress,
         isConnected,
         hasAllowance,
         isAllowing,
@@ -515,8 +523,15 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
         try {
             setIsAllowing(true);
-
-            const hash = await erc20Instance.write.approve([addressToApprove, approveAmount]);
+            let hash;
+            if (isBiconomy) {
+                hash = await executeBiconomyTransaction(erc20Instance.address, erc20Instance, 'approve', [
+                    addressToApprove,
+                    approveAmount,
+                ]);
+            } else {
+                hash = await erc20Instance.write.approve([addressToApprove, approveAmount]);
+            }
             setOpenApprovalModal(false);
             const txReceipt = await waitForTransactionReceipt(client as Client, {
                 hash,
@@ -525,7 +540,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 toast.update(id, getSuccessToastOptions(t(`common.transaction.successful`), id));
                 setIsAllowing(false);
             } else {
-                console.log('Transaction status', txReceipt.status);
                 toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
                 setIsAllowing(false);
                 setOpenApprovalModal(false);
@@ -602,9 +616,12 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 priceUpdateData,
                 updateFee,
                 collateralAddress || '',
-                referral,
-                skewImpactBigNum as any
+                referral as string,
+                skewImpactBigNum as any,
+                isBiconomy
             );
+
+            console.log(hash);
 
             const txReceipt = await waitForTransactionReceipt(client as Client, {
                 hash,
@@ -612,9 +629,13 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
             if (txReceipt.status === 'success') {
                 toast.update(id, getSuccessToastOptions(t(`common.buy.confirmation-message`), id));
-                refetchUserSpeedMarkets(isChained, networkId, address as string);
+                refetchUserSpeedMarkets(
+                    isChained,
+                    networkId,
+                    (isBiconomy ? biconomyConnector.address : walletAddress) as string
+                );
                 refetchSpeedMarketsLimits(isChained, networkId);
-                refetchBalances(address as string, networkId);
+                refetchBalances((isBiconomy ? biconomyConnector.address : walletAddress) as string, networkId);
                 PLAUSIBLE.trackEvent(
                     isChained ? PLAUSIBLE_KEYS.chainedSpeedMarketsBuy : PLAUSIBLE_KEYS.speedMarketsBuy,
                     {
@@ -625,7 +646,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                         },
                     }
                 );
-                resetData();
                 setPaidAmount('');
             } else {
                 console.log('Transaction status', txReceipt.status);
@@ -652,7 +672,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         }) as ViemContract;
 
         try {
-            const hash = await collateralWithSigner.write.mintForUser([address]);
+            const hash = await collateralWithSigner.write.mintForUser([walletAddress]);
 
             const txReceipt = await waitForTransactionReceipt(client as Client, {
                 hash,
@@ -663,7 +683,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                     id,
                     getSuccessToastOptions(t(`common.mint.confirmation-message`, { token: selectedCollateral }), id)
                 );
-                refetchBalances(address as string, networkId);
+                refetchBalances((isBiconomy ? biconomyConnector.address : walletAddress) as string, networkId);
             } else {
                 console.log('Transaction status', txReceipt.status);
                 await delay(800);

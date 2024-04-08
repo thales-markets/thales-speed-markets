@@ -16,12 +16,14 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsMobile } from 'redux/modules/ui';
+import { getIsBiconomy } from 'redux/modules/wallet';
 import styled, { CSSProperties } from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
 import { UserOpenPositions } from 'types/market';
 import { SupportedNetwork } from 'types/network';
 import { RootState } from 'types/ui';
 import { ViemContract } from 'types/viem';
+import { executeBiconomyTransaction } from 'utils/biconomy';
 import { getContarctAbi } from 'utils/contracts/abi';
 import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
 import { getPriceId, getPriceServiceEndpoint, priceParser } from 'utils/pyth';
@@ -50,6 +52,7 @@ const OverviewPositionAction: React.FC<OverviewPositionActionProps> = ({
     const client = useClient();
     const walletClient = useWalletClient();
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
+    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -73,10 +76,19 @@ const OverviewPositionAction: React.FC<OverviewPositionActionProps> = ({
         try {
             let hash;
             if (isAdmin) {
-                hash = await speedMarketsAMMContractWithSigner.write.resolveMarketManually([
-                    position.market,
-                    Number(priceParser(position.finalPrice || 0)),
-                ]);
+                if (isBiconomy) {
+                    hash = await executeBiconomyTransaction(
+                        'todo: add collateral addres',
+                        speedMarketsAMMContractWithSigner,
+                        'resolveMarketManually',
+                        [position.market, Number(priceParser(position.finalPrice || 0))]
+                    );
+                } else {
+                    hash = await speedMarketsAMMContractWithSigner.write.resolveMarketManually([
+                        position.market,
+                        Number(priceParser(position.finalPrice || 0)),
+                    ]);
+                }
             } else {
                 const pythContract = getContract({
                     abi: PythInterfaceAbi,
@@ -104,9 +116,22 @@ const OverviewPositionAction: React.FC<OverviewPositionActionProps> = ({
                 const priceUpdateData = ['0x' + Buffer.from(priceFeedUpdateVaa, 'base64').toString('hex')];
                 const updateFee = await pythContract.read.getUpdateFee([priceUpdateData]);
 
-                hash = await speedMarketsAMMContractWithSigner.write.resolveMarket([position.market, priceUpdateData], {
-                    value: updateFee,
-                });
+                if (isBiconomy) {
+                    hash = await executeBiconomyTransaction(
+                        'todo: add collateral addres',
+                        speedMarketsAMMContractWithSigner,
+                        'resolveMarket',
+                        [position.market, priceUpdateData],
+                        updateFee
+                    );
+                } else {
+                    hash = await speedMarketsAMMContractWithSigner.write.resolveMarket(
+                        [position.market, priceUpdateData],
+                        {
+                            value: updateFee,
+                        }
+                    );
+                }
             }
 
             const txReceipt = await waitForTransactionReceipt(client as Client, {

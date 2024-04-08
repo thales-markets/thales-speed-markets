@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import OutsideClickHandler from 'components/OutsideClick/OutsideClick';
 import { useDispatch, useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
-import { getSelectedCollateralIndex, setSelectedCollateralIndex } from 'redux/modules/wallet';
+import { getSelectedCollateralIndex, getIsBiconomy, setSelectedCollateralIndex } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivRow } from 'styles/common';
 import { Coins, formatCurrencyWithKey } from 'thales-utils';
@@ -19,20 +19,22 @@ import {
 } from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
 import { useAccount, useChainId, useClient } from 'wagmi';
+import biconomyConnector from 'utils/biconomyWallet';
 
 const UserCollaterals: React.FC = () => {
     const dispatch = useDispatch();
     const networkId = useChainId();
     const client = useClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const { isConnected, address } = useAccount();
+    const { isConnected, address: walletAddress } = useAccount();
+    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
     const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
     const userSelectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const multipleCollateralBalances = useMultipleCollateralBalanceQuery(
-        address as string,
+        (isBiconomy ? biconomyConnector.address : walletAddress) as string,
         { networkId, client },
         {
             enabled: isAppReady && isConnected,

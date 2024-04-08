@@ -9,12 +9,15 @@ import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
 import { formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
 import { UserOpenPositions } from 'types/market';
-import { ThemeInterface } from 'types/ui';
+import { RootState, ThemeInterface } from 'types/ui';
 import { formatNumberShort } from 'utils/formatters/number';
 import { refetchUserSpeedMarkets } from 'utils/queryConnector';
 import { getColorPerPosition } from 'utils/style';
 import SharePositionModal from '../SharePositionModal';
 import { useAccount, useChainId } from 'wagmi';
+import { useSelector } from 'react-redux';
+import { getIsBiconomy } from 'redux/modules/wallet';
+import biconomyConnector from 'utils/biconomyWallet';
 
 type OpenPositionProps = {
     position: UserOpenPositions;
@@ -33,7 +36,8 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
     const theme: ThemeInterface = useTheme();
 
     const networkId = useChainId();
-    const { address } = useAccount();
+    const { address: walletAddress } = useAccount();
+    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
     const [openTwitterShareModal, setOpenTwitterShareModal] = useState(false);
     const [isSpeedMarketMatured, setIsSpeedMarketMatured] = useState(Date.now() > position.maturityDate);
 
@@ -43,7 +47,11 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
                 setIsSpeedMarketMatured(true);
             }
             if (!position.finalPrice) {
-                refetchUserSpeedMarkets(false, networkId, address as string);
+                refetchUserSpeedMarkets(
+                    false,
+                    networkId,
+                    (isBiconomy ? biconomyConnector.address : walletAddress) as string
+                );
             }
         }
     }, secondsToMilliseconds(10));

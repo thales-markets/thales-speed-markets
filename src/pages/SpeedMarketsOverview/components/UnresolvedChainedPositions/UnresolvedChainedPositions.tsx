@@ -29,6 +29,8 @@ import { getPriceId } from 'utils/pyth';
 import { refetchActiveSpeedMarkets, refetchPythPrice } from 'utils/queryConnector';
 import { resolveAllChainedMarkets } from 'utils/speedAmm';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
+import { getIsBiconomy } from 'redux/modules/wallet';
+import biconomyConnector from 'utils/biconomyWallet';
 
 const UnresolvedChainedPositions: React.FC = () => {
     const { t } = useTranslation();
@@ -37,16 +39,21 @@ const UnresolvedChainedPositions: React.FC = () => {
     const client = useClient();
     const walletClient = useWalletClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const { address } = useAccount();
+    const { address: walletAddress } = useAccount();
+    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSubmittingSection, setIsSubmittingSection] = useState('');
     const [isLoadingEnabled, setIsLoadingEnabled] = useState(true);
 
-    const ammChainedSpeedMarketsLimitsQuery = useAmmChainedSpeedMarketsLimitsQuery({ networkId, client }, address, {
-        enabled: isAppReady,
-    });
+    const ammChainedSpeedMarketsLimitsQuery = useAmmChainedSpeedMarketsLimitsQuery(
+        { networkId, client },
+        isBiconomy ? biconomyConnector.address : walletAddress,
+        {
+            enabled: isAppReady,
+        }
+    );
 
     const ammChainedSpeedMarketsLimitsData = useMemo(() => {
         return ammChainedSpeedMarketsLimitsQuery.isSuccess ? ammChainedSpeedMarketsLimitsQuery.data : null;

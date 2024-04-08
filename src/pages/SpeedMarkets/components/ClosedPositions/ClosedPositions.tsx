@@ -14,6 +14,8 @@ import { RootState } from 'types/ui';
 import ChainedPosition from '../ChainedPosition';
 import ClosedPosition from '../ClosedPosition';
 import { useAccount, useChainId, useClient } from 'wagmi';
+import { getIsBiconomy } from 'redux/modules/wallet';
+import biconomyConnector from 'utils/biconomyWallet';
 
 const ClosedPositions: React.FC<{ isChained: boolean }> = ({ isChained }) => {
     const { t } = useTranslation();
@@ -21,11 +23,12 @@ const ClosedPositions: React.FC<{ isChained: boolean }> = ({ isChained }) => {
     const networkId = useChainId();
     const client = useClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const { isConnected, address } = useAccount();
+    const { isConnected, address: walletAddress } = useAccount();
+    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
 
     const userResolvedSpeedMarketsDataQuery = useUserResolvedSpeedMarketsDataQuery(
         { networkId, client },
-        address as string,
+        (isBiconomy ? biconomyConnector.address : walletAddress) as string,
         {
             enabled: isAppReady && isConnected && !isChained,
         }
@@ -44,7 +47,7 @@ const ClosedPositions: React.FC<{ isChained: boolean }> = ({ isChained }) => {
 
     const userResolvedChainedSpeedMarketsDataQuery = useUserResolvedChainedSpeedMarketsDataQuery(
         { networkId, client },
-        address as string,
+        (isBiconomy ? biconomyConnector.address : walletAddress) as string,
         {
             enabled: isAppReady && isConnected && !!isChained,
         }

@@ -17,19 +17,22 @@ import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getPriceId } from 'utils/pyth';
 import { buildHref } from 'utils/routes';
 import { useAccount, useChainId, useClient } from 'wagmi';
+import { getIsBiconomy } from 'redux/modules/wallet';
+import biconomyConnector from 'utils/biconomyWallet';
 
 const Notifications: React.FC = () => {
     const { t } = useTranslation();
     const networkId = useChainId();
     const client = useClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const { isConnected, address } = useAccount();
+    const { address: walletAddress, isConnected } = useAccount();
+    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
 
     const isNetworkSupported = !isOnlySpeedMarketsSupported(networkId);
 
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
         { networkId, client },
-        address as string,
+        (isBiconomy ? biconomyConnector.address : walletAddress) as string,
         {
             enabled: isAppReady && isConnected,
         }
@@ -43,7 +46,7 @@ const Notifications: React.FC = () => {
 
     const userActiveChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
         { networkId, client },
-        address as string,
+        (isBiconomy ? biconomyConnector.address : walletAddress) as string,
         {
             enabled: isAppReady && isConnected && isNetworkSupported,
         }

@@ -18,6 +18,8 @@ import { RootState, ThemeInterface } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { useAccount, useChainId, useClient } from 'wagmi';
 import { getDirections } from '../styled-components';
+import { getIsBiconomy } from 'redux/modules/wallet';
+import biconomyConnector from 'utils/biconomyWallet';
 
 type TransactionHistoryProps = {
     searchAddress: string;
@@ -31,11 +33,12 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ searchAddress, 
     const networkId = useChainId();
     const client = useClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const { address, isConnected } = useAccount();
+    const { isConnected, address: walletAddress } = useAccount();
+    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
 
     const speedMarketsDataQuery = useUserSpeedMarketsTransactionsQuery(
         { networkId, client },
-        searchAddress || (address as string),
+        searchAddress || ((isBiconomy ? biconomyConnector.address : walletAddress) as string),
         {
             enabled: isAppReady && isConnected,
         }
@@ -47,7 +50,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ searchAddress, 
 
     const chainedSpeedMarketsDataQuery = useUserChainedSpeedMarketsTransactionsQuery(
         { networkId, client },
-        searchAddress || (address as string),
+        searchAddress || ((isBiconomy ? biconomyConnector.address : walletAddress) as string),
         {
             enabled: isAppReady && isConnected && !isOnlySpeedMarketsSupported(networkId),
         }

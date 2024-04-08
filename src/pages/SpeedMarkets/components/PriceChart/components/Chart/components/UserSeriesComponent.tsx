@@ -6,8 +6,10 @@ import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActi
 import { useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
+import { getIsBiconomy } from 'redux/modules/wallet';
 import { Colors } from 'styles/common';
 import { RootState } from 'types/ui';
+import biconomyConnector from 'utils/biconomyWallet';
 import { timeToLocal } from 'utils/formatters/date';
 import { useAccount, useChainId, useClient } from 'wagmi';
 
@@ -20,12 +22,13 @@ export const UserPositionAreaSeries: React.FC<{
     const networkId = useChainId();
     const client = useClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const { isConnected, address } = useAccount();
+    const { isConnected, address: walletAddress } = useAccount();
+    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
     const [userData, setUserData] = useState<any>([]);
 
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
         { networkId, client },
-        address as string,
+        (isBiconomy ? biconomyConnector.address : walletAddress) as string,
         {
             enabled: isAppReady && isConnected,
             refetchInterval: 30 * 1000,

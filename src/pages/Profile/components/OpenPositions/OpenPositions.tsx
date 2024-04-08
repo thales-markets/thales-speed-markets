@@ -29,6 +29,8 @@ import MyPositionAction from '../MyPositionAction/MyPositionAction';
 import { getDirections } from '../styled-components';
 import { useAccount, useChainId } from 'wagmi';
 import { useClient } from 'wagmi';
+import { getIsBiconomy } from 'redux/modules/wallet';
+import biconomyConnector from 'utils/biconomyWallet';
 
 type OpenPositionsProps = {
     searchAddress: string;
@@ -43,7 +45,8 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
     const networkId = useChainId();
     const client = useClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const { isConnected, address } = useAccount();
+    const { isConnected, address: walletAddress } = useAccount();
+    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
 
     const [openTwitterShareModal, setOpenTwitterShareModal] = useState<boolean>(false);
     const [positionsShareData, setPositionShareData] = useState<SharePositionData | null>(null);
@@ -71,7 +74,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
 
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
         { networkId, client },
-        searchAddress || (address as string),
+        searchAddress || ((isBiconomy ? biconomyConnector.address : walletAddress) as string),
         {
             enabled: isAppReady && isConnected,
         }
@@ -87,7 +90,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
 
     const userActiveChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
         { networkId, client },
-        searchAddress || (address as string),
+        searchAddress || ((isBiconomy ? biconomyConnector.address : walletAddress) as string),
         {
             enabled: isAppReady && isConnected && !isOnlySpeedMarketsSupported(networkId),
         }

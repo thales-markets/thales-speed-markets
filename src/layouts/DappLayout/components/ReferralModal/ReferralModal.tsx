@@ -10,9 +10,13 @@ import ROUTES from 'constants/routes';
 import useGetReffererIdQuery from 'queries/referral/useGetReffererIdQuery';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
+import { getIsBiconomy } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { BoldText, FlexDivCentered, FlexDivColumnCentered, FlexDivRowCentered, FlexDivStart } from 'styles/common';
+import { RootState } from 'types/ui';
+import biconomyConnector from 'utils/biconomyWallet';
 import { buildReferrerLink } from 'utils/routes';
 import { useAccount, useSignMessage } from 'wagmi';
 
@@ -31,14 +35,17 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
     const { t } = useTranslation();
     const { openConnectModal } = useConnectModal();
 
-    const { isConnected, address } = useAccount();
+    const { address: walletAddress, isConnected } = useAccount();
+    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
     const { signMessageAsync } = useSignMessage();
     const [referralPage, setReferralPage] = useState<number>(Pages.Markets);
     const [referrerID, setReferrerID] = useState('');
     const [savedReferrerID, setSavedReferrerID] = useState('');
     const [referralLink, setReferralLink] = useState('');
 
-    const referrerIDQuery = useGetReffererIdQuery(address as string, { enabled: isConnected });
+    const referrerIDQuery = useGetReffererIdQuery((isBiconomy ? biconomyConnector.address : walletAddress) as string, {
+        enabled: isConnected,
+    });
 
     const referralPageOptions = [
         {
@@ -86,7 +93,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                address,
+                address: isBiconomy ? biconomyConnector.address : walletAddress,
                 reffererID: referrerID,
                 signature,
                 previousReffererID: savedReferrerID,
@@ -105,7 +112,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
                 getSuccessToastOptions('', 'customId')
             );
         }
-    }, [referrerID, address, savedReferrerID, t, referralPage, signMessageAsync]);
+    }, [referrerID, isBiconomy, walletAddress, savedReferrerID, t, referralPage, signMessageAsync]);
 
     const copyLink = () => {
         navigator.clipboard.writeText(referralLink);
@@ -162,7 +169,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
                         disabled={isConnected && (!referrerID || savedReferrerID === referrerID)}
                         onClick={isConnected ? generateLinkHandler : openConnectModal}
                     >
-                        {address ? t('referral.generate.link-btn') : t('common.wallet.connect-your-wallet')}
+                        {isConnected ? t('referral.generate.link-btn') : t('common.wallet.connect-your-wallet')}
                     </Button>
                 </RowWrapper>
                 <RowWrapper>

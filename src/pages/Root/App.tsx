@@ -1,3 +1,4 @@
+import { createSmartAccountClient } from '@biconomy/account';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import Loader from 'components/Loader';
 import UnsupportedNetwork from 'components/UnsupportedNetwork';
@@ -19,16 +20,28 @@ import { isMobile } from 'utils/device';
 import { getSupportedNetworksByRoute, isNetworkSupported } from 'utils/network';
 import queryConnector from 'utils/queryConnector';
 import { history } from 'utils/routes';
-import { useAccount, useChainId, useDisconnect, useSwitchChain, useWalletClient } from 'wagmi';
+import { useChainId, useConnect, useDisconnect, useSwitchChain, useWalletClient } from 'wagmi';
 import enTranslation from '../../i18n/en.json';
+import biconomyConnector from 'utils/biconomyWallet';
+import { setIsBiconomy } from 'redux/modules/wallet';
+import { useConnect as useParticleConnect } from '@particle-network/auth-core-modal';
+import {
+    AuthCoreEvent,
+    getLatestAuthType,
+    isSocialAuthType,
+    particleAuth,
+    SocialAuthType,
+} from '@particle-network/auth-core';
+import { particleWagmiWallet } from 'utils/particleWallet/particleWagmiWallet';
 
 const App = () => {
     const dispatch = useDispatch();
     const networkId = useChainId();
-    const walletClient = useWalletClient();
+    const { data: walletClient } = useWalletClient();
     const { switchChain } = useSwitchChain();
-    const { address } = useAccount();
     const { disconnect } = useDisconnect();
+    const { connect } = useConnect();
+    const { connectionStatus } = useParticleConnect();
 
     // particle context provider is overriding our i18n configuration and languages, so we need to add our localization after the initialization of particle context
     // initialization of particle context is happening in Root
@@ -55,7 +68,42 @@ const App = () => {
                 switchChain({ chainId: ethereumChainId as SupportedNetwork });
             });
         }
-    }, [dispatch, address, switchChain, disconnect, walletClient]);
+        if (walletClient) {
+            const bundlerUrl = `https://bundler.biconomy.io/api/v2/${networkId}/${
+                import.meta.env.VITE_APP_BICONOMY_BUNDLE_KEY
+            }`;
+
+            const createSmartAccount = async () => {
+                const PAYMASTER_API_KEY = import.meta.env['VITE_APP_PAYMASTER_KEY_' + networkId];
+                console.log(PAYMASTER_API_KEY);
+                const smartAccount = await createSmartAccountClient({
+                    signer: walletClient,
+                    bundlerUrl: bundlerUrl,
+                    biconomyPaymasterApiKey: PAYMASTER_API_KEY,
+                });
+                const smartAddress = await smartAccount.getAccountAddress();
+                console.log(smartAddress);
+                biconomyConnector.setWallet(smartAccount, smartAddress);
+                dispatch(setIsBiconomy(true));
+            };
+            createSmartAccount();
+        }
+    }, [dispatch, switchChain, networkId, disconnect, walletClient]);
+
+    useEffect(() => {
+        if (connectionStatus === 'connected' && isSocialAuthType(getLatestAuthType())) {
+            connect({
+                connector: particleWagmiWallet({ socialType: getLatestAuthType() as SocialAuthType }),
+            });
+        }
+        const onDisconnect = () => {
+            disconnect();
+        };
+        particleAuth.on(AuthCoreEvent.ParticleAuthDisconnect, onDisconnect);
+        return () => {
+            particleAuth.off(AuthCoreEvent.ParticleAuthDisconnect, onDisconnect);
+        };
+    }, [connect, connectionStatus, disconnect]);
 
     useEffect(() => {
         const handlePageResized = () => {

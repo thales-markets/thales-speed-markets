@@ -136,3 +136,8 @@ export const getSupportedNetworksByRoute = (route: string): NetworkId[] => {
 
 export const isOnlySpeedMarketsSupported = (networkId: NetworkId): boolean =>
     [NetworkId.ZkSync, NetworkId.ZkSyncSepolia, NetworkId.BlastSepolia].includes(networkId);
+
+export const getNetworkNameByNetworkId = (networkId: NetworkId, shortName = false): string | undefined => {
+    const network = SUPPORTED_NETWORKS_PARAMS[networkId];
+    return shortName ? network?.chainName : network?.chainName;
+};

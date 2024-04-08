@@ -6,6 +6,7 @@ export type AppSliceState = {
 
 export type WalletSliceState = {
     selectedCollateralIndex: number;
+    isBiconomy?: boolean;
 };
 
 export type UISliceState = {

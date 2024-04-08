@@ -23,6 +23,7 @@ import { getContract } from 'viem';
 import { getContarctAbi } from './contracts/abi';
 import chainedSpeedMarketsAMMContract from './contracts/chainedSpeedMarketsAMMContract';
 import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
+import { executeBiconomyTransaction } from './biconomy';
 
 export const getTransactionForSpeedAMM = async (
     speedMarketsAMMContractWithSigner: any, // speed or chained
@@ -36,68 +37,138 @@ export const getTransactionForSpeedAMM = async (
     pythUpdateFee: any,
     collateralAddress: string,
     referral: string | null,
-    skewImpact?: bigint
+    skewImpact?: bigint,
+    isBiconomy?: boolean
 ) => {
-    let tx;
+    let txHash;
     const isEth = collateralAddress === ZERO_ADDRESS;
     const isChained = sides.length > 1;
 
     if (isNonDefaultCollateral) {
         if (isChained) {
-            tx = await speedMarketsAMMContractWithSigner.write.createNewMarketWithDifferentCollateral(
-                [
-                    asset,
-                    deltaTimeSec,
-                    sides,
-                    pythPriceUpdateData,
+            if (isBiconomy) {
+                txHash = await executeBiconomyTransaction(
                     collateralAddress,
-                    buyInAmount,
-                    isEth,
-                    referral ? referral : ZERO_ADDRESS,
-                ],
-                { value: isEth ? buyInAmount + pythUpdateFee : pythUpdateFee }
-            );
+                    speedMarketsAMMContractWithSigner,
+                    'createNewMarketWithDifferentCollateral',
+                    [
+                        asset,
+                        deltaTimeSec,
+                        sides,
+                        pythPriceUpdateData,
+                        collateralAddress,
+                        buyInAmount,
+                        isEth,
+                        referral ? referral : ZERO_ADDRESS,
+                    ],
+                    isEth ? buyInAmount + pythUpdateFee : pythUpdateFee
+                );
+            } else {
+                txHash = await speedMarketsAMMContractWithSigner.write.createNewMarketWithDifferentCollateral(
+                    [
+                        asset,
+                        deltaTimeSec,
+                        sides,
+                        pythPriceUpdateData,
+                        collateralAddress,
+                        buyInAmount,
+                        isEth,
+                        referral ? referral : ZERO_ADDRESS,
+                    ],
+                    { value: isEth ? buyInAmount + pythUpdateFee : pythUpdateFee }
+                );
+            }
         } else {
-            tx = await speedMarketsAMMContractWithSigner.write.createNewMarketWithDifferentCollateral(
-                [
-                    asset,
-                    strikeTimeSec,
-                    deltaTimeSec,
-                    sides[0],
-                    pythPriceUpdateData,
+            if (isBiconomy) {
+                txHash = await executeBiconomyTransaction(
                     collateralAddress,
-                    buyInAmount,
-                    isEth,
-                    referral ? referral : ZERO_ADDRESS,
-                    skewImpact,
-                ],
-                { value: isEth ? buyInAmount + pythUpdateFee : pythUpdateFee }
-            );
+                    speedMarketsAMMContractWithSigner,
+                    'createNewMarketWithDifferentCollateral',
+                    [
+                        asset,
+                        strikeTimeSec,
+                        deltaTimeSec,
+                        sides[0],
+                        pythPriceUpdateData,
+                        collateralAddress,
+                        buyInAmount,
+                        isEth,
+                        referral ? referral : ZERO_ADDRESS,
+                        skewImpact,
+                    ],
+                    isEth ? buyInAmount + pythUpdateFee : pythUpdateFee
+                );
+            } else {
+                txHash = await speedMarketsAMMContractWithSigner.write.createNewMarketWithDifferentCollateral(
+                    [
+                        asset,
+                        strikeTimeSec,
+                        deltaTimeSec,
+                        sides[0],
+                        pythPriceUpdateData,
+                        collateralAddress,
+                        buyInAmount,
+                        isEth,
+                        referral ? referral : ZERO_ADDRESS,
+                        skewImpact,
+                    ],
+                    { value: isEth ? buyInAmount + pythUpdateFee : pythUpdateFee }
+                );
+            }
         }
     } else {
         if (isChained) {
-            tx = await speedMarketsAMMContractWithSigner.write.createNewMarket(
-                [asset, deltaTimeSec, sides, buyInAmount, pythPriceUpdateData, referral ? referral : ZERO_ADDRESS],
-                { value: pythUpdateFee }
-            );
+            if (isBiconomy) {
+                txHash = await executeBiconomyTransaction(
+                    collateralAddress,
+                    speedMarketsAMMContractWithSigner,
+                    'createNewMarket',
+                    [asset, deltaTimeSec, sides, buyInAmount, pythPriceUpdateData, referral ? referral : ZERO_ADDRESS],
+                    pythUpdateFee
+                );
+            } else {
+                txHash = await speedMarketsAMMContractWithSigner.write.createNewMarket(
+                    [asset, deltaTimeSec, sides, buyInAmount, pythPriceUpdateData, referral ? referral : ZERO_ADDRESS],
+                    { value: pythUpdateFee }
+                );
+            }
         } else {
-            tx = await speedMarketsAMMContractWithSigner.write.createNewMarket(
-                [
-                    asset,
-                    strikeTimeSec,
-                    deltaTimeSec,
-                    sides[0],
-                    buyInAmount,
-                    pythPriceUpdateData,
-                    referral ? referral : ZERO_ADDRESS,
-                    skewImpact,
-                ],
-                { value: pythUpdateFee }
-            );
+            if (isBiconomy) {
+                txHash = await executeBiconomyTransaction(
+                    collateralAddress,
+                    speedMarketsAMMContractWithSigner,
+                    'createNewMarket',
+                    [
+                        asset,
+                        strikeTimeSec,
+                        deltaTimeSec,
+                        sides[0],
+                        buyInAmount,
+                        pythPriceUpdateData,
+                        referral ? referral : ZERO_ADDRESS,
+                        skewImpact,
+                    ],
+                    pythUpdateFee
+                );
+            } else {
+                txHash = await speedMarketsAMMContractWithSigner.write.createNewMarket(
+                    [
+                        asset,
+                        strikeTimeSec,
+                        deltaTimeSec,
+                        sides[0],
+                        buyInAmount,
+                        pythPriceUpdateData,
+                        referral ? referral : ZERO_ADDRESS,
+                        skewImpact,
+                    ],
+                    { value: pythUpdateFee }
+                );
+            }
         }
     }
 
-    return tx;
+    return txHash;
 };
 
 // get dynamic LP fee based on time threshold and delta time to maturity
@@ -153,7 +224,8 @@ export const getUserLostAtSideIndex = (position: ChainedSpeedMarket) => {
 export const resolveAllSpeedPositions = async (
     positions: UserOpenPositions[],
     isAdmin: boolean,
-    queryConfig: QueryConfig
+    queryConfig: QueryConfig,
+    isBiconomy?: boolean
 ) => {
     if (!positions.length) {
         return;
@@ -211,19 +283,37 @@ export const resolveAllSpeedPositions = async (
 
     if (marketsToResolve.length > 0) {
         try {
-            const tx = isAdmin
-                ? await speedMarketsAMMContractWithSigner.write.resolveMarketManuallyBatch([
-                      marketsToResolve,
-                      manualFinalPrices,
-                  ])
-                : await speedMarketsAMMContractWithSigner.write.resolveMarketsBatch(
-                      [marketsToResolve, priceUpdateDataArray],
-                      {
-                          value: totalUpdateFee,
-                      }
-                  );
+            let txHash;
+            if (isBiconomy) {
+                txHash = isAdmin
+                    ? await executeBiconomyTransaction(
+                          'todo: add collateral addres',
+                          speedMarketsAMMContractWithSigner,
+                          'resolveMarketManuallyBatch',
+                          [marketsToResolve, manualFinalPrices]
+                      )
+                    : await executeBiconomyTransaction(
+                          'todo: add collateral addres',
+                          speedMarketsAMMContractWithSigner,
+                          'resolveMarketsBatch',
+                          [marketsToResolve, priceUpdateDataArray],
+                          totalUpdateFee
+                      );
+            } else {
+                txHash = isAdmin
+                    ? await speedMarketsAMMContractWithSigner.write.resolveMarketManuallyBatch([
+                          marketsToResolve,
+                          manualFinalPrices,
+                      ])
+                    : await speedMarketsAMMContractWithSigner.write.resolveMarketsBatch(
+                          [marketsToResolve, priceUpdateDataArray],
+                          {
+                              value: totalUpdateFee,
+                          }
+                      );
+            }
 
-            if (tx) {
+            if (txHash) {
                 toast.update(id, getSuccessToastOptions(i18n.t(`speed-markets.overview.confirmation-message`), id));
                 await delay(5000);
                 refetchActiveSpeedMarkets(false, queryConfig.networkId);
@@ -241,7 +331,8 @@ export const resolveAllSpeedPositions = async (
 export const resolveAllChainedMarkets = async (
     positions: ChainedSpeedMarket[],
     isAdmin: boolean,
-    queryConfig: QueryConfig
+    queryConfig: QueryConfig,
+    isBiconomy?: boolean
 ) => {
     if (!positions.length) {
         return;
@@ -318,17 +409,35 @@ export const resolveAllChainedMarkets = async (
 
     if (marketsToResolve.length > 0) {
         try {
-            const tx = isAdmin
-                ? await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarketManuallyBatch([
-                      marketsToResolve,
-                      manualFinalPrices,
-                  ])
-                : await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarketsBatch(
-                      [marketsToResolve, priceUpdateDataArray],
-                      { value: totalUpdateFee }
-                  );
+            let txHash;
+            if (isBiconomy) {
+                txHash = isAdmin
+                    ? await executeBiconomyTransaction(
+                          'todo: add collateral addres',
+                          chainedSpeedMarketsAMMContractWithSigner,
+                          'resolveMarketManuallyBatch',
+                          [marketsToResolve, manualFinalPrices]
+                      )
+                    : await executeBiconomyTransaction(
+                          'todo: add collateral addres',
+                          chainedSpeedMarketsAMMContractWithSigner,
+                          'resolveMarketsBatch',
+                          [marketsToResolve, priceUpdateDataArray],
+                          totalUpdateFee
+                      );
+            } else {
+                txHash = isAdmin
+                    ? await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarketManuallyBatch([
+                          marketsToResolve,
+                          manualFinalPrices,
+                      ])
+                    : await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarketsBatch(
+                          [marketsToResolve, priceUpdateDataArray],
+                          { value: totalUpdateFee }
+                      );
+            }
 
-            if (tx) {
+            if (txHash) {
                 toast.update(id, getSuccessToastOptions(i18n.t(`speed-markets.overview.confirmation-message`), id));
                 await delay(5000);
                 refetchActiveSpeedMarkets(true, queryConfig.networkId);

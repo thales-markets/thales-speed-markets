@@ -29,7 +29,7 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsMobile } from 'redux/modules/ui';
-import { getSelectedCollateralIndex } from 'redux/modules/wallet';
+import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
 import { useTheme } from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
 import { coinParser, formatCurrencyWithSign, roundNumberToDecimals } from 'thales-utils';
@@ -55,6 +55,8 @@ import { delay } from 'utils/timer';
 import { Client, getContract } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
+import biconomyConnector from 'utils/biconomyWallet';
+import { executeBiconomyTransaction } from 'utils/biconomy';
 
 type ChainedPositionActionProps = {
     position: ChainedSpeedMarket;
@@ -81,7 +83,8 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
     const networkId = useChainId() as SupportedNetwork;
     const client = useClient();
     const walletClient = useWalletClient();
-    const { isConnected, address } = useAccount();
+    const { isConnected, address: walletAddress } = useAccount();
+    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
 
@@ -124,7 +127,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 const allowance = await checkAllowance(
                     parsedAmount,
                     erc20Instance,
-                    address as string,
+                    (isBiconomy ? biconomyConnector.address : walletAddress) as string,
                     addressToApprove
                 );
                 setAllowance(allowance);
@@ -140,7 +143,8 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
         position.isOpen,
         position.claimable,
         networkId,
-        address,
+        walletAddress,
+        isBiconomy,
         isConnected,
         hasAllowance,
         isAllowing,
@@ -161,8 +165,16 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
         try {
             setIsAllowing(true);
+            let hash;
+            if (isBiconomy) {
+                hash = await executeBiconomyTransaction(collateralAddress, erc20Instance, 'approve', [
+                    addressToApprove,
+                    approveAmount,
+                ]);
+            } else {
+                hash = await erc20Instance.write.approve([addressToApprove, approveAmount]);
+            }
 
-            const hash = await erc20Instance.write.approve([addressToApprove, approveAmount]);
             setOpenApprovalModal(false);
             const txReceipt = await waitForTransactionReceipt(client as Client, {
                 hash,
@@ -205,11 +217,19 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 const manualFinalPrices: number[] = position.finalPrices
                     .slice(0, fetchUntilFinalPriceEndIndex)
                     .map((finalPrice) => Number(priceParser(finalPrice)));
-
-                hash = await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarketManually([
-                    position.address,
-                    manualFinalPrices,
-                ]);
+                if (isBiconomy) {
+                    hash = executeBiconomyTransaction(
+                        collateralAddress,
+                        chainedSpeedMarketsAMMContractWithSigner,
+                        'resolveMarketManually',
+                        [position.address, manualFinalPrices]
+                    );
+                } else {
+                    hash = await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarketManually([
+                        position.address,
+                        manualFinalPrices,
+                    ]);
+                }
             } else {
                 const pythContract = getContract({
                     abi: PythInterfaceAbi,
@@ -255,17 +275,37 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
 
                 const isEth = collateralAddress === ZERO_ADDRESS;
 
-                hash = isDefaultCollateral
-                    ? await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarket(
-                          [position.address, priceUpdateDataArray],
-                          {
-                              value: totalUpdateFee,
-                          }
-                      )
-                    : await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarketWithOfframp(
-                          [position.address, priceUpdateDataArray, collateralAddress, isEth],
-                          { value: totalUpdateFee }
-                      );
+                if (isBiconomy) {
+                    if (isDefaultCollateral) {
+                        hash = await executeBiconomyTransaction(
+                            collateralAddress,
+                            chainedSpeedMarketsAMMContractWithSigner,
+                            'resolveMarket',
+                            [position.address, priceUpdateDataArray],
+                            totalUpdateFee
+                        );
+                    } else {
+                        hash = await executeBiconomyTransaction(
+                            collateralAddress,
+                            chainedSpeedMarketsAMMContractWithSigner,
+                            'resolveMarketWithOfframp',
+                            [position.address, priceUpdateDataArray, collateralAddress, isEth],
+                            totalUpdateFee
+                        );
+                    }
+                } else {
+                    hash = isDefaultCollateral
+                        ? await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarket(
+                              [position.address, priceUpdateDataArray],
+                              {
+                                  value: totalUpdateFee,
+                              }
+                          )
+                        : await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarketWithOfframp(
+                              [position.address, priceUpdateDataArray, collateralAddress, isEth],
+                              { value: totalUpdateFee }
+                          );
+                }
             }
 
             const txReceipt = await waitForTransactionReceipt(client as Client, {
@@ -277,9 +317,17 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 if (isOverview) {
                     refetchActiveSpeedMarkets(true, networkId);
                 } else {
-                    refetchUserSpeedMarkets(true, networkId, address ?? '');
-                    refetchUserResolvedSpeedMarkets(true, networkId, address ?? '');
-                    refetchBalances(address as string, networkId);
+                    refetchUserSpeedMarkets(
+                        true,
+                        networkId,
+                        (isBiconomy ? biconomyConnector.address : walletAddress) as string
+                    );
+                    refetchUserResolvedSpeedMarkets(
+                        true,
+                        networkId,
+                        (isBiconomy ? biconomyConnector.address : walletAddress) as string
+                    );
+                    refetchBalances((isBiconomy ? biconomyConnector.address : walletAddress) as string, networkId);
                 }
             } else {
                 console.log('Transaction status', txReceipt.status);

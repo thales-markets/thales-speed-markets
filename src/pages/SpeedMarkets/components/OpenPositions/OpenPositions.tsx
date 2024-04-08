@@ -24,6 +24,8 @@ import { getIsMultiCollateralSupported } from 'utils/network';
 import { resolveAllChainedMarkets, resolveAllSpeedPositions } from 'utils/speedAmm';
 import OpenPosition from '../OpenPosition';
 import { useChainId, useAccount, useClient, useWalletClient } from 'wagmi';
+import { getIsBiconomy } from 'redux/modules/wallet';
+import biconomyConnector from 'utils/biconomyWallet';
 
 type OpenPositionsProps = {
     isChained?: boolean;
@@ -38,7 +40,8 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
     const networkId = useChainId();
     const client = useClient();
     const walletClient = useWalletClient();
-    const { isConnected, address } = useAccount();
+    const { isConnected, address: walletAddress } = useAccount();
+    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
@@ -53,7 +56,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
 
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
         { networkId, client },
-        address as string,
+        (isBiconomy ? biconomyConnector.address : walletAddress) as string,
         {
             enabled: isAppReady && isConnected && !isChained,
         }
@@ -69,7 +72,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
 
     const userChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
         { networkId, client },
-        address as string,
+        (isBiconomy ? biconomyConnector.address : walletAddress) as string,
         {
             enabled: isAppReady && isConnected && !!isChained,
         }
