@@ -7,7 +7,6 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsMobile } from 'redux/modules/ui';
-import { getNetworkId } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
 import { formatCurrencyWithKey, formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
@@ -15,6 +14,7 @@ import { MarketInfo } from 'types/market';
 import { RootState } from 'types/ui';
 import { getDefaultCollateral } from 'utils/currency';
 import { ColumnSpaceBetween, Text, TextLabel, TextValue } from './styled-components';
+import { useChainId } from 'wagmi';
 
 type SpeedMarketsTrade = {
     address: string;
@@ -46,7 +46,7 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
 }) => {
     const { t } = useTranslation();
 
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
+    const networkId = useChainId();
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const [dateFromDelta, setDateFromDelta] = useState(0);
@@ -105,7 +105,7 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
 
     const getChainedPositions = () =>
         chainedPositions.map((pos, index) => (
-            <PositionText isUp={pos === Positions.UP} key={index}>{`${pos}${
+            <PositionText $isUp={pos === Positions.UP} key={index}>{`${pos}${
                 index !== chainedPositions.length - 1 ? ', ' : ''
             }`}</PositionText>
         ));
@@ -133,8 +133,8 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
                         <>
                             {!isMobile && !isChained && (
                                 <SentanceTextValue
-                                    uppercase={!!positionTypeFormatted}
-                                    lowercase={!positionTypeFormatted}
+                                    $uppercase={!!positionTypeFormatted}
+                                    $lowercase={!positionTypeFormatted}
                                 >
                                     {positionTypeFormatted
                                         ? positionTypeFormatted
@@ -154,7 +154,7 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
             </FlexDivCentered>
             {isChained && (
                 <FlexDivCentered>
-                    <SentanceTextValue uppercase={!!positionTypeFormatted} lowercase={!positionTypeFormatted}>
+                    <SentanceTextValue $uppercase={!!positionTypeFormatted} $lowercase={!positionTypeFormatted}>
                         <TextLabel>{t('speed-markets.chained.follows')}&nbsp;</TextLabel>
                         {isAllChainedMarketsSelected
                             ? getChainedPositions()
@@ -169,27 +169,27 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
                     </TextLabel>
                     {isChained ? (
                         <>
-                            <SentanceTextValue lowercase>{deltaTimeFormatted}</SentanceTextValue>
+                            <SentanceTextValue $lowercase>{deltaTimeFormatted}</SentanceTextValue>
                             <TextLabel>{` ${t('speed-markets.chained.between-rounds')}`}</TextLabel>
                             {!isMobile && (
-                                <SentanceTextValue lowercase>{fullDateFromDeltaTimeFormatted}</SentanceTextValue>
+                                <SentanceTextValue $lowercase>{fullDateFromDeltaTimeFormatted}</SentanceTextValue>
                             )}
                         </>
                     ) : (
-                        <SentanceTextValue lowercase>{timeFormatted}</SentanceTextValue>
+                        <SentanceTextValue $lowercase>{timeFormatted}</SentanceTextValue>
                     )}
                 </Text>
             </FlexDivCentered>
             {isChained && isMobile && (
                 <FlexDivCentered>
-                    <SentanceTextValue lowercase>{fullDateFromDeltaTimeFormatted}</SentanceTextValue>
+                    <SentanceTextValue $lowercase>{fullDateFromDeltaTimeFormatted}</SentanceTextValue>
                 </FlexDivCentered>
             )}
             <FlexDivCentered>
                 <Text>
                     <TextLabel>{t('speed-markets.amm-trading.you-win')}</TextLabel>
                     {hasCollateralConversion && <TextLabel>{` ${t('speed-markets.amm-trading.at-least')}`}</TextLabel>}
-                    <SentanceTextValue isProfit={true}>
+                    <SentanceTextValue $isProfit>
                         {Number(priceProfit) > 0 && Number(paidAmount) > 0
                             ? potentialWinFormatted
                             : '( ' + t('speed-markets.amm-trading.based-amount') + ' )'}
@@ -207,8 +207,8 @@ const SentanceTextValue = styled(TextValue)`
     padding-left: 5px;
 `;
 
-const PositionText = styled(TextValue)<{ isUp: boolean }>`
-    color: ${(props) => (props.isUp ? props.theme.positionColor.up : props.theme.positionColor.down)};
+const PositionText = styled(TextValue)<{ $isUp: boolean }>`
+    color: ${(props) => (props.$isUp ? props.theme.positionColor.up : props.theme.positionColor.down)};
     text-transform: uppercase;
 `;
 

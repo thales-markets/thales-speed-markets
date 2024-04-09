@@ -10,33 +10,19 @@ import { ThemeInterface } from 'types/ui';
 
 type TimeRemainingProps = {
     end: Date | number;
-    onEnded?: () => void;
     fontSize?: number;
-    showBorder?: boolean;
     showFullCounter?: boolean;
     showSecondsCounter?: boolean;
-    zIndex?: number;
-    textColor?: string;
-    fontWeight?: number;
 };
 
 const ONE_SECOND_IN_MS = 1000;
+const SHOW_WEEKS_THRESHOLD = 4;
 
-const TimeRemaining: React.FC<TimeRemainingProps> = ({
-    end,
-    onEnded,
-    fontSize,
-    showBorder,
-    showFullCounter,
-    showSecondsCounter,
-    zIndex,
-    textColor,
-    fontWeight,
-}) => {
+const TimeRemaining: React.FC<TimeRemainingProps> = ({ end, fontSize, showFullCounter, showSecondsCounter }) => {
     const now = Date.now();
     const [timeElapsed, setTimeElapsed] = useState(now >= Number(end));
     const [weeksDiff, setWeekDiff] = useState(Math.abs(differenceInWeeks(now, end)));
-    const [showRemainingInWeeks, setShowRemainingInWeeks] = useState(weeksDiff > 4);
+    const [showRemainingInWeeks, setShowRemainingInWeeks] = useState(weeksDiff > SHOW_WEEKS_THRESHOLD);
     const [countdownDisabled, setCountdownDisabled] = useState(timeElapsed || showRemainingInWeeks);
 
     const [timeInterval, setTimeInterval] = useState<number | null>(countdownDisabled ? null : ONE_SECOND_IN_MS);
@@ -66,23 +52,28 @@ const TimeRemaining: React.FC<TimeRemainingProps> = ({
     };
 
     useEffect(() => {
-        if (onEnded && timeElapsed) {
-            onEnded();
-        }
-    }, [onEnded, timeElapsed]);
+        const nowValue = Date.now();
 
-    useEffect(() => {
-        const today = Date.now();
-        setTimeElapsed(today >= Number(end));
-        setWeekDiff(Math.abs(differenceInWeeks(today, end)));
-        setShowRemainingInWeeks(Math.abs(differenceInWeeks(today, end)) > 4);
-        setCountdownDisabled(today >= Number(end) || Math.abs(differenceInWeeks(today, end)) > 4);
-        setDuration(intervalToDuration({ start: timeElapsed ? end : today, end }));
+        const timeElapsedValue = nowValue >= Number(end);
+        setTimeElapsed(timeElapsedValue);
+
+        const weekDiffValue = Math.abs(differenceInWeeks(nowValue, end));
+        setWeekDiff(weekDiffValue);
+
+        const showRemainingInWeeksValue = weekDiffValue > SHOW_WEEKS_THRESHOLD;
+        setShowRemainingInWeeks(showRemainingInWeeksValue);
+
+        const countdownDisabledValue = timeElapsedValue || showRemainingInWeeksValue;
+        setCountdownDisabled(countdownDisabledValue);
+
+        setTimeInterval(countdownDisabledValue ? null : ONE_SECOND_IN_MS);
+        setDuration(intervalToDuration({ start: timeElapsed ? end : nowValue, end }));
     }, [end, timeElapsed]);
 
     useInterval(() => {
-        if (now <= Number(end)) {
-            setDuration(intervalToDuration({ start: now, end }));
+        const nowValue = Date.now();
+        if (nowValue <= Number(end)) {
+            setDuration(intervalToDuration({ start: nowValue, end }));
         } else {
             setTimeElapsed(true);
             setTimeInterval(null);
@@ -90,14 +81,7 @@ const TimeRemaining: React.FC<TimeRemainingProps> = ({
     }, timeInterval);
 
     return (
-        <Container
-            fontSize={fontSize}
-            duration={duration}
-            showBorder={showBorder}
-            zIndex={zIndex}
-            color={textColor}
-            fontWeight={fontWeight}
-        >
+        <Container fontSize={fontSize} duration={duration}>
             {timeElapsed
                 ? t('common.time-remaining.ended')
                 : showRemainingInWeeks
@@ -127,28 +111,16 @@ const getColor = (duration: Duration, theme: ThemeInterface) => {
 const Container = styled.span<{
     fontSize?: number;
     duration: Duration;
-    showBorder?: boolean;
-    zIndex?: number;
-    color?: string;
-    fontWeight?: number;
 }>`
     font-size: ${(props) => props.fontSize || 12}px;
-    font-weight: ${(props) => props.fontWeight || 400};
+    font-weight: 400;
     @media (max-width: 512px) {
         font-size: ${(props) => props.fontSize || 10}px;
     }
     color: ${(props) => (props.color ? props.color : getColor(props.duration, props.theme))};
-    border: ${(props) =>
-        props.showBorder
-            ? '1px solid ' +
-              (getColor(props.duration, props.theme) === props.theme.error.textColor.primary
-                  ? props.theme.error.textColor.primary
-                  : 'transparent')
-            : 'none'};
-    padding: ${(props) => (props.showBorder ? '2px 12px 4px 12px' : '0')};
-    border-radius: ${(props) => (props.showBorder ? '5px' : '0')};
+    border: none;
     text-align: center;
-    z-index: ${(props) => (props.zIndex !== undefined ? props.zIndex : 3)};
+    z-index: 3;
     white-space: pre;
 `;
 

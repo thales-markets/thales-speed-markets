@@ -1,8 +1,10 @@
-// date-fns formatDuration does not let us customize the actual string, so we need to write this custom formatter.
+import { format, millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
 
-import { millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
+export const formatShortDateWithFullTime = (date: Date | number) => format(date, 'd MMM yyyy HH:mm:ss');
+export const formatHoursMinutesSecondsFromTimestamp = (timestamp: number) => format(timestamp, 'HH:mm:ss');
 
 // TODO: support translations
+// date-fns formatDuration does not let us customize the actual string, so we need to write this custom formatter.
 export const formattedDuration = (
     duration: Duration,
     dateTimeTranslationMap: any,

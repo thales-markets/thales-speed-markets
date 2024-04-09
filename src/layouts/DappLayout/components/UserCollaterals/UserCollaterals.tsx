@@ -1,15 +1,9 @@
 import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipleCollateralBalanceQuery';
 import React, { useEffect, useMemo, useState } from 'react';
-import OutsideClickHandler from 'react-outside-click-handler';
+import OutsideClickHandler from 'components/OutsideClick/OutsideClick';
 import { useDispatch, useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
-import {
-    getIsWalletConnected,
-    getNetworkId,
-    getSelectedCollateralIndex,
-    getWalletAddress,
-    setSelectedCollateralIndex,
-} from 'redux/modules/wallet';
+import { getSelectedCollateralIndex, setSelectedCollateralIndex } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivRow } from 'styles/common';
 import { Coins, formatCurrencyWithKey } from 'thales-utils';
@@ -18,28 +12,32 @@ import {
     getAssetIcon,
     getCoinBalance,
     getCollateral,
-    getPositiveCollateralIndexByBalance,
     getCollateralIndexForNetwork,
     getCollaterals,
-    isStableCurrency,
+    getMinBalanceThreshold,
+    getPositiveCollateralIndexByBalance,
 } from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
+import { useAccount, useChainId, useClient } from 'wagmi';
 
 const UserCollaterals: React.FC = () => {
     const dispatch = useDispatch();
-
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
+    const networkId = useChainId();
+    const client = useClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
+    const { isConnected, address } = useAccount();
     const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
     const userSelectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-    const multipleCollateralBalances = useMultipleCollateralBalanceQuery(walletAddress, networkId, {
-        enabled: isAppReady && walletAddress !== '',
-    });
+    const multipleCollateralBalances = useMultipleCollateralBalanceQuery(
+        address as string,
+        { networkId, client },
+        {
+            enabled: isAppReady && isConnected,
+        }
+    );
 
     const multipleCollateralBalancesData =
         multipleCollateralBalances.isSuccess && multipleCollateralBalances.data
@@ -60,7 +58,7 @@ const UserCollaterals: React.FC = () => {
     const currentCollateralWithBalance = { name: currentCollateral, balance: currentCollateralBalance };
 
     const defaultCollateral =
-        isMultiCollateralSupported && currentCollateralBalance < 1
+        isMultiCollateralSupported && currentCollateralBalance <= getMinBalanceThreshold(currentCollateral)
             ? multipleCollateralBalances?.data
                 ? collateralsWithBalance.find(
                       (col) =>
@@ -76,7 +74,11 @@ const UserCollaterals: React.FC = () => {
     const [collateral, setCollateral] = useState(defaultCollateral);
 
     useEffect(() => {
-        if (isMultiCollateralSupported && multipleCollateralBalances?.data) {
+        if (
+            isMultiCollateralSupported &&
+            multipleCollateralBalances?.data &&
+            currentCollateralBalance <= getMinBalanceThreshold(currentCollateral)
+        ) {
             const collateralIndexWithPositiveBalance = getPositiveCollateralIndexByBalance(
                 multipleCollateralBalances.data,
                 networkId
@@ -85,15 +87,20 @@ const UserCollaterals: React.FC = () => {
                 (el) => el.name === getCollateral(networkId, collateralIndexWithPositiveBalance)
             );
 
-            if (
-                positiveCollateral &&
-                positiveCollateral.balance > (isStableCurrency(positiveCollateral.name) ? 1 : 0)
-            ) {
+            if (positiveCollateral) {
                 setCollateral(positiveCollateral);
                 dispatch(setSelectedCollateralIndex(getCollateralIndexForNetwork(networkId, positiveCollateral.name)));
             }
         }
-    }, [multipleCollateralBalances.data, dispatch, isMultiCollateralSupported, networkId, collateralsWithBalance]);
+    }, [
+        multipleCollateralBalances.data,
+        dispatch,
+        isMultiCollateralSupported,
+        networkId,
+        collateralsWithBalance,
+        currentCollateral,
+        currentCollateralBalance,
+    ]);
 
     useEffect(() => {
         if (!isMultiCollateralSupported) {
@@ -110,6 +117,7 @@ const UserCollaterals: React.FC = () => {
 
     const onCollateralClickHandler = (coinType: Coins) => {
         dispatch(setSelectedCollateralIndex(getCollateralIndexForNetwork(networkId, coinType)));
+        setIsDropdownOpen(false);
     };
 
     const assetIcon = (type: string) => {
@@ -122,9 +130,9 @@ const UserCollaterals: React.FC = () => {
             <OutsideClickHandler onOutsideClick={() => isDropdownOpen && setIsDropdownOpen(false)}>
                 <Wrapper>
                     <SwapWrapper
-                        clickable={isWalletConnected && isMultiCollateralSupported}
+                        $clickable={isConnected && isMultiCollateralSupported}
                         onClick={() =>
-                            isWalletConnected &&
+                            isConnected &&
                             (isMultiCollateralSupported
                                 ? setIsDropdownOpen(!isDropdownOpen)
                                 : onCollateralClickHandler(collateral.name))
@@ -134,7 +142,7 @@ const UserCollaterals: React.FC = () => {
                         <BalanceTextWrapper>
                             <BalanceText>{formatCurrencyWithKey(collateral.name, collateral.balance, 2)}</BalanceText>
                         </BalanceTextWrapper>
-                        {isWalletConnected && isMultiCollateralSupported && (
+                        {isConnected && isMultiCollateralSupported && (
                             <Icon className={isDropdownOpen ? `icon icon--caret-up` : `icon icon--caret-down`} />
                         )}
                     </SwapWrapper>
@@ -143,12 +151,12 @@ const UserCollaterals: React.FC = () => {
                             {collateralsWithBalance.map((coin, index) => (
                                 <BalanceWrapper
                                     key={index}
-                                    clickable={isWalletConnected}
+                                    $clickable={isConnected}
                                     onClick={() => onCollateralClickHandler(coin.name)}
                                 >
                                     {assetIcon(coin.name)}
                                     <BalanceTextWrapper>
-                                        <BalanceText>{formatCurrencyWithKey(coin.name, coin.balance, 2)}</BalanceText>
+                                        <BalanceText>{formatCurrencyWithKey(coin.name, coin.balance)}</BalanceText>
                                     </BalanceTextWrapper>
                                 </BalanceWrapper>
                             ))}
@@ -174,11 +182,11 @@ const Wrapper = styled(FlexDivRow)`
     }
 `;
 
-const SwapWrapper = styled.div<{ clickable: boolean }>`
+const SwapWrapper = styled.div<{ $clickable: boolean }>`
     display: flex;
     align-items: center;
     width: 100%;
-    cursor: ${(props) => (props.clickable ? 'pointer' : 'default')};
+    cursor: ${(props) => (props.$clickable ? 'pointer' : 'default')};
     padding: 4px 13px;
     @media (max-width: 500px) {
         padding: 4px 7px;
@@ -204,13 +212,13 @@ const Dropdown = styled.div`
     }
 `;
 
-const BalanceWrapper = styled.div<{ clickable: boolean }>`
+const BalanceWrapper = styled.div<{ $clickable: boolean }>`
     display: -webkit-flex;
     flex-direction: row;
     align-items: center;
     text-align: center;
     padding: 6px;
-    cursor: ${(props) => (props.clickable ? 'pointer' : 'default')};
+    cursor: ${(props) => (props.$clickable ? 'pointer' : 'default')};
     border-radius: 8px;
     &:hover {
         background: ${(props) => props.theme.background.primary};

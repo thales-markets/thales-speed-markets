@@ -1,20 +1,32 @@
 import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
 import QUERY_KEYS from 'constants/queryKeys';
-import { useQuery, UseQueryOptions } from 'react-query';
-import { bigNumberFormatter, NetworkId, parseBytes32String } from 'thales-utils';
-import snxJSConnector from 'utils/snxJSConnector';
+import { useQuery, UseQueryOptions } from '@tanstack/react-query';
+import { bigNumberFormatter, parseBytes32String } from 'thales-utils';
+import priceFeedContract from 'utils/contracts/priceFeedContract';
+import { getContract } from 'viem';
+import { QueryConfig } from 'types/network';
+import { ViemContract } from 'types/viem';
 export type Rates = Record<string, number>;
 
-const useExchangeRatesQuery = (networkId: NetworkId, options?: UseQueryOptions<Rates>) => {
-    return useQuery<Rates>(
-        QUERY_KEYS.Rates.ExchangeRates(networkId),
-        async () => {
+const useExchangeRatesQuery = (
+    queryConfig: QueryConfig,
+    options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
+) => {
+    return useQuery<Rates>({
+        queryKey: QUERY_KEYS.Rates.ExchangeRates(queryConfig.networkId),
+        queryFn: async () => {
             const exchangeRates: Rates = {};
 
-            if (snxJSConnector.priceFeedContract) {
+            const priceFeedContractLocal = getContract({
+                address: priceFeedContract.addresses[queryConfig.networkId],
+                abi: priceFeedContract.abi,
+                client: queryConfig.client,
+            }) as ViemContract;
+
+            if (priceFeedContractLocal) {
                 const [currencies, rates] = await Promise.all([
-                    snxJSConnector.priceFeedContract.getCurrencies(),
-                    snxJSConnector.priceFeedContract.getRates(),
+                    priceFeedContractLocal.read.getCurrencies(),
+                    priceFeedContractLocal.read.getRates(),
                 ]);
                 currencies.forEach((currency: string, idx: number) => {
                     const currencyName = parseBytes32String(currency);
@@ -32,11 +44,9 @@ const useExchangeRatesQuery = (networkId: NetworkId, options?: UseQueryOptions<R
 
             return exchangeRates;
         },
-        {
-            refetchInterval: 60 * 1000,
-            ...options,
-        }
-    );
+        refetchInterval: 60 * 1000,
+        ...options,
+    });
 };
 
 export default useExchangeRatesQuery;

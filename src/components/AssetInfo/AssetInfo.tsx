@@ -5,43 +5,30 @@ import { getSynthName } from 'utils/currency';
 
 export type AssetInfoProps = {
     currencyKey: string;
-    iconFontSize?: string;
-    currencyKeyFontSize?: string;
-    displayInRow?: boolean;
     displayInRowMobile?: boolean;
-    width?: string;
 };
 
-const AssetInfo: React.FC<AssetInfoProps> = ({
-    currencyKey,
-    iconFontSize,
-    currencyKeyFontSize,
-    displayInRow,
-    displayInRowMobile,
-    width,
-}) => {
+const AssetInfo: React.FC<AssetInfoProps> = ({ currencyKey, displayInRowMobile }) => {
     return (
-        <AssetContainer displayInRowMobile={displayInRowMobile} width={width}>
+        <AssetContainer displayInRowMobile={displayInRowMobile}>
             <CurrencyIcon
                 className={`currency-icon currency-icon--${currencyKey.toLowerCase()}`}
-                fontSize={iconFontSize}
                 displayInRowMobile={displayInRowMobile}
             />
-            <AssetNameContainer displayInRow={displayInRow} displayInRowMobile={displayInRowMobile}>
+            <AssetNameContainer displayInRowMobile={displayInRowMobile}>
                 <AssetName>{getSynthName(currencyKey)}</AssetName>
-                <CurrencyKey fontSize={currencyKeyFontSize}>{currencyKey}</CurrencyKey>
+                <CurrencyKey>{currencyKey}</CurrencyKey>
             </AssetNameContainer>
         </AssetContainer>
     );
 };
 
-const AssetContainer = styled.div<{ displayInRowMobile?: boolean; width?: string }>`
+const AssetContainer = styled.div<{ displayInRowMobile?: boolean }>`
     display: flex;
     flex-direction: row;
     justify-content: start;
     align-items: center;
     flex: 1;
-    max-width: ${(props) => props.width || ''};
     @media screen and (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         min-height: 100%;
         flex-direction: ${(props) => (props.displayInRowMobile ? 'row' : 'column')};
@@ -49,10 +36,8 @@ const AssetContainer = styled.div<{ displayInRowMobile?: boolean; width?: string
     }
 `;
 
-const AssetNameContainer = styled.div<{ displayInRow?: boolean; displayInRowMobile?: boolean }>`
-    display: ${(props) => (props.displayInRow ? 'flex' : 'block')};
-    ${(props) => (props.displayInRow ? 'flex-direction: row;' : '')}
-    ${(props) => (props.displayInRow ? 'align-items: baseline;' : '')}
+const AssetNameContainer = styled.div<{ displayInRowMobile?: boolean }>`
+    display: block;
     text-align: left;
     font-size: 15px;
     color: ${(props) => props.theme.textColor.primary};
@@ -61,10 +46,10 @@ const AssetNameContainer = styled.div<{ displayInRow?: boolean; displayInRowMobi
     }
 `;
 
-const AssetName = styled.span<{ fontSize?: string }>`
+const AssetName = styled.span`
     display: block;
     font-weight: 700;
-    font-size: ${(props) => props.fontSize || '12px'};
+    font-size: 12px;
     color: ${(props) => props.theme.textColor.secondary};
     text-transform: uppercase;
     line-height: 120%;
@@ -74,17 +59,17 @@ const AssetName = styled.span<{ fontSize?: string }>`
     }
 `;
 
-const CurrencyKey = styled.span<{ fontSize?: string }>`
+const CurrencyKey = styled.span`
     display: block;
     font-weight: 700;
     line-height: 120%;
-    font-size: ${(props) => props.fontSize || '12px'};
+    font-size: 12px;
     color: ${(props) => props.theme.textColor.primary};
     text-transform: uppercase;
 `;
 
-const CurrencyIcon = styled.i<{ fontSize?: string; displayInRowMobile?: boolean }>`
-    font-size: ${(props) => props.fontSize || '24px'};
+const CurrencyIcon = styled.i<{ displayInRowMobile?: boolean }>`
+    font-size: 24px;
     margin-right: 6px;
     @media screen and (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         margin-right: ${(props) => (props.displayInRowMobile ? '4px' : '0')};

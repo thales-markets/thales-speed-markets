@@ -6,10 +6,10 @@ import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActi
 import { useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
-import { getIsWalletConnected, getNetworkId, getWalletAddress } from 'redux/modules/wallet';
 import { Colors } from 'styles/common';
 import { RootState } from 'types/ui';
 import { timeToLocal } from 'utils/formatters/date';
+import { useAccount, useChainId, useClient } from 'wagmi';
 
 export const UserPositionAreaSeries: React.FC<{
     asset: string;
@@ -17,16 +17,20 @@ export const UserPositionAreaSeries: React.FC<{
 }> = ({ asset, candlestickData }) => {
     const chart = useContext(ChartContext);
     const [series, setSeries] = useState<ISeriesApi<'Area'> | undefined>();
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
-    const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
+    const networkId = useChainId();
+    const client = useClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
+    const { isConnected, address } = useAccount();
     const [userData, setUserData] = useState<any>([]);
 
-    const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(networkId, walletAddress, {
-        enabled: isAppReady && isWalletConnected,
-        refetchInterval: 30 * 1000,
-    });
+    const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
+        { networkId, client },
+        address as string,
+        {
+            enabled: isAppReady && isConnected,
+            refetchInterval: 30 * 1000,
+        }
+    );
 
     useEffect(() => {
         if (userActiveSpeedMarketsDataQuery.isSuccess && candlestickData && candlestickData.length) {
@@ -55,7 +59,7 @@ export const UserPositionAreaSeries: React.FC<{
                             // we are adding every tick on the x axis but are hiding the data from being drawn by setting hide: true
                             result.push({
                                 time: lastCandleTime + iterator * deltaTime,
-                                value: position.strikePriceNum,
+                                value: position.strikePrice,
                                 position,
                                 hide: true,
                             });
@@ -64,7 +68,7 @@ export const UserPositionAreaSeries: React.FC<{
                         // finally we can push the position that should be drawn and are passing hide:false to tell the chart to draw marker for this position
                         result.push({
                             time: millisecondsToSeconds(Number(position.maturityDate)),
-                            value: position.strikePriceNum,
+                            value: position.strikePrice,
                             position,
                             hide: false,
                         });
@@ -83,7 +87,7 @@ export const UserPositionAreaSeries: React.FC<{
                             if (it < candlestickData.length)
                                 result.push({
                                     time: candlestickData[it - 1].time,
-                                    value: position.strikePriceNum,
+                                    value: position.strikePrice,
                                     position,
                                     hide: false,
                                 });
@@ -128,7 +132,11 @@ export const UserPositionAreaSeries: React.FC<{
                     shape: 'circle',
                 };
             });
-            series.setData(userDataWithLocalTime as any);
+            const userDataWitoutDuplicates = userDataWithLocalTime.filter(
+                (data: any, i: number) =>
+                    i === userDataWithLocalTime.length - 1 || data.time !== userDataWithLocalTime[i + 1].time
+            );
+            series.setData(userDataWitoutDuplicates as any);
 
             const cleanArray = [];
             // merging multiple positions that have the same timestamp in one marker

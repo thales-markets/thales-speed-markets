@@ -23,7 +23,6 @@ import { PYTH_CONTRACT_ADDRESS, PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import { millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
 import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
-import { BigNumber, ethers } from 'ethers';
 import useDebouncedEffect from 'hooks/useDebouncedEffect';
 import useInterval from 'hooks/useInterval';
 import SharePositionModal from 'pages/SpeedMarkets/components/SharePositionModal';
@@ -37,32 +36,38 @@ import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
-import { getIsWalletConnected, getNetworkId, getSelectedCollateralIndex, getWalletAddress } from 'redux/modules/wallet';
+import { getSelectedCollateralIndex } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivCentered, FlexDivColumn, FlexDivRow, FlexDivRowCentered } from 'styles/common';
 import {
     COLLATERAL_DECIMALS,
     NetworkId,
     bigNumberFormatter,
+    ceilNumberToDecimals,
     coinParser,
-    formatCurrency,
     formatCurrencyWithKey,
     formatCurrencyWithSign,
     formatPercentage,
-    roundNumberToDecimals,
     truncToDecimals,
 } from 'thales-utils';
 import { AmmChainedSpeedMarketsLimits, AmmSpeedMarketsLimits } from 'types/market';
+import { SupportedNetwork } from 'types/network';
 import { RootState } from 'types/ui';
-import erc20Contract from 'utils/contracts/erc20Contract';
+import { ViemContract } from 'types/viem';
+import chainedSpeedMarketsAMMContract from 'utils/contracts/chainedSpeedMarketsAMMContract';
+import erc20Contract from 'utils/contracts/collateralContract';
+import multipleCollateral from 'utils/contracts/multipleCollateralContract';
+import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
 import { getCoinBalance, getCollateral, getCollaterals, getDefaultCollateral, isStableCurrency } from 'utils/currency';
 import { checkAllowance, getIsMultiCollateralSupported } from 'utils/network';
 import { getPriceId, getPriceServiceEndpoint } from 'utils/pyth';
 import { refetchBalances, refetchSpeedMarketsLimits, refetchUserSpeedMarkets } from 'utils/queryConnector';
 import { getReferralWallet } from 'utils/referral';
-import snxJSConnector from 'utils/snxJSConnector';
 import { getFeeByTimeThreshold, getTransactionForSpeedAMM } from 'utils/speedAmm';
 import { delay } from 'utils/timer';
+import { Client, getContract, parseUnits, stringToHex } from 'viem';
+import { waitForTransactionReceipt } from 'viem/actions';
+import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 import { SelectedPosition } from '../SelectPosition/SelectPosition';
 
 type AmmSpeedTradingProps = {
@@ -79,7 +84,6 @@ type AmmSpeedTradingProps = {
     currentPrice: number;
     setSkewImpact: React.Dispatch<{ [Positions.UP]: number; [Positions.DOWN]: number }>;
     resetData: React.Dispatch<void>;
-    showWalletBalance?: boolean;
 };
 
 const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
@@ -96,15 +100,16 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     currentPrice,
     setSkewImpact,
     resetData,
-    showWalletBalance,
 }) => {
     const { t } = useTranslation();
     const { openConnectModal } = useConnectModal();
 
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
-    const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
+    const networkId = useChainId() as SupportedNetwork;
+    const client = useClient();
+    const walletClient = useWalletClient();
+    const { isConnected, address } = useAccount();
+
     const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
@@ -141,7 +146,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         outOfLiquidity;
 
     const isButtonBuyAvailable =
-        isWalletConnected &&
+        isConnected &&
         isPositionSelected &&
         !!(strikeTimeSec || deltaTimeSec) &&
         isPaidAmountEntered &&
@@ -179,20 +184,26 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         selectedCollateralIndex,
     ]);
     const collateralAddress = isMultiCollateralSupported
-        ? snxJSConnector.multipleCollateral && snxJSConnector.multipleCollateral[selectedCollateral]?.address
-        : snxJSConnector.collateral?.address;
+        ? multipleCollateral[selectedCollateral].addresses[networkId]
+        : erc20Contract.addresses[networkId];
 
     const referral =
-        walletAddress && getReferralWallet()?.toLowerCase() !== walletAddress?.toLowerCase()
-            ? getReferralWallet()
-            : null;
+        address && getReferralWallet()?.toLowerCase() !== address?.toLowerCase() ? getReferralWallet() : null;
 
-    const stableBalanceQuery = useStableBalanceQuery(walletAddress, networkId, {
-        enabled: isAppReady && isWalletConnected && !isMultiCollateralSupported,
-    });
-    const multipleCollateralBalances = useMultipleCollateralBalanceQuery(walletAddress, networkId, {
-        enabled: isAppReady && isWalletConnected && isMultiCollateralSupported,
-    });
+    const stableBalanceQuery = useStableBalanceQuery(
+        address as string,
+        { networkId, client },
+        {
+            enabled: isAppReady && isConnected && !isMultiCollateralSupported,
+        }
+    );
+    const multipleCollateralBalances = useMultipleCollateralBalanceQuery(
+        address as string,
+        { networkId, client },
+        {
+            enabled: isAppReady && isConnected && isMultiCollateralSupported,
+        }
+    );
 
     const walletBalancesMap = useMemo(() => {
         return stableBalanceQuery.isSuccess ? stableBalanceQuery.data : null;
@@ -215,9 +226,12 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     const isBlastSepolia = networkId === NetworkId.BlastSepolia;
     const isMintAvailable = isBlastSepolia && collateralBalance < totalPaidAmount;
 
-    const exchangeRatesMarketDataQuery = useExchangeRatesQuery(networkId, {
-        enabled: isAppReady,
-    });
+    const exchangeRatesMarketDataQuery = useExchangeRatesQuery(
+        { networkId, client },
+        {
+            enabled: isAppReady,
+        }
+    );
     const exchangeRates: Rates | null =
         exchangeRatesMarketDataQuery.isSuccess && exchangeRatesMarketDataQuery.data
             ? exchangeRatesMarketDataQuery.data
@@ -259,11 +273,11 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         )[0];
 
         if (riskPerUp && riskPerDown) {
-            skewPerPosition[Positions.UP] = roundNumberToDecimals(
+            skewPerPosition[Positions.UP] = ceilNumberToDecimals(
                 (riskPerUp.current / riskPerUp.max) * ammSpeedMarketsLimits?.maxSkewImpact,
                 4
             );
-            skewPerPosition[Positions.DOWN] = roundNumberToDecimals(
+            skewPerPosition[Positions.DOWN] = ceilNumberToDecimals(
                 (riskPerDown.current / riskPerDown.max) * ammSpeedMarketsLimits?.maxSkewImpact,
                 4
             );
@@ -343,7 +357,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     // Reset inputs
     useEffect(() => {
         setPaidAmount('');
-    }, [networkId, isWalletConnected]);
+    }, [networkId, isConnected]);
 
     // Input field validations
     useEffect(() => {
@@ -354,7 +368,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         }
         if (
             Number(paidAmount) > 0 &&
-            ((isWalletConnected && Number(paidAmount) > collateralBalance) || collateralBalance === 0)
+            ((isConnected && Number(paidAmount) > collateralBalance) || collateralBalance === 0)
         ) {
             messageKey = isBlastSepolia
                 ? 'speed-markets.errors.insufficient-balance-wallet'
@@ -378,7 +392,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         maxBuyinAmount,
         paidAmount,
         collateralBalance,
-        isWalletConnected,
+        isConnected,
         totalPaidAmount,
         selectedCollateral,
         convertToStable,
@@ -434,22 +448,30 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         if (!collateralAddress) {
             return;
         }
-        const erc20Instance = new ethers.Contract(collateralAddress, erc20Contract.abi, snxJSConnector.provider);
-        const addressToApprove =
-            (isChained
-                ? snxJSConnector.chainedSpeedMarketsAMMContract?.address
-                : snxJSConnector.speedMarketsAMMContract?.address) || '';
+        const erc20Instance = getContract({
+            abi: erc20Contract.abi,
+            address: collateralAddress,
+            client: client as Client,
+        });
+        const addressToApprove = isChained
+            ? chainedSpeedMarketsAMMContract.addresses[networkId]
+            : speedMarketsAMMContract.addresses[networkId];
 
         const getAllowance = async () => {
             try {
-                const parsedAmount: BigNumber = coinParser(
+                const parsedAmount: bigint = coinParser(
                     isStableCurrency(selectedCollateral)
-                        ? roundNumberToDecimals(totalPaidAmount).toString()
-                        : roundNumberToDecimals(totalPaidAmount, COLLATERAL_DECIMALS[selectedCollateral]).toString(),
+                        ? ceilNumberToDecimals(totalPaidAmount).toString()
+                        : ceilNumberToDecimals(totalPaidAmount, COLLATERAL_DECIMALS[selectedCollateral]).toString(),
                     networkId,
                     selectedCollateral
                 );
-                const allowance = await checkAllowance(parsedAmount, erc20Instance, walletAddress, addressToApprove);
+                const allowance: boolean = await checkAllowance(
+                    parsedAmount,
+                    erc20Instance,
+                    address as string,
+                    addressToApprove
+                );
 
                 setAllowance(allowance);
             } catch (e) {
@@ -457,7 +479,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             }
         };
 
-        if (isWalletConnected && erc20Instance.provider) {
+        if (isConnected) {
             if (selectedCollateral === CRYPTO_CURRENCY_MAP.ETH) {
                 setAllowance(true);
             } else {
@@ -469,33 +491,44 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         networkId,
         paidAmount,
         totalPaidAmount,
-        walletAddress,
-        isWalletConnected,
+        address,
+        isConnected,
         hasAllowance,
         isAllowing,
         selectedCollateral,
     ]);
 
-    const handleAllowance = async (approveAmount: BigNumber) => {
+    const handleAllowance = async (approveAmount: bigint) => {
         if (!collateralAddress) {
             return;
         }
-        const erc20Instance = new ethers.Contract(collateralAddress, erc20Contract.abi, snxJSConnector.signer);
-        const addressToApprove =
-            (isChained
-                ? snxJSConnector.chainedSpeedMarketsAMMContract?.address
-                : snxJSConnector.speedMarketsAMMContract?.address) || '';
+
+        const erc20Instance = getContract({
+            abi: erc20Contract.abi,
+            address: collateralAddress,
+            client: walletClient.data as Client,
+        }) as ViemContract;
+        const addressToApprove = isChained
+            ? chainedSpeedMarketsAMMContract.addresses[networkId]
+            : speedMarketsAMMContract.addresses[networkId];
 
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
         try {
             setIsAllowing(true);
 
-            const tx = (await erc20Instance.approve(addressToApprove, approveAmount)) as ethers.ContractTransaction;
+            const hash = await erc20Instance.write.approve([addressToApprove, approveAmount]);
             setOpenApprovalModal(false);
-            const txResult = await tx.wait();
-            if (txResult && txResult.transactionHash) {
+            const txReceipt = await waitForTransactionReceipt(client as Client, {
+                hash,
+            });
+            if (txReceipt.status === 'success') {
                 toast.update(id, getSuccessToastOptions(t(`common.transaction.successful`), id));
                 setIsAllowing(false);
+            } else {
+                console.log('Transaction status', txReceipt.status);
+                toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
+                setIsAllowing(false);
+                setOpenApprovalModal(false);
             }
         } catch (e) {
             console.log(e);
@@ -508,131 +541,144 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     const handleSubmit = async () => {
         if (isButtonDisabled) return;
 
-        const { speedMarketsAMMContract, chainedSpeedMarketsAMMContract, provider, signer } = snxJSConnector as any;
-        if (speedMarketsAMMContract || (isChained && chainedSpeedMarketsAMMContract)) {
-            setIsSubmitting(true);
-            const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
+        setIsSubmitting(true);
+        const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
 
-            const speedMarketsAMMContractWithSigner = isChained
-                ? chainedSpeedMarketsAMMContract.connect(signer)
-                : speedMarketsAMMContract.connect(signer);
-            try {
-                const priceId = getPriceId(networkId, currencyKey);
+        const speedMarketsAMMContractWithSigner = getContract({
+            abi: !isChained ? speedMarketsAMMContract.abi : chainedSpeedMarketsAMMContract.abi,
+            address: !isChained
+                ? speedMarketsAMMContract.addresses[networkId]
+                : chainedSpeedMarketsAMMContract.addresses[networkId],
+            client: walletClient.data as Client,
+        });
 
-                const latestPriceUpdateResponse = await fetch(`
+        try {
+            const priceId = getPriceId(networkId, currencyKey);
+
+            const latestPriceUpdateResponse = await fetch(`
                 ${getPriceServiceEndpoint(networkId)}/v2/updates/price/latest?ids[]=${priceId.replace('0x', '')}`);
 
-                const latestPriceUpdate = JSON.parse(await latestPriceUpdateResponse.text());
+            const latestPriceUpdate = JSON.parse(await latestPriceUpdateResponse.text());
 
-                const pythPrice = bigNumberFormatter(latestPriceUpdate.parsed[0].price.price, PYTH_CURRENCY_DECIMALS);
-                setSubmittedStrikePrice(pythPrice);
+            const pythPrice = bigNumberFormatter(latestPriceUpdate.parsed[0].price.price, PYTH_CURRENCY_DECIMALS);
+            setSubmittedStrikePrice(pythPrice);
 
-                const pythContract = new ethers.Contract(
-                    PYTH_CONTRACT_ADDRESS[networkId],
-                    PythInterfaceAbi as any,
-                    provider
+            const pythContract = getContract({
+                abi: PythInterfaceAbi,
+                address: PYTH_CONTRACT_ADDRESS[networkId],
+                client: client as Client,
+            });
+            const priceUpdateData = ['0x' + latestPriceUpdate.binary.data[0]];
+            const updateFee = await pythContract.read.getUpdateFee([priceUpdateData]);
+
+            const asset = stringToHex(currencyKey, { size: 32 });
+
+            // guaranteed by isButtonDisabled that there are no undefined positions
+            const chainedSides = chainedPositions.map((pos) => (pos !== undefined ? POSITIONS_TO_SIDE_MAP[pos] : -1));
+            const singleSides = positionType !== undefined ? [POSITIONS_TO_SIDE_MAP[positionType]] : [];
+            const sides = isChained ? chainedSides : singleSides;
+
+            const buyInAmountBigNum =
+                selectedCollateral === defaultCollateral
+                    ? coinParser(truncToDecimals(paidAmount), networkId, selectedCollateral)
+                    : isStableCurrency(selectedCollateral)
+                    ? coinParser(truncToDecimals(totalPaidAmount), networkId, selectedCollateral)
+                    : coinParser(
+                          truncToDecimals(totalPaidAmount, COLLATERAL_DECIMALS[selectedCollateral]),
+                          networkId,
+                          selectedCollateral
+                      );
+            const skewImpactBigNum = positionType ? parseUnits(skewImpact[positionType].toString(), 18) : undefined;
+            const isNonDefaultCollateral = selectedCollateral !== defaultCollateral;
+
+            const hash = await getTransactionForSpeedAMM(
+                speedMarketsAMMContractWithSigner,
+                isNonDefaultCollateral,
+                asset,
+                deltaTimeSec,
+                strikeTimeSec,
+                sides,
+                buyInAmountBigNum,
+                priceUpdateData,
+                updateFee,
+                collateralAddress || '',
+                referral,
+                skewImpactBigNum as any
+            );
+
+            const txReceipt = await waitForTransactionReceipt(client as Client, {
+                hash,
+            });
+
+            if (txReceipt.status === 'success') {
+                toast.update(id, getSuccessToastOptions(t(`common.buy.confirmation-message`), id));
+                refetchUserSpeedMarkets(isChained, networkId, address as string);
+                refetchSpeedMarketsLimits(isChained, networkId);
+                refetchBalances(address as string, networkId);
+                PLAUSIBLE.trackEvent(
+                    isChained ? PLAUSIBLE_KEYS.chainedSpeedMarketsBuy : PLAUSIBLE_KEYS.speedMarketsBuy,
+                    {
+                        props: {
+                            value: Number(paidAmount),
+                            collateral: getCollateral(networkId, selectedCollateralIndex),
+                            networkId,
+                        },
+                    }
                 );
-                const priceUpdateData = ['0x' + latestPriceUpdate.binary.data[0]];
-                const updateFee = await pythContract.getUpdateFee(priceUpdateData);
-
-                const asset = ethers.utils.formatBytes32String(currencyKey);
-
-                // guaranteed by isButtonDisabled that there are no undefined positions
-                const chainedSides = chainedPositions.map((pos) =>
-                    pos !== undefined ? POSITIONS_TO_SIDE_MAP[pos] : -1
-                );
-                const singleSides = positionType !== undefined ? [POSITIONS_TO_SIDE_MAP[positionType]] : [];
-                const sides = isChained ? chainedSides : singleSides;
-
-                const buyInAmountBigNum =
-                    selectedCollateral === defaultCollateral
-                        ? coinParser(truncToDecimals(paidAmount), networkId, selectedCollateral)
-                        : isStableCurrency(selectedCollateral)
-                        ? coinParser(truncToDecimals(totalPaidAmount), networkId, selectedCollateral)
-                        : coinParser(
-                              truncToDecimals(totalPaidAmount, COLLATERAL_DECIMALS[selectedCollateral]),
-                              networkId,
-                              selectedCollateral
-                          );
-                const skewImpactBigNum = positionType
-                    ? ethers.utils.parseUnits(skewImpact[positionType].toString(), 18)
-                    : undefined;
-                const isNonDefaultCollateral = selectedCollateral !== defaultCollateral;
-
-                const tx: ethers.ContractTransaction = await getTransactionForSpeedAMM(
-                    speedMarketsAMMContractWithSigner,
-                    isNonDefaultCollateral,
-                    asset,
-                    deltaTimeSec,
-                    strikeTimeSec,
-                    sides,
-                    buyInAmountBigNum,
-                    priceUpdateData,
-                    updateFee,
-                    collateralAddress || '',
-                    referral,
-                    skewImpactBigNum
-                );
-
-                const txResult = await tx.wait();
-
-                if (txResult && txResult.transactionHash) {
-                    toast.update(id, getSuccessToastOptions(t(`common.buy.confirmation-message`), id));
-                    refetchUserSpeedMarkets(isChained, networkId, walletAddress);
-                    refetchSpeedMarketsLimits(isChained, networkId);
-                    PLAUSIBLE.trackEvent(
-                        isChained ? PLAUSIBLE_KEYS.chainedSpeedMarketsBuy : PLAUSIBLE_KEYS.speedMarketsBuy,
-                        {
-                            props: {
-                                value: Number(paidAmount),
-                                collateral: getCollateral(networkId, selectedCollateralIndex),
-                                networkId,
-                            },
-                        }
-                    );
-                    resetData();
-                    setPaidAmount('');
-                }
-            } catch (e) {
-                console.log(e);
+                resetData();
+                setPaidAmount('');
+            } else {
+                console.log('Transaction status', txReceipt.status);
                 await delay(800);
                 toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
             }
-            setSubmittedStrikePrice(0);
-            setIsSubmitting(false);
+        } catch (e) {
+            console.log(e);
+            await delay(800);
+            toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
         }
+        setSubmittedStrikePrice(0);
+        setIsSubmitting(false);
     };
 
     const handleMint = async () => {
-        const { collateral, signer } = snxJSConnector as any;
-        if (collateral) {
-            setIsSubmitting(true);
-            const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
+        setIsSubmitting(true);
+        const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
 
-            const collateralWithSigner = collateral.connect(signer);
-            try {
-                const tx: ethers.ContractTransaction = await collateralWithSigner.mintForUser(walletAddress);
+        const collateralWithSigner = getContract({
+            abi: erc20Contract.abi,
+            address: erc20Contract.addresses[networkId],
+            client: walletClient.data as Client,
+        }) as ViemContract;
 
-                const txResult = await tx.wait();
+        try {
+            const hash = await collateralWithSigner.write.mintForUser([address]);
 
-                if (txResult && txResult.transactionHash) {
-                    toast.update(
-                        id,
-                        getSuccessToastOptions(t(`common.mint.confirmation-message`, { token: selectedCollateral }), id)
-                    );
-                    refetchBalances(walletAddress, networkId);
-                }
-            } catch (e) {
-                console.log(e);
+            const txReceipt = await waitForTransactionReceipt(client as Client, {
+                hash,
+            });
+
+            if (txReceipt.status === 'success') {
+                toast.update(
+                    id,
+                    getSuccessToastOptions(t(`common.mint.confirmation-message`, { token: selectedCollateral }), id)
+                );
+                refetchBalances(address as string, networkId);
+            } else {
+                console.log('Transaction status', txReceipt.status);
                 await delay(800);
                 toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
             }
-            setIsSubmitting(false);
+        } catch (e) {
+            console.log(e);
+            await delay(800);
+            toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
         }
+        setIsSubmitting(false);
     };
 
     const getSubmitButton = () => {
-        if (!isWalletConnected) {
+        if (!isConnected) {
             return <Button onClick={openConnectModal}>{t('common.wallet.connect-your-wallet')}</Button>;
         }
         if (isMintAvailable) {
@@ -785,7 +831,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             : {};
 
     return (
-        <Container isChained={isChained}>
+        <Container $isChained={isChained}>
             {!isMobile && getTradingDetails()}
             <FinalizeTrade>
                 <ColumnSpaceBetween ref={inputWrapperRef}>
@@ -805,11 +851,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                             maxAmount: convertFromStable(maxBuyinAmount),
                             fee: totalFee ? formatPercentage(totalFee) : '...',
                         })}
-                        balance={
-                            showWalletBalance && isWalletConnected
-                                ? `${t('common.balance')}: ${formatCurrency(collateralBalance)}`
-                                : undefined
-                        }
                         currencyComponent={
                             isMultiCollateralSupported ? (
                                 <CollateralSelector
@@ -933,8 +974,8 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 <ApprovalModal
                     defaultAmount={
                         isStableCurrency(selectedCollateral)
-                            ? roundNumberToDecimals(totalPaidAmount)
-                            : roundNumberToDecimals(totalPaidAmount, COLLATERAL_DECIMALS[selectedCollateral])
+                            ? ceilNumberToDecimals(totalPaidAmount)
+                            : ceilNumberToDecimals(totalPaidAmount, COLLATERAL_DECIMALS[selectedCollateral])
                     }
                     tokenSymbol={selectedCollateral}
                     isAllowing={isAllowing}
@@ -946,11 +987,11 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     );
 };
 
-const Container = styled(FlexDivRow)<{ isChained: boolean }>`
+const Container = styled(FlexDivRow)<{ $isChained: boolean }>`
     position: relative;
     z-index: 4;
-    height: ${(props) => (props.isChained ? '98' : '78')}px;
-    margin-bottom: ${(props) => (props.isChained ? '48' : '68')}px;
+    height: ${(props) => (props.$isChained ? '98' : '78')}px;
+    margin-bottom: ${(props) => (props.$isChained ? '48' : '68')}px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         min-width: initial;
         height: 100%;

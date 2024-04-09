@@ -14,7 +14,6 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
-import { getIsWalletConnected, getNetworkId, getWalletAddress } from 'redux/modules/wallet';
 import styled, { useTheme } from 'styled-components';
 import { FlexDivCentered, FlexDivRow, FlexDivRowCentered } from 'styles/common';
 import { formatCurrencyWithSign } from 'thales-utils';
@@ -24,6 +23,7 @@ import { getDefaultCollateral } from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
 import { resolveAllChainedMarkets, resolveAllSpeedPositions } from 'utils/speedAmm';
 import OpenPosition from '../OpenPosition';
+import { useChainId, useAccount, useClient, useWalletClient } from 'wagmi';
 
 type OpenPositionsProps = {
     isChained?: boolean;
@@ -35,10 +35,11 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
-    const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
+    const networkId = useChainId();
+    const client = useClient();
+    const walletClient = useWalletClient();
+    const { isConnected, address } = useAccount();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
@@ -50,9 +51,13 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
     >([]);
     const [chainedWithClaimableStatus, setChainedWithClaimableStatus] = useState<ChainedSpeedMarket[]>([]);
 
-    const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(networkId, walletAddress, {
-        enabled: isAppReady && isWalletConnected && !isChained,
-    });
+    const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
+        { networkId, client },
+        address as string,
+        {
+            enabled: isAppReady && isConnected && !isChained,
+        }
+    );
 
     const userOpenSpeedMarketsData = useMemo(
         () =>
@@ -62,9 +67,13 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
         [userActiveSpeedMarketsDataQuery]
     );
 
-    const userChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(networkId, walletAddress, {
-        enabled: isAppReady && isWalletConnected && !!isChained,
-    });
+    const userChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
+        { networkId, client },
+        address as string,
+        {
+            enabled: isAppReady && isConnected && !!isChained,
+        }
+    );
 
     const userOpenChainedSpeedMarketsData = useMemo(
         () =>
@@ -153,9 +162,9 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
     const handleSubmit = async () => {
         setIsSubmitting(true);
         if (isChained) {
-            await resolveAllChainedMarkets(claimableChainedPositions, false, networkId);
+            await resolveAllChainedMarkets(claimableChainedPositions, false, { networkId, client: walletClient.data });
         } else {
-            await resolveAllSpeedPositions(claimableSpeedPositions, false, networkId);
+            await resolveAllSpeedPositions(claimableSpeedPositions, false, { networkId, client: walletClient.data });
         }
         setIsSubmitting(false);
     };
@@ -210,7 +219,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
                 </LoaderContainer>
             ) : (
                 <>
-                    <PositionsWrapper noPositions={noPositions} isChained={isChained}>
+                    <PositionsWrapper $noPositions={noPositions} $isChained={isChained}>
                         {isChained && !noPositions
                             ? sortedUserOpenChainedSpeedMarketsData.map((position, index) => (
                                   <ChainedPosition
@@ -248,7 +257,7 @@ const dummyPositions: UserOpenPositions[] = [
         payout: 15,
         paid: 100,
         maturityDate: 1684483200000,
-        strikePrice: '$ 25,000.00',
+        strikePrice: 25000,
         side: Positions.UP,
         value: 0,
     },
@@ -259,7 +268,7 @@ const dummyPositions: UserOpenPositions[] = [
         payout: 10,
         paid: 200,
         maturityDate: 1684483200000,
-        strikePrice: '$ 35,000.00',
+        strikePrice: 35000,
         side: Positions.DOWN,
         value: 0,
     },
@@ -272,13 +281,13 @@ const Wrapper = styled.div`
     margin-top: 20px;
 `;
 
-const PositionsWrapper = styled.div<{ noPositions?: boolean; isChained?: boolean }>`
+const PositionsWrapper = styled.div<{ $noPositions?: boolean; $isChained?: boolean }>`
     display: flex;
     flex-direction: column;
-    gap: ${(props) => (props.isChained ? '16' : '6')}px;
+    gap: ${(props) => (props.$isChained ? '16' : '6')}px;
     overflow-y: auto;
-    max-height: ${(props) => (props.isChained ? '624' : '560')}px;
-    ${(props) => (props.noPositions ? 'filter: blur(10px);' : '')}
+    max-height: ${(props) => (props.$isChained ? '624' : '560')}px;
+    ${(props) => (props.$noPositions ? 'filter: blur(10px);' : '')}
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         flex-direction: row;
         overflow: auto;

@@ -10,14 +10,11 @@ import ROUTES from 'constants/routes';
 import useGetReffererIdQuery from 'queries/referral/useGetReffererIdQuery';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { getIsWalletConnected, getWalletAddress } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { BoldText, FlexDivCentered, FlexDivColumnCentered, FlexDivRowCentered, FlexDivStart } from 'styles/common';
-import { RootState } from 'types/ui';
 import { buildReferrerLink } from 'utils/routes';
-import snxJSConnector from 'utils/snxJSConnector';
+import { useAccount, useSignMessage } from 'wagmi';
 
 type ReferralModalProps = {
     onClose: () => void;
@@ -34,15 +31,14 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
     const { t } = useTranslation();
     const { openConnectModal } = useConnectModal();
 
-    const walletAddress = useSelector((state: RootState) => getWalletAddress(state));
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
-
+    const { isConnected, address } = useAccount();
+    const { signMessageAsync } = useSignMessage();
     const [referralPage, setReferralPage] = useState<number>(Pages.Markets);
     const [referrerID, setReferrerID] = useState('');
     const [savedReferrerID, setSavedReferrerID] = useState('');
     const [referralLink, setReferralLink] = useState('');
 
-    const referrerIDQuery = useGetReffererIdQuery(walletAddress || '', { enabled: !!walletAddress });
+    const referrerIDQuery = useGetReffererIdQuery(address as string, { enabled: isConnected });
 
     const referralPageOptions = [
         {
@@ -83,14 +79,14 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
     }, [referrerIDQuery.isSuccess, referrerIDQuery.data, referralPage]);
 
     const generateLinkHandler = useCallback(async () => {
-        const signature = await (snxJSConnector as any).signer.signMessage(referrerID);
+        const signature = await signMessageAsync({ message: referrerID });
         const response = await fetch(`${LINKS.API}/update-refferer-id`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                walletAddress,
+                address,
                 reffererID: referrerID,
                 signature,
                 previousReffererID: savedReferrerID,
@@ -109,7 +105,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
                 getSuccessToastOptions('', 'customId')
             );
         }
-    }, [referrerID, walletAddress, savedReferrerID, t, referralPage]);
+    }, [referrerID, address, savedReferrerID, t, referralPage, signMessageAsync]);
 
     const copyLink = () => {
         navigator.clipboard.writeText(referralLink);
@@ -140,7 +136,6 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
                 </Step>
                 <RowWrapper>
                     <SelectInput
-                        width="100%"
                         options={referralPageOptions}
                         handleChange={(value) => handleReferralPageChange(value)}
                         defaultValue={referralPage}
@@ -164,10 +159,10 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
                 <RowWrapper marginBottom="20px">
                     <Button
                         width="100%"
-                        disabled={isWalletConnected && (!referrerID || savedReferrerID === referrerID)}
-                        onClick={isWalletConnected ? generateLinkHandler : openConnectModal}
+                        disabled={isConnected && (!referrerID || savedReferrerID === referrerID)}
+                        onClick={isConnected ? generateLinkHandler : openConnectModal}
                     >
-                        {walletAddress ? t('referral.generate.link-btn') : t('common.wallet.connect-your-wallet')}
+                        {address ? t('referral.generate.link-btn') : t('common.wallet.connect-your-wallet')}
                     </Button>
                 </RowWrapper>
                 <RowWrapper>

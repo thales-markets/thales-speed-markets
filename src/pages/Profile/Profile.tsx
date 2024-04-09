@@ -1,24 +1,24 @@
 import SearchInput from 'components/SearchInput';
 import { USD_SIGN } from 'constants/currency';
 import { millisecondsToSeconds } from 'date-fns';
-import { Positions } from 'enums/market';
-import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
-import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveSpeedMarketsDataQuery';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import useProfileDataQuery from 'queries/profile/useProfileDataQuery';
+import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
+import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveSpeedMarketsDataQuery';
 import queryString from 'query-string';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { getIsAppReady } from 'redux/modules/app';
-import { getIsWalletConnected, getNetworkId, getWalletAddress } from 'redux/modules/wallet';
 import { useTheme } from 'styled-components';
 import { formatCurrencyWithSign, formatPercentage } from 'thales-utils';
 import { UserProfileData } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
 import { getPriceId } from 'utils/pyth';
 import { history } from 'utils/routes';
+import { isUserWinner } from 'utils/speedAmm';
+import { useAccount, useChainId, useClient } from 'wagmi';
 import { MARKET_DURATION_IN_DAYS } from '../../constants/market';
 import ClaimablePositions from './components/ClaimablePositions';
 import OpenPositions from './components/OpenPositions';
@@ -49,19 +49,19 @@ const Profile: React.FC = () => {
     const location = useLocation();
     const theme: ThemeInterface = useTheme();
 
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
+    const networkId = useChainId();
+    const client = useClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
+    const { address, isConnected } = useAccount();
 
     const [searchAddress, setSearchAddress] = useState<string>('');
     const [searchText, setSearchText] = useState<string>('');
 
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
-        networkId,
-        searchAddress || walletAddress,
+        { networkId, client },
+        searchAddress || (address as string),
         {
-            enabled: isAppReady && isWalletConnected,
+            enabled: isAppReady && isConnected,
         }
     );
     const speedMarketsNotifications =
@@ -70,10 +70,10 @@ const Profile: React.FC = () => {
             : 0;
 
     const userActiveChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
-        networkId,
-        searchAddress || walletAddress,
+        { networkId, client },
+        searchAddress || (address as string),
         {
-            enabled: isAppReady && isWalletConnected,
+            enabled: isAppReady && isConnected,
         }
     );
     const userActiveChainedSpeedMarketsData =
@@ -118,10 +118,7 @@ const Profile: React.FC = () => {
                 i > 0 ? finalPrices[i - 1] : strikePrice
             );
             const userWonStatuses = marketData.sides.map((side, i) =>
-                finalPrices[i] > 0 && strikePrices[i] > 0
-                    ? (side === Positions.UP && finalPrices[i] > strikePrices[i]) ||
-                      (side === Positions.DOWN && finalPrices[i] < strikePrices[i])
-                    : undefined
+                isUserWinner(side, strikePrices[i], finalPrices[i])
             );
             const claimable = userWonStatuses.every((status) => status);
 
@@ -131,8 +128,8 @@ const Profile: React.FC = () => {
 
     const totalNotifications = speedMarketsNotifications + chainedSpeedMarketsNotifications;
 
-    const userProfileDataQuery = useProfileDataQuery(networkId, searchAddress || walletAddress, {
-        enabled: isAppReady && isWalletConnected,
+    const userProfileDataQuery = useProfileDataQuery({ networkId, client }, searchAddress || (address as string), {
+        enabled: isAppReady && isConnected,
     });
     const profileData: UserProfileData =
         userProfileDataQuery.isSuccess && userProfileDataQuery.data
@@ -228,12 +225,15 @@ const Profile: React.FC = () => {
                     <Nav>
                         <NavItem
                             onClick={() => onTabClickHandler(NavItems.MyPositions)}
-                            active={view === NavItems.MyPositions}
+                            $active={view === NavItems.MyPositions}
                         >
                             {t('profile.tabs.my-positions')}
                             {totalNotifications > 0 && <Notification>{totalNotifications}</Notification>}
                         </NavItem>
-                        <NavItem onClick={() => onTabClickHandler(NavItems.History)} active={view === NavItems.History}>
+                        <NavItem
+                            onClick={() => onTabClickHandler(NavItems.History)}
+                            $active={view === NavItems.History}
+                        >
                             {t('profile.tabs.history')}
                         </NavItem>
                     </Nav>

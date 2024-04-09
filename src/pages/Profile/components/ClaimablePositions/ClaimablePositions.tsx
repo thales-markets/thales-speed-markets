@@ -1,7 +1,6 @@
 import TileTable from 'components/TileTable/TileTable';
 import { USD_SIGN } from 'constants/currency';
 import { millisecondsToSeconds } from 'date-fns';
-import { Positions } from 'enums/market';
 import { orderBy } from 'lodash';
 import ChainedPositionAction from 'pages/SpeedMarkets/components/ChainedPositionAction';
 import { ShareIcon } from 'pages/SpeedMarkets/components/OpenPosition/OpenPosition';
@@ -14,14 +13,16 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
-import { getIsWalletConnected, getNetworkId, getWalletAddress } from 'redux/modules/wallet';
 import { useTheme } from 'styled-components';
-import { formatCurrency, formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
+import { formatCurrency, formatCurrencyWithSign } from 'thales-utils';
 import { SharePositionData } from 'types/flexCards';
 import { UserPosition } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
+import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getPriceId } from 'utils/pyth';
+import { isUserWinner } from 'utils/speedAmm';
+import { useAccount, useChainId, useClient } from 'wagmi';
 import MyPositionAction from '../MyPositionAction';
 import { getDirections } from '../styled-components';
 
@@ -35,19 +36,19 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
     const theme: ThemeInterface = useTheme();
 
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
+    const networkId = useChainId();
+    const client = useClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
+    const { isConnected, address } = useAccount();
 
     const [openTwitterShareModal, setOpenTwitterShareModal] = useState<boolean>(false);
     const [positionsShareData, setPositionShareData] = useState<SharePositionData | null>(null);
 
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
-        networkId,
-        searchAddress || walletAddress,
+        { networkId, client },
+        searchAddress || (address as string),
         {
-            enabled: isAppReady && isWalletConnected,
+            enabled: isAppReady && isConnected,
         }
     );
 
@@ -60,10 +61,10 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
     );
 
     const userActiveChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
-        networkId,
-        searchAddress || walletAddress,
+        { networkId, client },
+        searchAddress || (address as string),
         {
-            enabled: isAppReady && isWalletConnected && !isOnlySpeedMarketsSupported(networkId),
+            enabled: isAppReady && isConnected && !isOnlySpeedMarketsSupported(networkId),
         }
     );
 
@@ -112,10 +113,7 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
                 i === 0 ? strikePrice : finalPrices[i - 1]
             );
             const userWonStatuses = marketData.sides.map((side, i) =>
-                finalPrices[i] > 0 && strikePrices[i] > 0
-                    ? (side === Positions.UP && finalPrices[i] > strikePrices[i]) ||
-                      (side === Positions.DOWN && finalPrices[i] < strikePrices[i])
-                    : undefined
+                isUserWinner(side, strikePrices[i], finalPrices[i])
             );
             const canResolve =
                 userWonStatuses.some((status) => status === false) ||
@@ -132,7 +130,7 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
                 return {
                     positionAddress: marketData.positionAddress,
                     currencyKey: marketData.currencyKey,
-                    strikePrice: marketData.strikePriceNum || 0,
+                    strikePrice: marketData.strikePrice,
                     leftPrice: 0,
                     rightPrice: 0,
                     finalPrice: marketData.finalPrice || 0,
@@ -215,7 +213,7 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
                         },
                         {
                             title: t('profile.history.expired'),
-                            value: formatShortDateWithTime(row.maturityDate),
+                            value: formatShortDateWithFullTime(row.maturityDate),
                         },
                         {
                             value: chainedPosition ? (

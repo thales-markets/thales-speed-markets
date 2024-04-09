@@ -1,6 +1,6 @@
+import SimpleLoader from 'components/SimpleLoader';
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import { CircularProgress } from '@material-ui/core';
 import { history } from 'utils/routes';
 
 const Loader: React.FC = () => {
@@ -11,16 +11,10 @@ const Loader: React.FC = () => {
     });
     return (
         <Wrapper>
-            <CustomCircularProgress />
+            <SimpleLoader />
         </Wrapper>
     );
 };
-
-const CustomCircularProgress = styled(CircularProgress)`
-    &.MuiCircularProgress-colorPrimary {
-        color: ${(props) => props.theme.background.quaternary};
-    }
-`;
 
 const Wrapper = styled.div`
     position: absolute;

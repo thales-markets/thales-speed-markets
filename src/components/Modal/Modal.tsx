@@ -1,19 +1,13 @@
-import { ScreenSizeBreakpoint } from 'enums/ui';
 import React from 'react';
 import ReactModal from 'react-modal';
-import styled, { CSSProperties } from 'styled-components';
+import styled from 'styled-components';
 import { FlexDiv, FlexDivRow } from 'styles/common';
-import { convertCssToStyledProperties } from 'thales-utils';
 
 type ModalProps = {
     title: string;
     shouldCloseOnOverlayClick?: boolean;
-    customStyle?: ReactModal.Styles;
-    mobileStyle?: {
-        container?: CSSProperties;
-        header?: CSSProperties;
-    };
     onClose: () => void;
+    children?: React.ReactNode;
 };
 
 ReactModal.setAppElement('#root');
@@ -38,30 +32,16 @@ const defaultCustomStyles = {
     },
 };
 
-const Modal: React.FC<ModalProps> = ({
-    title,
-    onClose,
-    children,
-    shouldCloseOnOverlayClick,
-    customStyle,
-    mobileStyle,
-}) => {
-    const customStylesOverride = customStyle
-        ? {
-              content: { ...defaultCustomStyles.content, ...customStyle.content },
-              overlay: { ...defaultCustomStyles.overlay, ...customStyle.overlay },
-          }
-        : defaultCustomStyles;
-
+const Modal: React.FC<ModalProps> = ({ title, onClose, children, shouldCloseOnOverlayClick }) => {
     return (
         <ReactModal
             isOpen
             onRequestClose={onClose}
             shouldCloseOnOverlayClick={shouldCloseOnOverlayClick}
-            style={customStylesOverride}
+            style={defaultCustomStyles}
         >
-            <Container mobileStyle={mobileStyle?.container}>
-                <Header mobileStyle={mobileStyle?.header}>
+            <Container>
+                <Header>
                     <Title>{title}</Title>
                     <FlexDivRow>{<CloseIcon className="icon icon--x-sign" onClick={onClose} />}</FlexDivRow>
                 </Header>
@@ -71,24 +51,17 @@ const Modal: React.FC<ModalProps> = ({
     );
 };
 
-const Container = styled.div<{ mobileStyle?: CSSProperties }>`
+const Container = styled.div`
     border: 1px solid ${(props) => props.theme.borderColor.secondary};
     background: ${(props) => props.theme.background.primary};
     padding: 20px;
     border-radius: 8px;
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        padding: 13px;
-        ${(props) => (props.mobileStyle ? convertCssToStyledProperties(props.mobileStyle) : '')}
-    }
     max-height: 100vh;
     height: fit-content;
 `;
 
-const Header = styled(FlexDivRow)<{ mobileStyle?: CSSProperties }>`
+const Header = styled(FlexDivRow)`
     margin-bottom: 20px;
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        ${(props) => props.mobileStyle && convertCssToStyledProperties(props.mobileStyle)}
-    }
 `;
 
 const Title = styled(FlexDiv)`

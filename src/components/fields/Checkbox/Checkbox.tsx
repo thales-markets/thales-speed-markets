@@ -9,18 +9,11 @@ type CheckboxProps = {
     label?: string;
 };
 
-const Checkbox: React.FC<CheckboxProps> = ({ value, onChange, disabled, checked, label, ...rest }) => {
+const Checkbox: React.FC<CheckboxProps> = ({ value, onChange, disabled, checked, label }) => {
     return (
         <CheckboxContainer className={disabled ? 'disabled' : ''}>
             {label}
-            <CheckboxInput
-                {...rest}
-                type="checkbox"
-                checked={checked}
-                value={value}
-                onChange={onChange}
-                disabled={disabled}
-            />
+            <CheckboxInput type="checkbox" checked={checked} value={value} onChange={onChange} disabled={disabled} />
             <Checkmark className="checkmark" />
         </CheckboxContainer>
     );

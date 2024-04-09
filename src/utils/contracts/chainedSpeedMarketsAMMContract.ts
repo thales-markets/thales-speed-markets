@@ -1,16 +1,18 @@
+import { TBD_ADDRESS } from 'constants/network';
 import { NetworkId } from 'thales-utils';
+import { Address } from 'viem';
 
 const chainedSpeedMarketsAMMContract = {
     addresses: {
-        [NetworkId.OptimismMainnet]: '0xFf8Cf5ABF583D0979C0B9c35d62dd1fD52cce7C7',
-        [NetworkId.OptimismGoerli]: '0xe9FdD4717f9dDAa7e74e9a63B559F54A38f98613',
-        [NetworkId.OptimismSepolia]: 'TBD',
-        [NetworkId.PolygonMainnet]: '0x14D2d7f64D6F10f8eF06372c2e5E36850661a537',
-        [NetworkId.Arbitrum]: '0xe92B4c614b04c239d30c31A7ea1290AdDCb8217D',
-        [NetworkId.Base]: '0x6848F001ddDb4442d352C495c7B4a231e3889b70',
-        [NetworkId.ZkSync]: 'TBD',
-        [NetworkId.ZkSyncSepolia]: 'TBD',
-        [NetworkId.BlastSepolia]: 'TBD',
+        [NetworkId.OptimismMainnet]: '0xFf8Cf5ABF583D0979C0B9c35d62dd1fD52cce7C7' as Address,
+        [NetworkId.OptimismGoerli]: '0xe9FdD4717f9dDAa7e74e9a63B559F54A38f98613' as Address,
+        [NetworkId.OptimismSepolia]: TBD_ADDRESS,
+        [NetworkId.PolygonMainnet]: '0x14D2d7f64D6F10f8eF06372c2e5E36850661a537' as Address,
+        [NetworkId.Arbitrum]: '0xe92B4c614b04c239d30c31A7ea1290AdDCb8217D' as Address,
+        [NetworkId.Base]: '0x6848F001ddDb4442d352C495c7B4a231e3889b70' as Address,
+        [NetworkId.ZkSync]: TBD_ADDRESS,
+        [NetworkId.ZkSyncSepolia]: TBD_ADDRESS,
+        [NetworkId.BlastSepolia]: TBD_ADDRESS,
     },
     abi: [
         {

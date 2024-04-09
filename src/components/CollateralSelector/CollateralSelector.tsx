@@ -1,7 +1,7 @@
+import OutsideClickHandler from 'components/OutsideClick/OutsideClick';
 import { USD_SIGN } from 'constants/currency';
 import { Rates } from 'queries/rates/useExchangeRatesQuery';
 import React, { CSSProperties, useCallback, useMemo, useState } from 'react';
-import OutsideClickHandler from 'react-outside-click-handler';
 import { useDispatch } from 'react-redux';
 import { setSelectedCollateralIndex } from 'redux/modules/wallet';
 import styled from 'styled-components';

@@ -1,34 +1,52 @@
+import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { SIDE_TO_POSITION_MAP } from 'constants/market';
 import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { secondsToMilliseconds } from 'date-fns';
-import { parseBytes32String } from 'ethers/lib/utils.js';
-import { UseQueryOptions, useQuery } from 'react-query';
-import { NetworkId, bigNumberFormatter, coinFormatter, roundNumberToDecimals } from 'thales-utils';
+import { bigNumberFormatter, coinFormatter, parseBytes32String, roundNumberToDecimals } from 'thales-utils';
 import { ChainedSpeedMarket } from 'types/market';
-import snxJSConnector from 'utils/snxJSConnector';
+import { QueryConfig } from 'types/network';
+import { ViemContract } from 'types/viem';
+import { getContarctAbi } from 'utils/contracts/abi';
+import chainedSpeedMarketsAMMContract from 'utils/contracts/chainedSpeedMarketsAMMContract';
+import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
+import { getContract } from 'viem';
 
 const useUserActiveChainedSpeedMarketsDataQuery = (
-    networkId: NetworkId,
+    queryConfig: QueryConfig,
     walletAddress: string,
-    options?: UseQueryOptions<ChainedSpeedMarket[]>
+    options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
-    return useQuery<ChainedSpeedMarket[]>(
-        QUERY_KEYS.User.ChainedSpeedMarkets(networkId, walletAddress),
-        async () => {
+    return useQuery<ChainedSpeedMarket[]>({
+        queryKey: QUERY_KEYS.User.ChainedSpeedMarkets(queryConfig.networkId, walletAddress),
+        queryFn: async () => {
             const userChainedSpeedMarketsData: ChainedSpeedMarket[] = [];
 
-            const { chainedSpeedMarketsAMMContract, speedMarketsDataContract } = snxJSConnector;
+            try {
+                const speedMarketsDataContractLocal = getContract({
+                    abi: getContarctAbi(speedMarketsDataContract, queryConfig.networkId),
+                    address: speedMarketsDataContract.addresses[queryConfig.networkId],
+                    client: queryConfig.client,
+                }) as ViemContract;
 
-            if (chainedSpeedMarketsAMMContract && speedMarketsDataContract) {
-                const ammParams = await speedMarketsDataContract.getChainedSpeedMarketsAMMParameters(walletAddress);
+                const chainedMarketsAMMContract = getContract({
+                    abi: chainedSpeedMarketsAMMContract.abi,
+                    address: chainedSpeedMarketsAMMContract.addresses[queryConfig.networkId],
+                    client: queryConfig.client,
+                }) as ViemContract;
 
-                const activeMarkets = await chainedSpeedMarketsAMMContract.activeMarketsPerUser(
+                const ammParams = await speedMarketsDataContractLocal.read.getChainedSpeedMarketsAMMParameters([
+                    walletAddress,
+                ]);
+
+                const activeMarkets = await chainedMarketsAMMContract.read.activeMarketsPerUser([
                     0,
                     ammParams.numActiveMarketsPerUser,
-                    walletAddress
-                );
-                const marketsDataArray = await speedMarketsDataContract.getChainedMarketsData(activeMarkets);
+                    walletAddress,
+                ]);
+                const marketsDataArray = await speedMarketsDataContractLocal.read.getChainedMarketsData([
+                    activeMarkets,
+                ]);
                 const userActiveMarkets = marketsDataArray.map((marketData: any, index: number) => ({
                     ...marketData,
                     market: activeMarkets[index],
@@ -48,7 +66,7 @@ const useUserActiveChainedSpeedMarketsDataQuery = (
                         );
                     const strikePrices = Array(sides.length).fill(0);
                     strikePrices[0] = bigNumberFormatter(marketData.initialStrikePrice, PYTH_CURRENCY_DECIMALS);
-                    const buyinAmount = coinFormatter(marketData.buyinAmount, networkId);
+                    const buyinAmount = coinFormatter(marketData.buyinAmount, queryConfig.networkId);
                     const fee = bigNumberFormatter(marketData.safeBoxImpact);
                     const payout = roundNumberToDecimals(
                         buyinAmount * bigNumberFormatter(marketData.payoutMultiplier) ** sides.length,
@@ -77,14 +95,14 @@ const useUserActiveChainedSpeedMarketsDataQuery = (
 
                     userChainedSpeedMarketsData.push(userData);
                 }
+            } catch (e) {
+                console.log(e);
             }
 
             return userChainedSpeedMarketsData;
         },
-        {
-            ...options,
-        }
-    );
+        ...options,
+    });
 };
 
 export default useUserActiveChainedSpeedMarketsDataQuery;

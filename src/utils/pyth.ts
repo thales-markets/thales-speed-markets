@@ -2,8 +2,8 @@ import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
 import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
 import { LINKS } from 'constants/links';
 import { PRICE_ID, PRICE_SERVICE_ENDPOINTS, PYTH_CURRENCY_DECIMALS, SUPPORTED_ASSETS } from 'constants/pyth';
-import { ethers } from 'ethers';
 import { NetworkId, bigNumberFormatter, floorNumberToDecimals } from 'thales-utils';
+import { parseUnits } from 'viem';
 
 export const getPriceServiceEndpoint = (networkId: NetworkId) => {
     if (
@@ -127,4 +127,4 @@ export const getBenchmarksPriceFeeds = async (priceFeeds: { priceId: string; pub
 };
 
 export const priceParser = (value: number) =>
-    ethers.utils.parseUnits(floorNumberToDecimals(value, PYTH_CURRENCY_DECIMALS).toString(), PYTH_CURRENCY_DECIMALS);
+    parseUnits(floorNumberToDecimals(value, PYTH_CURRENCY_DECIMALS).toString(), PYTH_CURRENCY_DECIMALS);

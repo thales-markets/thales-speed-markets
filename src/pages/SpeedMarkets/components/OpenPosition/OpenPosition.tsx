@@ -6,15 +6,15 @@ import useInterval from 'hooks/useInterval';
 import MyPositionAction from 'pages/Profile/components/MyPositionAction/MyPositionAction';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
-import { getNetworkId, getWalletAddress } from 'redux/modules/wallet';
 import styled, { useTheme } from 'styled-components';
-import { formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
+import { formatCurrencyWithSign } from 'thales-utils';
 import { UserOpenPositions } from 'types/market';
-import { RootState, ThemeInterface } from 'types/ui';
+import { ThemeInterface } from 'types/ui';
+import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import { formatNumberShort } from 'utils/formatters/number';
 import { refetchUserSpeedMarkets } from 'utils/queryConnector';
 import { getColorPerPosition } from 'utils/style';
+import { useAccount, useChainId } from 'wagmi';
 import SharePositionModal from '../SharePositionModal';
 
 type OpenPositionProps = {
@@ -33,9 +33,8 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
-    const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
-
+    const networkId = useChainId();
+    const { address } = useAccount();
     const [openTwitterShareModal, setOpenTwitterShareModal] = useState(false);
     const [isSpeedMarketMatured, setIsSpeedMarketMatured] = useState(Date.now() > position.maturityDate);
 
@@ -45,7 +44,7 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
                 setIsSpeedMarketMatured(true);
             }
             if (!position.finalPrice) {
-                refetchUserSpeedMarkets(false, networkId, walletAddress);
+                refetchUserSpeedMarkets(false, networkId, address as string);
             }
         }
     }, secondsToMilliseconds(10));
@@ -56,13 +55,13 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
         <Position>
             <Icon className={`currency-icon currency-icon--${position.currencyKey.toLowerCase()}`} />
             <AlignedFlex>
-                <FlexContainer firstChildWidth="130px">
+                <FlexContainer $firstChildWidth="130px">
                     <Label>{position.currencyKey}</Label>
-                    <Value>{position.strikePrice}</Value>
+                    <Value>{formatCurrencyWithSign(USD_SIGN, position.strikePrice)}</Value>
                 </FlexContainer>
 
                 <Separator />
-                <FlexContainer secondChildWidth="140px">
+                <FlexContainer $secondChildWidth="140px">
                     <Label>{isSpeedMarketMatured ? t('profile.final-price') : t('profile.current-price')}</Label>
                     <Value>
                         {isSpeedMarketMatured ? (
@@ -80,9 +79,9 @@ const OpenPosition: React.FC<OpenPositionProps> = ({
                     </Value>
                 </FlexContainer>
                 <Separator />
-                <FlexContainer>
+                <FlexContainer $thirdChildWidth="175px">
                     <Label>{t('speed-markets.user-positions.end-time')}</Label>
-                    <Value>{formatShortDateWithTime(position.maturityDate)}</Value>
+                    <Value>{formatShortDateWithFullTime(position.maturityDate)}</Value>
                 </FlexContainer>
                 <Separator />
                 <FlexContainer>
@@ -167,16 +166,23 @@ const AlignedFlex = styled.div`
     }
 `;
 
-const FlexContainer = styled(AlignedFlex)<{ firstChildWidth?: string; secondChildWidth?: string }>`
+const FlexContainer = styled(AlignedFlex)<{
+    $firstChildWidth?: string;
+    $secondChildWidth?: string;
+    $thirdChildWidth?: string;
+}>`
     gap: 4px;
     flex: 1;
     justify-content: center;
     &:first-child {
-        min-width: ${(props) => (props.firstChildWidth ? props.firstChildWidth : '195px')};
-        max-width: ${(props) => (props.firstChildWidth ? props.firstChildWidth : '195px')};
+        min-width: ${(props) => (props.$firstChildWidth ? props.$firstChildWidth : '195px')};
+        max-width: ${(props) => (props.$firstChildWidth ? props.$firstChildWidth : '195px')};
     }
     &:nth-child(3) {
-        ${(props) => (props.secondChildWidth ? `min-width: ${props.secondChildWidth};` : '')};
+        ${(props) => (props.$secondChildWidth ? `min-width: ${props.$secondChildWidth};` : '')};
+    }
+    &:nth-child(5) {
+        ${(props) => (props.$thirdChildWidth ? `min-width: ${props.$thirdChildWidth};` : '')};
     }
 
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {

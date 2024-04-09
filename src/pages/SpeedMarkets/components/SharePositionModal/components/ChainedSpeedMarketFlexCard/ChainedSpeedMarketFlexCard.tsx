@@ -8,13 +8,13 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsMobile } from 'redux/modules/ui';
-import { RootState } from 'types/ui';
 import styled, { useTheme } from 'styled-components';
 import { FlexDiv, FlexDivCentered, FlexDivColumn, FlexDivEnd, FlexDivRow } from 'styles/common';
 import { formatCurrency, formatCurrencyWithSign, roundNumberToDecimals } from 'thales-utils';
 import { SharePositionData } from 'types/flexCards';
-import { ThemeInterface } from 'types/ui';
+import { RootState, ThemeInterface } from 'types/ui';
 import { getSynthName } from 'utils/currency';
+import { isUserWinner } from 'utils/speedAmm';
 
 const ChainedSpeedMarketFlexCard: React.FC<SharePositionData> = ({
     type,
@@ -31,26 +31,23 @@ const ChainedSpeedMarketFlexCard: React.FC<SharePositionData> = ({
 
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
-    const isUserWinner = type === 'chained-speed-won';
+    const isWonType = type === 'chained-speed-won';
 
-    const userStatusByDirection = positions.map((position, i) =>
-        finalPrices && strikePrices && Number(finalPrices[i]) > 0 && Number(strikePrices[i]) > 0
-            ? (position === Positions.UP && Number(finalPrices[i]) > Number(strikePrices[i])) ||
-              (position === Positions.DOWN && Number(finalPrices[i]) < Number(strikePrices[i]))
-            : undefined
+    const userStatusByDirection = positions.map(
+        (position, i) => finalPrices && strikePrices && isUserWinner(position, strikePrices[i], finalPrices[i])
     );
 
     const roi = payoutMultiplier ? roundNumberToDecimals(payoutMultiplier ** positions.length) : 0;
 
     return (
-        <Container isWon={isUserWinner}>
-            <ContentWrapper isWon={isUserWinner}>
-                <HeaderWrapper isWon={isUserWinner}>
-                    {isUserWinner && <Won>{t('common.flex-card.won')}</Won>}
-                    {isUserWinner && <Payout>{formatCurrencyWithSign(USD_SIGN, payout ?? 0)}</Payout>}
+        <Container isWon={isWonType}>
+            <ContentWrapper isWon={isWonType}>
+                <HeaderWrapper isWon={isWonType}>
+                    {isWonType && <Won>{t('common.flex-card.won')}</Won>}
+                    {isWonType && <Payout>{formatCurrencyWithSign(USD_SIGN, payout ?? 0)}</Payout>}
                     <HeaderLabel>{t('speed-markets.chained.name')}</HeaderLabel>
                 </HeaderWrapper>
-                <AssetDiv isWon={isUserWinner}>
+                <AssetDiv isWon={isWonType}>
                     <CurrencyIcon className={`currency-icon currency-icon--${currencyKey.toLowerCase()}`} />
                     <AssetLabel>{getSynthName(currencyKey)}</AssetLabel>
                     <AssetLabel isBold>{currencyKey}</AssetLabel>
@@ -66,7 +63,7 @@ const ChainedSpeedMarketFlexCard: React.FC<SharePositionData> = ({
                 {positions.map((position, index) => {
                     return (
                         <DirectionRow key={index} isLast={index === positions.length - 1}>
-                            <Text width={8} isBold>
+                            <Text width={8} $isBold>
                                 {index + 1}
                             </Text>
                             <FlexDivCentered>
@@ -79,21 +76,21 @@ const ChainedSpeedMarketFlexCard: React.FC<SharePositionData> = ({
                                         className="icon icon--caret-down"
                                     />
                                 )}
-                                <Text width={50} isBold padding="0 0 0 5px">
+                                <Text width={50} $isBold padding="0 0 0 5px">
                                     {position}
                                 </Text>
                             </FlexDivCentered>
-                            <Text width={90} isCenter={!(strikePrices && strikePrices[index])}>
+                            <Text width={90} $isCenter={!(strikePrices && strikePrices[index])}>
                                 {strikePrices && strikePrices[index]
                                     ? `${currencyKey} ${formatCurrencyWithSign(USD_SIGN, strikePrices[index])}`
                                     : '-'}
                             </Text>
-                            <Text width={90} isCenter={!(finalPrices && finalPrices[index])}>
+                            <Text width={90} $isCenter={!(finalPrices && finalPrices[index])}>
                                 {finalPrices && finalPrices[index]
                                     ? `${currencyKey} ${formatCurrencyWithSign(USD_SIGN, finalPrices[index])}`
                                     : '-'}
                             </Text>
-                            <Text width={20} isCenter={userStatusByDirection[index] === undefined}>
+                            <Text width={20} $isCenter={userStatusByDirection[index] === undefined}>
                                 {userStatusByDirection[index] === undefined ? (
                                     '-'
                                 ) : userStatusByDirection[index] ? (
@@ -106,7 +103,7 @@ const ChainedSpeedMarketFlexCard: React.FC<SharePositionData> = ({
                     );
                 })}
                 <FlexDivRow>
-                    <Text isUppercase>{`${t('common.flex-card.buy-in')}: ${formatCurrency(buyIn)} ${
+                    <Text $isUppercase>{`${t('common.flex-card.buy-in')}: ${formatCurrency(buyIn)} ${
                         FIAT_CURRENCY_MAP.USD
                     }`}</Text>
                     <Text>{`${t('speed-markets.chained.roi', {
@@ -114,7 +111,7 @@ const ChainedSpeedMarketFlexCard: React.FC<SharePositionData> = ({
                     })}x`}</Text>
                 </FlexDivRow>
             </ContentWrapper>
-            {!isUserWinner && <LossWatermark>{t('common.loss')}</LossWatermark>}
+            {!isWonType && <LossWatermark>{t('common.loss')}</LossWatermark>}
         </Container>
     );
 };
@@ -228,18 +225,18 @@ const DirectionRow = styled(FlexDivRow)<{ isLast?: boolean }>`
 
 const Text = styled.span<{
     width?: number;
-    isBold?: boolean;
-    isUppercase?: boolean;
+    $isBold?: boolean;
+    $isUppercase?: boolean;
     padding?: string;
-    isCenter?: boolean;
+    $isCenter?: boolean;
 }>`
     font-size: 13px;
-    font-weight: ${(props) => (props.isBold ? 700 : 400)};
+    font-weight: ${(props) => (props.$isBold ? 700 : 400)};
     line-height: 230%;
     color: ${(props) => props.theme.textColor.primary};
-    text-transform: ${(props) => (props.isUppercase ? 'uppercase' : 'capitalize')};
+    text-transform: ${(props) => (props.$isUppercase ? 'uppercase' : 'capitalize')};
     width: ${(props) => (props.width ? `${props.width}px` : 'initial')};
-    text-align: ${(props) => (props.isCenter ? 'center' : 'left')};
+    text-align: ${(props) => (props.$isCenter ? 'center' : 'left')};
     padding: ${(props) => (props.padding ? props.padding : '0')};
 `;
 

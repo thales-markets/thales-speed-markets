@@ -8,6 +8,7 @@ type ProfileSectionProps = {
     subtitle?: string;
     maxHeight?: string;
     mobileMaxHeight?: string;
+    children?: React.ReactNode;
 };
 
 const ProfileSection: React.FC<ProfileSectionProps> = ({ title, subtitle, children, maxHeight, mobileMaxHeight }) => {

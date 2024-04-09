@@ -3,21 +3,19 @@ import ROUTES from 'constants/routes';
 import queryString from 'query-string';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import { getNetworkId } from 'redux/modules/wallet';
-import { RootState } from 'types/ui';
 import { getSupportedNetworksByRoute } from 'utils/network';
 import { buildHref } from 'utils/routes';
 import UnresolvedChainedPositions from './components/UnresolvedChainedPositions';
 import UnresolvedPositions from './components/UnresolvedPositions';
 import { Container, Header, LinkContainer, NavigationIcon } from './styled-components';
+import { useChainId } from 'wagmi';
 
 const SpeedMarketsOverview: React.FC = () => {
     const { t } = useTranslation();
     const location = useLocation();
 
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
+    const networkId = useChainId();
 
     const isChainedSupported = getSupportedNetworksByRoute(ROUTES.Markets.ChainedSpeedMarkets).includes(networkId);
     const isChainedMarkets = isChainedSupported && queryString.parse(location.search).isChained === 'true';

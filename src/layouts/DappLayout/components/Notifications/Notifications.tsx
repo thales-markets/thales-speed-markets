@@ -2,34 +2,38 @@ import SPAAnchor from 'components/SPAAnchor/SPAAnchor';
 import Tooltip from 'components/Tooltip';
 import ROUTES from 'constants/routes';
 import { millisecondsToSeconds } from 'date-fns';
-import { Positions } from 'enums/market';
+import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
 import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveSpeedMarketsDataQuery';
-import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
-import { getIsWalletConnected, getNetworkId, getWalletAddress } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
 import { RootState } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getPriceId } from 'utils/pyth';
 import { buildHref } from 'utils/routes';
+import { isUserWinner } from 'utils/speedAmm';
+import { useAccount, useChainId, useClient } from 'wagmi';
 
 const Notifications: React.FC = () => {
     const { t } = useTranslation();
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
+    const networkId = useChainId();
+    const client = useClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
+    const { isConnected, address } = useAccount();
 
     const isNetworkSupported = !isOnlySpeedMarketsSupported(networkId);
 
-    const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(networkId, walletAddress, {
-        enabled: isAppReady && isWalletConnected,
-    });
+    const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
+        { networkId, client },
+        address as string,
+        {
+            enabled: isAppReady && isConnected,
+        }
+    );
     const speedMarketsNotifications = useMemo(() => {
         if (userActiveSpeedMarketsDataQuery.isSuccess && userActiveSpeedMarketsDataQuery.data) {
             return userActiveSpeedMarketsDataQuery.data.filter((marketData) => marketData.claimable).length;
@@ -37,9 +41,13 @@ const Notifications: React.FC = () => {
         return 0;
     }, [userActiveSpeedMarketsDataQuery]);
 
-    const userActiveChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(networkId, walletAddress, {
-        enabled: isAppReady && isWalletConnected && isNetworkSupported,
-    });
+    const userActiveChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
+        { networkId, client },
+        address as string,
+        {
+            enabled: isAppReady && isConnected && isNetworkSupported,
+        }
+    );
     const userActiveChainedSpeedMarketsData = useMemo(
         () =>
             userActiveChainedSpeedMarketsDataQuery.isSuccess && userActiveChainedSpeedMarketsDataQuery.data
@@ -85,10 +93,7 @@ const Notifications: React.FC = () => {
                 i > 0 ? finalPrices[i - 1] : strikePrice
             );
             const userWonStatuses = marketData.sides.map((side, i) =>
-                finalPrices[i] > 0 && strikePrices[i] > 0
-                    ? (side === Positions.UP && finalPrices[i] > strikePrices[i]) ||
-                      (side === Positions.DOWN && finalPrices[i] < strikePrices[i])
-                    : undefined
+                isUserWinner(side, strikePrices[i], finalPrices[i])
             );
             const claimable = userWonStatuses.every((status) => status);
 
@@ -100,7 +105,7 @@ const Notifications: React.FC = () => {
 
     const hasNotifications = totalNotifications > 0;
 
-    return isWalletConnected ? (
+    return isConnected ? (
         <SPAAnchor href={buildHref(ROUTES.Markets.Profile)}>
             <Container>
                 {hasNotifications ? (

@@ -4,7 +4,6 @@ import Tooltip from 'components/Tooltip/Tooltip';
 import { USD_SIGN } from 'constants/currency';
 import { CONNECTION_TIMEOUT_MS, SUPPORTED_ASSETS } from 'constants/pyth';
 import { millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
-import { Positions } from 'enums/market';
 import useInterval from 'hooks/useInterval';
 import { orderBy } from 'lodash';
 import MaturityDate from 'pages/Profile/components/MaturityDate';
@@ -18,7 +17,6 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
-import { getIsWalletConnected, getNetworkId, getWalletAddress } from 'redux/modules/wallet';
 import { useTheme } from 'styled-components';
 import { formatCurrency, formatCurrencyWithSign } from 'thales-utils';
 import { SharePositionData } from 'types/flexCards';
@@ -26,6 +24,8 @@ import { UserPosition } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAssetsAsObject } from 'utils/pyth';
+import { isUserWinner } from 'utils/speedAmm';
+import { useAccount, useChainId, useClient } from 'wagmi';
 import MyPositionAction from '../MyPositionAction/MyPositionAction';
 import { getDirections } from '../styled-components';
 
@@ -39,10 +39,10 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
     const theme: ThemeInterface = useTheme();
 
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
+    const networkId = useChainId();
+    const client = useClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
+    const { isConnected, address } = useAccount();
 
     const [openTwitterShareModal, setOpenTwitterShareModal] = useState<boolean>(false);
     const [positionsShareData, setPositionShareData] = useState<SharePositionData | null>(null);
@@ -69,10 +69,10 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
     }, secondsToMilliseconds(10));
 
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
-        networkId,
-        searchAddress || walletAddress,
+        { networkId, client },
+        searchAddress || (address as string),
         {
-            enabled: isAppReady && isWalletConnected,
+            enabled: isAppReady && isConnected,
         }
     );
 
@@ -85,10 +85,10 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
     );
 
     const userActiveChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
-        networkId,
-        searchAddress || walletAddress,
+        { networkId, client },
+        searchAddress || (address as string),
         {
-            enabled: isAppReady && isWalletConnected && !isOnlySpeedMarketsSupported(networkId),
+            enabled: isAppReady && isConnected && !isOnlySpeedMarketsSupported(networkId),
         }
     );
 
@@ -137,12 +137,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
             i === 0 ? strikePrice : finalPrices[i - 1]
         );
         const lastStrikePrice = [...strikePrices].reverse().find((strikePrice) => strikePrice);
-        const userWonStatuses = marketData.sides.map((side, i) =>
-            finalPrices[i] > 0 && strikePrices[i] > 0
-                ? (side === Positions.UP && finalPrices[i] > strikePrices[i]) ||
-                  (side === Positions.DOWN && finalPrices[i] < strikePrices[i])
-                : undefined
-        );
+        const userWonStatuses = marketData.sides.map((side, i) => isUserWinner(side, strikePrices[i], finalPrices[i]));
         const userLost = userWonStatuses.some((status) => status === false);
         return { ...marketData, strikePrices, userLost, lastStrikePrice };
     });
@@ -154,7 +149,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
                 return {
                     positionAddress: marketData.positionAddress,
                     currencyKey: marketData.currencyKey,
-                    strikePrice: marketData.strikePriceNum || 0,
+                    strikePrice: marketData.strikePrice,
                     leftPrice: 0,
                     rightPrice: 0,
                     finalPrice: marketData.finalPrice || 0,
@@ -240,13 +235,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
                         },
                         {
                             title: t('profile.history.expires'),
-                            value: (
-                                <MaturityDate
-                                    maturityDateUnix={row.maturityDate}
-                                    showFullCounter
-                                    showDateWithTime={true}
-                                />
-                            ),
+                            value: <MaturityDate maturityDateUnix={row.maturityDate} showFullCounter />,
                         },
                         {
                             value: <MyPositionAction position={row} isProfileAction />,
