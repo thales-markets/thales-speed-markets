@@ -1,5 +1,4 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query';
-import { USD_SIGN } from 'constants/currency';
 import {
     BATCH_NUMBER_OF_SPEED_MARKETS,
     MAX_NUMBER_OF_SPEED_MARKETS_TO_FETCH,
@@ -10,7 +9,7 @@ import {
 import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
-import { bigNumberFormatter, coinFormatter, formatCurrencyWithSign, parseBytes32String } from 'thales-utils';
+import { bigNumberFormatter, coinFormatter, parseBytes32String } from 'thales-utils';
 import { UserClosedPositions } from 'types/market';
 import { QueryConfig } from 'types/network';
 import { ViemContract } from 'types/viem';
@@ -96,11 +95,7 @@ const useUserResolvedSpeedMarketsDataQuery = (
 
                     const userData: UserClosedPositions = {
                         currencyKey: parseBytes32String(marketData.asset),
-                        strikePrice: formatCurrencyWithSign(
-                            USD_SIGN,
-                            bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS)
-                        ),
-                        strikePriceNum: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS),
+                        strikePrice: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS),
                         payout,
                         maturityDate,
                         market: marketData.market,

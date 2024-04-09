@@ -12,21 +12,18 @@ import { useSelector } from 'react-redux';
 import { getIsMobile } from 'redux/modules/ui';
 import styled, { useTheme } from 'styled-components';
 import { FlexDivCentered, FlexDivColumn, FlexDivColumnCentered, FlexDivSpaceBetween } from 'styles/common';
-import {
-    formatCurrencyWithSign,
-    formatHoursAndMinutesFromTimestamp,
-    formatShortDate,
-    formatShortDateWithTime,
-} from 'thales-utils';
+import { formatCurrencyWithSign, formatShortDate } from 'thales-utils';
 import { ChainedSpeedMarket } from 'types/market';
 import { RootState, ThemeInterface } from 'types/ui';
+import { formatHoursMinutesSecondsFromTimestamp, formatShortDateWithFullTime } from 'utils/formatters/date';
 import { formatNumberShort } from 'utils/formatters/number';
 import { getPriceId } from 'utils/pyth';
 import { refetchPythPrice } from 'utils/queryConnector';
+import { isUserWinner } from 'utils/speedAmm';
 import { getColorPerPosition } from 'utils/style';
+import { useChainId } from 'wagmi';
 import ChainedPositionAction from '../ChainedPositionAction';
 import { AssetIcon, Icon, PositionSymbolDown, PositionSymbolUp } from '../SelectPosition/styled-components';
-import { useChainId } from 'wagmi';
 
 type ChainedPositionProps = {
     position: ChainedSpeedMarket;
@@ -86,12 +83,7 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                   i > 0 && i <= fetchLastFinalPriceIndex ? finalPrices[i - 1] : strikePrice
               )
             : position.strikePrices;
-    const userWonStatuses = position.sides.map((side, i) =>
-        finalPrices[i] > 0 && strikePrices[i] > 0
-            ? (side === Positions.UP && finalPrices[i] > strikePrices[i]) ||
-              (side === Positions.DOWN && finalPrices[i] < strikePrices[i])
-            : undefined
-    );
+    const userWonStatuses = position.sides.map((side, i) => isUserWinner(side, strikePrices[i], finalPrices[i]));
     const canResolve = position.isOpen
         ? userWonStatuses.some((status) => status === false) || userWonStatuses.every((status) => status !== undefined)
         : position.canResolve;
@@ -171,7 +163,7 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                     <FlexContainer>
                         <Text>{t('speed-markets.user-positions.end-time')}</Text>
                         <Text isActiveColor>
-                            {formatShortDateWithTime(
+                            {formatShortDateWithFullTime(
                                 positionWithPrices.canResolve
                                     ? positionWithPrices.strikeTimes[statusDecisionIndex]
                                     : positionWithPrices.maturityDate
@@ -251,7 +243,7 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                                         {formatShortDate(positionWithPrices.strikeTimes[index])}
                                     </Text>
                                     <Text lineHeight="14px" padding="0 0 1px 0">
-                                        {formatHoursAndMinutesFromTimestamp(positionWithPrices.strikeTimes[index])}
+                                        {formatHoursMinutesSecondsFromTimestamp(positionWithPrices.strikeTimes[index])}
                                     </Text>
                                     {positionWithPrices.strikePrices[index] ? (
                                         <Text isActiveColor={!maturedStrikeTimes[index]}>

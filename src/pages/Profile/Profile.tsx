@@ -1,11 +1,10 @@
 import SearchInput from 'components/SearchInput';
 import { USD_SIGN } from 'constants/currency';
 import { millisecondsToSeconds } from 'date-fns';
-import { Positions } from 'enums/market';
-import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
-import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveSpeedMarketsDataQuery';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import useProfileDataQuery from 'queries/profile/useProfileDataQuery';
+import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
+import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveSpeedMarketsDataQuery';
 import queryString from 'query-string';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +17,8 @@ import { UserProfileData } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
 import { getPriceId } from 'utils/pyth';
 import { history } from 'utils/routes';
+import { isUserWinner } from 'utils/speedAmm';
+import { useAccount, useChainId, useClient } from 'wagmi';
 import { MARKET_DURATION_IN_DAYS } from '../../constants/market';
 import ClaimablePositions from './components/ClaimablePositions';
 import OpenPositions from './components/OpenPositions';
@@ -37,7 +38,6 @@ import {
     StatsValue,
     Title,
 } from './styled-components';
-import { useAccount, useChainId, useClient } from 'wagmi';
 import { getIsBiconomy } from 'redux/modules/wallet';
 import biconomyConnector from 'utils/biconomyWallet';
 
@@ -121,10 +121,7 @@ const Profile: React.FC = () => {
                 i > 0 ? finalPrices[i - 1] : strikePrice
             );
             const userWonStatuses = marketData.sides.map((side, i) =>
-                finalPrices[i] > 0 && strikePrices[i] > 0
-                    ? (side === Positions.UP && finalPrices[i] > strikePrices[i]) ||
-                      (side === Positions.DOWN && finalPrices[i] < strikePrices[i])
-                    : undefined
+                isUserWinner(side, strikePrices[i], finalPrices[i])
             );
             const claimable = userWonStatuses.every((status) => status);
 

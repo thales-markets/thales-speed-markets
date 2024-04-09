@@ -1,14 +1,12 @@
 import { EvmPriceServiceConnection, PriceFeed } from '@pythnetwork/pyth-evm-js';
 import { UseQueryOptions, useQuery } from '@tanstack/react-query';
-import { USD_SIGN } from 'constants/currency';
 import { SIDE_TO_POSITION_MAP, SPEED_MARKETS_QUOTE } from 'constants/market';
 import { ZERO_ADDRESS } from 'constants/network';
 import { CONNECTION_TIMEOUT_MS, PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
-import { Positions } from 'enums/market';
 import { reject } from 'lodash';
-import { bigNumberFormatter, coinFormatter, formatCurrencyWithSign, parseBytes32String } from 'thales-utils';
+import { bigNumberFormatter, coinFormatter, parseBytes32String } from 'thales-utils';
 import { UserOpenPositions } from 'types/market';
 import { QueryConfig } from 'types/network';
 import { ViemContract } from 'types/viem';
@@ -16,7 +14,7 @@ import { getContarctAbi } from 'utils/contracts/abi';
 import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
 import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
 import { getBenchmarksPriceFeeds, getPriceId, getPriceServiceEndpoint } from 'utils/pyth';
-import { getFeesFromHistory } from 'utils/speedAmm';
+import { getFeesFromHistory, isUserWinner } from 'utils/speedAmm';
 import { getContract } from 'viem';
 
 const useUserActiveSpeedMarketsDataQuery = (
@@ -92,18 +90,18 @@ const useUserActiveSpeedMarketsDataQuery = (
                     const payout = coinFormatter(marketData.buyinAmount, queryConfig.networkId) * SPEED_MARKETS_QUOTE;
 
                     let isClaimable = false;
-                    let price = 0;
+                    let finalPrice = 0;
                     const isMarketMatured = secondsToMilliseconds(Number(marketData.strikeTime)) < Date.now();
                     if (isMarketMatured) {
                         const priceFeed: PromiseSettledResult<PriceFeed> = priceFeeds[i];
                         if (priceFeed.status === 'fulfilled' && priceFeed.value) {
-                            price = priceFeed.value.getPriceUnchecked().getPriceAsNumberUnchecked();
+                            finalPrice = priceFeed.value.getPriceUnchecked().getPriceAsNumberUnchecked();
                         } else {
                             const benchmarksPriceId = getPriceId(
                                 queryConfig.networkId,
                                 parseBytes32String(marketData.asset)
                             ).replace('0x', '');
-                            price =
+                            finalPrice =
                                 benchmarksPriceFeeds.find(
                                     (benchmarksPrice) =>
                                         benchmarksPrice.priceId === benchmarksPriceId &&
@@ -111,12 +109,11 @@ const useUserActiveSpeedMarketsDataQuery = (
                                 )?.price || 0;
                         }
 
-                        isClaimable =
-                            !!price &&
-                            ((side === Positions.UP &&
-                                price > bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS)) ||
-                                (side === Positions.DOWN &&
-                                    price < bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS)));
+                        isClaimable = !!isUserWinner(
+                            side,
+                            bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS),
+                            finalPrice
+                        );
                     }
 
                     const maturityDate = secondsToMilliseconds(Number(marketData.strikeTime));
@@ -137,11 +134,7 @@ const useUserActiveSpeedMarketsDataQuery = (
                     const userData: UserOpenPositions = {
                         positionAddress: ZERO_ADDRESS,
                         currencyKey: parseBytes32String(marketData.asset),
-                        strikePrice: formatCurrencyWithSign(
-                            USD_SIGN,
-                            bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS)
-                        ),
-                        strikePriceNum: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS),
+                        strikePrice: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS),
                         payout: payout,
                         maturityDate,
                         market: marketData.market,
@@ -149,7 +142,7 @@ const useUserActiveSpeedMarketsDataQuery = (
                         paid: coinFormatter(marketData.buyinAmount, queryConfig.networkId) * (1 + fees),
                         value: payout,
                         claimable: isClaimable,
-                        finalPrice: price,
+                        finalPrice: finalPrice,
                     };
 
                     userSpeedMarketsData.push(userData);

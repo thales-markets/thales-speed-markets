@@ -2,7 +2,6 @@ import Button from 'components/Button';
 import SimpleLoader from 'components/SimpleLoader/SimpleLoader';
 import { SPEED_MARKETS_OVERVIEW_SECTIONS as SECTIONS } from 'constants/market';
 import { millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
-import { Positions } from 'enums/market';
 import useInterval from 'hooks/useInterval';
 import ChainedPosition from 'pages/SpeedMarkets/components/ChainedPosition';
 import {
@@ -15,19 +14,19 @@ import {
     getAdditionalButtonStyle,
     getDefaultButtonProps,
 } from 'pages/SpeedMarketsOverview/styled-components';
+import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import useActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useActiveChainedSpeedMarketsDataQuery';
 import useAmmChainedSpeedMarketsLimitsQuery from 'queries/speedMarkets/useAmmChainedSpeedMarketsLimitsQuery';
-import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
-import { RootState } from 'types/ui';
 import { ChainedSpeedMarket } from 'types/market';
+import { RootState } from 'types/ui';
 import { getPriceId } from 'utils/pyth';
 import { refetchActiveSpeedMarkets, refetchPythPrice } from 'utils/queryConnector';
-import { resolveAllChainedMarkets } from 'utils/speedAmm';
+import { isUserWinner, resolveAllChainedMarkets } from 'utils/speedAmm';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 import { getIsBiconomy } from 'redux/modules/wallet';
 import biconomyConnector from 'utils/biconomyWallet';
@@ -99,7 +98,7 @@ const UnresolvedChainedPositions: React.FC = () => {
     const pythPricesQueries = usePythPriceQueries(networkId, priceRequests, { enabled: priceRequests.length > 0 });
     const pythPricesWithMarket = priceRequests.map((request, i) => ({
         market: request.market,
-        price: pythPricesQueries[i]?.data || 0,
+        price: Number(pythPricesQueries[i]?.data || 0),
     }));
 
     // Based on Pyth prices determine if chained position is claimable
@@ -110,12 +109,7 @@ const UnresolvedChainedPositions: React.FC = () => {
         const strikePrices = marketData.strikePrices.map((strikePrice, i) =>
             i > 0 ? finalPrices[i - 1] : strikePrice
         );
-        const userWonStatuses = marketData.sides.map((side, i) =>
-            finalPrices[i] > 0 && strikePrices[i] > 0
-                ? (side === Positions.UP && finalPrices[i] > strikePrices[i]) ||
-                  (side === Positions.DOWN && finalPrices[i] < strikePrices[i])
-                : undefined
-        );
+        const userWonStatuses = marketData.sides.map((side, i) => isUserWinner(side, strikePrices[i], finalPrices[i]));
         const canResolve =
             userWonStatuses.some((status) => status === false) ||
             userWonStatuses.every((status) => status !== undefined);
