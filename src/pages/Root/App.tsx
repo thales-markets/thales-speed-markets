@@ -33,6 +33,8 @@ import {
     SocialAuthType,
 } from '@particle-network/auth-core';
 import { particleWagmiWallet } from 'utils/particleWallet/particleWagmiWallet';
+import Deposit from 'pages/AARelatedPages/Deposit';
+import Withdraw from 'pages/AARelatedPages/Withdraw';
 
 const App = () => {
     const dispatch = useDispatch();
@@ -172,6 +174,22 @@ const App = () => {
                             </Suspense>
                         </Route>
                     )}
+
+                    <Route exact path={ROUTES.Deposit}>
+                        <Suspense fallback={<Loader />}>
+                            <DappLayout>
+                                <Deposit />
+                            </DappLayout>
+                        </Suspense>
+                    </Route>
+
+                    <Route exact path={ROUTES.Withdraw}>
+                        <Suspense fallback={<Loader />}>
+                            <DappLayout>
+                                <Withdraw />
+                            </DappLayout>
+                        </Suspense>
+                    </Route>
 
                     <Route>
                         <Redirect to={ROUTES.Markets.SpeedMarkets} />

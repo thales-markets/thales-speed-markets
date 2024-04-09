@@ -8,5 +8,7 @@ const ROUTES = {
         ChainedSpeedMarketsOverview: '/speed-markets/overview?isChained=true',
         Profile: '/profile',
     },
+    Deposit: '/deposit',
+    Withdraw: '/withdraw',
 };
 export default ROUTES;
