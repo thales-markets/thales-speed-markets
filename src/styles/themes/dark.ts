@@ -5,7 +5,7 @@ export default {
         primary: "'Fira Sans' !important",
     },
     background: {
-        primary: Colors.GRAY_DARK,
+        primary: Colors.BLACK,
         secondary: Colors.GRAY,
         tertiary: Colors.GRAY_LIGHT,
         quaternary: Colors.GREEN,
@@ -121,26 +121,6 @@ export default {
         down: Colors.RED,
         in: Colors.GREEN_LIGHT,
         out: Colors.PURPLE,
-    },
-    tradeTypeColor: {
-        buy: Colors.GREEN,
-        sell: Colors.RED,
-    },
-    landingPage: {
-        background: {
-            primary: Colors.BLUE_MIDNIGHT,
-            secondary: Colors.BLUE_MIDNIGHT_LIGHT,
-        },
-        textColor: {
-            primary: Colors.WHITE,
-            secondary: Colors.BLUE_SKY,
-        },
-    },
-    tokenPage: {
-        border: {
-            primary: Colors.GRAY,
-            secondary: Colors.PURPLE,
-        },
     },
     toastMessages: {
         success: {

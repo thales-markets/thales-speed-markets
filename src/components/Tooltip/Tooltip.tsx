@@ -24,10 +24,10 @@ const InfoIcon = styled.i`
     cursor: pointer;
     position: relative;
     margin-left: 4px;
-    color: white;
+    color: ${(props) => props.theme.textColor.primary};
     &:before {
-        font-family: ThalesIcons !important;
-        content: '\\0043';
+        font-family: Icons !important;
+        content: '\\20AC';
     }
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         font-size: 15px;

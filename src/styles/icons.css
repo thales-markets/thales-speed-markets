@@ -398,17 +398,6 @@
     content: '\007B';
 }
 
-@keyframes shake {
-    0% {
-        transform: rotate(0deg);
-    }
-    25% {
-        transform: rotate(10deg);
-    }
-    50% {
-        transform: rotate(0deg);
-    }
-    75% {
-        transform: rotate(-10deg);
-    }
+.icon--info-full:before {
+    content: '\20AC';
 }

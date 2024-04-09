@@ -17,8 +17,3 @@
     font-family: 'SidebarIcons';
     src: local('SidebarIcons'), url(/fonts/sidebar.ttf) format('truetype');
 }
-
-@font-face {
-    font-family: 'ThalesIcons';
-    src: local('ThalesIcons'), url(/fonts/Thales2022v2.ttf) format('truetype');
-}

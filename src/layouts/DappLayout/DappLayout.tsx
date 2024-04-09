@@ -2,12 +2,14 @@ import { LINKS } from 'constants/links';
 import useWidgetBotScript from 'hooks/useWidgetBotScript';
 import queryString from 'query-string';
 import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { getIsMobile } from 'redux/modules/ui';
 import styled, { useTheme } from 'styled-components';
 import { isAndroid, isMetamask } from 'thales-utils';
-import { ThemeInterface } from 'types/ui';
+import { RootState, ThemeInterface } from 'types/ui';
 import { isMobile } from 'utils/device';
 import { setReferralWallet } from 'utils/referral';
 import { ScreenSizeBreakpoint } from '../../enums/ui';
@@ -24,6 +26,8 @@ const DappLayout: React.FC<DappLayoutProps> = ({ children }) => {
 
     const rawParams = useLocation();
     const queryParams = queryString.parse(rawParams?.search);
+
+    const isMobileResponsive = useSelector((state: RootState) => getIsMobile(state));
 
     const [preventDiscordWidgetLoad, setPreventDiscordWidgetLoad] = useState(true);
 
@@ -64,7 +68,7 @@ const DappLayout: React.FC<DappLayoutProps> = ({ children }) => {
     return (
         <Background id="main-content">
             <Wrapper>
-                <DappSidebar />
+                {isMobileResponsive && <DappSidebar />}
                 <DappHeader />
                 {children}
                 <DappFooter />

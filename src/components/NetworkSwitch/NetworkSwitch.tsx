@@ -1,4 +1,4 @@
-import OutsideClickHandler from 'components/OutsideClick/OutsideClick';
+import OutsideClickHandler from 'components/OutsideClick';
 import { DEFAULT_NETWORK } from 'constants/network';
 import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';

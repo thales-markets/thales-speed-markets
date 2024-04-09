@@ -148,6 +148,21 @@ const Bell = styled.i`
     color: ${(props) => props.theme.background.primary};
     font-size: 13px;
     animation: shake 1s linear infinite;
+
+    @keyframes shake {
+        0% {
+            transform: rotate(0deg);
+        }
+        25% {
+            transform: rotate(10deg);
+        }
+        50% {
+            transform: rotate(0deg);
+        }
+        75% {
+            transform: rotate(-10deg);
+        }
+    }
 `;
 
 const Icon = styled.i`

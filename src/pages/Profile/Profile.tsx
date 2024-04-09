@@ -164,126 +164,121 @@ const Profile: React.FC = () => {
     };
 
     return (
-        <>
-            <Container>
-                <Header>
-                    <Title>{t('profile.title')}</Title>
-                    <SearchInput
-                        placeholder={t('profile.search-placeholder')}
-                        text={searchText}
-                        handleChange={(value) => setSearchText(value)}
-                        width="300px"
-                        height="28px"
-                        iconTop="6px"
-                    />
-                </Header>
-                <MainContainer>
-                    <StatsContainer>
-                        <StatsItem>
-                            <StatsLabel>{t('profile.stats.netprofit-col')}:</StatsLabel>
-                            <StatsValue
-                                color={
-                                    profileData.profit > 0
-                                        ? theme.textColor.quaternary
-                                        : profileData.profit < 0
-                                        ? theme.textColor.tertiary
-                                        : theme.textColor.primary
-                                }
-                            >
-                                {userProfileDataQuery.isLoading
-                                    ? '-'
-                                    : formatCurrencyWithSign(USD_SIGN, profileData.profit, 2)}
-                            </StatsValue>
-                        </StatsItem>
-                        <StatsItem>
-                            <StatsLabel>{t('profile.stats.gain-col')}:</StatsLabel>
-                            <StatsValue
-                                color={
-                                    profileData.gain > 0
-                                        ? theme.textColor.quaternary
-                                        : profileData.gain < 0
-                                        ? theme.textColor.tertiary
-                                        : theme.textColor.primary
-                                }
-                            >
-                                {userProfileDataQuery.isLoading ? '-' : formatPercentage(profileData.gain)}
-                            </StatsValue>
-                        </StatsItem>
-                        <StatsItem>
-                            <StatsLabel>{t('profile.stats.trades-col')}:</StatsLabel>
-                            <StatsValue>{userProfileDataQuery.isLoading ? '-' : profileData.numberOfTrades}</StatsValue>
-                        </StatsItem>
-                        <StatsItem>
-                            <StatsLabel>{t('profile.stats.volume-col')}:</StatsLabel>
-                            <StatsValue>
-                                {userProfileDataQuery.isLoading
-                                    ? '-'
-                                    : formatCurrencyWithSign(USD_SIGN, profileData.volume, 2)}
-                            </StatsValue>
-                        </StatsItem>
-                    </StatsContainer>
-                    <Nav>
-                        <NavItem
-                            onClick={() => onTabClickHandler(NavItems.MyPositions)}
-                            $active={view === NavItems.MyPositions}
+        <Container>
+            <Header>
+                <Title>{t('profile.title')}</Title>
+                <SearchInput
+                    placeholder={t('profile.search-placeholder')}
+                    text={searchText}
+                    handleChange={(value) => setSearchText(value)}
+                    width="300px"
+                    height="28px"
+                    iconTop="6px"
+                />
+            </Header>
+            <MainContainer>
+                <StatsContainer>
+                    <StatsItem>
+                        <StatsLabel>{t('profile.stats.netprofit-col')}:</StatsLabel>
+                        <StatsValue
+                            color={
+                                profileData.profit > 0
+                                    ? theme.textColor.quaternary
+                                    : profileData.profit < 0
+                                    ? theme.textColor.tertiary
+                                    : theme.textColor.primary
+                            }
                         >
-                            {t('profile.tabs.my-positions')}
-                            {totalNotifications > 0 && <Notification>{totalNotifications}</Notification>}
-                        </NavItem>
-                        <NavItem
-                            onClick={() => onTabClickHandler(NavItems.History)}
-                            $active={view === NavItems.History}
+                            {userProfileDataQuery.isLoading
+                                ? '-'
+                                : formatCurrencyWithSign(USD_SIGN, profileData.profit, 2)}
+                        </StatsValue>
+                    </StatsItem>
+                    <StatsItem>
+                        <StatsLabel>{t('profile.stats.gain-col')}:</StatsLabel>
+                        <StatsValue
+                            color={
+                                profileData.gain > 0
+                                    ? theme.textColor.quaternary
+                                    : profileData.gain < 0
+                                    ? theme.textColor.tertiary
+                                    : theme.textColor.primary
+                            }
                         >
-                            {t('profile.tabs.history')}
-                        </NavItem>
-                    </Nav>
-                    <>
-                        {view === NavItems.MyPositions && (
-                            <>
-                                <ProfileSection
-                                    title={t('profile.accordions.claimable-positions')}
-                                    subtitle={t('profile.winnings-are-forfeit', { days: MARKET_DURATION_IN_DAYS })}
-                                    mobileMaxHeight="360px"
-                                >
-                                    <ClaimablePositions
-                                        searchAddress={searchAddress}
-                                        searchText={searchAddress ? '' : searchText}
-                                    />
-                                </ProfileSection>
-                                <ProfileSection title={t('profile.accordions.open-positions')} mobileMaxHeight="360px">
-                                    <OpenPositions
-                                        searchAddress={searchAddress}
-                                        searchText={searchAddress ? '' : searchText}
-                                    />
-                                </ProfileSection>
-                            </>
-                        )}
-                        {view === NavItems.History && (
-                            <>
-                                <ProfileSection
-                                    title={t('profile.accordions.transaction-history')}
-                                    subtitle={t('profile.history-limit', { days: MARKET_DURATION_IN_DAYS })}
-                                >
-                                    <TransactionHistory
-                                        searchAddress={searchAddress}
-                                        searchText={searchAddress ? '' : searchText}
-                                    />
-                                </ProfileSection>
-                                <ProfileSection
-                                    title={t('profile.accordions.position-history')}
-                                    subtitle={t('profile.history-limit', { days: MARKET_DURATION_IN_DAYS })}
-                                >
-                                    <PositionHistory
-                                        searchAddress={searchAddress}
-                                        searchText={searchAddress ? '' : searchText}
-                                    />
-                                </ProfileSection>
-                            </>
-                        )}
-                    </>
-                </MainContainer>
-            </Container>
-        </>
+                            {userProfileDataQuery.isLoading ? '-' : formatPercentage(profileData.gain)}
+                        </StatsValue>
+                    </StatsItem>
+                    <StatsItem>
+                        <StatsLabel>{t('profile.stats.trades-col')}:</StatsLabel>
+                        <StatsValue>{userProfileDataQuery.isLoading ? '-' : profileData.numberOfTrades}</StatsValue>
+                    </StatsItem>
+                    <StatsItem>
+                        <StatsLabel>{t('profile.stats.volume-col')}:</StatsLabel>
+                        <StatsValue>
+                            {userProfileDataQuery.isLoading
+                                ? '-'
+                                : formatCurrencyWithSign(USD_SIGN, profileData.volume, 2)}
+                        </StatsValue>
+                    </StatsItem>
+                </StatsContainer>
+                <Nav>
+                    <NavItem
+                        onClick={() => onTabClickHandler(NavItems.MyPositions)}
+                        $active={view === NavItems.MyPositions}
+                    >
+                        {t('profile.tabs.my-positions')}
+                        {totalNotifications > 0 && <Notification>{totalNotifications}</Notification>}
+                    </NavItem>
+                    <NavItem onClick={() => onTabClickHandler(NavItems.History)} $active={view === NavItems.History}>
+                        {t('profile.tabs.history')}
+                    </NavItem>
+                </Nav>
+                <>
+                    {view === NavItems.MyPositions && (
+                        <>
+                            <ProfileSection
+                                title={t('profile.accordions.claimable-positions')}
+                                subtitle={t('profile.winnings-are-forfeit', { days: MARKET_DURATION_IN_DAYS })}
+                                mobileMaxHeight="360px"
+                            >
+                                <ClaimablePositions
+                                    searchAddress={searchAddress}
+                                    searchText={searchAddress ? '' : searchText}
+                                />
+                            </ProfileSection>
+                            <ProfileSection title={t('profile.accordions.open-positions')} mobileMaxHeight="360px">
+                                <OpenPositions
+                                    searchAddress={searchAddress}
+                                    searchText={searchAddress ? '' : searchText}
+                                />
+                            </ProfileSection>
+                        </>
+                    )}
+                    {view === NavItems.History && (
+                        <>
+                            <ProfileSection
+                                title={t('profile.accordions.transaction-history')}
+                                subtitle={t('profile.history-limit', { days: MARKET_DURATION_IN_DAYS })}
+                            >
+                                <TransactionHistory
+                                    searchAddress={searchAddress}
+                                    searchText={searchAddress ? '' : searchText}
+                                />
+                            </ProfileSection>
+                            <ProfileSection
+                                title={t('profile.accordions.position-history')}
+                                subtitle={t('profile.history-limit', { days: MARKET_DURATION_IN_DAYS })}
+                            >
+                                <PositionHistory
+                                    searchAddress={searchAddress}
+                                    searchText={searchAddress ? '' : searchText}
+                                />
+                            </ProfileSection>
+                        </>
+                    )}
+                </>
+            </MainContainer>
+        </Container>
     );
 };
 
