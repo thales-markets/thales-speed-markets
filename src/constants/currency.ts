@@ -3,7 +3,6 @@ import keyBy from 'lodash/keyBy';
 import ARBIcon from 'assets/currencies/crypto/ARB.svg?react';
 import BNBIcon from 'assets/currencies/crypto/BNB.svg?react';
 import BTCIcon from 'assets/currencies/crypto/BTC.svg?react';
-import BUSDIcon from 'assets/currencies/crypto/BUSD.svg?react';
 import DAIIcon from 'assets/currencies/crypto/DAI.svg?react';
 import ETHIcon from 'assets/currencies/crypto/ETH.svg?react';
 import MATICIcon from 'assets/currencies/crypto/MATIC.svg?react';
@@ -34,7 +33,6 @@ const CRYPTO_CURRENCY = [
     'USDT',
     'THALES',
     'ETC',
-    'BUSD',
     'WETH',
 ];
 export const CRYPTO_CURRENCY_MAP = keyBy(CRYPTO_CURRENCY);
@@ -46,7 +44,6 @@ export const STABLE_COINS = [
     CRYPTO_CURRENCY_MAP.USDbC,
     CRYPTO_CURRENCY_MAP.USDC,
     CRYPTO_CURRENCY_MAP.USDT,
-    CRYPTO_CURRENCY_MAP.BUSD,
 ];
 
 const FIAT_CURRENCY = ['USD'];
@@ -72,7 +69,6 @@ export const currencyKeyToAssetIconMap = {
     [CRYPTO_CURRENCY_MAP.OP]: OPIcon,
     [CRYPTO_CURRENCY_MAP.ARB]: ARBIcon,
     [CRYPTO_CURRENCY_MAP.BNB]: BNBIcon,
-    [CRYPTO_CURRENCY_MAP.BUSD]: BUSDIcon,
     [CRYPTO_CURRENCY_MAP.BTC]: BTCIcon,
 };
 

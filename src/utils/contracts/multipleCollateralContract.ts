@@ -1244,20 +1244,6 @@ const multipleCollateral = {
         },
         abi,
     },
-    BUSD: {
-        addresses: {
-            [NetworkId.OptimismMainnet]: TBD_ADDRESS,
-            [NetworkId.OptimismGoerli]: TBD_ADDRESS,
-            [NetworkId.OptimismSepolia]: TBD_ADDRESS,
-            [NetworkId.PolygonMainnet]: TBD_ADDRESS,
-            [NetworkId.Arbitrum]: TBD_ADDRESS,
-            [NetworkId.Base]: TBD_ADDRESS,
-            [NetworkId.ZkSync]: TBD_ADDRESS,
-            [NetworkId.ZkSyncSepolia]: TBD_ADDRESS,
-            [NetworkId.BlastSepolia]: TBD_ADDRESS,
-        },
-        abi,
-    },
 };
 
 export default multipleCollateral;
