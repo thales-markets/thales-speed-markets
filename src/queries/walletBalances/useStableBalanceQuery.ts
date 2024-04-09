@@ -1,20 +1,30 @@
-import snxJSConnector from 'utils/snxJSConnector';
-
 import QUERY_KEYS from 'constants/queryKeys';
-import { useQuery, UseQueryOptions } from 'react-query';
 import { COLLATERAL_DECIMALS } from 'thales-utils';
-import { SupportedNetwork } from 'types/network';
+import { QueryConfig } from 'types/network';
 import { getDefaultCollateral } from 'utils/currency';
+import { UseQueryOptions, useQuery } from '@tanstack/react-query';
+import { getContract } from 'viem';
+import erc20Contract from 'utils/contracts/collateralContract';
+import { ViemContract } from 'types/viem';
 
-const useStableBalanceQuery = (walletAddress: string, networkId: SupportedNetwork, options?: UseQueryOptions<any>) => {
-    return useQuery<any>(
-        QUERY_KEYS.WalletBalances.StableCoinBalance(walletAddress ?? '', networkId),
-        async () => {
+// used only for when multiCollateral is not available(zk sync, blast)
+const useStableBalanceQuery = (
+    walletAddress: string,
+    queryConfig: QueryConfig,
+    options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
+) => {
+    return useQuery<any>({
+        queryKey: QUERY_KEYS.WalletBalances.StableCoinBalance(walletAddress ?? '', queryConfig.networkId),
+        queryFn: async () => {
             try {
-                const collateral = snxJSConnector.collateral;
-                const collateralKey = getDefaultCollateral(networkId);
+                const collateral = getContract({
+                    abi: erc20Contract.abi,
+                    address: erc20Contract.addresses[queryConfig.networkId],
+                    client: queryConfig.client,
+                }) as ViemContract;
+                const collateralKey = getDefaultCollateral(queryConfig.networkId);
 
-                let usdBalance = await collateral?.balanceOf(walletAddress);
+                let usdBalance = await collateral.read.balanceOf([walletAddress]);
                 usdBalance = usdBalance
                     ? parseInt(usdBalance) /
                       10 ** (COLLATERAL_DECIMALS[collateralKey] ? COLLATERAL_DECIMALS[collateralKey] : 18)
@@ -30,8 +40,8 @@ const useStableBalanceQuery = (walletAddress: string, networkId: SupportedNetwor
                 return null;
             }
         },
-        options
-    );
+        ...options,
+    });
 };
 
 export default useStableBalanceQuery;

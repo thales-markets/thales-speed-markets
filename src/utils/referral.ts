@@ -1,7 +1,7 @@
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 import { REFERRAL_COOKIE_LIFETIME } from 'constants/ui';
-import { isAddress } from 'ethers/lib/utils';
 import Cookies from 'universal-cookie';
+import { isAddress } from 'viem';
 
 const cookies = new Cookies();
 

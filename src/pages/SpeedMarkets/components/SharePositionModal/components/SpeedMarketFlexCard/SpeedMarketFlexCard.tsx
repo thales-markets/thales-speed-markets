@@ -8,9 +8,10 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { FlexDiv } from 'styles/common';
-import { formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
+import { formatCurrencyWithSign } from 'thales-utils';
 import { SharePositionData, SharePositionType } from 'types/flexCards';
 import { getSynthName } from 'utils/currency';
+import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import SpeedMarketsFooter from '../SpeedMarketsFooter';
 
 const SpeedMarketFlexCard: React.FC<SharePositionData> = ({
@@ -24,13 +25,7 @@ const SpeedMarketFlexCard: React.FC<SharePositionData> = ({
 }) => {
     const { t } = useTranslation();
 
-    const strikePrice = strikePrices ? strikePrices[0] : 0;
-    const price =
-        typeof strikePrice == 'string' && strikePrice
-            ? strikePrice
-            : strikePrice
-            ? formatCurrencyWithSign(USD_SIGN, strikePrice ?? 0)
-            : 0;
+    const strikePrice = formatCurrencyWithSign(USD_SIGN, strikePrices ? strikePrices[0] : 0);
 
     const position = positions[0];
 
@@ -57,11 +52,11 @@ const SpeedMarketFlexCard: React.FC<SharePositionData> = ({
                             ? t('common.flex-card.entry-price')
                             : t('common.flex-card.strike-price')}
                     </ItemName>
-                    <Value type={type}>{price}</Value>
+                    <Value type={type}>{strikePrice}</Value>
                 </MarketDetailsItemContainer>
                 <MarketDetailsItemContainer type={type}>
                     <ItemName type={type}>{t('common.flex-card.strike-date')}</ItemName>
-                    <Value type={type}>{formatShortDateWithTime(strikeDate)}</Value>
+                    <Value type={type}>{formatShortDateWithFullTime(strikeDate)}</Value>
                 </MarketDetailsItemContainer>
                 <MarketDetailsItemContainer type={type}>
                     <ItemName type={type}>{t('common.flex-card.buy-in')}</ItemName>

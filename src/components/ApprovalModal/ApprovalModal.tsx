@@ -3,42 +3,40 @@ import Button from 'components/Button';
 import Modal from 'components/Modal';
 import Checkbox from 'components/fields/Checkbox';
 import NumericInput from 'components/fields/NumericInput/NumericInput';
-import { BigNumber, ethers } from 'ethers';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
-import { getIsWalletConnected, getNetworkId } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivCentered, FlexDivColumnCentered, FlexDivRow } from 'styles/common';
 import { Coins, bigNumberFormatter, coinParser } from 'thales-utils';
-import { RootState } from 'types/ui';
+import { maxUint256 } from 'viem';
+import { useAccount, useChainId } from 'wagmi';
 
 type ApprovalModalProps = {
     defaultAmount: number | string;
     tokenSymbol: string;
     isAllowing: boolean;
-    onSubmit: (approveAmount: BigNumber) => void;
+    onSubmit: (approveAmount: bigint) => void;
     onClose: () => void;
 };
 
 const ApprovalModal: React.FC<ApprovalModalProps> = ({ defaultAmount, tokenSymbol, isAllowing, onSubmit, onClose }) => {
     const { t } = useTranslation();
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
+    const { isConnected } = useAccount();
+    const networkId = useChainId();
     const [amount, setAmount] = useState<number | string>(defaultAmount);
     const [approveAll, setApproveAll] = useState<boolean>(true);
     const [isAmountValid, setIsAmountValid] = useState<boolean>(true);
 
     const { openConnectModal } = useConnectModal();
 
-    const maxApproveAmount = bigNumberFormatter(ethers.constants.MaxUint256);
+    const maxApproveAmount = bigNumberFormatter(maxUint256);
     const isAmountEntered = Number(amount) > 0;
-    const isButtonDisabled = !isWalletConnected || isAllowing || (!approveAll && (!isAmountEntered || !isAmountValid));
+    const isButtonDisabled = !isConnected || isAllowing || (!approveAll && (!isAmountEntered || !isAmountValid));
 
     const amountConverted = coinParser(Number(amount).toString(), networkId, tokenSymbol as Coins);
 
     const getSubmitButton = () => {
-        if (!isWalletConnected) {
+        if (!isConnected) {
             return <Button onClick={() => openConnectModal?.()}>{t('common.wallet.connect-your-wallet')}</Button>;
         }
         if (!approveAll && !isAmountEntered) {
@@ -47,7 +45,7 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({ defaultAmount, tokenSymbo
         return (
             <Button
                 disabled={isButtonDisabled}
-                onClick={() => onSubmit(approveAll ? ethers.constants.MaxUint256 : amountConverted)}
+                onClick={() => onSubmit(approveAll ? maxUint256 : amountConverted)}
                 additionalStyles={{ textTransform: 'none' }}
             >
                 {!isAllowing

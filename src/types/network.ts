@@ -1,4 +1,4 @@
-import { NetworkId } from "thales-utils";
+import { NetworkId } from 'thales-utils';
 
 export type NetworkParams = {
     chainId: string;
@@ -11,6 +11,11 @@ export type NetworkParams = {
         symbol: string;
         decimals: number;
     };
+};
+
+export type QueryConfig = {
+    networkId: SupportedNetwork;
+    client: any;
 };
 
 export type SupportedNetwork = Exclude<NetworkId, NetworkId.Mainnet>;

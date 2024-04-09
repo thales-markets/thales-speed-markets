@@ -6,75 +6,31 @@ import 'styles/tooltip.css';
 
 type TooltipProps = {
     overlay: any;
-    iconFontSize?: number;
     customIconStyling?: CSSProperties;
-    overlayInnerStyle?: CSSProperties;
-    marginLeft?: number;
-    top?: number;
-    overlayClassName?: string;
-    iconColor?: string;
-    mobileIconFontSize?: number;
-    mouseEnterDelay?: number;
+    children?: React.ReactNode;
 };
 
-const Tooltip: React.FC<TooltipProps> = ({
-    overlay,
-    iconFontSize,
-    customIconStyling,
-    overlayInnerStyle,
-    marginLeft,
-    top,
-    overlayClassName,
-    iconColor,
-    children,
-    mobileIconFontSize,
-    mouseEnterDelay,
-}) => {
+const Tooltip: React.FC<TooltipProps> = ({ overlay, customIconStyling, children }) => {
     return (
-        <ReactTooltip
-            overlay={overlay}
-            placement="top"
-            overlayClassName={overlayClassName || ''}
-            overlayInnerStyle={overlayInnerStyle}
-            mouseEnterDelay={mouseEnterDelay}
-        >
-            {children ? (
-                (children as any)
-            ) : (
-                <InfoIcon
-                    color={iconColor}
-                    iconFontSize={iconFontSize}
-                    marginLeft={marginLeft}
-                    top={top}
-                    style={customIconStyling}
-                    mobileIconFontSize={mobileIconFontSize}
-                />
-            )}
+        <ReactTooltip overlay={overlay} placement="top">
+            {children ? (children as any) : <InfoIcon style={customIconStyling} />}
         </ReactTooltip>
     );
 };
 
-const InfoIcon = styled.i<{
-    iconFontSize?: number;
-    marginLeft?: number;
-    top?: number;
-    color?: string;
-    mobileIconFontSize?: number;
-}>`
-    font-size: ${(props) => props.iconFontSize || 15}px;
+const InfoIcon = styled.i`
+    font-size: 15px;
     font-weight: normal;
     cursor: pointer;
     position: relative;
-    margin-left: ${(props) => (props.marginLeft !== undefined ? props.marginLeft : 4)}px;
-    top: ${(props) => props.top || 0}px;
-    color: ${(props) => props.color || 'white'};
+    margin-left: 4px;
+    color: white;
     &:before {
         font-family: ThalesIcons !important;
         content: '\\0043';
     }
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        font-size: ${(props) =>
-            props.mobileIconFontSize ? props.mobileIconFontSize : props.iconFontSize ? props.iconFontSize : 15}px;
+        font-size: 15px;
     }
 `;
 

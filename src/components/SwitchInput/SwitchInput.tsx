@@ -33,21 +33,21 @@ type SwitchProps = {
 type SwitchContainerProps = {
     disabled?: boolean;
     handleClick?: () => void;
-    borderWidth?: string;
-    borderColor?: string;
-    borderRadius?: string;
+    $borderWidth?: string;
+    $borderColor?: string;
+    $borderRadius?: string;
     width?: string;
     height?: string;
     background?: string;
-    backgroundGradient?: boolean;
+    $backgroundGradient?: boolean;
 };
 
 type CircleProps = {
     active: boolean;
     size?: string;
     background?: string;
-    backgroundGradient?: boolean;
-    circlePosition?: string;
+    $backgroundGradient?: boolean;
+    $circlePosition?: string;
 };
 
 const defaultSwitchHeight = 28;
@@ -80,21 +80,21 @@ const SwitchInput: React.FC<SwitchProps> = ({
             )}
             <SwitchContainer
                 disabled={disabled}
-                borderWidth={borderWidth}
-                borderColor={borderColor}
-                borderRadius={borderRadius}
+                $borderWidth={borderWidth}
+                $borderColor={borderColor}
+                $borderRadius={borderRadius}
                 width={width}
                 height={height}
                 background={background}
-                backgroundGradient={backgroundGradient}
+                $backgroundGradient={backgroundGradient}
                 onClick={() => (!disabled && handleClick ? handleClick() : null)}
             >
                 <Circle
                     active={active}
                     size={dotSize}
                     background={dotBackground}
-                    backgroundGradient={dotGradient}
-                    circlePosition={circlePosition}
+                    $backgroundGradient={dotGradient}
+                    $circlePosition={circlePosition}
                 />
             </SwitchContainer>
             {label?.secondLabel && (
@@ -134,22 +134,22 @@ const SwitchContainer = styled.div<SwitchContainerProps>`
     align-items: center;
     position: relative;
     cursor: ${(props: any) => (props.disabled ? 'default' : 'pointer')};
-    border-width: ${(props: any) => props.borderWidth || '1px'};
+    border-width: ${(props: any) => props.$borderWidth || '1px'};
     border-style: solid;
-    border-color: ${(props: any) => props.borderColor || props.theme.textColor.primary};
-    border-radius: ${(props: any) => props.borderRadius || '30px'};
+    border-color: ${(props: any) => props.$borderColor || props.theme.textColor.primary};
+    border-radius: ${(props: any) => props.$borderRadius || '30px'};
     width: ${(props: any) => props.width || defaultSwitchHeight * 2.18 + 'px'};
     height: ${(props: any) => props.height || defaultSwitchHeight + 'px'};
 `;
 
 const Circle = styled.div<CircleProps>`
-    width: ${(props: any) => props.size || '15px'};
-    height: ${(props: any) => props.size || '15px'};
+    width: ${(props) => props.size || '15px'};
+    height: ${(props) => props.size || '15px'};
     border-radius: 60%;
     position: absolute;
-    background-color: ${(props: any) => props.background || props.theme.textColor.primary};
-    ${(props: any) =>
-        props?.active ? `right: ${props.circlePosition || '5px'};` : `left: ${props.circlePosition || '5px'};`};
+    background-color: ${(props) => props.background || props.theme.textColor.primary};
+    ${(props) =>
+        props?.active ? `right: ${props.$circlePosition || '5px'};` : `left: ${props.$circlePosition || '5px'};`};
 `;
 
 export default SwitchInput;

@@ -17,12 +17,11 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsMobile } from 'redux/modules/ui';
-import { getIsWalletConnected } from 'redux/modules/wallet';
-import { RootState } from 'types/ui';
 import styled, { useTheme } from 'styled-components';
-import { FlexDivCentered, FlexDivColumnCentered, FlexDivRow } from 'styles/common';
+import { FlexDivCentered, FlexDivColumnCentered, FlexDivEnd, FlexDivRow } from 'styles/common';
 import { AmmSpeedMarketsLimits } from 'types/market';
-import { ThemeInterface } from 'types/ui';
+import { RootState, ThemeInterface } from 'types/ui';
+import { useAccount } from 'wagmi';
 
 type SelectTimeProps = {
     selectedDeltaSec: number;
@@ -35,8 +34,7 @@ type SelectTimeProps = {
 
 const SPEED_NUMBER_OF_BUTTONS = 4;
 
-const CHAINED_FIRST_TIMEFRAME_MINUTES = 5;
-const CHAINED_SECOND_TIMEFRAME_MINUTES = 10;
+const CHAINED_TIMEFRAMES_MINUTES = [2, 5, 10];
 
 const SelectTime: React.FC<SelectTimeProps> = ({
     selectedDeltaSec,
@@ -49,7 +47,7 @@ const SelectTime: React.FC<SelectTimeProps> = ({
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
+    const { isConnected } = useAccount();
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const [isDeltaSelected, setIsDeltaSelected] = useState(true); // false is when exact time is selected
@@ -67,7 +65,7 @@ const SelectTime: React.FC<SelectTimeProps> = ({
     const deltaTimesMinutes: number[] = useMemo(() => {
         let times: number[] = [];
         if (isChained) {
-            times = [CHAINED_FIRST_TIMEFRAME_MINUTES, CHAINED_SECOND_TIMEFRAME_MINUTES];
+            times = CHAINED_TIMEFRAMES_MINUTES;
         } else {
             if (ammSpeedMarketsLimits && secondsToHours(ammSpeedMarketsLimits?.minimalTimeToMaturity) === 0) {
                 times = ammSpeedMarketsLimits.timeThresholdsForFees
@@ -235,10 +233,10 @@ const SelectTime: React.FC<SelectTimeProps> = ({
 
     // Reset inputs
     useEffect(() => {
-        if (!isWalletConnected || isResetTriggered) {
+        if (!isConnected || isResetTriggered) {
             resetData();
         }
-    }, [isWalletConnected, resetData, isResetTriggered]);
+    }, [isConnected, resetData, isResetTriggered]);
 
     useEffect(() => {
         resetData();
@@ -287,7 +285,7 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                     {deltaTimesMinutes.map((deltaMinutes, index) => (
                         <DeltaTime
                             key={'minutes' + index}
-                            isSelected={isDeltaSelected && selectedDeltaSec === minutesToSeconds(deltaMinutes)}
+                            $isSelected={isDeltaSelected && selectedDeltaSec === minutesToSeconds(deltaMinutes)}
                             onClick={() => onDeltaTimeClickHandler(0, deltaMinutes)}
                         >{`${deltaMinutes}m`}</DeltaTime>
                     ))}
@@ -299,18 +297,18 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                         {deltaTimesMinutes.map((deltaMinutes, index) => (
                             <DeltaTime
                                 key={'minutes' + index}
-                                isSelected={isDeltaSelected && selectedDeltaSec === minutesToSeconds(deltaMinutes)}
+                                $isSelected={isDeltaSelected && selectedDeltaSec === minutesToSeconds(deltaMinutes)}
                                 onClick={() => onDeltaTimeClickHandler(0, deltaMinutes)}
                             >{`${deltaMinutes}m`}</DeltaTime>
                         ))}
                         {deltaTimesHours.map((deltaHours, index) => (
                             <DeltaTime
                                 key={'hours' + index}
-                                isSelected={isDeltaSelected && selectedDeltaSec === hoursToSeconds(deltaHours)}
+                                $isSelected={isDeltaSelected && selectedDeltaSec === hoursToSeconds(deltaHours)}
                                 onClick={() => onDeltaTimeClickHandler(deltaHours, 0)}
                             >{`${deltaHours}h`}</DeltaTime>
                         ))}
-                        <Time isSelected={!isDeltaSelected} onClick={onSwitchTimeClickHandler}>
+                        <Time $isSelected={!isDeltaSelected} onClick={onSwitchTimeClickHandler}>
                             <Icon className="icon icon--clock" />
                         </Time>
                     </Row>
@@ -374,7 +372,7 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                                 max="12"
                                 margin="0"
                                 inputPadding="5px 10px"
-                                validationMargin={isMobile ? '-10px 0 0 5px' : '-10px 0 0 150px'}
+                                zIndex={2}
                             />
                             <TimeSeparator>:</TimeSeparator>
                             <TimeInput
@@ -385,6 +383,7 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                                 max="59"
                                 margin="0"
                                 inputPadding="5px 10px"
+                                zIndex={1}
                             />
                             <Column>
                                 <Button
@@ -432,9 +431,8 @@ const Row = styled(FlexDivRow)`
     }
 `;
 
-const ChainedRow = styled(FlexDivCentered)`
+const ChainedRow = styled(FlexDivEnd)`
     gap: 15px;
-    padding-right: 85px;
 `;
 
 const Column = styled(FlexDivColumnCentered)`
@@ -446,16 +444,16 @@ const InputWrapper = styled.div`
     width: 100%;
 `;
 
-const Time = styled(FlexDivCentered)<{ isSelected: boolean }>`
+const Time = styled(FlexDivCentered)<{ $isSelected: boolean }>`
     width: 70px;
     height: 31px;
     border-radius: 8px;
     background: ${(props) =>
-        props.isSelected ? props.theme.button.background.primary : props.theme.button.background.tertiary};
+        props.$isSelected ? props.theme.button.background.primary : props.theme.button.background.tertiary};
     color: ${(props) =>
-        props.isSelected ? props.theme.button.textColor.primary : props.theme.button.textColor.secondary};
+        props.$isSelected ? props.theme.button.textColor.primary : props.theme.button.textColor.secondary};
     cursor: pointer;
-    font-weight: ${(props) => (props.isSelected ? '600' : '300')};
+    font-weight: ${(props) => (props.$isSelected ? '600' : '300')};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         width: 60px;
     }

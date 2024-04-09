@@ -38,7 +38,7 @@ export const Nav = styled.div`
 `;
 
 export const NavItem = styled.p<{
-    active?: boolean;
+    $active?: boolean;
 }>`
     font-weight: bold;
     line-height: 40px;
@@ -48,7 +48,7 @@ export const NavItem = styled.p<{
     cursor: pointer;
     padding: 0 50px;
     white-space: pre;
-    box-shadow: ${(props) => (props.active ? `0px 4px ${props.theme.borderColor.quaternary};` : '')};
+    box-shadow: ${(props) => (props.$active ? `0px 4px ${props.theme.borderColor.quaternary};` : '')};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         line-height: 30px;
         font-size: 13px;

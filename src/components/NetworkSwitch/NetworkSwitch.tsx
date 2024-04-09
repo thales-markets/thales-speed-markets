@@ -1,50 +1,20 @@
+import OutsideClickHandler from 'components/OutsideClick/OutsideClick';
 import { DEFAULT_NETWORK } from 'constants/network';
 import React, { useMemo, useState } from 'react';
-import OutsideClickHandler from 'react-outside-click-handler';
-import { useDispatch, useSelector } from 'react-redux';
-import { getNetworkId, switchToNetworkId } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { SupportedNetwork } from 'types/network';
-import { RootState } from 'types/ui';
+import { isMobile } from 'utils/device';
 import { SUPPORTED_NETWORK_IDS_MAP } from 'utils/network';
-import { useSwitchNetwork } from 'wagmi';
+import { useChainId, useConfig, useSwitchChain } from 'wagmi';
 
-type NetworkSwitchProps = {
-    selectedNetworkId?: number;
-    setSelectedNetworkId?: any;
-    supportedNetworks?: number[];
-};
+const NetworkSwitch: React.FC = () => {
+    const config = useConfig();
+    const networkId = useChainId();
+    const { switchChain } = useSwitchChain();
 
-const NetworkSwitch: React.FC<NetworkSwitchProps> = ({
-    selectedNetworkId,
-    setSelectedNetworkId,
-    supportedNetworks,
-}) => {
-    const { switchNetwork } = useSwitchNetwork();
-    const dispatch = useDispatch();
-
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
-
-    const filteredSupportedNetworks: Record<number, any> = useMemo(
-        () =>
-            supportedNetworks
-                ? Object.keys(SUPPORTED_NETWORK_IDS_MAP)
-                      .filter((key) => supportedNetworks.includes(Number(key)))
-                      .reduce((obj, key) => {
-                          return Object.assign(obj, {
-                              [key]: SUPPORTED_NETWORK_IDS_MAP[Number(key)],
-                          });
-                      }, {})
-                : SUPPORTED_NETWORK_IDS_MAP,
-        [supportedNetworks]
-    );
-
-    // TODO: add support for testnets
     const selectedNetwork = useMemo(
-        () =>
-            filteredSupportedNetworks[selectedNetworkId || networkId] ||
-            filteredSupportedNetworks[DEFAULT_NETWORK.networkId],
-        [networkId, selectedNetworkId, filteredSupportedNetworks]
+        () => SUPPORTED_NETWORK_IDS_MAP[networkId] || SUPPORTED_NETWORK_IDS_MAP[DEFAULT_NETWORK.networkId],
+        [networkId]
     );
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -52,7 +22,7 @@ const NetworkSwitch: React.FC<NetworkSwitchProps> = ({
         <NetworkInfoContainer>
             <OutsideClickHandler onOutsideClick={() => isDropdownOpen && setIsDropdownOpen(false)}>
                 <SelectedNetworkContainer cursor={'pointer'}>
-                    <NetworkItem selectedItem={true} onClick={() => setIsDropdownOpen(!isDropdownOpen)} noHover>
+                    <NetworkItem $selectedItem={true} onClick={() => setIsDropdownOpen(!isDropdownOpen)} $noHover>
                         {React.createElement(selectedNetwork.icon, {
                             style: { marginRight: 5 },
                         })}
@@ -61,9 +31,12 @@ const NetworkSwitch: React.FC<NetworkSwitchProps> = ({
                     </NetworkItem>
                     {isDropdownOpen && (
                         <NetworkDropDown>
-                            {Object.keys(filteredSupportedNetworks)
+                            {Object.keys(SUPPORTED_NETWORK_IDS_MAP)
                                 .map((key) => {
-                                    return { id: Number(key), ...filteredSupportedNetworks[Number(key)] };
+                                    return {
+                                        id: Number(key) as SupportedNetwork,
+                                        ...SUPPORTED_NETWORK_IDS_MAP[Number(key)],
+                                    };
                                 })
                                 .sort((a, b) => a.order - b.order)
                                 .map((network, index) => (
@@ -71,31 +44,27 @@ const NetworkSwitch: React.FC<NetworkSwitchProps> = ({
                                         key={index}
                                         onClick={async () => {
                                             setIsDropdownOpen(!isDropdownOpen);
-                                            if (setSelectedNetworkId) {
-                                                setSelectedNetworkId(Number(network.id));
-                                            } else {
-                                                await filteredSupportedNetworks[network.id].changeNetwork(
-                                                    network.id,
-                                                    () => {
-                                                        switchNetwork?.(network.id);
-                                                        // Trigger App.js init
-                                                        // do not use updateNetworkSettings(networkId) as it will trigger queries before provider in App.js is initialized
-                                                        dispatch(
-                                                            switchToNetworkId({
-                                                                networkId: Number(network.id) as SupportedNetwork,
-                                                            })
-                                                        );
-                                                    }
-                                                );
+
+                                            await SUPPORTED_NETWORK_IDS_MAP[network.id].changeNetwork(
+                                                network.id,
+                                                () => {
+                                                    switchChain?.({ chainId: network.id });
+                                                }
+                                            );
+                                            if (isMobile() && config.state.chainId !== network.id) {
+                                                config.setState((state) => ({
+                                                    ...state,
+                                                    chainId: network.id,
+                                                }));
                                             }
                                         }}
                                     >
-                                        {React.createElement(filteredSupportedNetworks[network.id].icon, {
+                                        {React.createElement(SUPPORTED_NETWORK_IDS_MAP[network.id].icon, {
                                             height: '18px',
                                             width: '18px',
                                             style: { marginRight: 5 },
                                         })}
-                                        {filteredSupportedNetworks[network.id].name}
+                                        {SUPPORTED_NETWORK_IDS_MAP[network.id].name}
                                     </NetworkItem>
                                 ))}
                         </NetworkDropDown>
@@ -148,22 +117,22 @@ const SelectedNetworkContainer = styled.div<{ cursor: string }>`
     }
 `;
 
-const NetworkItem = styled.div<{ selectedItem?: boolean; noHover?: boolean }>`
+const NetworkItem = styled.div<{ $selectedItem?: boolean; $noHover?: boolean }>`
     display: flex;
     align-items: center;
     width: 100%;
-    padding: ${(props) => (props.selectedItem ? '4px 13px' : '6px')};
+    padding: ${(props) => (props.$selectedItem ? '4px 13px' : '6px')};
     font-size: 13px;
     border-radius: 8px;
     &:hover {
-        background: ${(props) => (props.noHover ? '' : props.theme.background.primary)};
+        background: ${(props) => (props.$noHover ? '' : props.theme.background.primary)};
     }
     svg {
         width: 16px;
         height: 16px;
     }
     @media (max-width: 500px) {
-        ${(props) => (props.selectedItem ? 'padding: 4px 7px' : '')}
+        ${(props) => (props.$selectedItem ? 'padding: 4px 7px' : '')}
     }
 `;
 

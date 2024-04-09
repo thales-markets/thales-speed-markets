@@ -6,17 +6,13 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
-import { getIsWalletConnected, getNetworkId, getWalletAddress } from 'redux/modules/wallet';
 import { useTheme } from 'styled-components';
-import {
-    formatCurrencyWithSign,
-    formatHoursAndMinutesFromTimestamp,
-    formatShortDate,
-    formatShortDateWithTime,
-} from 'thales-utils';
+import { formatCurrencyWithSign, formatShortDate } from 'thales-utils';
 import { TradeWithMarket } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
+import { formatHoursMinutesSecondsFromTimestamp, formatShortDateWithFullTime } from 'utils/formatters/date';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
+import { useAccount, useChainId, useClient } from 'wagmi';
 import { getDirections } from '../styled-components';
 
 type TransactionHistoryProps = {
@@ -28,24 +24,28 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ searchAddress, 
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
+    const networkId = useChainId();
+    const client = useClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
+    const { address, isConnected } = useAccount();
 
-    const speedMarketsDataQuery = useUserSpeedMarketsTransactionsQuery(networkId, searchAddress || walletAddress, {
-        enabled: isAppReady && isWalletConnected,
-    });
+    const speedMarketsDataQuery = useUserSpeedMarketsTransactionsQuery(
+        { networkId, client },
+        searchAddress || (address as string),
+        {
+            enabled: isAppReady && isConnected,
+        }
+    );
     const speedMarketsData: TradeWithMarket[] = useMemo(
         () => (speedMarketsDataQuery.isSuccess && speedMarketsDataQuery.data ? speedMarketsDataQuery.data : []),
         [speedMarketsDataQuery.isSuccess, speedMarketsDataQuery.data]
     );
 
     const chainedSpeedMarketsDataQuery = useUserChainedSpeedMarketsTransactionsQuery(
-        networkId,
-        searchAddress || walletAddress,
+        { networkId, client },
+        searchAddress || (address as string),
         {
-            enabled: isAppReady && isWalletConnected && !isOnlySpeedMarketsSupported(networkId),
+            enabled: isAppReady && isConnected && !isOnlySpeedMarketsSupported(networkId),
         }
     );
     const chainedSpeedMarketsData: TradeWithMarket[] = useMemo(
@@ -97,7 +97,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ searchAddress, 
                     const marketExpired = row.marketItem.maturityDate < Date.now();
 
                     const cells: any = [
-                        { title: 'buy', value: formatHoursAndMinutesFromTimestamp(row.marketItem.timestamp) },
+                        { title: 'buy', value: formatHoursMinutesSecondsFromTimestamp(row.marketItem.timestamp) },
                         {
                             title: t('profile.history.strike'),
                             value: formatCurrencyWithSign(USD_SIGN, row.marketItem.strikePrice),
@@ -118,7 +118,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({ searchAddress, 
                         },
                         {
                             title: marketExpired ? t('profile.history.expired') : t('profile.history.expires'),
-                            value: formatShortDateWithTime(row.marketItem.maturityDate),
+                            value: formatShortDateWithFullTime(row.marketItem.maturityDate),
                         },
                     ];
 

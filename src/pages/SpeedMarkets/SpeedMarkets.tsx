@@ -23,7 +23,6 @@ import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
-import { getIsWalletConnected, getNetworkId } from 'redux/modules/wallet';
 import styled, { useTheme } from 'styled-components';
 import { BoldText, FlexDivCentered, FlexDivRowCentered, FlexDivSpaceBetween, FlexDivStart } from 'styles/common';
 import { roundNumberToDecimals } from 'thales-utils';
@@ -38,6 +37,8 @@ import SelectBuyin from './components/SelectBuyin';
 import SelectPosition from './components/SelectPosition';
 import { SelectedPosition } from './components/SelectPosition/SelectPosition';
 import SelectTime from './components/SelectTime';
+import { useChainId, useClient } from 'wagmi';
+import { useAccount } from 'wagmi';
 
 const SpeedMarkets: React.FC = () => {
     const { t } = useTranslation();
@@ -45,8 +46,9 @@ const SpeedMarkets: React.FC = () => {
     const theme: ThemeInterface = useTheme();
 
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
+    const networkId = useChainId();
+    const client = useClient();
+    const { isConnected } = useAccount();
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const isChainedSupported = getSupportedNetworksByRoute(ROUTES.Markets.ChainedSpeedMarkets).includes(networkId);
@@ -63,7 +65,7 @@ const SpeedMarkets: React.FC = () => {
     const [isResetTriggered, setIsResetTriggered] = useState(false);
     const [skew, setSkew] = useState({ [Positions.UP]: 0, [Positions.DOWN]: 0 });
 
-    const ammSpeedMarketsLimitsQuery = useAmmSpeedMarketsLimitsQuery(networkId, undefined, {
+    const ammSpeedMarketsLimitsQuery = useAmmSpeedMarketsLimitsQuery({ networkId, client }, undefined, {
         enabled: isAppReady,
     });
 
@@ -71,7 +73,7 @@ const SpeedMarkets: React.FC = () => {
         return ammSpeedMarketsLimitsQuery.isSuccess ? ammSpeedMarketsLimitsQuery.data : null;
     }, [ammSpeedMarketsLimitsQuery]);
 
-    const ammChainedSpeedMarketsLimitsQuery = useAmmChainedSpeedMarketsLimitsQuery(networkId, undefined, {
+    const ammChainedSpeedMarketsLimitsQuery = useAmmChainedSpeedMarketsLimitsQuery({ networkId, client }, undefined, {
         enabled: isAppReady && isChainedSupported,
     });
 
@@ -138,10 +140,10 @@ const SpeedMarkets: React.FC = () => {
     }, [ammChainedSpeedMarketsLimitsData?.minChainedMarkets]);
 
     useEffect(() => {
-        if (!isWalletConnected) {
+        if (!isConnected) {
             resetData();
         }
-    }, [isWalletConnected, resetData]);
+    }, [isConnected, resetData]);
 
     useEffect(() => {
         resetData();
@@ -367,7 +369,7 @@ const SpeedMarkets: React.FC = () => {
                         resetData={resetData}
                     />
                     <PageLinkBanner link={LINKS.Markets.Thales} />
-                    {isWalletConnected && (
+                    {isConnected && (
                         <>
                             <OpenPositions
                                 isChained={isChained}

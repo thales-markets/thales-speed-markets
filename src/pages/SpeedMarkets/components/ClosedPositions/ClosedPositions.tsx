@@ -7,25 +7,29 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
-import { getIsWalletConnected, getNetworkId, getWalletAddress } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivCentered, FlexDivRowCentered } from 'styles/common';
 import { UserClosedPositions } from 'types/market';
 import { RootState } from 'types/ui';
 import ChainedPosition from '../ChainedPosition';
 import ClosedPosition from '../ClosedPosition';
+import { useAccount, useChainId, useClient } from 'wagmi';
 
 const ClosedPositions: React.FC<{ isChained: boolean }> = ({ isChained }) => {
     const { t } = useTranslation();
 
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
-    const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
+    const networkId = useChainId();
+    const client = useClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
+    const { isConnected, address } = useAccount();
 
-    const userResolvedSpeedMarketsDataQuery = useUserResolvedSpeedMarketsDataQuery(networkId, walletAddress, {
-        enabled: isAppReady && isWalletConnected && !isChained,
-    });
+    const userResolvedSpeedMarketsDataQuery = useUserResolvedSpeedMarketsDataQuery(
+        { networkId, client },
+        address as string,
+        {
+            enabled: isAppReady && isConnected && !isChained,
+        }
+    );
 
     const lastTenUserResolvedPositions = useMemo(
         () =>
@@ -39,10 +43,10 @@ const ClosedPositions: React.FC<{ isChained: boolean }> = ({ isChained }) => {
     );
 
     const userResolvedChainedSpeedMarketsDataQuery = useUserResolvedChainedSpeedMarketsDataQuery(
-        networkId,
-        walletAddress,
+        { networkId, client },
+        address as string,
         {
-            enabled: isAppReady && isWalletConnected && !!isChained,
+            enabled: isAppReady && isConnected && !!isChained,
         }
     );
 
@@ -73,7 +77,7 @@ const ClosedPositions: React.FC<{ isChained: boolean }> = ({ isChained }) => {
                 </LoaderContainer>
             ) : (
                 <>
-                    <PositionsWrapper noPositions={noPositions} isChained={isChained}>
+                    <PositionsWrapper $noPositions={noPositions} $isChained={isChained}>
                         {isChained && !noPositions
                             ? lastTenUserResolvedChainedPositions.map((position, index) => (
                                   <ChainedPosition position={position} key={`closedPosition${index}`} />
@@ -98,8 +102,7 @@ const dummyPositions: UserClosedPositions[] = [
         payout: 15,
         paid: 100,
         maturityDate: 1684483200000,
-        strikePrice: '$ 25,000.00',
-        strikePriceNum: 25000,
+        strikePrice: 25000,
         side: Positions.UP,
         value: 0,
         finalPrice: 30000,
@@ -111,8 +114,7 @@ const dummyPositions: UserClosedPositions[] = [
         payout: 10,
         paid: 200,
         maturityDate: 1684483200000,
-        strikePrice: '$ 35,000.00',
-        strikePriceNum: 35000,
+        strikePrice: 35000,
         side: Positions.DOWN,
         value: 0,
         finalPrice: 30000,
@@ -127,13 +129,13 @@ const Wrapper = styled.div`
     margin-top: 20px;
 `;
 
-const PositionsWrapper = styled.div<{ noPositions?: boolean; isChained?: boolean }>`
+const PositionsWrapper = styled.div<{ $noPositions?: boolean; $isChained?: boolean }>`
     display: flex;
     flex-direction: column;
-    gap: ${(props) => (props.isChained ? '16' : '6')}px;
+    gap: ${(props) => (props.$isChained ? '16' : '6')}px;
     overflow-y: auto;
-    max-height: ${(props) => (props.isChained ? '624' : '560')}px;
-    ${(props) => (props.noPositions ? 'filter: blur(10px);' : '')}
+    max-height: ${(props) => (props.$isChained ? '624' : '560')}px;
+    ${(props) => (props.$noPositions ? 'filter: blur(10px);' : '')}
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         flex-direction: row;
         overflow: auto;

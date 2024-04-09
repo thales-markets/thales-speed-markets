@@ -8,12 +8,13 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
-import { getIsWalletConnected, getNetworkId, getWalletAddress } from 'redux/modules/wallet';
 import { useTheme } from 'styled-components';
-import { formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
+import { formatCurrencyWithSign } from 'thales-utils';
 import { UserPosition } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
+import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
+import { useAccount, useChainId, useClient } from 'wagmi';
 import { getStatus } from '../styled-components';
 
 type PositionHistoryProps = {
@@ -25,16 +26,16 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
+    const networkId = useChainId();
+    const client = useClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
+    const { isConnected, address } = useAccount();
 
     const closedSpeedMarketsDataQuery = useUserResolvedSpeedMarketsDataQuery(
-        networkId,
-        searchAddress || walletAddress,
+        { networkId, client },
+        searchAddress || (address as string),
         {
-            enabled: isAppReady && isWalletConnected,
+            enabled: isAppReady && isConnected,
         }
     );
 
@@ -47,10 +48,10 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
     );
 
     const closedChainedSpeedMarketsDataQuery = useUserResolvedChainedSpeedMarketsDataQuery(
-        networkId,
-        searchAddress || walletAddress,
+        { networkId, client },
+        searchAddress || (address as string),
         {
-            enabled: isAppReady && isWalletConnected && !isOnlySpeedMarketsSupported(networkId),
+            enabled: isAppReady && isConnected && !isOnlySpeedMarketsSupported(networkId),
         }
     );
 
@@ -67,7 +68,7 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
             return {
                 positionAddress: ZERO_ADDRESS,
                 currencyKey: marketData.currencyKey,
-                strikePrice: marketData.strikePriceNum,
+                strikePrice: marketData.strikePrice,
                 leftPrice: 0,
                 rightPrice: 0,
                 finalPrice: marketData.finalPrice,
@@ -145,7 +146,7 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
                         },
                         {
                             title: t('profile.history.expired'),
-                            value: formatShortDateWithTime(row.maturityDate),
+                            value: formatShortDateWithFullTime(row.maturityDate),
                         },
                     ];
 

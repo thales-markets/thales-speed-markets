@@ -1,3 +1,4 @@
+import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import {
     BATCH_NUMBER_OF_SPEED_MARKETS,
     MAX_NUMBER_OF_SPEED_MARKETS_TO_FETCH,
@@ -8,36 +9,55 @@ import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { secondsToMilliseconds } from 'date-fns';
 import { Positions } from 'enums/market';
-import { UseQueryOptions, useQuery } from 'react-query';
 import { NetworkId, bigNumberFormatter, coinFormatter, parseBytes32String, roundNumberToDecimals } from 'thales-utils';
 import { SpeedMarket } from 'types/market';
+import { QueryConfig } from 'types/network';
 import { TradeWithMarket } from 'types/profile';
-import snxJSConnector from 'utils/snxJSConnector';
+import { ViemContract } from 'types/viem';
+import { getContarctAbi } from 'utils/contracts/abi';
+import chainedSpeedMarketsAMMContract from 'utils/contracts/chainedSpeedMarketsAMMContract';
+import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
+import { getContract } from 'viem';
 
 const useUserChainedSpeedMarketsTransactionsQuery = (
-    networkId: NetworkId,
+    queryConfig: QueryConfig,
     walletAddress: string,
-    options?: UseQueryOptions<TradeWithMarket[]>
+    options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
-    return useQuery<TradeWithMarket[]>(
-        QUERY_KEYS.User.ChainedSpeedMarketsTransactions(networkId, walletAddress),
-        async () => {
+    return useQuery<TradeWithMarket[]>({
+        queryKey: QUERY_KEYS.User.ChainedSpeedMarketsTransactions(queryConfig.networkId, walletAddress),
+        queryFn: async () => {
             const userTransactions: TradeWithMarket[] = [];
 
-            const { chainedSpeedMarketsAMMContract, speedMarketsDataContract } = snxJSConnector;
+            try {
+                const speedMarketsDataContractLocal = getContract({
+                    abi: getContarctAbi(speedMarketsDataContract, queryConfig.networkId),
+                    address: speedMarketsDataContract.addresses[queryConfig.networkId],
+                    client: queryConfig.client,
+                }) as ViemContract;
 
-            if (chainedSpeedMarketsAMMContract && speedMarketsDataContract) {
-                const ammParams = await speedMarketsDataContract.getChainedSpeedMarketsAMMParameters(walletAddress);
+                const chainedMarketsAMMContract = getContract({
+                    abi: chainedSpeedMarketsAMMContract.abi,
+                    address: chainedSpeedMarketsAMMContract.addresses[queryConfig.networkId],
+                    client: queryConfig.client,
+                }) as ViemContract;
 
-                const pageSize = Math.min(ammParams.numMaturedMarketsPerUser, MAX_NUMBER_OF_SPEED_MARKETS_TO_FETCH);
+                const ammParams = await speedMarketsDataContractLocal.read.getChainedSpeedMarketsAMMParameters([
+                    walletAddress,
+                ]);
+
+                const pageSize = Math.min(
+                    Number(ammParams.numMaturedMarketsPerUser),
+                    MAX_NUMBER_OF_SPEED_MARKETS_TO_FETCH
+                );
                 const index = Number(ammParams.numMaturedMarketsPerUser) - pageSize;
                 const [activeMarkets, maturedMarkets] = await Promise.all([
-                    chainedSpeedMarketsAMMContract.activeMarketsPerUser(
+                    chainedMarketsAMMContract.read.activeMarketsPerUser([
                         0,
                         ammParams.numActiveMarketsPerUser,
-                        walletAddress
-                    ),
-                    chainedSpeedMarketsAMMContract.maturedMarketsPerUser(index, pageSize, walletAddress),
+                        walletAddress,
+                    ]),
+                    chainedMarketsAMMContract.read.maturedMarketsPerUser([index, pageSize, walletAddress]),
                 ]);
                 const allMarkets: any[] = activeMarkets.concat(maturedMarkets);
 
@@ -50,14 +70,14 @@ const useUserChainedSpeedMarketsTransactionsQuery = (
                             let marketAddresss;
                             // Hot fix for 2 markets when resolved with final price 0 and fetching data for that market is failing
                             if (
-                                networkId === NetworkId.OptimismMainnet &&
+                                queryConfig.networkId === NetworkId.OptimismMainnet &&
                                 walletAddress === '0x5ef88d0a93e5773DB543bd421864504618A18de4' &&
                                 market === '0x79F6f48410fC659a274c0A236e19e581373bf2f9'
                             ) {
                                 // some other market address of this user
                                 marketAddresss = '0x6A01283c0F4579B55FB7214CaF619CFe72044b68';
                             } else if (
-                                networkId === NetworkId.PolygonMainnet &&
+                                queryConfig.networkId === NetworkId.PolygonMainnet &&
                                 walletAddress === '0x8AAcec3D7077D04F19aC924d2743fc0DE1456941' &&
                                 market === '0x1e195Ea2ABf23C1A793F01c934692A230bb5Fc40'
                             ) {
@@ -69,7 +89,7 @@ const useUserChainedSpeedMarketsTransactionsQuery = (
 
                             return marketAddresss;
                         });
-                    promises.push(speedMarketsDataContract.getChainedMarketsData(batchMarkets));
+                    promises.push(speedMarketsDataContractLocal.read.getChainedMarketsData([batchMarkets]));
                 }
                 const allMarketsDataArray = await Promise.all(promises);
 
@@ -88,7 +108,7 @@ const useUserChainedSpeedMarketsTransactionsQuery = (
                     const sides: Positions[] = marketData.directions.map(
                         (direction: number) => SIDE_TO_POSITION_MAP[direction]
                     );
-                    const buyinAmount = coinFormatter(marketData.buyinAmount, networkId);
+                    const buyinAmount = coinFormatter(marketData.buyinAmount, queryConfig.networkId);
                     const payout = roundNumberToDecimals(
                         buyinAmount * bigNumberFormatter(marketData.payoutMultiplier) ** sides.length,
                         8
@@ -129,7 +149,7 @@ const useUserChainedSpeedMarketsTransactionsQuery = (
 
                     // Hot fix for 3 markets when resolved with final price 0 and fetching data for that market is failing
                     if (
-                        networkId === NetworkId.OptimismMainnet &&
+                        queryConfig.networkId === NetworkId.OptimismMainnet &&
                         userData.marketItem.address === '0x79F6f48410fC659a274c0A236e19e581373bf2f9'
                     ) {
                         userData.payout = roundNumberToDecimals(5 * 1.9 ** 6, 8);
@@ -153,7 +173,7 @@ const useUserChainedSpeedMarketsTransactionsQuery = (
                             isChained: true,
                         } as SpeedMarket;
                     } else if (
-                        networkId === NetworkId.PolygonMainnet &&
+                        queryConfig.networkId === NetworkId.PolygonMainnet &&
                         userData.marketItem.address === '0x9C5e5C979DbCaB721336AD3eD6eac76650F7eB2C'
                     ) {
                         userData.marketItem = {
@@ -162,7 +182,7 @@ const useUserChainedSpeedMarketsTransactionsQuery = (
                             finalPrice: 38830.08275709,
                         } as SpeedMarket;
                     } else if (
-                        networkId === NetworkId.PolygonMainnet &&
+                        queryConfig.networkId === NetworkId.PolygonMainnet &&
                         userData.marketItem.address === '0x1e195Ea2ABf23C1A793F01c934692A230bb5Fc40'
                     ) {
                         userData.payout = roundNumberToDecimals(5 * 1.9 ** 6, 8);
@@ -189,14 +209,14 @@ const useUserChainedSpeedMarketsTransactionsQuery = (
 
                     userTransactions.push(userData);
                 }
+            } catch (e) {
+                console.log(e);
             }
 
             return userTransactions;
         },
-        {
-            ...options,
-        }
-    );
+        ...options,
+    });
 };
 
 export default useUserChainedSpeedMarketsTransactionsQuery;

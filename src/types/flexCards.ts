@@ -6,8 +6,8 @@ export type SharePositionData = {
     type: SharePositionType;
     positions: Positions[];
     currencyKey: string;
-    strikePrices?: (number | string)[];
-    finalPrices?: (number | string)[];
+    strikePrices?: number[];
+    finalPrices?: number[];
     strikeDate: number;
     buyIn: number;
     payout: number;

@@ -1,8 +1,8 @@
 import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
+import { UseQueryOptions, useQueries } from '@tanstack/react-query';
 import { CONNECTION_TIMEOUT_MS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds } from 'date-fns';
-import { UseQueryOptions, useQueries } from 'react-query';
 import { NetworkId } from 'thales-utils';
 import { getBenchmarksPriceFeeds, getPriceServiceEndpoint } from 'utils/pyth';
 
@@ -14,7 +14,7 @@ type PriceRequest = {
 const usePythPriceQueries = (
     networkId: NetworkId,
     priceRequests: PriceRequest[],
-    options?: UseQueryOptions<number>
+    options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
     const fetchPythPrice = async (priceRequest: PriceRequest) => {
         const priceConnection = new EvmPriceServiceConnection(getPriceServiceEndpoint(networkId), {
@@ -39,15 +39,15 @@ const usePythPriceQueries = (
         return price;
     };
 
-    return useQueries(
-        priceRequests.map((priceRequest) => ({
+    return useQueries({
+        queries: priceRequests.map((priceRequest) => ({
             queryKey: QUERY_KEYS.Prices.PythPrices(priceRequest.priceId, priceRequest.publishTime),
             queryFn: () => fetchPythPrice(priceRequest),
             cacheTime: hoursToMilliseconds(10),
             staleTime: hoursToMilliseconds(10),
             ...options,
-        }))
-    );
+        })),
+    });
 };
 
 export default usePythPriceQueries;

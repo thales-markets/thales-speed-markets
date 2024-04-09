@@ -174,11 +174,3 @@ input[type='number'] {
 a {
     text-decoration: none;
 }
-
-@import './fonts.css';
-@import './overrides.css';
-@import './datepicker.css';
-@import './icons.css';
-@import './sidebar-icons.css';
-@import './thales-icons.css';
-@import './currencies.css';

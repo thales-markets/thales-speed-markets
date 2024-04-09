@@ -1,15 +1,7 @@
 import React from 'react';
-import Select, {
-    ControlProps,
-    GroupTypeBase,
-    IndicatorProps,
-    MenuProps,
-    OptionProps,
-    OptionTypeBase,
-    ValueType,
-    components,
-} from 'react-select';
-import styled, { CSSObject, useTheme } from 'styled-components';
+import Select, { CSSObjectWithLabel, ControlProps, GroupBase, OptionProps, components } from 'react-select';
+
+import styled, { useTheme } from 'styled-components';
 import { ThemeInterface } from 'types/ui';
 
 type SelectOption = { value: number | string; label: string };
@@ -18,56 +10,46 @@ type SelectInputProps = {
     options: Array<SelectOption>;
     handleChange: (value: number | undefined | null) => void;
     defaultValue?: number;
-    width?: number | string;
-    height?: number;
-    fontSize?: number;
-    isDisabled?: boolean;
 };
 
-const SelectInput: React.FC<SelectInputProps> = ({
-    options,
-    handleChange,
-    defaultValue,
-    width,
-    height,
-    fontSize,
-    isDisabled,
-}) => {
+const SelectInput: React.FC<SelectInputProps> = ({ options, handleChange, defaultValue }) => {
     const theme: ThemeInterface = useTheme();
     const defaultOption = options[defaultValue ? defaultValue : 0];
 
     const customStyled = {
-        container: (base: CSSObject) => ({ ...base, width: '100%' }),
-        menu: (base: CSSObject, props: MenuProps<OptionTypeBase, boolean, GroupTypeBase<OptionTypeBase>>) => ({
+        container: (base: CSSObjectWithLabel) => ({ ...base, width: '100%' }),
+        valueContainer: (base: CSSObjectWithLabel) => ({ ...base, height: '100%' }),
+        menu: (base: CSSObjectWithLabel) => ({
             ...base,
             width: '100%',
-            color: props.selectProps.menuColor,
+            // color: props.selectProps.menuColor,
             backgroundColor: theme.background.secondary,
             border: `1px solid ${theme.borderColor.primary}`,
             marginTop: 5,
             borderRadius: 8,
             overflow: 'auto',
-            fontSize: fontSize || 16,
+            fontSize: 16,
         }),
-        menuList: (base: CSSObject) => ({
+        menuList: (base: CSSObjectWithLabel) => ({
             ...base,
             padding: '4px',
         }),
-        option: (base: CSSObject, props: OptionProps<OptionTypeBase, boolean, GroupTypeBase<OptionTypeBase>>) => ({
+        option: (base: CSSObjectWithLabel, props: OptionProps<SelectOption, boolean, GroupBase<SelectOption>>) => ({
             ...base,
             color: theme.textColor.primary,
             backgroundColor: props?.isFocused ? theme.background.primary : 'transparent',
             cursor: 'pointer',
             borderRadius: 8,
         }),
-        control: (base: CSSObject, props: ControlProps<OptionTypeBase, boolean, GroupTypeBase<OptionTypeBase>>) => ({
+        control: (base: CSSObjectWithLabel, props: ControlProps<SelectOption, boolean, GroupBase<SelectOption>>) => ({
             ...base,
             backgroundColor: theme.background.secondary,
             borderColor: theme.borderColor.primary,
             color: theme.textColor.secondary,
             borderRadius: '8px',
-            width: width,
-            minHeight: height || 38,
+            // width: width,
+            minHeight: 38,
+            height: 38,
             cursor: 'pointer',
             boxShadow: 'none',
             '&:hover': {
@@ -75,22 +57,23 @@ const SelectInput: React.FC<SelectInputProps> = ({
                 boxShadow: 'none',
             },
             opacity: props.isDisabled ? 0.4 : 1,
-            fontSize: fontSize || 16,
+            fontSize: 16,
             lineHeight: 20,
         }),
-        placeholder: (base: CSSObject) => ({
+        placeholder: (base: CSSObjectWithLabel) => ({
             ...base,
             color: theme.textColor.primary,
         }),
-        singleValue: (base: CSSObject) => ({
+        singleValue: (base: CSSObjectWithLabel) => ({
             ...base,
             color: theme.textColor.primary,
         }),
         indicatorSeparator: () => ({
             display: 'none',
         }),
-        dropdownIndicator: (base: CSSObject) => ({
+        dropdownIndicator: (base: CSSObjectWithLabel) => ({
             ...base,
+
             color: theme.textColor.quaternary,
             [':hover']: {
                 ...base[':hover'],
@@ -102,20 +85,17 @@ const SelectInput: React.FC<SelectInputProps> = ({
     return (
         <Select
             components={{ DropdownIndicator }}
-            value={defaultOption}
             options={options}
-            styles={customStyled}
-            onChange={(props: ValueType<OptionTypeBase, boolean>) =>
-                handleChange(Number((props as SelectOption).value))
-            }
             defaultValue={defaultOption}
+            value={defaultOption}
             isSearchable={false}
-            isDisabled={isDisabled}
+            onChange={(props: any) => handleChange(Number((props as SelectOption).value))}
+            styles={customStyled}
         />
     );
 };
 
-const DropdownIndicator: React.FC<IndicatorProps<OptionTypeBase, boolean, GroupTypeBase<OptionTypeBase>>> = (props) => {
+const DropdownIndicator: React.FC<any> = (props) => {
     return (
         <components.DropdownIndicator {...props}>
             <Icon className={`icon ${props.selectProps.menuIsOpen ? 'icon--caret-up' : 'icon--caret-down'}`} />

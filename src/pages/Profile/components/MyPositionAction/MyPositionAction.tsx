@@ -15,31 +15,38 @@ import { USD_SIGN } from 'constants/currency';
 import { ZERO_ADDRESS } from 'constants/network';
 import { CONNECTION_TIMEOUT_MS, PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
 import { differenceInSeconds, millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
-import { BigNumber, ethers } from 'ethers';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsMobile } from 'redux/modules/ui';
-import { getIsWalletConnected, getNetworkId, getSelectedCollateralIndex, getWalletAddress } from 'redux/modules/wallet';
+import { getSelectedCollateralIndex } from 'redux/modules/wallet';
 import styled, { CSSProperties, useTheme } from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
 import { coinParser, formatCurrencyWithSign, roundNumberToDecimals } from 'thales-utils';
 import { UserOpenPositions } from 'types/market';
+import { SupportedNetwork } from 'types/network';
 import { UserPosition } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
-import erc20Contract from 'utils/contracts/erc20Contract';
+import { ViemContract } from 'types/viem';
+import { getContarctAbi } from 'utils/contracts/abi';
+import erc20Contract from 'utils/contracts/collateralContract';
+import multipleCollateral from 'utils/contracts/multipleCollateralContract';
+import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
 import { getCollateral, getCollaterals, getDefaultCollateral } from 'utils/currency';
 import { checkAllowance, getIsMultiCollateralSupported } from 'utils/network';
 import { getPriceId, getPriceServiceEndpoint } from 'utils/pyth';
 import {
+    refetchBalances,
     refetchUserNotifications,
     refetchUserProfileQueries,
     refetchUserResolvedSpeedMarkets,
     refetchUserSpeedMarkets,
 } from 'utils/queryConnector';
-import snxJSConnector from 'utils/snxJSConnector';
 import { delay } from 'utils/timer';
+import { Client, getContract } from 'viem';
+import { waitForTransactionReceipt } from 'viem/actions';
+import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 
 const ONE_HUNDRED_AND_THREE_PERCENT = 1.03;
 
@@ -59,9 +66,10 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 
-    const networkId = useSelector((state: RootState) => getNetworkId(state));
-    const walletAddress = useSelector((state: RootState) => getWalletAddress(state)) || '';
-    const isWalletConnected = useSelector((state: RootState) => getIsWalletConnected(state));
+    const networkId = useChainId() as SupportedNetwork;
+    const client = useClient();
+    const walletClient = useWalletClient();
+    const { isConnected, address } = useAccount();
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
 
@@ -73,8 +81,8 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     ]);
     const isDefaultCollateral = selectedCollateral === defaultCollateral;
     const collateralAddress = isMultiCollateralSupported
-        ? snxJSConnector.multipleCollateral && snxJSConnector.multipleCollateral[selectedCollateral]?.address
-        : snxJSConnector.collateral?.address;
+        ? multipleCollateral[selectedCollateral].addresses[networkId]
+        : erc20Contract.addresses[networkId];
 
     const [openApprovalModal, setOpenApprovalModal] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -86,41 +94,50 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
             return;
         }
 
-        const { speedMarketsAMMContract, collateral } = snxJSConnector;
-        const erc20Instance = new ethers.Contract(
-            collateral?.address || '',
-            erc20Contract.abi,
-            snxJSConnector.provider
-        );
-        const addressToApprove = speedMarketsAMMContract?.address || '';
+        const erc20Instance = getContract({
+            abi: erc20Contract.abi,
+            address: erc20Contract.addresses[networkId],
+            client: client as Client,
+        }) as ViemContract;
+        const addressToApprove = speedMarketsAMMContract.addresses[networkId];
 
         const getAllowance = async () => {
             try {
                 const parsedAmount = coinParser(position.value.toString(), networkId);
-                const allowance = await checkAllowance(parsedAmount, erc20Instance, walletAddress, addressToApprove);
+                const allowance = await checkAllowance(
+                    parsedAmount,
+                    erc20Instance,
+                    address as string,
+                    addressToApprove
+                );
                 setAllowance(allowance);
             } catch (e) {
                 console.log(e);
             }
         };
-        if (isWalletConnected && erc20Instance.provider) {
+        if (isConnected) {
             getAllowance();
         }
-    }, [position.value, networkId, walletAddress, isWalletConnected, hasAllowance, isAllowing, isDefaultCollateral]);
+    }, [position.value, networkId, address, isConnected, hasAllowance, isAllowing, isDefaultCollateral, client]);
 
-    const handleAllowance = async (approveAmount: BigNumber) => {
-        const { speedMarketsAMMContract, collateral } = snxJSConnector;
-        const erc20Instance = new ethers.Contract(collateral?.address || '', erc20Contract.abi, snxJSConnector.signer);
-        const addressToApprove = speedMarketsAMMContract?.address || '';
+    const handleAllowance = async (approveAmount: bigint) => {
+        const erc20Instance = getContract({
+            abi: erc20Contract.abi,
+            address: erc20Contract.addresses[networkId],
+            client: client as Client,
+        }) as ViemContract;
+        const addressToApprove = speedMarketsAMMContract.addresses[networkId];
 
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
         try {
             setIsAllowing(true);
 
-            const tx = (await erc20Instance.approve(addressToApprove, approveAmount)) as ethers.ContractTransaction;
+            const hash = await erc20Instance.write.approve([addressToApprove, approveAmount]);
             setOpenApprovalModal(false);
-            const txResult = await tx.wait();
-            if (txResult && txResult.transactionHash) {
+            const txReceipt = await waitForTransactionReceipt(client as Client, {
+                hash,
+            });
+            if (txReceipt.status === 'success') {
                 toast.update(id, getSuccessToastOptions(t(`common.transaction.successful`), id));
                 setAllowance(true);
                 setIsAllowing(false);
@@ -138,72 +155,75 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
             timeout: CONNECTION_TIMEOUT_MS,
         });
 
-        const { speedMarketsAMMContract, signer } = snxJSConnector as any;
-        if (speedMarketsAMMContract) {
-            setIsSubmitting(true);
-            const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
+        setIsSubmitting(true);
+        const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
 
-            const speedMarketsAMMContractWithSigner = speedMarketsAMMContract.connect(signer);
-            try {
-                const pythContract = new ethers.Contract(
-                    PYTH_CONTRACT_ADDRESS[networkId],
-                    PythInterfaceAbi as any,
-                    (snxJSConnector as any).provider
-                );
+        try {
+            const pythContract = getContract({
+                abi: PythInterfaceAbi,
+                address: PYTH_CONTRACT_ADDRESS[networkId],
+                client: client as Client,
+            });
 
-                const [priceFeedUpdateVaa, publishTime] = await priceConnection.getVaa(
-                    getPriceId(networkId, position.currencyKey),
-                    millisecondsToSeconds(position.maturityDate)
-                );
+            const [priceFeedUpdateVaa, publishTime] = await priceConnection.getVaa(
+                getPriceId(networkId, position.currencyKey),
+                millisecondsToSeconds(position.maturityDate)
+            );
 
-                // check if price feed is not too late
-                if (
-                    maxPriceDelayForResolvingSec &&
-                    differenceInSeconds(secondsToMilliseconds(publishTime), position.maturityDate) >
-                        maxPriceDelayForResolvingSec
-                ) {
-                    await delay(800);
-                    toast.update(id, getErrorToastOptions(t('speed-markets.user-positions.errors.price-stale'), id));
-                    setIsSubmitting(false);
-                    return;
-                }
+            // check if price feed is not too late
+            if (
+                maxPriceDelayForResolvingSec &&
+                differenceInSeconds(secondsToMilliseconds(publishTime), position.maturityDate) >
+                    maxPriceDelayForResolvingSec
+            ) {
+                await delay(800);
+                toast.update(id, getErrorToastOptions(t('speed-markets.user-positions.errors.price-stale'), id));
+                setIsSubmitting(false);
+                return;
+            }
 
-                const priceUpdateData = ['0x' + Buffer.from(priceFeedUpdateVaa, 'base64').toString('hex')];
-                const updateFee = await pythContract.getUpdateFee(priceUpdateData);
+            const priceUpdateData = ['0x' + Buffer.from(priceFeedUpdateVaa, 'base64').toString('hex')];
+            const updateFee = await pythContract.read.getUpdateFee([priceUpdateData]);
 
-                const isEth = collateralAddress === ZERO_ADDRESS;
+            const isEth = collateralAddress === ZERO_ADDRESS;
 
-                const tx: ethers.ContractTransaction = isDefaultCollateral
-                    ? await speedMarketsAMMContractWithSigner.resolveMarket(position.market, priceUpdateData, {
-                          value: updateFee,
-                      })
-                    : await speedMarketsAMMContractWithSigner.resolveMarketWithOfframp(
-                          position.market,
-                          priceUpdateData,
-                          collateralAddress,
-                          isEth,
-                          { value: updateFee }
-                      );
+            const speedMarketsAMMContractWithSigner = getContract({
+                abi: getContarctAbi(speedMarketsAMMContract, networkId),
+                address: speedMarketsAMMContract.addresses[networkId],
+                client: walletClient.data as Client,
+            }) as ViemContract;
 
-                const txResult = await tx.wait();
+            const hash = isDefaultCollateral
+                ? await speedMarketsAMMContractWithSigner.write.resolveMarket([position.market, priceUpdateData], {
+                      value: updateFee,
+                  })
+                : await speedMarketsAMMContractWithSigner.write.resolveMarketWithOfframp(
+                      [position.market, priceUpdateData, collateralAddress, isEth],
+                      { value: updateFee }
+                  );
 
-                if (txResult && txResult.transactionHash) {
-                    toast.update(
-                        id,
-                        getSuccessToastOptions(t(`speed-markets.user-positions.confirmation-message`), id)
-                    );
-                    refetchUserNotifications(walletAddress, networkId);
-                    refetchUserSpeedMarkets(false, networkId, walletAddress);
-                    refetchUserResolvedSpeedMarkets(false, networkId, walletAddress);
-                    refetchUserProfileQueries(walletAddress, networkId);
-                }
-            } catch (e) {
-                console.log(e);
+            const txReceipt = await waitForTransactionReceipt(client as Client, {
+                hash,
+            });
+
+            if (txReceipt.status === 'success') {
+                toast.update(id, getSuccessToastOptions(t(`speed-markets.user-positions.confirmation-message`), id));
+                refetchUserNotifications(address as string, networkId);
+                refetchUserSpeedMarkets(false, networkId, address as string);
+                refetchUserResolvedSpeedMarkets(false, networkId, address as string);
+                refetchUserProfileQueries(address as string, networkId);
+                refetchBalances(address as string, networkId);
+            } else {
+                console.log('Transaction status', txReceipt.status);
                 await delay(800);
                 toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
             }
-            setIsSubmitting(false);
+        } catch (e) {
+            console.log(e);
+            await delay(800);
+            toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
         }
+        setIsSubmitting(false);
     };
 
     const getResolveButton = () => (
@@ -247,14 +267,14 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
             return (
                 <ResultsContainer>
                     <Label>{t('common.result')}</Label>
-                    <Value isUpperCase color={theme.error.textColor.primary}>
+                    <Value $isUpperCase color={theme.error.textColor.primary}>
                         {t('common.loss')}
                     </Value>
                 </ResultsContainer>
             );
         } else {
             return (
-                <ResultsContainer minWidth="180px">
+                <ResultsContainer $minWidth="180px">
                     <Label>{t('speed-markets.user-positions.results')}</Label>
                     <TimeRemaining fontSize={13} end={position.maturityDate} showFullCounter showSecondsCounter />
                 </ResultsContainer>
@@ -309,22 +329,22 @@ const additionalButtonStyle: CSSProperties = {
     border: 'none',
 };
 
-export const ResultsContainer = styled(FlexDivCentered)<{ minWidth?: string }>`
+export const ResultsContainer = styled(FlexDivCentered)<{ $minWidth?: string }>`
     gap: 4px;
     font-weight: 700;
     font-size: 13px;
     line-height: 100%;
     white-space: nowrap;
-    min-width: ${(props) => (props.minWidth ? props.minWidth : '174px')};
+    min-width: ${(props) => (props.$minWidth ? props.$minWidth : '174px')};
 `;
 
 export const Label = styled.span<{ color?: string }>`
     color: ${(props) => (props.color ? props.color : props.theme.textColor.secondary)};
 `;
 
-export const Value = styled.span<{ color?: string; isUpperCase?: boolean }>`
+export const Value = styled.span<{ color?: string; $isUpperCase?: boolean }>`
     color: ${(props) => props.color || props.theme.textColor.primary};
-    ${(props) => (props.isUpperCase ? 'text-transform: uppercase;' : '')}
+    ${(props) => (props.$isUpperCase ? 'text-transform: uppercase;' : '')}
     font-weight: bold;
     line-height: 100%;
 `;
