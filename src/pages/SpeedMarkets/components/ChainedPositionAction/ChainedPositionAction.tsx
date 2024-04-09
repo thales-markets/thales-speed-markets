@@ -312,25 +312,19 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 }
             >
                 {hasAllowance || isDefaultCollateral || isOverview
-                    ? isSubmitting
-                        ? isOverview
-                            ? isSubmittingBatch
-                                ? t('speed-markets.overview.resolve')
-                                : t(`speed-markets.overview.resolve-progress`)
-                            : `${t('speed-markets.user-positions.claim-win-progress')} ${formatCurrencyWithSign(
-                                  USD_SIGN,
-                                  position.payout,
-                                  2
-                              )}`
-                        : isOverview
-                        ? isAdmin
-                            ? `${t('common.admin')} ${t('speed-markets.overview.resolve')}`
-                            : t('speed-markets.overview.resolve')
-                        : `${t('speed-markets.user-positions.claim-win')} ${formatCurrencyWithSign(
-                              USD_SIGN,
-                              position.payout,
-                              2
-                          )}`
+                    ? `${
+                          isSubmitting
+                              ? isOverview
+                                  ? isSubmittingBatch
+                                      ? t('speed-markets.overview.resolve')
+                                      : t(`speed-markets.overview.resolve-progress`)
+                                  : t('speed-markets.user-positions.claim-win-progress')
+                              : isOverview
+                              ? isAdmin
+                                  ? `${t('common.admin')} ${t('speed-markets.overview.resolve')}`
+                                  : t('speed-markets.overview.resolve')
+                              : t('speed-markets.user-positions.claim-win')
+                      } ${formatCurrencyWithSign(USD_SIGN, position.payout, 2)}`
                     : isAllowing
                     ? `${t('common.enable-wallet-access.approve-progress')} ${defaultCollateral}...`
                     : t('common.enable-wallet-access.approve-swap', {
