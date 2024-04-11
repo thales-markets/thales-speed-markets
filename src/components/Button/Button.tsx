@@ -43,7 +43,7 @@ const Button: React.FC<ButtonProps> = ({
             $borderRadius={borderRadius}
             style={additionalStyles}
         >
-            <Wrapper
+            <ButtonWrapper
                 height={height}
                 padding={padding}
                 $textColor={textColor}
@@ -55,7 +55,7 @@ const Button: React.FC<ButtonProps> = ({
                 style={additionalStyles}
             >
                 {children}
-            </Wrapper>
+            </ButtonWrapper>
         </Container>
     );
 };
@@ -80,7 +80,7 @@ const Container = styled(FlexDivCentered)<{
     margin: ${(props) => props.margin || ''};
 `;
 
-const Wrapper = styled.button<{
+const ButtonWrapper = styled.button<{
     height?: string;
     padding?: string;
     $borderRadius?: string;
@@ -105,7 +105,6 @@ const Wrapper = styled.button<{
     cursor: pointer;
     color: ${(props) => props.$textColor || props.theme.button.textColor.primary};
     background-color: ${(props) => props.$backgroundColor || props.theme.button.background.primary};
-    padding: ${(props) => props.padding || '0 30px'};
     outline: none;
     &:disabled {
         opacity: 0.5;
