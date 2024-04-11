@@ -140,8 +140,20 @@
     content: '\0061';
 }
 
-.icon-home--speed-logo:before {
+.icon-home--chained:before {
+    content: '\0066';
+}
+
+.icon-home--any-crypto:before {
+    content: '\0067';
+}
+
+.icon-home--speed-full-logo:before {
     content: '\0078';
+}
+
+.icon-home--speed-logo:before {
+    content: '\0079';
 }
 
 /* icons.ttf */

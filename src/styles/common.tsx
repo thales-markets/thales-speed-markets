@@ -74,7 +74,8 @@ export const Colors = {
     BLUE_MIDNIGHT: '#052040',
     BLUE_MIDNIGHT_LIGHT: '#1b314f',
     BLUE_SKY: '#91bced',
-    BLUE_DEEP_SKY: '#169cd2',
+    BLUE_DEEP_SKY: '#169CD2',
+    BLUE_DEEP_SKY_2: '#1D7DC0',
 
     RED: '#DE496D',
     RED_LIGHT: '#E29587',
@@ -91,4 +92,5 @@ export const Colors = {
 
     PURPLE: '#BF7EFF',
     PURPLE_DARK: '#A764B7',
+    PURPLE_DARK_2: '#681483',
 };
