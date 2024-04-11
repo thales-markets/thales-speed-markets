@@ -1,3 +1,6 @@
+import Blurry from 'assets/images/landing/blurry.svg';
+import PurpleTriangle from 'assets/images/landing/purple-triangle.png';
+import BlueTriangle from 'assets/images/landing/blue-triangle.png';
 import Zeus from 'assets/images/landing/zeus-hero.webp';
 import SPAAnchor from 'components/SPAAnchor';
 import ROUTES from 'constants/routes';
@@ -10,6 +13,7 @@ const LandingPage: React.FC = () => {
 
     return (
         <Container>
+            <BlueTriangleImg src={BlueTriangle} />
             <ZeusImg src={Zeus} />
             <Header>
                 <FlexDivRow>
@@ -36,12 +40,14 @@ const LandingPage: React.FC = () => {
             </Header>
             <ButtonContainer>
                 <ButtonWrapper>
+                    <BlurImg src={Blurry} />
                     <SPAAnchor href={ROUTES.Markets.Home}>
                         <Button>{t('landing.trade-now')}</Button>
                     </SPAAnchor>
                 </ButtonWrapper>
             </ButtonContainer>
             <Content>
+                <PurpleTriangleImg src={PurpleTriangle} />
                 <ContentRow>
                     <ContentIcon className="icon-home icon-home--speed-logo" fontSize="148" isRotating={true} />
                     <ContentText>
@@ -104,6 +110,32 @@ const ZeusImg = styled.img`
     width: 695px;
 `;
 
+const BlurImg = styled.img`
+    position: absolute;
+    width: 500px;
+    transform: rotate(12deg);
+`;
+
+const BlueTriangleImg = styled.img`
+    position: absolute;
+    top: -50px;
+    left: 554px;
+    width: 400px;
+    height: 400px;
+    transform: rotate(180deg);
+`;
+
+const PurpleTriangleImg = styled.img`
+    position: absolute;
+    top: 50px;
+    right: 0;
+    object-fit: cover;
+    object-position: 15% 100%;
+    width: 260px;
+    height: 400px;
+    overflow: clip;
+`;
+
 const Header = styled(FlexDivColumn)`
     position: relative;
     margin: 94px 155px 0 95px;
@@ -162,9 +194,11 @@ const Button = styled(FlexDivCentered)`
     line-height: 100%;
     font-weight: 800;
     text-transform: uppercase;
+    z-index: 1;
 `;
 
 const Content = styled(FlexDivColumn)`
+    position: relative;
     margin-left: 321px;
     gap: 60px;
 `;
