@@ -1,4 +1,4 @@
-import { useAccountModal, useConnectModal } from '@rainbow-me/rainbowkit';
+import { useAccountModal } from '@rainbow-me/rainbowkit';
 import NetworkSwitch from 'components/NetworkSwitch';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -6,20 +6,22 @@ import styled from 'styled-components';
 import { truncateAddress } from 'thales-utils';
 import UserCollaterals from '../UserCollaterals';
 import { useAccount } from 'wagmi';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'types/ui';
-import { getIsBiconomy } from 'redux/modules/wallet';
+import { getIsBiconomy, getWalletConnectModalVisibility, setWalletConnectModalVisibility } from 'redux/modules/wallet';
 import biconomyConnector from 'utils/biconomyWallet';
+import ConnectWalletModal from 'components/ConnectWalletModal';
 
 const TRUNCATE_ADDRESS_NUMBER_OF_CHARS = 5;
 
 const UserWallet: React.FC = () => {
     const { t } = useTranslation();
-    const { openConnectModal } = useConnectModal();
     const { openAccountModal } = useAccountModal();
+    const dispatch = useDispatch();
 
     const { isConnected, address: walletAddress } = useAccount();
     const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
+    const connectWalletModalVisibility = useSelector((state: RootState) => getWalletConnectModalVisibility(state));
 
     const [walletText, setWalletText] = useState('');
 
@@ -30,7 +32,15 @@ const UserWallet: React.FC = () => {
                 <WalletContainer
                     $connected={isConnected}
                     onClick={() => {
-                        isConnected ? openAccountModal?.() : openConnectModal?.();
+                        if (isConnected) {
+                            openAccountModal?.();
+                        } else {
+                            dispatch(
+                                setWalletConnectModalVisibility({
+                                    visibility: true,
+                                })
+                            );
+                        }
                     }}
                     onMouseOver={() => setWalletText(t('common.wallet.wallet-options'))}
                     onMouseLeave={() => setWalletText('')}
@@ -45,6 +55,16 @@ const UserWallet: React.FC = () => {
                         : t('common.wallet.connect-your-wallet')}
                 </WalletContainer>
                 <NetworkSwitch />
+                <ConnectWalletModal
+                    isOpen={connectWalletModalVisibility}
+                    onClose={() => {
+                        dispatch(
+                            setWalletConnectModalVisibility({
+                                visibility: !connectWalletModalVisibility,
+                            })
+                        );
+                    }}
+                />
             </Wrapper>
         </Container>
     );

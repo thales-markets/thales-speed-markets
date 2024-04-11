@@ -10,6 +10,7 @@ import './styles/main.css';
 import './styles/overrides.css';
 import './styles/sidebar-icons.css';
 import './styles/thales-icons.css';
+import './styles/social-icons.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(

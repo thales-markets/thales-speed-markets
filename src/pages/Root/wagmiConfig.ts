@@ -14,7 +14,14 @@ import {
 import { RPC_LIST } from 'constants/network';
 import { NetworkId } from 'thales-utils';
 import { isMobile } from 'utils/device';
-import { particleGoogleWallet, particleTwitterWallet } from 'utils/particleWallet';
+import {
+    particleAppleWallet,
+    particleDiscordWallet,
+    particleGithubWallet,
+    particleGoogleWallet,
+    particleTwitterWallet,
+    particleWallet,
+} from 'utils/particleWallet';
 import { createConfig, fallback, http } from 'wagmi';
 import {
     arbitrum,
@@ -38,8 +45,15 @@ const wallets = [
     coinbaseWallet,
     rainbowWallet,
     imTokenWallet,
+];
+
+const socialWallets = [
+    particleWallet,
     particleGoogleWallet,
     particleTwitterWallet,
+    particleGithubWallet,
+    particleAppleWallet,
+    particleDiscordWallet,
 ];
 
 !isMobile() && wallets.push(injectedWallet);
@@ -59,8 +73,12 @@ export const wagmiConfig = createConfig({
     connectors: connectorsForWallets(
         [
             {
-                groupName: 'Recommended',
+                groupName: 'Wallets',
                 wallets,
+            },
+            {
+                groupName: 'Social Login',
+                wallets: socialWallets,
             },
         ],
         {

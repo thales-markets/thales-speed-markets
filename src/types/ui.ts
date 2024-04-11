@@ -7,6 +7,10 @@ export type AppSliceState = {
 export type WalletSliceState = {
     selectedCollateralIndex: number;
     isBiconomy?: boolean;
+    walletConnectModal: {
+        visibility: boolean;
+        origin?: 'sign-up' | 'sign-in' | undefined;
+    };
 };
 
 export type UISliceState = {

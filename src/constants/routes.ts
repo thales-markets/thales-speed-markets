@@ -10,5 +10,6 @@ const ROUTES = {
     },
     Deposit: '/deposit',
     Withdraw: '/withdraw',
+    Wizard: '/wizard',
 };
 export default ROUTES;

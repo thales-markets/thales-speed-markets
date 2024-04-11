@@ -159,12 +159,12 @@ export const getOnRamperUrl = (
 };
 
 export const getSpecificConnectorFromConnectorsArray = (
-    connectors: Connector[],
+    connectors: readonly Connector[],
     name: string,
     particle?: boolean
 ): Connector | undefined => {
     if (particle) {
-        return connectors.find((connector: any) => connector?.options?.authType == name);
+        return connectors.find((connector: any) => connector?.type == name);
     }
     return connectors.find((connector: any) => connector.id == name);
 };

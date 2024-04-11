@@ -13,7 +13,7 @@ export const particleWallet = (): Wallet => ({
         createConnector(
             (config) =>
                 ({
-                    ...particleWagmiWallet()(config),
+                    ...particleWagmiWallet({ socialType: 'particle', id: 'particleWalletSDK' })(config),
                     ...walletDetails,
                 } as any)
         ),
@@ -29,7 +29,7 @@ export const particleGoogleWallet = (): Wallet => ({
         createConnector(
             (config) =>
                 ({
-                    ...particleWagmiWallet({ socialType: 'google' })(config),
+                    ...particleWagmiWallet({ socialType: 'google', id: 'particleWalletSDKGoogle' })(config),
                     ...walletDetails,
                 } as any)
         ),
@@ -45,7 +45,55 @@ export const particleTwitterWallet = (): Wallet => ({
         createConnector(
             (config) =>
                 ({
-                    ...particleWagmiWallet({ socialType: 'twitter' })(config),
+                    ...particleWagmiWallet({ socialType: 'twitter', id: 'particleWalletSDKTwitter' })(config),
+                    ...walletDetails,
+                } as any)
+        ),
+});
+
+export const particleGithubWallet = (): Wallet => ({
+    id: 'particle_github',
+    name: 'Github',
+    iconUrl: async () => twitterIcon,
+    iconBackground: '#fff',
+    installed: true,
+    createConnector: (walletDetails: WalletDetailsParams) =>
+        createConnector(
+            (config) =>
+                ({
+                    ...particleWagmiWallet({ socialType: 'github', id: 'particleWalletGithub' })(config),
+                    ...walletDetails,
+                } as any)
+        ),
+});
+
+export const particleDiscordWallet = (): Wallet => ({
+    id: 'particle_discord',
+    name: 'Discord',
+    iconUrl: async () => twitterIcon,
+    iconBackground: '#fff',
+    installed: true,
+    createConnector: (walletDetails: WalletDetailsParams) =>
+        createConnector(
+            (config) =>
+                ({
+                    ...particleWagmiWallet({ socialType: 'discord', id: 'particleWalletSDKDiscord' })(config),
+                    ...walletDetails,
+                } as any)
+        ),
+});
+
+export const particleAppleWallet = (): Wallet => ({
+    id: 'particle_apple',
+    name: 'Apple',
+    iconUrl: async () => twitterIcon,
+    iconBackground: '#fff',
+    installed: true,
+    createConnector: (walletDetails: WalletDetailsParams) =>
+        createConnector(
+            (config) =>
+                ({
+                    ...particleWagmiWallet({ socialType: 'apple', id: 'particleWalletSDKApple' })(config),
                     ...walletDetails,
                 } as any)
         ),

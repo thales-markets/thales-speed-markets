@@ -20,19 +20,11 @@ import { isMobile } from 'utils/device';
 import { getSupportedNetworksByRoute, isNetworkSupported } from 'utils/network';
 import queryConnector from 'utils/queryConnector';
 import { history } from 'utils/routes';
-import { useChainId, useConnect, useDisconnect, useSwitchChain, useWalletClient } from 'wagmi';
+import { useChainId, useDisconnect, useSwitchChain, useWalletClient } from 'wagmi';
 import enTranslation from '../../i18n/en.json';
 import biconomyConnector from 'utils/biconomyWallet';
 import { setIsBiconomy } from 'redux/modules/wallet';
-import { useConnect as useParticleConnect } from '@particle-network/auth-core-modal';
-import {
-    AuthCoreEvent,
-    getLatestAuthType,
-    isSocialAuthType,
-    particleAuth,
-    SocialAuthType,
-} from '@particle-network/auth-core';
-import { particleWagmiWallet } from 'utils/particleWallet/particleWagmiWallet';
+
 import Deposit from 'pages/AARelatedPages/Deposit';
 import Withdraw from 'pages/AARelatedPages/Withdraw';
 
@@ -42,8 +34,6 @@ const App = () => {
     const { data: walletClient } = useWalletClient();
     const { switchChain } = useSwitchChain();
     const { disconnect } = useDisconnect();
-    const { connect } = useConnect();
-    const { connectionStatus } = useParticleConnect();
 
     // particle context provider is overriding our i18n configuration and languages, so we need to add our localization after the initialization of particle context
     // initialization of particle context is happening in Root
@@ -91,21 +81,6 @@ const App = () => {
             createSmartAccount();
         }
     }, [dispatch, switchChain, networkId, disconnect, walletClient]);
-
-    useEffect(() => {
-        if (connectionStatus === 'connected' && isSocialAuthType(getLatestAuthType())) {
-            connect({
-                connector: particleWagmiWallet({ socialType: getLatestAuthType() as SocialAuthType }),
-            });
-        }
-        const onDisconnect = () => {
-            disconnect();
-        };
-        particleAuth.on(AuthCoreEvent.ParticleAuthDisconnect, onDisconnect);
-        return () => {
-            particleAuth.off(AuthCoreEvent.ParticleAuthDisconnect, onDisconnect);
-        };
-    }, [connect, connectionStatus, disconnect]);
 
     useEffect(() => {
         const handlePageResized = () => {
