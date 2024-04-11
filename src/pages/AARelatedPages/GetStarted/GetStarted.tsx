@@ -101,7 +101,8 @@ const GetStarted: React.FC = () => {
 
 const Container = styled(FlexDivColumn)`
     margin-bottom: 40px;
-    max-width: 1080px;
+    max-width: 900px;
+    width: 100%;
 `;
 
 const Title = styled(FlexDivStart)`
@@ -128,7 +129,7 @@ const ProgressBar = styled(FlexDiv)<{ selected?: boolean }>`
     height: 10px;
     width: 32%;
     border-radius: 10px;
-    background-color: yellow;
+    background: linear-gradient(90deg, #a764b7 0%, #169cd2 100%);
 `;
 
 const HorizontalLine = styled.hr`

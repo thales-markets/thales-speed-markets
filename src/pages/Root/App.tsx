@@ -27,6 +27,7 @@ import { setIsBiconomy } from 'redux/modules/wallet';
 
 import Deposit from 'pages/AARelatedPages/Deposit';
 import Withdraw from 'pages/AARelatedPages/Withdraw';
+import GetStarted from 'pages/AARelatedPages/GetStarted';
 
 const App = () => {
     const dispatch = useDispatch();
@@ -162,6 +163,13 @@ const App = () => {
                         <Suspense fallback={<Loader />}>
                             <DappLayout>
                                 <Withdraw />
+                            </DappLayout>
+                        </Suspense>
+                    </Route>
+                    <Route exact path={ROUTES.Wizard}>
+                        <Suspense fallback={<Loader />}>
+                            <DappLayout>
+                                <GetStarted />
                             </DappLayout>
                         </Suspense>
                     </Route>

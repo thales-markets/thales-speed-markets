@@ -28,15 +28,15 @@ const defaultStyle = {
         left: '50%',
         right: 'auto',
         bottom: 'auto',
-        padding: '25px',
-        backgroundColor: '#181A20',
-        border: '1px solid #5F6180',
+        padding: '2px',
+        background: 'linear-gradient(90deg, #a764b7 0%, #169cd2 100%)',
         width: '720px',
         borderRadius: '15px',
         marginRight: '-50%',
         transform: 'translate(-50%, -50%)',
         overflow: 'none',
         height: 'auto',
+        border: 'none',
     },
     overlay: {
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -63,10 +63,6 @@ const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({ isOpen, onClose
             defaultStyle.content.width = '100%';
             defaultStyle.content.padding = '20px 5px';
             defaultStyle.content.height = '100%';
-        } else {
-            defaultStyle.content.width = '720px';
-            defaultStyle.content.padding = '25px';
-            defaultStyle.content.height = 'auto';
         }
     }, [isMobile]);
 
@@ -88,101 +84,126 @@ const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({ isOpen, onClose
 
     return (
         <ReactModal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={defaultStyle}>
-            <CloseIconContainer>
-                <CloseIcon onClick={onClose} />
-            </CloseIconContainer>
-            {!isPending && (
-                <>
-                    <HeaderContainer>
-                        <Header>{t('common.wallet.connect-wallet-modal-title')}</Header>
-                    </HeaderContainer>
-                    <ButtonsContainer disabled={!termsAccepted}>
-                        <SocialLoginWrapper>
-                            <SocialButtonsWrapper>
-                                {SUPPORTED_PARTICAL_CONNECTORS.map((item, index) => {
-                                    const connector = getSpecificConnectorFromConnectorsArray(connectors, item, true);
-                                    console.log('connector: ', connector);
-                                    if (index == 0 && connector) {
-                                        return (
-                                            <Button
-                                                key={index}
-                                                onClick={() => handleConnect(connector)}
-                                                oneButtoninRow={true}
-                                            >
-                                                <SocialIcon className={getClassNameForParticalLogin(item)} />
-                                                {item}
-                                            </Button>
+            <Container>
+                <CloseIconContainer>
+                    <CloseIcon onClick={onClose} />
+                </CloseIconContainer>
+                {!isPending && (
+                    <>
+                        <HeaderContainer>
+                            <Header>{t('common.wallet.connect-wallet-modal-title')}</Header>
+                        </HeaderContainer>
+                        <ButtonsContainer disabled={!termsAccepted}>
+                            <SocialLoginWrapper>
+                                <SocialButtonsWrapper>
+                                    {SUPPORTED_PARTICAL_CONNECTORS.map((item, index) => {
+                                        const connector = getSpecificConnectorFromConnectorsArray(
+                                            connectors,
+                                            item,
+                                            true
                                         );
-                                    }
-                                })}
-                            </SocialButtonsWrapper>
-                            <SocialButtonsWrapper>
-                                {SUPPORTED_PARTICAL_CONNECTORS.map((item, index) => {
-                                    const connector = getSpecificConnectorFromConnectorsArray(connectors, item, true);
-                                    if (index > 0 && index < 3 && connector) {
-                                        return (
-                                            <Button key={index} onClick={() => handleConnect(connector)}>
-                                                <SocialIcon className={getClassNameForParticalLogin(item)} />
-                                                {item}
-                                            </Button>
+                                        if (index == 0 && connector) {
+                                            return (
+                                                <GradientContainer key={index}>
+                                                    <Button
+                                                        onClick={() => handleConnect(connector)}
+                                                        oneButtoninRow={true}
+                                                    >
+                                                        <SocialIcon className={getClassNameForParticalLogin(item)} />
+                                                        {item}
+                                                    </Button>
+                                                </GradientContainer>
+                                            );
+                                        }
+                                    })}
+                                </SocialButtonsWrapper>
+                                <SocialButtonsWrapper>
+                                    {SUPPORTED_PARTICAL_CONNECTORS.map((item, index) => {
+                                        const connector = getSpecificConnectorFromConnectorsArray(
+                                            connectors,
+                                            item,
+                                            true
                                         );
-                                    }
-                                })}
-                            </SocialButtonsWrapper>
-                            <SocialButtonsWrapper>
-                                {SUPPORTED_PARTICAL_CONNECTORS.map((item, index) => {
-                                    const connector = getSpecificConnectorFromConnectorsArray(connectors, item, true);
-                                    if (index > 2 && index < 5 && connector) {
-                                        return (
-                                            <Button key={index} onClick={() => handleConnect(connector)}>
-                                                <SocialIcon className={getClassNameForParticalLogin(item)} />
-                                                {item}
-                                            </Button>
+                                        if (index > 0 && index < 3 && connector) {
+                                            return (
+                                                <GradientContainer key={index}>
+                                                    <Button onClick={() => handleConnect(connector)}>
+                                                        <SocialIcon className={getClassNameForParticalLogin(item)} />
+                                                        {item}
+                                                    </Button>
+                                                </GradientContainer>
+                                            );
+                                        }
+                                    })}
+                                </SocialButtonsWrapper>
+                                <SocialButtonsWrapper>
+                                    {SUPPORTED_PARTICAL_CONNECTORS.map((item, index) => {
+                                        const connector = getSpecificConnectorFromConnectorsArray(
+                                            connectors,
+                                            item,
+                                            true
                                         );
-                                    }
-                                })}
-                            </SocialButtonsWrapper>
-                        </SocialLoginWrapper>
-                        <ConnectWithLabel>{t('common.wallet.or-connect-with')}</ConnectWithLabel>
-                        <WalletIconsWrapper>
-                            <WalletIconContainer
-                                onClick={() => {
-                                    onClose();
-                                    openConnectModal?.();
-                                }}
-                            >
-                                <WalletIcon className={'v2-icon v2-icon--wallet'} />
-                                <WalletName>{t('common.wallet.connect-with-wallet')}</WalletName>
-                            </WalletIconContainer>
-                        </WalletIconsWrapper>
-                    </ButtonsContainer>
-                    <FooterContainer disabled={!termsAccepted}>
-                        <FooterText>
-                            <Trans
-                                i18nKey="common.wallet.disclaimer-info"
-                                components={{
-                                    disclaimer: (
-                                        <Link href={disclaimer}>
-                                            <></>
-                                        </Link>
-                                    ),
-                                    terms: (
-                                        <Link href={termsOfUse}>
-                                            <></>
-                                        </Link>
-                                    ),
-                                }}
+                                        if (index > 2 && index < 5 && connector) {
+                                            return (
+                                                <GradientContainer key={index}>
+                                                    <Button onClick={() => handleConnect(connector)}>
+                                                        <SocialIcon className={getClassNameForParticalLogin(item)} />
+                                                        {item}
+                                                    </Button>
+                                                </GradientContainer>
+                                            );
+                                        }
+                                    })}
+                                </SocialButtonsWrapper>
+                            </SocialLoginWrapper>
+                            <ConnectWithLabel>{t('common.wallet.or-connect-with')}</ConnectWithLabel>
+
+                            <WalletIconsWrapper>
+                                <GradientContainer>
+                                    <WalletIconContainer
+                                        onClick={() => {
+                                            onClose();
+                                            openConnectModal?.();
+                                        }}
+                                    >
+                                        <WalletIcon className={'v2-icon v2-icon--wallet'} />
+                                        <WalletName>{t('common.wallet.connect-with-wallet')}</WalletName>
+                                    </WalletIconContainer>
+                                </GradientContainer>
+                            </WalletIconsWrapper>
+                        </ButtonsContainer>
+                        <FooterContainer disabled={!termsAccepted}>
+                            <FooterText>
+                                <Trans
+                                    i18nKey="common.wallet.disclaimer-info"
+                                    components={{
+                                        disclaimer: (
+                                            <Link href={disclaimer}>
+                                                <></>
+                                            </Link>
+                                        ),
+                                        terms: (
+                                            <Link href={termsOfUse}>
+                                                <></>
+                                            </Link>
+                                        ),
+                                    }}
+                                />
+                            </FooterText>
+                            <Checkbox
+                                value={''}
+                                checked={termsAccepted}
+                                onChange={setTerms.bind(this, !termsAccepted)}
                             />
-                        </FooterText>
-                        <Checkbox value={''} checked={termsAccepted} onChange={setTerms.bind(this, !termsAccepted)} />
-                    </FooterContainer>
-                </>
-            )}
-            {isPending && (
-                <LoaderContainer>
-                    <SimpleLoader />
-                </LoaderContainer>
-            )}
+                        </FooterContainer>
+                    </>
+                )}
+                {isPending && (
+                    <LoaderContainer>
+                        <SimpleLoader />
+                    </LoaderContainer>
+                )}
+            </Container>
         </ReactModal>
     );
 };
@@ -194,6 +215,12 @@ const HeaderContainer = styled(FlexDivCentered)`
 
 const CloseIconContainer = styled(FlexDiv)`
     justify-content: flex-end;
+`;
+
+const Container = styled.div`
+    background-color: ${(props) => props.theme.background.primary};
+    border-radius: 15px;
+    padding: 25px;
 `;
 
 const CloseIcon = styled.i`
@@ -212,8 +239,9 @@ const CloseIcon = styled.i`
 
 const Header = styled.h2`
     color: ${(props) => props.theme.textColor.primary};
-    font-size: 20px;
-    font-weight: 400;
+    font-size: 22px;
+    font-weight: 900;
+    text-transform: uppercase;
 `;
 
 const Link = styled.a`
@@ -278,9 +306,9 @@ const WalletIconContainer = styled(FlexDivCentered)`
     flex-direction: row;
     width: 100%;
     border-radius: 8px;
-    border: ${(props) => `1px ${props.theme.button.borderColor.primary} solid`};
+    height: 78px;
+    background-color: ${(props) => props.theme.background.primary};
     &:hover {
-        border: ${(props) => `1px ${props.theme.button.borderColor.primary} solid`};
         ${WalletName} {
             color: ${(props) => props.theme.button.borderColor.primary};
         }
@@ -324,9 +352,8 @@ const Button = styled(FlexDivCentered)<{ oneButtoninRow?: boolean; active?: bool
     border-radius: 8px;
     width: 100%;
     height: 34px;
-    border: 1px ${(props) => props.theme.borderColor.primary} solid;
     color: ${(props) => props.theme.textColor.primary};
-    background-color: ${(props) => (props.oneButtoninRow ? props.theme.button.background.tertiary : '')};
+    background-color: ${(props) => props.theme.background.primary};
     font-size: 18px;
     font-weight: 600;
     text-transform: capitalize;
@@ -335,7 +362,6 @@ const Button = styled(FlexDivCentered)<{ oneButtoninRow?: boolean; active?: bool
         background-color: ${(props) => (props.oneButtoninRow ? props.theme.button.borderColor.primary : '')};
         color: ${(props) =>
             props.oneButtoninRow ? props.theme.button.textColor.primary : props.theme.button.borderColor.primary};
-        border: ${(props) => (props.oneButtoninRow ? 'none' : `1px ${props.theme.button.borderColor.primary} solid`)};
     }
 `;
 
@@ -343,6 +369,13 @@ const LoaderContainer = styled.div`
     height: 180px !important;
     width: 80px;
     overflow: none;
+`;
+
+const GradientContainer = styled.div`
+    padding: 1px;
+    background: linear-gradient(90deg, #a764b7 0%, #169cd2 100%);
+    border-radius: 8px;
+    width: 100%;
 `;
 
 export default ConnectWalletModal;
