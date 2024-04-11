@@ -140,6 +140,10 @@
     content: '\0061';
 }
 
+.icon-home--speed-logo:before {
+    content: '\0078';
+}
+
 /* icons.ttf */
 
 .icon--caret-down:before {

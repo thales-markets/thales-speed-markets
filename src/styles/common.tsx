@@ -43,6 +43,9 @@ export const FlexDivColumnCentered = styled(FlexDivColumn)`
 export const BoldText = styled.span`
     font-weight: 700;
 `;
+export const ExtraBoldText = styled.span`
+    font-weight: 800;
+`;
 
 // TODO: Update color names
 export const Colors = {
@@ -71,6 +74,7 @@ export const Colors = {
     BLUE_MIDNIGHT: '#052040',
     BLUE_MIDNIGHT_LIGHT: '#1b314f',
     BLUE_SKY: '#91bced',
+    BLUE_DEEP_SKY: '#169cd2',
 
     RED: '#DE496D',
     RED_LIGHT: '#E29587',
@@ -86,4 +90,5 @@ export const Colors = {
     YELLOW_DARK: '#9b8327',
 
     PURPLE: '#BF7EFF',
+    PURPLE_DARK: '#A764B7',
 };

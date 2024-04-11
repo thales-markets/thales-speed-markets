@@ -3,6 +3,8 @@ import { Colors } from '../common';
 export default {
     fontFamily: {
         primary: "'Fira Sans' !important",
+        secondary: "'Montserrat' !important",
+        tertiary: "'Karla' !important",
     },
     background: {
         primary: Colors.BLACK,
@@ -24,19 +26,19 @@ export default {
     },
     button: {
         background: {
-            primary: Colors.GREEN,
+            primary: Colors.BLACK,
             secondary: Colors.GRAY_DARK,
             tertiary: Colors.GRAY,
             quaternary: Colors.GRAY_LIGHT,
         },
         textColor: {
-            primary: Colors.GRAY_DARK,
+            primary: Colors.WHITE,
             secondary: Colors.WHITE,
             tertiary: Colors.GRAY_LIGHT,
             quaternary: Colors.ORANGE,
         },
         borderColor: {
-            primary: Colors.GREEN,
+            primary: `linear-gradient(90deg, ${Colors.PURPLE_DARK} 0%, ${Colors.BLUE_DEEP_SKY} 100%)`,
             secondary: Colors.GRAY_LIGHT,
             tertiary: Colors.GRAY,
             quaternary: Colors.GRAY_DARK,

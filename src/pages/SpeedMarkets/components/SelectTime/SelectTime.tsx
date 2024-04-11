@@ -338,8 +338,8 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                                         !isDeltaMinutesSelected ? theme.button.background.tertiary : undefined
                                     }
                                     borderColor={!isDeltaMinutesSelected ? theme.button.background.tertiary : undefined}
+                                    borderRadius="4px"
                                     textColor={!isDeltaMinutesSelected ? theme.button.textColor.tertiary : undefined}
-                                    additionalStyles={{ borderRadius: '4px' }}
                                     onClick={onMinutesButtonClikHandler}
                                 >
                                     {t('common.time-remaining.minutes')}
@@ -354,7 +354,7 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                                     }
                                     borderColor={isDeltaMinutesSelected ? theme.button.background.tertiary : undefined}
                                     textColor={isDeltaMinutesSelected ? theme.button.textColor.tertiary : undefined}
-                                    additionalStyles={{ borderRadius: '4px' }}
+                                    borderRadius="4px"
                                     onClick={onHoursButtonClikHandler}
                                 >
                                     {t('common.time-remaining.hours')}
@@ -394,7 +394,7 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                                     backgroundColor={!isAM ? theme.button.background.tertiary : undefined}
                                     borderColor={!isAM ? theme.button.background.tertiary : undefined}
                                     textColor={!isAM ? theme.button.textColor.tertiary : undefined}
-                                    additionalStyles={{ borderRadius: '4px' }}
+                                    borderRadius="4px"
                                     onClick={() => setIsAM(true)}
                                 >
                                     {'AM'}
@@ -407,7 +407,7 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                                     backgroundColor={isAM ? theme.button.background.tertiary : undefined}
                                     borderColor={isAM ? theme.button.background.tertiary : undefined}
                                     textColor={isAM ? theme.button.textColor.tertiary : undefined}
-                                    additionalStyles={{ borderRadius: '4px' }}
+                                    borderRadius="4px"
                                     onClick={() => setIsAM(false)}
                                 >
                                     {'PM'}
