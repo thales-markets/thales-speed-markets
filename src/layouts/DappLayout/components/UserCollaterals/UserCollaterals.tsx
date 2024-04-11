@@ -1,6 +1,6 @@
+import OutsideClickHandler from 'components/OutsideClick';
 import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipleCollateralBalanceQuery';
 import React, { useEffect, useMemo, useState } from 'react';
-import OutsideClickHandler from 'components/OutsideClick/OutsideClick';
 import { useDispatch, useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getSelectedCollateralIndex, getIsBiconomy, setSelectedCollateralIndex } from 'redux/modules/wallet';

@@ -27,7 +27,7 @@ const DappHeader: React.FC = () => {
                     {isMobile && <Icon className="sidebar-icon icon--nav-menu" onClick={sidebarMenuClickHandler} />}
                     <Logo />
                     <Button
-                        width="117px"
+                        width="121px"
                         height="21px"
                         padding="0 15px"
                         margin="0 0 0 15px"

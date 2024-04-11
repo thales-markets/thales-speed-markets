@@ -180,7 +180,7 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
                     />
                     <TooltipInfo
                         overlay={t('speed-markets.tooltips.current-price')}
-                        customIconStyling={{ marginTop: '1px' }}
+                        customIconStyling={{ marginTop: '2px' }}
                     />
                 </FlexDivRowCentered>
                 {!!liquidity && (

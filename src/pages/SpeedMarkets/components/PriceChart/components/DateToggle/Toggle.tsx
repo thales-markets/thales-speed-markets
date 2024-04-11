@@ -29,9 +29,9 @@ const Toggle: React.FC<ToggleProps> = ({ options, onChange, selectedIndex }) => 
                     }
                     borderColor={theme.button.borderColor.tertiary}
                     fontSize="13px"
-                    padding="0"
+                    padding={index === selectedIndex ? '0' : '1px'}
+                    borderRadius="8px"
                     additionalStyles={{
-                        borderRadius: '8px',
                         transition: 'all 0.2s ease-in-out',
                         textTransform: 'none',
                     }}

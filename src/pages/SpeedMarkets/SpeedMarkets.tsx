@@ -319,7 +319,7 @@ const SpeedMarkets: React.FC = () => {
                                 />
                                 <Tooltip
                                     overlay={t('speed-markets.tooltips.buyin-fees')}
-                                    customIconStyling={{ top: '-2px' }}
+                                    customIconStyling={{ top: '1px' }}
                                 />
                             </Info>
                             <LightweightChart

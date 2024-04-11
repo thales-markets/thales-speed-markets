@@ -1,4 +1,4 @@
-import OutsideClickHandler from 'components/OutsideClick/OutsideClick';
+import OutsideClickHandler from 'components/OutsideClick';
 import { USD_SIGN } from 'constants/currency';
 import { Rates } from 'queries/rates/useExchangeRatesQuery';
 import React, { CSSProperties, useCallback, useMemo, useState } from 'react';

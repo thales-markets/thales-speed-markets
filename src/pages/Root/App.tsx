@@ -4,7 +4,9 @@ import Loader from 'components/Loader';
 import UnsupportedNetwork from 'components/UnsupportedNetwork';
 import ROUTES from 'constants/routes';
 import DappLayout from 'layouts/DappLayout';
+import MainLayout from 'layouts/MainLayout';
 import ThemeProvider from 'layouts/Theme';
+import LandingPage from 'pages/LandingPage';
 import Profile from 'pages/Profile';
 import SpeedMarkets from 'pages/SpeedMarkets';
 import SpeedMarketsOverview from 'pages/SpeedMarketsOverview';
@@ -144,9 +146,9 @@ const App = () => {
                     {getSupportedNetworksByRoute(ROUTES.Home).includes(networkId) && (
                         <Route exact path={ROUTES.Home}>
                             <Suspense fallback={<Loader />}>
-                                <DappLayout>
-                                    <SpeedMarkets />
-                                </DappLayout>
+                                <MainLayout>
+                                    <LandingPage />
+                                </MainLayout>
                             </Suspense>
                         </Route>
                     )}
