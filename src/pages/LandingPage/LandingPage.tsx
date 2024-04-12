@@ -1,12 +1,42 @@
+import BlueTriangle from 'assets/images/landing/blue-triangle.png';
 import Blurry from 'assets/images/landing/blurry.svg';
 import PurpleTriangle from 'assets/images/landing/purple-triangle.png';
-import BlueTriangle from 'assets/images/landing/blue-triangle.png';
+import Rocket from 'assets/images/landing/rocket.png';
 import Zeus from 'assets/images/landing/zeus-hero.webp';
 import SPAAnchor from 'components/SPAAnchor';
 import ROUTES from 'constants/routes';
 import { Trans, useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-import { ExtraBoldText, FlexDivCentered, FlexDivColumn, FlexDivRow, FlexDivStart } from 'styles/common';
+import { ExtraBoldText, FlexDivRow } from 'styles/common';
+import {
+    BigBlurImg,
+    BigRocketImg,
+    BigRocketImgWrapper,
+    BigRocketWrapper,
+    BlueTriangleImg,
+    BlurImg,
+    Button,
+    ButtonContainer,
+    ButtonWrapper,
+    Container,
+    Content,
+    ContentIcon,
+    ContentIconWrapper,
+    ContentRow,
+    ContentTextDesc,
+    ContentTextTitle,
+    ContentTextWrapper,
+    Header,
+    MediumBlurImg,
+    PurpleTriangleImg,
+    RocketImg,
+    RocketWrapper,
+    SpeedLogo,
+    Title,
+    TitleDesc,
+    TitleWrapper,
+    Video,
+    ZeusImg,
+} from './styled-components';
 
 const LandingPage: React.FC = () => {
     const { t } = useTranslation();
@@ -15,6 +45,16 @@ const LandingPage: React.FC = () => {
         <Container>
             <BlueTriangleImg src={BlueTriangle} />
             <ZeusImg src={Zeus} />
+            <RocketWrapper>
+                <MediumBlurImg src={Blurry} />
+                <RocketImg src={Rocket} />
+            </RocketWrapper>
+            <BigRocketWrapper>
+                <BigBlurImg src={Blurry} />
+                <BigRocketImgWrapper>
+                    <BigRocketImg src={Rocket} />
+                </BigRocketImgWrapper>
+            </BigRocketWrapper>
             <Header>
                 <FlexDivRow>
                     <SpeedLogo className="icon-home icon-home--speed-full-logo" />
@@ -49,8 +89,15 @@ const LandingPage: React.FC = () => {
             <Content>
                 <PurpleTriangleImg src={PurpleTriangle} />
                 <ContentRow>
-                    <ContentIcon className="icon-home icon-home--speed-logo" fontSize="148" isRotating={true} />
-                    <ContentText>
+                    <ContentIconWrapper>
+                        <ContentIcon
+                            className="icon-home icon-home--speed-logo"
+                            fontSize="148"
+                            isRotating={true}
+                            margin="-4px -22px -18px 0px"
+                        />
+                    </ContentIconWrapper>
+                    <ContentTextWrapper>
                         <ContentTextTitle>{t('landing.content.title-1')}</ContentTextTitle>
                         <ContentTextDesc>
                             <Trans
@@ -61,11 +108,13 @@ const LandingPage: React.FC = () => {
                                 }}
                             />
                         </ContentTextDesc>
-                    </ContentText>
+                    </ContentTextWrapper>
                 </ContentRow>
                 <ContentRow>
-                    <ContentIcon className="icon-home icon-home--chained" />
-                    <ContentText>
+                    <ContentIconWrapper>
+                        <ContentIcon className="icon-home icon-home--chained" margin="-2px -4px -14px 0px" />
+                    </ContentIconWrapper>
+                    <ContentTextWrapper>
                         <ContentTextTitle>{t('landing.content.title-2')}</ContentTextTitle>
                         <ContentTextDesc>
                             <Trans
@@ -76,11 +125,13 @@ const LandingPage: React.FC = () => {
                                 }}
                             />
                         </ContentTextDesc>
-                    </ContentText>
+                    </ContentTextWrapper>
                 </ContentRow>
                 <ContentRow>
-                    <ContentIcon className="icon-home icon-home--any-crypto" />
-                    <ContentText>
+                    <ContentIconWrapper>
+                        <ContentIcon className="icon-home icon-home--any-crypto" margin="-8px -8px -20px 0px" />
+                    </ContentIconWrapper>
+                    <ContentTextWrapper>
                         <ContentTextTitle>{t('landing.content.title-3')}</ContentTextTitle>
                         <ContentTextDesc>
                             <Trans
@@ -91,151 +142,93 @@ const LandingPage: React.FC = () => {
                                 }}
                             />
                         </ContentTextDesc>
-                    </ContentText>
+                    </ContentTextWrapper>
                 </ContentRow>
             </Content>
+            <Video>VIDEO</Video>
+            <Content>
+                <ContentRow>
+                    <ContentIconWrapper>
+                        <ContentIcon
+                            className="icon-home icon-home--cache-bag"
+                            isBold={true}
+                            margin="0 -10px -10px 0"
+                        />
+                    </ContentIconWrapper>
+                    <ContentTextWrapper>
+                        <ContentTextTitle>{t('landing.content.title-4')}</ContentTextTitle>
+                        <ContentTextDesc>
+                            <Trans
+                                i18nKey="landing.content.text-4"
+                                components={{
+                                    br: <br />,
+                                    bold: <ExtraBoldText />,
+                                }}
+                            />
+                        </ContentTextDesc>
+                    </ContentTextWrapper>
+                </ContentRow>
+                <ContentRow>
+                    <ContentIconWrapper>
+                        <ContentIcon className="icon-home icon-home--pyth" margin="-8px -15px -18px 0" />
+                    </ContentIconWrapper>
+                    <ContentTextWrapper>
+                        <ContentTextTitle>{t('landing.content.title-5')}</ContentTextTitle>
+                        <ContentTextDesc>
+                            <Trans
+                                i18nKey="landing.content.text-5"
+                                components={{
+                                    br: <br />,
+                                    bold: <ExtraBoldText />,
+                                }}
+                            />
+                        </ContentTextDesc>
+                    </ContentTextWrapper>
+                </ContentRow>
+                <ContentRow>
+                    <ContentIconWrapper>
+                        <ContentIcon className="icon-home icon-home--secure" margin="-4px -6px -12px 0px" />
+                    </ContentIconWrapper>
+                    <ContentTextWrapper>
+                        <ContentTextDesc>
+                            <Trans
+                                i18nKey="landing.content.text-6"
+                                components={{
+                                    br: <br />,
+                                    bold: <ExtraBoldText />,
+                                }}
+                            />
+                        </ContentTextDesc>
+                    </ContentTextWrapper>
+                </ContentRow>
+                <ContentRow>
+                    <ContentIconWrapper>
+                        <ContentIcon className="icon-home icon-home--detective" margin="-8px -4px -18px 0px" />
+                    </ContentIconWrapper>
+                    <ContentTextWrapper>
+                        <ContentTextTitle>{t('landing.content.title-7')}</ContentTextTitle>
+                        <ContentTextDesc>
+                            <Trans
+                                i18nKey="landing.content.text-7"
+                                components={{
+                                    br: <br />,
+                                    bold: <ExtraBoldText />,
+                                }}
+                            />
+                        </ContentTextDesc>
+                    </ContentTextWrapper>
+                </ContentRow>
+            </Content>
+            <ButtonContainer margin="232px 0 88px 0">
+                <ButtonWrapper>
+                    <BlurImg src={Blurry} />
+                    <SPAAnchor href={ROUTES.Markets.Home}>
+                        <Button>{t('landing.trade-now')}</Button>
+                    </SPAAnchor>
+                </ButtonWrapper>
+            </ButtonContainer>
         </Container>
     );
 };
-
-const Container = styled.div`
-    position: relative;
-    width: 100%;
-    min-height: 800px;
-`;
-
-const ZeusImg = styled.img`
-    position: absolute;
-    right: 0;
-    width: 695px;
-`;
-
-const BlurImg = styled.img`
-    position: absolute;
-    width: 500px;
-    transform: rotate(12deg);
-`;
-
-const BlueTriangleImg = styled.img`
-    position: absolute;
-    top: -50px;
-    left: 554px;
-    width: 400px;
-    height: 400px;
-    transform: rotate(180deg);
-`;
-
-const PurpleTriangleImg = styled.img`
-    position: absolute;
-    top: 50px;
-    right: 0;
-    object-fit: cover;
-    object-position: 15% 100%;
-    width: 260px;
-    height: 400px;
-    overflow: clip;
-`;
-
-const Header = styled(FlexDivColumn)`
-    position: relative;
-    margin: 94px 155px 0 95px;
-    gap: 45px;
-    z-index: 1;
-`;
-
-const SpeedLogo = styled.i`
-    font-size: 350px;
-    line-height: 127px;
-    margin-left: -15px;
-    margin-bottom: -23px;
-`;
-
-const TitleWrapper = styled(FlexDivColumn)`
-    gap: 13px;
-`;
-
-const Title = styled.h1`
-    font-family: ${(props) => props.theme.fontFamily.secondary};
-    font-size: 55px;
-    line-height: 100%;
-    font-weight: 900;
-    color: ${(props) => props.theme.textColor.primary};
-    text-transform: uppercase;
-`;
-
-const TitleDesc = styled.p`
-    width: 694px;
-    font-family: ${(props) => props.theme.fontFamily.tertiary};
-    font-size: 18px;
-    line-height: 110%;
-    font-weight: 400;
-    color: ${(props) => props.theme.textColor.primary};
-`;
-
-const ButtonContainer = styled(FlexDivCentered)`
-    margin-top: 73px;
-    margin-bottom: 70px;
-`;
-
-const ButtonWrapper = styled(FlexDivCentered)`
-    background: ${(props) => props.theme.button.borderColor.primary};
-    border-radius: 60px;
-    padding: 2px;
-    z-index: 1;
-`;
-
-const Button = styled(FlexDivCentered)`
-    width: 210px;
-    height: 55px;
-    background: ${(props) => props.theme.button.background.primary};
-    border-radius: 60px;
-    font-family: ${(props) => props.theme.fontFamily.secondary};
-    font-size: 16px;
-    line-height: 100%;
-    font-weight: 800;
-    text-transform: uppercase;
-    z-index: 1;
-`;
-
-const Content = styled(FlexDivColumn)`
-    position: relative;
-    margin-left: 321px;
-    gap: 60px;
-`;
-const ContentRow = styled(FlexDivStart)`
-    align-items: center;
-    gap: 24px;
-`;
-
-const ContentIcon = styled.i<{ fontSize?: string; isRotating?: boolean }>`
-    width: 130px;
-    font-size: ${(props) => props.fontSize || 113}px;
-    line-height: 110%;
-    ${(props) => (props.isRotating ? 'transform: rotate(-12deg);' : '')}
-    background: ${(props) => props.theme.icon.textColor.primary};
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-align: right;
-`;
-
-const ContentText = styled(FlexDivColumn)`
-    max-width: 554px;
-    gap: 15px;
-`;
-const ContentTextTitle = styled.h2`
-    font-family: ${(props) => props.theme.fontFamily.secondary};
-    font-size: 30px;
-    line-height: 110%;
-    font-weight: 900;
-    color: ${(props) => props.theme.textColor.primary};
-    text-transform: uppercase;
-`;
-const ContentTextDesc = styled.p`
-    font-family: ${(props) => props.theme.fontFamily.tertiary};
-    font-size: 16px;
-    line-height: 100%;
-    font-weight: 400;
-    color: ${(props) => props.theme.textColor.primary};
-`;
 
 export default LandingPage;

@@ -208,6 +208,7 @@
             "title-5": "Curious about the accuracy of prices?",
             "text-5": "<bold>Pyth Benchmark oracles</bold> provide presteen accurate historical price information accessible by anyone, that helps traders verify trades quickly.<br><br>Pyth price data are pulled every second and are used by 300+ projects on 50+ blockchains with top of the line security and track record!",
             "text-6": "Within the underlying <bold>Thales Protocol's Speed Markets</bold> architecture, solvency is not just a possibility—it's a guarantee. All your trades are 100% collateralized at all times from the moment you open them.<br><br>This essential assurance fosters a <bold>seamless and secure trading journey</bold> for all participants, instilling confidence and reliability in each transaction.",
+            "title-7": "No KYC",
             "text-7": "No <bold>sign-up is required</bold>, meaning anyone with a Web3 wallet can participate.<br>Additionally, you can enjoy Speed Markets with a seamless Social Login onboarding (Google, Twitter, Discord, Github, Apple, etc.), a user-friendly Deposit/Withdrawal mechanism, and a cutting edge Credit Card on-ramp aggregator enabled.<br><br>With a full implementation of Account Abstraction, all your transactions are confirmed with a single click without worrying about gas or external wallet interactions! Pay gas with buy-in collateral or even have gas paid by the platform via various gas sponsorship campaigns!"
         }
     },
