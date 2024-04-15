@@ -23,19 +23,35 @@ export const BlueTriangleImg = styled.img`
     transform: rotate(180deg);
 `;
 
-export const PurpleTriangleImg = styled.img`
+export const PurpleTriangleImgWrapper = styled.div`
     position: absolute;
     top: 50px;
-    left: 1150px;
+    right: calc(${ScreenSizeBreakpoint.EXTRA_LARGE}px - 100vw);
+    width: calc(100vw - ${ScreenSizeBreakpoint.EXTRA_LARGE}px + 400px);
+    height: 400px;
+    overflow: clip;
+    @media screen and (max-width: ${ScreenSizeBreakpoint.EXTRA_LARGE}px) {
+        right: 0;
+        width: 400px;
+    }
+`;
+
+export const PurpleTriangleImg = styled.img`
+    position: absolute;
+    top: 0;
+    left: 100px;
     width: 400px;
     height: 400px;
-    @media screen and (max-width: ${ScreenSizeBreakpoint.LARGE}px) {
+    @media screen and (max-width: ${ScreenSizeBreakpoint.EXTRA_LARGE}px) {
         left: unset;
         right: 0;
+        width: 260px;
         object-fit: cover;
         object-position: 15% 100%;
-        width: 260px;
-        overflow: clip;
+    }
+    @media screen and (max-width: ${ScreenSizeBreakpoint.LARGE}px) {
+        width: 200px;
+        object-position: 15% 100%;
     }
 `;
 
@@ -49,50 +65,108 @@ export const MediumBlurImg = styled(BlurImg)`
     top: 190px;
     left: -60px;
     transform: scale(2);
+    @media screen and (max-width: ${ScreenSizeBreakpoint.LARGE}px) {
+        top: 60px;
+        left: -110px;
+        transform: scale(1);
+    }
 `;
+
+export const BigBlurImgWrapper = styled.div`
+    position: absolute;
+    top: 180px;
+    right: calc(${ScreenSizeBreakpoint.EXTRA_LARGE}px - 100vw);
+    width: calc(100vw - ${ScreenSizeBreakpoint.EXTRA_LARGE}px + 1000px);
+    height: 1300px;
+    overflow: clip;
+    @media screen and (max-width: ${ScreenSizeBreakpoint.EXTRA_LARGE}px) {
+        top: 180px;
+        right: 0px;
+        width: 1000px;
+        height: 1300px;
+    }
+    @media screen and (max-width: ${ScreenSizeBreakpoint.LARGE}px) {
+        top: 77px;
+        right: 0px;
+        width: 350px;
+        height: 480px;
+    }
+`;
+
 export const BigBlurImg = styled(BlurImg)`
     position: absolute;
-    top: 630px;
-    right: 0;
+    top: 500px;
+    left: 630px;
     transform: scale(6);
+    @media screen and (max-width: ${ScreenSizeBreakpoint.EXTRA_LARGE}px) {
+        top: 500px;
+        left: 750px;
+    }
+    @media screen and (max-width: ${ScreenSizeBreakpoint.LARGE}px) {
+        top: 100px;
+        left: 90px;
+        transform: scale(2);
+    }
 `;
 
 export const RocketWrapper = styled.div`
     position: absolute;
     top: 2070px;
     left: 50px;
+    @media screen and (max-width: ${ScreenSizeBreakpoint.LARGE}px) {
+        top: 2220px;
+    }
+    @media screen and (max-width: ${ScreenSizeBreakpoint.MEDIUM}px) {
+        display: none;
+    }
 `;
 
 export const RocketImg = styled.img`
     width: 240px;
     position: relative;
     z-index: 1;
+    @media screen and (max-width: ${ScreenSizeBreakpoint.LARGE}px) {
+        width: 120px;
+    }
 `;
 
 export const BigRocketWrapper = styled.div`
     position: absolute;
     top: 2350px;
     right: 0;
+    @media screen and (max-width: ${ScreenSizeBreakpoint.LARGE}px) {
+        top: 2600px;
+    }
+    @media screen and (max-width: ${ScreenSizeBreakpoint.MEDIUM}px) {
+        display: none;
+    }
 `;
 
 export const BigRocketImgWrapper = styled.div`
     position: absolute;
-    right: 0;
-    width: 430px;
+    right: calc(${ScreenSizeBreakpoint.EXTRA_LARGE}px - 100vw);
+    width: calc(100vw - ${ScreenSizeBreakpoint.EXTRA_LARGE}px + 500px);
+    overflow-x: clip;
+    @media screen and (max-width: ${ScreenSizeBreakpoint.EXTRA_LARGE}px) {
+        right: 0;
+        width: 500px;
+    }
     @media screen and (max-width: ${ScreenSizeBreakpoint.LARGE}px) {
-        overflow-x: clip;
+        width: 200px;
     }
 `;
 
 export const BigRocketImg = styled.img`
     position: absolute;
-    left: 0;
+    left: 70px;
     width: 500px;
-    height: 1350px;
-    overflow: clip;
     object-fit: cover;
     object-position: 15% 12%;
     z-index: 1;
+    @media screen and (max-width: ${ScreenSizeBreakpoint.LARGE}px) {
+        left: 0;
+        width: 200px;
+    }
 `;
 
 export const Header = styled(FlexDivColumn)`
@@ -164,6 +238,7 @@ export const Content = styled(FlexDivColumn)`
 export const ContentRow = styled(FlexDivStart)`
     align-items: center;
     gap: 24px;
+    z-index: 1;
 `;
 
 export const ContentIconWrapper = styled(FlexDivEnd)`

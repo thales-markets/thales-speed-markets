@@ -9,6 +9,7 @@ import { Trans, useTranslation } from 'react-i18next';
 import { ExtraBoldText, FlexDivRow } from 'styles/common';
 import {
     BigBlurImg,
+    BigBlurImgWrapper,
     BigRocketImg,
     BigRocketImgWrapper,
     BigRocketWrapper,
@@ -28,6 +29,7 @@ import {
     Header,
     MediumBlurImg,
     PurpleTriangleImg,
+    PurpleTriangleImgWrapper,
     RocketImg,
     RocketWrapper,
     SpeedLogo,
@@ -50,7 +52,9 @@ const LandingPage: React.FC = () => {
                 <RocketImg src={Rocket} />
             </RocketWrapper>
             <BigRocketWrapper>
-                <BigBlurImg src={Blurry} />
+                <BigBlurImgWrapper>
+                    <BigBlurImg src={Blurry} />
+                </BigBlurImgWrapper>
                 <BigRocketImgWrapper>
                     <BigRocketImg src={Rocket} />
                 </BigRocketImgWrapper>
@@ -79,15 +83,17 @@ const LandingPage: React.FC = () => {
                 </TitleWrapper>
             </Header>
             <ButtonContainer>
+                <BlurImg src={Blurry} />
                 <ButtonWrapper>
-                    <BlurImg src={Blurry} />
                     <SPAAnchor href={ROUTES.Markets.Home}>
                         <Button>{t('landing.trade-now')}</Button>
                     </SPAAnchor>
                 </ButtonWrapper>
             </ButtonContainer>
             <Content>
-                <PurpleTriangleImg src={PurpleTriangle} />
+                <PurpleTriangleImgWrapper>
+                    <PurpleTriangleImg src={PurpleTriangle} />
+                </PurpleTriangleImgWrapper>
                 <ContentRow>
                     <ContentIconWrapper>
                         <ContentIcon
@@ -220,8 +226,8 @@ const LandingPage: React.FC = () => {
                 </ContentRow>
             </Content>
             <ButtonContainer margin="232px 0 88px 0">
+                <BlurImg src={Blurry} />
                 <ButtonWrapper>
-                    <BlurImg src={Blurry} />
                     <SPAAnchor href={ROUTES.Markets.Home}>
                         <Button>{t('landing.trade-now')}</Button>
                     </SPAAnchor>
