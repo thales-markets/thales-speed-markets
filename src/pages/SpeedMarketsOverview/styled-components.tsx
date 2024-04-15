@@ -31,17 +31,16 @@ export const NavigationIcon = styled.i<{ isLeft: boolean }>`
     position: relative;
 `;
 
-export const getDefaultButtonProps = (isMobile: boolean) => ({
+export const getDefaultButtonProps = (isMobile: boolean, hasScroll?: boolean) => ({
+    minWidth: isMobile ? '120px' : '180px',
     height: isMobile ? '24px' : '27px',
     fontSize: isMobile ? '12px' : '13px',
-    padding: '0px 5px',
+    margin: hasScroll ? '0 20px 0 0' : '0 10px 0 0',
 });
 
-export const getAdditionalButtonStyle = (isMobile: boolean): CSSProperties => ({
-    minWidth: isMobile ? '120px' : '180px',
+export const getAdditionalButtonStyle = (): CSSProperties => ({
     lineHeight: '100%',
     border: 'none',
-    marginRight: '10px',
 });
 
 export const Wrapper = styled.div`

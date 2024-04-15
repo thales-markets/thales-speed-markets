@@ -190,9 +190,9 @@ const UnresolvedChainedPositions: React.FC = () => {
             !isLoading &&
             !!positions.length && (
                 <Button
-                    {...getDefaultButtonProps(isMobile)}
+                    {...getDefaultButtonProps(isMobile, positions.length > 5)}
                     disabled={isSubmitting || !positions.length}
-                    additionalStyles={getAdditionalButtonStyle(isMobile)}
+                    additionalStyles={getAdditionalButtonStyle()}
                     onClick={() => {
                         setIsSubmittingSection(sectionName);
                         handleResolveAll(positions, isAdmin);
