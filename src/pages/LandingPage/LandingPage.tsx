@@ -6,7 +6,7 @@ import Zeus from 'assets/images/landing/zeus-hero.webp';
 import SPAAnchor from 'components/SPAAnchor';
 import ROUTES from 'constants/routes';
 import { Trans, useTranslation } from 'react-i18next';
-import { ExtraBoldText, FlexDivRow } from 'styles/common';
+import { ExtraBoldText, FlexDivCentered, FlexDivColumn, FlexDivRow } from 'styles/common';
 import {
     BigBlurImg,
     BigBlurImgWrapper,
@@ -27,12 +27,14 @@ import {
     ContentTextTitle,
     ContentTextWrapper,
     Header,
+    LogoText,
     MediumBlurImg,
     PurpleTriangleImg,
     PurpleTriangleImgWrapper,
     RocketImg,
     RocketWrapper,
     SpeedLogo,
+    ThalesLogo,
     Title,
     TitleDesc,
     TitleWrapper,
@@ -233,6 +235,15 @@ const LandingPage: React.FC = () => {
                     </SPAAnchor>
                 </ButtonWrapper>
             </ButtonContainer>
+
+            <FlexDivColumn>
+                <FlexDivCentered>
+                    <LogoText>{t('landing.powered-by')}</LogoText>
+                </FlexDivCentered>
+                <FlexDivCentered>
+                    <ThalesLogo className="icon-home icon-home--thales" />
+                </FlexDivCentered>
+            </FlexDivColumn>
         </Container>
     );
 };

@@ -1,6 +1,5 @@
 import Loader from 'components/Loader';
 import { LINKS } from 'constants/links';
-import { ScreenSizeBreakpoint } from 'enums/ui';
 import DappFooter from 'layouts/DappLayout/DappFooter';
 import queryString from 'query-string';
 import React, { useEffect } from 'react';
@@ -59,12 +58,11 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 };
 
 const Container = styled(FlexDivColumnCentered)`
+    width: 100%;
     max-width: 1440px;
     min-height: 100vh;
     margin-left: auto;
     margin-right: auto;
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-    }
 `;
 
 export default MainLayout;

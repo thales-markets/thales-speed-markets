@@ -58,6 +58,7 @@ export const PurpleTriangleImg = styled.img`
 export const BlurImg = styled.img`
     position: absolute;
     transform: scale(0.7);
+    z-index: -1;
 `;
 
 export const MediumBlurImg = styled(BlurImg)`
@@ -77,8 +78,9 @@ export const BigBlurImgWrapper = styled.div`
     top: 180px;
     right: calc(${ScreenSizeBreakpoint.EXTRA_LARGE}px - 100vw);
     width: calc(100vw - ${ScreenSizeBreakpoint.EXTRA_LARGE}px + 1000px);
-    height: 1300px;
+    height: 1104px;
     overflow: clip;
+    z-index: -1;
     @media screen and (max-width: ${ScreenSizeBreakpoint.EXTRA_LARGE}px) {
         top: 180px;
         right: 0px;
@@ -132,8 +134,9 @@ export const RocketImg = styled.img`
 
 export const BigRocketWrapper = styled.div`
     position: absolute;
-    top: 2350px;
+    top: 2150px;
     right: 0;
+    z-index: -1;
     @media screen and (max-width: ${ScreenSizeBreakpoint.LARGE}px) {
         top: 2600px;
     }
@@ -146,7 +149,8 @@ export const BigRocketImgWrapper = styled.div`
     position: absolute;
     right: calc(${ScreenSizeBreakpoint.EXTRA_LARGE}px - 100vw);
     width: calc(100vw - ${ScreenSizeBreakpoint.EXTRA_LARGE}px + 500px);
-    overflow-x: clip;
+    height: 1284px;
+    overflow: clip;
     @media screen and (max-width: ${ScreenSizeBreakpoint.EXTRA_LARGE}px) {
         right: 0;
         width: 500px;
@@ -183,6 +187,13 @@ export const SpeedLogo = styled.i`
     margin-bottom: -23px;
 `;
 
+export const ThalesLogo = styled.i`
+    font-size: 200px;
+    line-height: 100%;
+    margin-top: -58px;
+    margin-bottom: -84px;
+`;
+
 export const TitleWrapper = styled(FlexDivColumn)`
     gap: 13px;
 `;
@@ -197,7 +208,6 @@ export const Title = styled.h1`
 `;
 
 export const TitleDesc = styled.p`
-    width: 694px;
     font-family: ${(props) => props.theme.fontFamily.tertiary};
     font-size: 18px;
     line-height: 110%;
@@ -284,4 +294,12 @@ export const Video = styled(FlexDivCentered)`
     height: 300px;
     margin-top: 126px;
     margin-bottom: 127px;
+`;
+
+export const LogoText = styled.span`
+    font-family: ${(props) => props.theme.fontFamily.tertiary};
+    font-size: 18px;
+    line-height: 150%;
+    font-weight: 600;
+    color: ${(props) => props.theme.textColor.primary};
 `;
