@@ -306,7 +306,7 @@ const WalletIconContainer = styled(FlexDivCentered)`
     flex-direction: row;
     width: 100%;
     border-radius: 8px;
-    height: 78px;
+    height: 68px;
     background-color: ${(props) => props.theme.background.primary};
     &:hover {
         ${WalletName} {
@@ -329,7 +329,7 @@ const SocialLoginWrapper = styled(FlexDivCentered)`
 `;
 
 const ConnectWithLabel = styled(SecondaryText)`
-    margin: 32px 0px;
+    margin: 24px 0px;
     text-align: center;
 `;
 

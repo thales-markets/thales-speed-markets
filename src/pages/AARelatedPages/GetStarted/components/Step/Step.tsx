@@ -2,9 +2,9 @@ import ROUTES from 'constants/routes';
 import { GetStartedStep } from 'enums/wizard';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getIsMobile } from 'redux/modules/ui';
-import { getIsBiconomy } from 'redux/modules/wallet';
+import { getIsBiconomy, setWalletConnectModalVisibility } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivCentered, FlexDivColumn } from 'styles/common';
 import { RootState } from 'types/ui';
@@ -24,6 +24,7 @@ type StepProps = {
 
 const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurrentStep, hasFunds }) => {
     const networkId = useChainId();
+    const dispatch = useDispatch();
     const { isConnected: isWalletConnected } = useAccount();
     const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
@@ -126,7 +127,11 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
         setCurrentStep(stepType);
         switch (stepType) {
             case GetStartedStep.LOG_IN:
-                console.log('login');
+                dispatch(
+                    setWalletConnectModalVisibility({
+                        visibility: true,
+                    })
+                );
                 break;
             case GetStartedStep.DEPOSIT:
                 navigateTo(buildHref(ROUTES.Deposit));
@@ -199,7 +204,7 @@ const StepTitle = styled.span<{ completed?: boolean }>`
     font-weight: 700;
     font-size: 20px;
     line-height: 27px;
-    color: ${(props) => (props.completed ? props.theme.background.quaternary : '')};
+    color: ${(props) => (props.completed ? props.theme.background.quinary : '')};
     margin-bottom: 10px;
 `;
 
@@ -208,7 +213,7 @@ const StepDescription = styled.p<{ completed?: boolean }>`
     font-size: 14px;
     line-height: 16px;
     text-align: justify;
-    color: ${(props) => (props.completed ? props.theme.background.quaternary : '')};
+    color: ${(props) => (props.completed ? props.theme.background.quinary : '')};
 `;
 
 const StepNumberWrapper = styled.div<{ isActive: boolean; isDisabled?: boolean; completed?: boolean }>`
@@ -218,11 +223,9 @@ const StepNumberWrapper = styled.div<{ isActive: boolean; isDisabled?: boolean; 
     width: 45px;
     height: 45px;
     border-radius: 50%;
-    ${(props) => (props.isActive ? `border: 2px solid ${props.theme.borderColor.quaternary};` : '')}
+    border: 2px solid ${(props) => (props.completed ? props.theme.textColor.quinary : props.theme.textColor.primary)};
     ${(props) =>
-        props.isActive
-            ? ''
-            : `background: ${props.completed ? props.theme.background.quaternary : props.theme.background.tertiary};`}
+        props.isActive ? '' : `background: ${props.completed ? props.theme.background.quinary : 'transparent'};`}
     cursor: ${(props) => (props.isDisabled ? 'not-allowed' : props.isActive ? 'default' : 'pointer')};
     @media (max-width: 600px) {
         width: 36px;
@@ -238,8 +241,7 @@ const StepNumber = styled.span<{ isActive: boolean }>`
     }
     line-height: 43px;
     text-transform: uppercase;
-    color: ${(props) =>
-        props.isActive ? props.theme.button.textColor.secondary : props.theme.button.textColor.primary};
+    color: ${(props) => props.theme.button.textColor.primary};
 `;
 
 const StepActionIconWrapper = styled.div<{ isActive: boolean; pulsate?: boolean }>`
@@ -267,10 +269,13 @@ const StepActionIcon = styled.i<{ isDisabled?: boolean; isActive?: boolean }>`
     font-size: 35px;
     padding-bottom: 15px;
     cursor: ${(props) => (props.isDisabled ? 'not-allowed' : 'pointer')};
-    color: ${(props) => props.theme.textColor.quaternary};
+    color: ${(props) => props.theme.textColor.quinary};
 `;
 
 const StepActionLabel = styled.div<{ isDisabled?: boolean }>`
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: ${(props) => (props.isDisabled ? 'not-allowed' : 'pointer')};
 `;
 
@@ -278,7 +283,8 @@ const StepActionName = styled.span<{ isActive?: boolean; completed?: boolean }>`
     font-weight: 600;
     font-size: 14px;
     line-height: 16px;
-    color: ${(props) => props.theme.background.quaternary};
+    color: ${(props) => props.theme.background.quinary};
+    white-space: nowrap;
     @media (max-width: 600px) {
         display: none;
     }
@@ -289,7 +295,7 @@ const LinkIcon = styled.i<{ isActive: boolean }>`
     margin-left: 10px;
     animation: ${(props) => (props.isActive ? 'pulsing 1s ease-in' : '')};
     animation-iteration-count: ${(props) => (props.isActive ? 'infinite;' : '')};
-    color: ${(props) => props.theme.textColor.quaternary};
+    color: ${(props) => props.theme.textColor.quinary};
 `;
 
 const CorrectIcon = styled.i`
@@ -302,7 +308,7 @@ const StyledInsertCard = styled(InsertCard)`
     height: 44px;
     margin-bottom: 4px;
     path {
-        fill: ${(props) => props.theme.textColor.quaternary};
+        fill: ${(props) => props.theme.textColor.quinary};
     }
 `;
 

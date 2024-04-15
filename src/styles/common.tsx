@@ -89,6 +89,6 @@ export const Colors = {
     YELLOW: '#FFCC00',
     YELLOW_DARK: '#9b8327',
 
-    PURPLE: '#BF7EFF',
+    PURPLE: '#C294F5',
     PURPLE_DARK: '#A764B7',
 };

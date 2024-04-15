@@ -129,7 +129,8 @@ const ProgressBar = styled(FlexDiv)<{ selected?: boolean }>`
     height: 10px;
     width: 32%;
     border-radius: 10px;
-    background: linear-gradient(90deg, #a764b7 0%, #169cd2 100%);
+    background: ${(props) =>
+        props.selected ? 'linear-gradient(90deg, #a764b7 0%, #169cd2 100%)' : props.theme.textColor.primary};
 `;
 
 const HorizontalLine = styled.hr`

@@ -11,12 +11,14 @@ export default {
         secondary: Colors.GRAY,
         tertiary: Colors.GRAY_LIGHT,
         quaternary: Colors.GREEN,
+        quinary: Colors.PURPLE,
     },
     textColor: {
         primary: Colors.WHITE,
         secondary: Colors.GRAY_LIGHT,
         tertiary: Colors.RED,
         quaternary: Colors.GREEN,
+        quinary: Colors.PURPLE,
     },
     borderColor: {
         primary: Colors.GRAY,
