@@ -2,7 +2,7 @@ import { LINKS } from 'constants/links';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { FlexDivColumn, FlexDivColumnCentered, FlexDivRow } from 'styles/common';
+import { FlexDivColumn, FlexDivRow } from 'styles/common';
 
 const DappFooter: React.FC = () => {
     const { t } = useTranslation();
@@ -58,11 +58,14 @@ const DappFooter: React.FC = () => {
     );
 };
 
-const Container = styled(FlexDivColumnCentered)`
+const Container = styled.div`
+    display: flex;
+    flex-direction: column;
     align-items: center;
     max-width: 990px;
     gap: 20px;
-    margin: 75px auto 25px auto;
+    padding-top: 75px;
+    margin: auto auto 25px auto;
 `;
 
 const Items = styled(FlexDivRow)`

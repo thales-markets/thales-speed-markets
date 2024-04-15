@@ -78,14 +78,12 @@ export const BigBlurImgWrapper = styled.div`
     top: 180px;
     right: calc(${ScreenSizeBreakpoint.EXTRA_LARGE}px - 100vw);
     width: calc(100vw - ${ScreenSizeBreakpoint.EXTRA_LARGE}px + 1000px);
-    height: 1104px;
+    height: 1084px;
     overflow: clip;
     z-index: -1;
     @media screen and (max-width: ${ScreenSizeBreakpoint.EXTRA_LARGE}px) {
-        top: 180px;
         right: 0px;
         width: 1000px;
-        height: 1300px;
     }
     @media screen and (max-width: ${ScreenSizeBreakpoint.LARGE}px) {
         top: 77px;
@@ -149,7 +147,7 @@ export const BigRocketImgWrapper = styled.div`
     position: absolute;
     right: calc(${ScreenSizeBreakpoint.EXTRA_LARGE}px - 100vw);
     width: calc(100vw - ${ScreenSizeBreakpoint.EXTRA_LARGE}px + 500px);
-    height: 1284px;
+    height: 1264px;
     overflow: clip;
     @media screen and (max-width: ${ScreenSizeBreakpoint.EXTRA_LARGE}px) {
         right: 0;
@@ -157,6 +155,7 @@ export const BigRocketImgWrapper = styled.div`
     }
     @media screen and (max-width: ${ScreenSizeBreakpoint.LARGE}px) {
         width: 200px;
+        height: 600px;
     }
 `;
 
@@ -175,7 +174,7 @@ export const BigRocketImg = styled.img`
 
 export const Header = styled(FlexDivColumn)`
     position: relative;
-    margin: 94px 155px 0 95px;
+    margin: 94px 94px 0 94px;
     gap: 45px;
     z-index: 1;
 `;
@@ -206,6 +205,9 @@ export const Title = styled.h1`
     font-weight: 900;
     color: ${(props) => props.theme.textColor.primary};
     text-transform: uppercase;
+    @media screen and (max-width: ${ScreenSizeBreakpoint.EXTRA_LARGE}px) {
+        font-size: 50px;
+    }
 `;
 
 export const TitleDesc = styled.p`
