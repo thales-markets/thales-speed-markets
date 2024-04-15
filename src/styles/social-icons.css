@@ -25,12 +25,12 @@
     content: '\0045';
 }
 
-.icon--qr-code::before {
-    content: '\004D';
+.icon--wallet:before {
+    content: '\0047';
 }
 
-.icon--wallet::before {
-    content: '\0061';
+.icon--qr-code::before {
+    content: '\004D';
 }
 
 .icon--visa::before {

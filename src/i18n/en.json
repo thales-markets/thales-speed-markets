@@ -89,7 +89,9 @@
             "wallet-options": "Wallet options",
             "disclaimer-info": "By connecting a wallet you agree to Thales DAO <terms>Terms of Use</terms> and Privacy Policy and acknowledge that you have read and understand the Thales DAO protocol <disclaimer>disclaimer</disclaimer>",
             "balance": "Wallet balance",
-            "connect-wallet-modal-title": "Sign Up to speeddmarkets"
+            "connect-wallet-modal-title": "Sign Up to speeddmarkets",
+            "connect-with-wallet": "Connect with wallet",
+            "or-connect-with": "Or"
         },
         "errors": {
             "try-again": "Try again. AMM data is changed.",

@@ -166,7 +166,7 @@ const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({ isOpen, onClose
                                             openConnectModal?.();
                                         }}
                                     >
-                                        <WalletIcon className={'v2-icon v2-icon--wallet'} />
+                                        <WalletIcon className={'social-icon icon--wallet'} />
                                         <WalletName>{t('common.wallet.connect-with-wallet')}</WalletName>
                                     </WalletIconContainer>
                                 </GradientContainer>
