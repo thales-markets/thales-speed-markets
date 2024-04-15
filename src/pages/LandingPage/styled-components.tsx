@@ -55,10 +55,10 @@ export const PurpleTriangleImg = styled.img`
     }
 `;
 
-export const BlurImg = styled.img`
+export const BlurImg = styled.img<{ zIndex?: number }>`
     position: absolute;
     transform: scale(0.7);
-    z-index: -1;
+    z-index: ${(props) => props.zIndex || -1};
 `;
 
 export const MediumBlurImg = styled(BlurImg)`
@@ -192,6 +192,7 @@ export const ThalesLogo = styled.i`
     line-height: 100%;
     margin-top: -58px;
     margin-bottom: -84px;
+    z-index: -1;
 `;
 
 export const TitleWrapper = styled(FlexDivColumn)`

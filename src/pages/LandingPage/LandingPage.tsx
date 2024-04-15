@@ -85,7 +85,7 @@ const LandingPage: React.FC = () => {
                 </TitleWrapper>
             </Header>
             <ButtonContainer>
-                <BlurImg src={Blurry} />
+                <BlurImg src={Blurry} zIndex={1} />
                 <ButtonWrapper>
                     <SPAAnchor href={ROUTES.Markets.Home}>
                         <Button>{t('landing.trade-now')}</Button>
