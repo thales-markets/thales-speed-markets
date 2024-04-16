@@ -100,22 +100,6 @@
     content: '\0055';
 }
 
-.icon-home--base:before {
-    content: '\0062';
-}
-
-.icon-home--arbitrum:before {
-    content: '\0063';
-}
-
-.icon-home--speed:before {
-    content: '\0064';
-}
-
-.icon-home--pyth:before {
-    content: '\0065';
-}
-
 .logo--bankless:before {
     content: '\0056';
 }
@@ -140,8 +124,52 @@
     content: '\0061';
 }
 
-.icon-home--speed-logo:before {
+.icon-home--base:before {
+    content: '\0062';
+}
+
+.icon-home--arbitrum:before {
+    content: '\0063';
+}
+
+.icon-home--speed:before {
+    content: '\0064';
+}
+
+.icon-home--pyth-full:before {
+    content: '\0065';
+}
+
+.icon-home--chained:before {
+    content: '\0066';
+}
+
+.icon-home--any-crypto:before {
+    content: '\0067';
+}
+
+.icon-home--cache-bag:before {
+    content: '\006A';
+}
+
+.icon-home--pyth:before {
+    content: '\0071';
+}
+
+.icon-home--detective:before {
+    content: '\0073';
+}
+
+.icon-home--speed-full-logo:before {
     content: '\0078';
+}
+
+.icon-home--speed-logo:before {
+    content: '\0079';
+}
+
+.icon-home--secure:before {
+    content: '\007A';
 }
 
 /* icons.ttf */

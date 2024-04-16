@@ -137,7 +137,7 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
                     }
 
                     const twitterLinkWithStatusMessage =
-                        LINKS.TwitterTweetStatus +
+                        LINKS.Twitter.TwitterTweetStatus +
                         TWITTER_MESSAGE_CHECKOUT +
                         (isChainedMarkets ? LINKS.Markets.ChainedSpeed : LINKS.Markets.Speed) +
                         (useDownloadImage ? TWITTER_MESSAGE_UPLOAD : TWITTER_MESSAGE_PASTE);

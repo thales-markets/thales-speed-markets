@@ -29,7 +29,6 @@ const DappHeader: React.FC = () => {
                     <Button
                         width="121px"
                         height="21px"
-                        padding="0 15px"
                         margin="0 0 0 15px"
                         fontSize="13px"
                         onClick={() => setOpenReferralModal(true)}

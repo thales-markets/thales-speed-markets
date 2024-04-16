@@ -45,6 +45,10 @@ export default {
             tertiary: Colors.GRAY,
             quaternary: Colors.GRAY_DARK,
         },
+        shadowColor: {
+            primary: Colors.PURPLE_DARK,
+            secondary: Colors.BLUE_DEEP_SKY,
+        },
     },
     input: {
         background: {
@@ -74,6 +78,11 @@ export default {
         textColor: {
             primary: Colors.GREEN,
             secondary: Colors.WHITE,
+        },
+    },
+    icon: {
+        textColor: {
+            primary: `linear-gradient(180deg, ${Colors.PURPLE_DARK_2} 0%, ${Colors.BLUE_DEEP_SKY_2} 100%)`,
         },
     },
     error: {

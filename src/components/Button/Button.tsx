@@ -4,6 +4,7 @@ import { FlexDivCentered } from 'styles/common';
 
 type ButtonProps = {
     width?: string;
+    minWidth?: string;
     height?: string;
     padding?: string;
     margin?: string;
@@ -20,6 +21,7 @@ type ButtonProps = {
 
 const Button: React.FC<ButtonProps> = ({
     width,
+    minWidth,
     height,
     padding,
     textColor,
@@ -36,6 +38,7 @@ const Button: React.FC<ButtonProps> = ({
     return (
         <Container
             width={width}
+            minWidth={minWidth}
             height={height}
             padding={padding}
             margin={margin}
@@ -43,7 +46,8 @@ const Button: React.FC<ButtonProps> = ({
             $borderRadius={borderRadius}
             style={additionalStyles}
         >
-            <Wrapper
+            <ButtonWrapper
+                minWidth={minWidth}
                 height={height}
                 padding={padding}
                 $textColor={textColor}
@@ -55,7 +59,7 @@ const Button: React.FC<ButtonProps> = ({
                 style={additionalStyles}
             >
                 {children}
-            </Wrapper>
+            </ButtonWrapper>
         </Container>
     );
 };
@@ -66,6 +70,7 @@ const DEFAULT_BORDER_RADIUS = '30px';
 
 const Container = styled(FlexDivCentered)<{
     width?: string;
+    minWidth?: string;
     height?: string;
     padding?: string;
     margin?: string;
@@ -73,6 +78,7 @@ const Container = styled(FlexDivCentered)<{
     $borderRadius?: string;
 }>`
     width: ${(props) => props.width || 'auto'};
+    ${(props) => (props.minWidth ? `min-width: ${props.minWidth};` : '')};
     min-height: ${(props) => props.height || DEFAULT_MIN_HEIGHT};
     background: ${(props) => props.$borderColor || props.theme.button.borderColor.primary};
     border-radius: ${(props) => props.$borderRadius || DEFAULT_BORDER_RADIUS};
@@ -80,7 +86,8 @@ const Container = styled(FlexDivCentered)<{
     margin: ${(props) => props.margin || ''};
 `;
 
-const Wrapper = styled.button<{
+const ButtonWrapper = styled.button<{
+    minWidth?: string;
     height?: string;
     padding?: string;
     $borderRadius?: string;
@@ -93,6 +100,8 @@ const Wrapper = styled.button<{
     align-items: center;
     justify-content: center;
     width: 100%;
+    ${(props) =>
+        props.minWidth ? `min-width: calc(${props.minWidth} - 2 * ${props.padding || DEFAULT_PADDING});` : ''};
     min-height: ${(props) =>
         props.height
             ? `calc(${props.height} - 2 * ${props.padding || DEFAULT_PADDING})`
@@ -105,7 +114,6 @@ const Wrapper = styled.button<{
     cursor: pointer;
     color: ${(props) => props.$textColor || props.theme.button.textColor.primary};
     background-color: ${(props) => props.$backgroundColor || props.theme.button.background.primary};
-    padding: ${(props) => props.padding || '0 30px'};
     outline: none;
     &:disabled {
         opacity: 0.5;

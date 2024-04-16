@@ -367,7 +367,6 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
 export const getDefaultButtonProps = (isMobile: boolean) => ({
     height: isMobile ? '24px' : '27px',
     fontSize: isMobile ? '12px' : '13px',
-    padding: '0px 5px',
 });
 
 const additionalButtonStyle: CSSProperties = {

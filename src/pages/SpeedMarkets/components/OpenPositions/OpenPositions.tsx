@@ -332,7 +332,6 @@ const getDefaultButtonProps = (isMobile: boolean) => ({
     width: isMobile ? '175px' : '220px',
     height: isMobile ? '24px' : '27px',
     fontSize: isMobile ? '12px' : '13px',
-    padding: '0px 5px',
 });
 
 const additionalButtonStyle: CSSProperties = {

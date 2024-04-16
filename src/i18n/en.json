@@ -129,9 +129,12 @@
             "notification": { "tooltip": "You have {{count}} claimable position(s)" }
         },
         "footer": {
-            "discover": "Discover",
-            "about": "About",
-            "resources": "Resources"
+            "github": "GitHub",
+            "discord": "Discord",
+            "medium": "Medium",
+            "twitter": "X",
+            "docs": "Documentation",
+            "description": "Lorem ipsum dolor sit amet consectetur. Porttitor laoreet leo in sed. Lacus senectus congue amet mauris. Ipsum mattis fermentum mollis lectus senectus dui metus nec. Nunc ac pellentesque volutpat praesent arcu viverra suspendisse ullamcorper in. Lectus viverra eu massa nunc ultrices. Nec tempor laoreet lacus ac augue velit ultrices. Netus nisl vulputate eleifend viverra gravida consectetur enim convallis in. Habitant sodales pellentesque nisl pulvinar lorem vitae urna luctus. Odio nunc eu donec elementum et. Morbi aliquet felis nunc velit et. In fringilla amet vel nec sed eget massa tristique nibh. Orci mi donec nunc malesuada et amet. In donec quis volutpat quis cursus donec. In turpis eu at et aliquet malesuada placerat. Elementum diam magna purus arcu malesuada risus dictum non quam. Sit in pharetra nibh lorem in pellentesque. Duis vulputate sed ornare ultricies. Amet vitae urna odio etiam dui sit interdum eu diam."
         },
         "sidebar": {
             "speed-markets": "Speed markets",
@@ -198,7 +201,23 @@
     "landing": {
         "title": "Trade Faster,<br>Win Bigger<br>and Have Fun With Speed Markets!!",
         "title-desc": "<bold>Speed Markets</bold> allow users to purchase UP or DOWN positions around the current price of ETH and BTC.",
-        "trade-now": "Trade now"
+        "trade-now": "Trade now",
+        "content": {
+            "title-1": "Accelerate your fun with Speed Markets",
+            "text-1": "In <bold>Speed Markets</bold>, traders predict the immediate direction of ETH or BTC price movement from the current price for a chance to earn a 2x payout on their buy-in!<br><br><bold>Speed Market</bold> duration can be chosen from as short as 5 minutes to as long as 24 hours!",
+            "title-2": "Exponential payout with Chained Speed Markets!",
+            "text-2": "Elevate Your Risk/Reward with <bold>Chained Speed Markets</bold>.<br><br><bold>Chained Speed Markets</bold> allow sequential predictions in a single flow for explosive leveraged payouts of up to 47x, enhancing trading dynamics and potential gains.<br><br><bold>Chained Speed Markets</bold> enable you to craft a sequence of 2 to 6 consecutive price predictions, each with a fixed Strike Time, and with an increasing payout multiplier for each added market.<br><br>Within <bold>Chained Speed Markets</bold>, you can now choose time frames between chains as short as 2 minutes, in addition to the existing options of 5 and 10 minutes.",
+            "title-3": "Trade using any major crypto asset!",
+            "text-3": "Positions can be purchased using many forms of collateral, with the minimum amount of each adjusted to be equal to 5 USDC. The following forms of collateral are accepted for trading:",
+            "title-4": "Instant winnings accessibility",
+            "text-4": "Our <bold>automated permissionless smart contracts</bold> allow you to claim your winnings to your wallet as soon as your position ends. No person can stop you from trading and no person can stop you from winning!",
+            "title-5": "Curious about the accuracy of prices?",
+            "text-5": "<bold>Pyth Benchmark oracles</bold> provide presteen accurate historical price information accessible by anyone, that helps traders verify trades quickly.<br><br>Pyth price data are pulled every second and are used by 300+ projects on 50+ blockchains with top of the line security and track record!",
+            "text-6": "Within the underlying <bold>Thales Protocol's Speed Markets</bold> architecture, solvency is not just a possibility—it's a guarantee. All your trades are 100% collateralized at all times from the moment you open them.<br><br>This essential assurance fosters a <bold>seamless and secure trading journey</bold> for all participants, instilling confidence and reliability in each transaction.",
+            "title-7": "No KYC",
+            "text-7": "No <bold>sign-up is required</bold>, meaning anyone with a Web3 wallet can participate.<br>Additionally, you can enjoy Speed Markets with a seamless Social Login onboarding (Google, Twitter, Discord, Github, Apple, etc.), a user-friendly Deposit/Withdrawal mechanism, and a cutting edge Credit Card on-ramp aggregator enabled.<br><br>With a full implementation of Account Abstraction, all your transactions are confirmed with a single click without worrying about gas or external wallet interactions! Pay gas with buy-in collateral or even have gas paid by the platform via various gas sponsorship campaigns!"
+        },
+        "powered-by": "Powered by"
     },
     "speed-markets": {
         "title": "Speed Markets",
