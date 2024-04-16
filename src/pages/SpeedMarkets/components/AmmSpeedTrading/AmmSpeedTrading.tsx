@@ -1,5 +1,4 @@
 import PythInterfaceAbi from '@pythnetwork/pyth-sdk-solidity/abis/IPyth.json';
-import { useConnectModal } from '@rainbow-me/rainbowkit';
 import ApprovalModal from 'components/ApprovalModal';
 import Button from 'components/Button';
 import CollateralSelector from 'components/CollateralSelector';
@@ -32,11 +31,11 @@ import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipl
 import useStableBalanceQuery from 'queries/walletBalances/useStableBalanceQuery';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
-import { getSelectedCollateralIndex, getIsBiconomy } from 'redux/modules/wallet';
+import { getSelectedCollateralIndex, getIsBiconomy, setWalletConnectModalVisibility } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivCentered, FlexDivColumn, FlexDivRow, FlexDivRowCentered } from 'styles/common';
 import {
@@ -104,7 +103,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     setSkewImpact,
 }) => {
     const { t } = useTranslation();
-    const { openConnectModal } = useConnectModal();
+    const dispatch = useDispatch();
 
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const networkId = useChainId() as SupportedNetwork;
@@ -699,7 +698,11 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
     const getSubmitButton = () => {
         if (!isConnected) {
-            return <Button onClick={openConnectModal}>{t('common.wallet.connect-your-wallet')}</Button>;
+            return (
+                <Button onClick={() => dispatch(setWalletConnectModalVisibility({ visibility: true }))}>
+                    {t('common.wallet.connect-your-wallet')}
+                </Button>
+            );
         }
         if (isMintAvailable) {
             return (
