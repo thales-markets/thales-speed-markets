@@ -36,13 +36,14 @@ export const Input = styled.input<{ fontSize?: string; width?: string; height?: 
     text-overflow: ellipsis;
     overflow: hidden;
     &::placeholder {
-        color: ${(props) => props.theme.input.textColor.secondary};
+        color: ${(props) => props.theme.input.textColor.primary};
     }
     &::selection {
         color: ${(props) => props.theme.input.textColor.tertiary};
         background: ${(props) => props.theme.input.background.selection.primary};
     }
     &:focus {
+        color: ${(props) => props.theme.input.textColor.secondary};
         border: 1px solid ${(props) => props.theme.input.borderColor.focus.primary};
         box-sizing: border-box;
     }

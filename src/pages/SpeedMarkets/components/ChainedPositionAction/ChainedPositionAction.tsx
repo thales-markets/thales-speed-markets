@@ -307,6 +307,8 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 disabled={isSubmitting || (isOverview && !position.canResolve)}
                 additionalStyles={additionalButtonStyle}
                 backgroundColor={!isOverview ? theme.button.textColor.quaternary : undefined}
+                borderColor={theme.button.textColor.quaternary}
+                textColor={theme.button.textColor.secondary}
                 onClick={() =>
                     hasAllowance || isDefaultCollateral || isOverview ? handleResolve() : setOpenApprovalModal(true)
                 }

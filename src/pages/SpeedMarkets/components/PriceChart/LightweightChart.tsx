@@ -178,10 +178,7 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
                         currentPrice={currentPrice}
                         isPriceUp={(explicitCurrentPrice || 0) > (prevExplicitPrice || 0)}
                     />
-                    <TooltipInfo
-                        overlay={t('speed-markets.tooltips.current-price')}
-                        customIconStyling={{ marginTop: '2px' }}
-                    />
+                    <TooltipInfo overlay={t('speed-markets.tooltips.current-price')} />
                 </FlexDivRowCentered>
                 {!!liquidity && (
                     <FlexDiv>
@@ -203,7 +200,6 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
                                     }}
                                 />
                             }
-                            customIconStyling={{ marginTop: '1px' }}
                         />
                     </FlexDiv>
                 )}

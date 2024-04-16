@@ -44,6 +44,7 @@ const Button: React.FC<ButtonProps> = ({
             margin={margin}
             $borderColor={borderColor}
             $borderRadius={borderRadius}
+            $disabled={disabled}
             style={additionalStyles}
         >
             <ButtonWrapper
@@ -76,6 +77,7 @@ const Container = styled(FlexDivCentered)<{
     margin?: string;
     $borderColor?: string;
     $borderRadius?: string;
+    $disabled?: boolean;
 }>`
     width: ${(props) => props.width || 'auto'};
     ${(props) => (props.minWidth ? `min-width: ${props.minWidth};` : '')};
@@ -84,6 +86,13 @@ const Container = styled(FlexDivCentered)<{
     border-radius: ${(props) => props.$borderRadius || DEFAULT_BORDER_RADIUS};
     padding: ${(props) => props.padding || DEFAULT_PADDING};
     margin: ${(props) => props.margin || ''};
+    ${(props) =>
+        props.$disabled
+            ? `
+                cursor: default;
+                opacity: 0.4;
+            `
+            : ''};
 `;
 
 const ButtonWrapper = styled.button<{
@@ -116,7 +125,6 @@ const ButtonWrapper = styled.button<{
     background-color: ${(props) => props.$backgroundColor || props.theme.button.background.primary};
     outline: none;
     &:disabled {
-        opacity: 0.5;
         cursor: default;
     }
 `;

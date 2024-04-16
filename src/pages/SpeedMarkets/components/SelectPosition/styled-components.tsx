@@ -172,8 +172,8 @@ export const Skew = styled.div<{ $isDiscount?: boolean }>`
 
 export const TooltipWrapper = styled.div`
     position: absolute;
-    bottom: -19px;
-    right: -6px;
+    bottom: -22px;
+    right: -7px;
 `;
 
 export const Chain = styled(FlexDivCentered)<{ isSelectedUp?: boolean }>`

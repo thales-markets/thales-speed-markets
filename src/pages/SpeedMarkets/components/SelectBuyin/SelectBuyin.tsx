@@ -118,9 +118,8 @@ const Amount = styled(FlexDivCentered)<{ $isSelected: boolean }>`
     height: 31px;
     border-radius: 8px;
     background: ${(props) =>
-        props.$isSelected ? props.theme.button.background.primary : props.theme.button.background.tertiary};
-    color: ${(props) =>
-        props.$isSelected ? props.theme.button.textColor.primary : props.theme.button.textColor.secondary};
+        props.$isSelected ? props.theme.button.background.secondary : props.theme.button.background.tertiary};
+    color: ${(props) => props.theme.button.textColor.secondary};
     cursor: pointer;
     font-weight: 600;
     font-size: 13px;

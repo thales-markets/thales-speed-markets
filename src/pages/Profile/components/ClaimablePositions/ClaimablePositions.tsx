@@ -128,7 +128,6 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
             .filter((marketData) => marketData.claimable)
             .map((marketData) => {
                 return {
-                    positionAddress: marketData.positionAddress,
                     currencyKey: marketData.currencyKey,
                     strikePrice: marketData.strikePrice,
                     leftPrice: 0,
@@ -150,7 +149,6 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
         const chainedSpeedMarketsOpenPositions: UserPosition[] = userOpenChainedSpeedMarketsDataWithPrices.map(
             (marketData) => {
                 return {
-                    positionAddress: marketData.address,
                     currencyKey: marketData.currencyKey,
                     strikePrice: marketData.strikePrices[marketData.strikePrices.length - 1],
                     leftPrice: 0,

@@ -60,9 +60,10 @@ const UnexpectedError: React.FC<{ theme: ThemeInterface }> = ({ theme }) => {
             <FlexDivCentered>
                 <Button
                     onClick={tryAgainHandler}
+                    minWidth="130px"
                     margin="10px 0 0 0"
                     backgroundColor={theme.button.background.primary}
-                    borderColor={theme.button.background.primary}
+                    borderColor={theme.button.borderColor.primary}
                     textColor={theme.button.textColor.primary}
                 >
                     {t('common.try-again')}

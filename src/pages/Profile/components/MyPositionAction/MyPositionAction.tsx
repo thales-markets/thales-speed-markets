@@ -232,6 +232,8 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
             disabled={isSubmitting}
             additionalStyles={additionalButtonStyle}
             backgroundColor={theme.button.textColor.quaternary}
+            borderColor={theme.button.textColor.quaternary}
+            textColor={theme.button.textColor.secondary}
             onClick={() => (hasAllowance || isDefaultCollateral ? handleResolve() : setOpenApprovalModal(true))}
         >
             {hasAllowance || isDefaultCollateral

@@ -57,9 +57,9 @@ export const NavItem = styled.p<{
 `;
 
 export const Notification = styled.span`
-    background: ${(props) => props.theme.button.background.primary};
+    background: ${(props) => props.theme.button.background.secondary};
     border-radius: 30px;
-    color: ${(props) => props.theme.button.textColor.primary};
+    color: ${(props) => props.theme.button.textColor.secondary};
     margin-left: 8px;
     min-width: 24px;
     padding: 0 5px;

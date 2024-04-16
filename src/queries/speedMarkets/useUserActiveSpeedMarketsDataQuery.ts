@@ -1,7 +1,6 @@
 import { EvmPriceServiceConnection, PriceFeed } from '@pythnetwork/pyth-evm-js';
 import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { SIDE_TO_POSITION_MAP, SPEED_MARKETS_QUOTE } from 'constants/market';
-import { ZERO_ADDRESS } from 'constants/network';
 import { CONNECTION_TIMEOUT_MS, PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
@@ -132,7 +131,6 @@ const useUserActiveSpeedMarketsDataQuery = (
                     const fees = lpFee + safeBoxImpact;
 
                     const userData: UserOpenPositions = {
-                        positionAddress: ZERO_ADDRESS,
                         currencyKey: parseBytes32String(marketData.asset),
                         strikePrice: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS),
                         payout: payout,

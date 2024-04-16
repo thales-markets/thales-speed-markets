@@ -201,7 +201,7 @@ export const UserPositionAreaSeries: React.FC<{
                         size: 0.1,
                         color:
                             value.shape === 'square'
-                                ? Colors.PURPLE
+                                ? Colors.PURPLE // TODO: move to theme
                                 : value.position.side === Positions.UP
                                 ? Colors.GREEN
                                 : Colors.RED,

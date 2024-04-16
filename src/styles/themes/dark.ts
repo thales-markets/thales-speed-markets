@@ -10,7 +10,7 @@ export default {
         primary: Colors.BLACK,
         secondary: Colors.GRAY,
         tertiary: Colors.GRAY_LIGHT,
-        quaternary: Colors.GREEN,
+        quaternary: Colors.PURPLE,
     },
     textColor: {
         primary: Colors.WHITE,
@@ -22,26 +22,25 @@ export default {
         primary: Colors.GRAY,
         secondary: Colors.GRAY_LIGHT,
         tertiary: Colors.ORANGE,
-        quaternary: Colors.GREEN,
+        quaternary: Colors.PURPLE,
     },
     button: {
         background: {
             primary: Colors.BLACK,
-            secondary: Colors.GRAY_DARK,
-            tertiary: Colors.GRAY,
+            secondary: Colors.PURPLE,
+            tertiary: Colors.WHITE,
             quaternary: Colors.GRAY_LIGHT,
         },
         textColor: {
             primary: Colors.WHITE,
-            secondary: Colors.WHITE,
-            tertiary: Colors.GRAY_LIGHT,
+            secondary: Colors.BLACK,
+            tertiary: Colors.PURPLE,
             quaternary: Colors.ORANGE,
         },
         borderColor: {
             primary: `linear-gradient(90deg, ${Colors.PURPLE_DARK} 0%, ${Colors.BLUE_DEEP_SKY} 100%)`,
-            secondary: Colors.GRAY_LIGHT,
-            tertiary: Colors.GRAY,
-            quaternary: Colors.GRAY_DARK,
+            secondary: Colors.PURPLE,
+            tertiary: Colors.WHITE,
         },
         shadowColor: {
             primary: Colors.PURPLE_DARK,
@@ -50,37 +49,51 @@ export default {
     },
     input: {
         background: {
-            primary: Colors.GRAY_DARK,
+            primary: Colors.BLACK,
             selection: {
                 primary: Colors.WHITE,
             },
         },
         textColor: {
             primary: Colors.WHITE,
-            secondary: Colors.GRAY_LIGHT,
-            tertiary: Colors.GRAY,
+            secondary: Colors.PURPLE,
+            tertiary: Colors.BLACK,
             quaternary: Colors.RED,
         },
         borderColor: {
-            primary: Colors.GRAY_LIGHT,
-            secondary: Colors.GRAY,
+            primary: Colors.WHITE,
             focus: {
-                primary: Colors.GREEN,
+                primary: Colors.PURPLE,
             },
             error: {
                 primary: Colors.RED,
             },
         },
     },
+    dropDown: {
+        background: {
+            primary: Colors.PURPLE,
+            secondary: Colors.WHITE,
+        },
+        textColor: {
+            primary: Colors.WHITE,
+            secondary: Colors.BLACK,
+        },
+    },
     link: {
         textColor: {
-            primary: Colors.GREEN,
+            primary: Colors.PURPLE,
             secondary: Colors.WHITE,
         },
     },
     icon: {
+        background: {
+            primary: Colors.WHITE,
+        },
         textColor: {
             primary: `linear-gradient(180deg, ${Colors.PURPLE_DARK_2} 0%, ${Colors.BLUE_DEEP_SKY_2} 100%)`,
+            secondary: Colors.BLACK,
+            tertiary: Colors.PURPLE,
         },
     },
     error: {
@@ -130,8 +143,6 @@ export default {
     positionColor: {
         up: Colors.GREEN,
         down: Colors.RED,
-        in: Colors.GREEN_LIGHT,
-        out: Colors.PURPLE,
     },
     toastMessages: {
         success: {

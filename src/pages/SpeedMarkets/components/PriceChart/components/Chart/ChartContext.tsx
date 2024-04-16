@@ -101,10 +101,10 @@ export const ChartComponent: React.FC<ChartProps> = ({
                     width="35px"
                     height="31px"
                     textColor={theme.button.textColor.tertiary}
-                    backgroundColor={theme.button.background.secondary}
-                    borderColor={theme.button.borderColor.tertiary}
+                    backgroundColor={theme.button.background.primary}
+                    borderColor={theme.button.borderColor.secondary}
                     fontSize="13px"
-                    padding="0"
+                    padding="1px"
                     borderRadius="8px"
                     additionalStyles={{
                         transition: 'all 0.2s ease-in-out',
@@ -119,7 +119,7 @@ export const ChartComponent: React.FC<ChartProps> = ({
                         });
                     }}
                 >
-                    <i className="icon icon--reload" />
+                    <ReloadIcon className="icon icon--reload" />
                 </Button>
             </ResetButton>
         </ChartContainer>
@@ -131,6 +131,8 @@ const ChartContainer = styled.div`
     position: relative;
 `;
 
+const Chart = styled.div``;
+
 const ResetButton = styled.div`
     position: absolute;
     width: 35px;
@@ -141,4 +143,6 @@ const ResetButton = styled.div`
     }
 `;
 
-const Chart = styled.div``;
+const ReloadIcon = styled.i`
+    color: ${(props) => props.theme.icon.textColor.tertiary};
+`;
