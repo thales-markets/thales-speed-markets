@@ -30,6 +30,9 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const { t } = useTranslation();
 
+    const isActive = currentStep === stepType;
+    const isDisabled = !isWalletConnected && stepType !== GetStartedStep.LOG_IN;
+
     const stepTitle = useMemo(() => {
         let transKey = 'get-started.steps.title';
         switch (stepType) {
@@ -102,23 +105,31 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
             <StepAction>
                 <StepActionIconWrapper isActive={isActive} pulsate={!isMobile}>
                     {stepType === GetStartedStep.DEPOSIT ? (
-                        <StyledInsertCard isActive={isActive} />
+                        <StyledInsertCard completed={!isActive && showStepIcon} isActive={isActive} />
                     ) : (
-                        <StepActionIcon className={`icon ${className}`} isDisabled={isDisabled} isActive={isActive} />
+                        <StepActionIcon
+                            className={`icon ${className}`}
+                            isDisabled={isDisabled}
+                            isActive={isActive}
+                            completed={!isActive && showStepIcon}
+                        />
                     )}
                 </StepActionIconWrapper>
                 <StepActionLabel isDisabled={isDisabled} onClick={onStepActionClickHandler}>
-                    <StepActionName isActive={isActive} completed={showStepIcon}>
+                    <StepActionName isActive={isActive} completed={!isActive && showStepIcon}>
                         {t(transKey)}
                     </StepActionName>
-                    {!isMobile && <LinkIcon className={`icon icon--external`} isActive={isActive} />}
+                    {!isMobile && (
+                        <LinkIcon
+                            className={`icon icon--external`}
+                            isActive={isActive}
+                            completed={!isActive && showStepIcon}
+                        />
+                    )}
                 </StepActionLabel>
             </StepAction>
         );
     };
-
-    const isActive = currentStep === stepType;
-    const isDisabled = !isWalletConnected && stepType !== GetStartedStep.LOG_IN;
 
     const onStepActionClickHandler = () => {
         if (isDisabled) {
@@ -231,6 +242,7 @@ const StepNumberWrapper = styled.div<{ isActive: boolean; isDisabled?: boolean; 
         width: 36px;
         height: 36px;
     }
+    opacity: ${(props) => (props.completed || props.isActive ? 1 : 0.7)};
 `;
 
 const StepNumber = styled.span<{ isActive: boolean }>`
@@ -265,12 +277,12 @@ const StepActionIconWrapper = styled.div<{ isActive: boolean; pulsate?: boolean 
     }
 `;
 
-const StepActionIcon = styled.i<{ isDisabled?: boolean; isActive?: boolean }>`
+const StepActionIcon = styled.i<{ isDisabled?: boolean; isActive?: boolean; completed?: boolean }>`
     font-size: 35px;
     padding-bottom: 15px;
     cursor: ${(props) => (props.isDisabled ? 'not-allowed' : 'pointer')};
-    color: ${(props) => (props.isActive ? props.theme.textColor.quinary : props.theme.textColor.primary)};
-    opacity: ${(props) => (props.isActive ? 1 : 0.7)};
+    color: ${(props) => (props.completed ? props.theme.textColor.quinary : props.theme.textColor.primary)};
+    opacity: ${(props) => (props.completed || props.isActive ? 1 : 0.7)};
 `;
 
 const StepActionLabel = styled.div<{ isDisabled?: boolean }>`
@@ -284,21 +296,21 @@ const StepActionName = styled.span<{ isActive?: boolean; completed?: boolean }>`
     font-weight: 600;
     font-size: 14px;
     line-height: 16px;
-    color: ${(props) => (props.isActive ? props.theme.textColor.quinary : props.theme.textColor.primary)};
-    opacity: ${(props) => (props.isActive ? 1 : 0.7)};
+    color: ${(props) => (props.completed ? props.theme.textColor.quinary : props.theme.textColor.primary)};
+    opacity: ${(props) => (props.completed || props.isActive ? 1 : 0.7)};
     white-space: nowrap;
     @media (max-width: 600px) {
         display: none;
     }
 `;
 
-const LinkIcon = styled.i<{ isActive: boolean }>`
+const LinkIcon = styled.i<{ isActive: boolean; completed?: boolean }>`
     font-size: 14px;
     margin-left: 10px;
     animation: ${(props) => (props.isActive ? 'pulsing 1s ease-in' : '')};
     animation-iteration-count: ${(props) => (props.isActive ? 'infinite;' : '')};
-    opacity: ${(props) => (props.isActive ? 1 : 0.7)};
-    color: ${(props) => (props.isActive ? props.theme.textColor.quinary : props.theme.textColor.primary)};
+    opacity: ${(props) => (props.completed || props.isActive ? 1 : 0.7)};
+    color: ${(props) => (props.completed ? props.theme.textColor.quinary : props.theme.textColor.primary)};
 `;
 
 const CorrectIcon = styled.i`
@@ -306,13 +318,13 @@ const CorrectIcon = styled.i`
     color: ${(props) => props.theme.background.primary};
 `;
 
-const StyledInsertCard = styled(InsertCard)<{ isActive: boolean }>`
+const StyledInsertCard = styled(InsertCard)<{ isActive: boolean; completed?: boolean }>`
     width: 54px;
     height: 44px;
     margin-bottom: 4px;
-    opacity: ${(props) => (props.isActive ? 1 : 0.7)};
+    opacity: ${(props) => (props.completed || props.isActive ? 1 : 0.7)};
     path {
-        fill: ${(props) => (props.isActive ? props.theme.textColor.quinary : props.theme.textColor.primary)};
+        fill: ${(props) => (props.completed ? props.theme.textColor.quinary : props.theme.textColor.primary)};
     }
 `;
 
