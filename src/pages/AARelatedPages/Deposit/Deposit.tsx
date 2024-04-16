@@ -1,4 +1,3 @@
-import CollateralSelector from 'components/CollateralSelector';
 import { getErrorToastOptions, getInfoToastOptions } from 'components/ToastMessage/ToastMessage';
 import useExchangeRatesQuery, { Rates } from 'queries/rates/useExchangeRatesQuery';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -12,7 +11,6 @@ import { getOnRamperUrl } from 'utils/biconomy';
 import { getNetworkNameByNetworkId } from 'utils/network';
 import {
     BalanceSection,
-    CollateralContainer,
     FormContainer,
     InputContainer,
     InputLabel,
@@ -34,6 +32,9 @@ import { useAccount, useChainId, useClient } from 'wagmi';
 import biconomyConnector from 'utils/biconomyWallet';
 import { getCollaterals } from 'utils/currency';
 import { COLLATERALS } from 'constants/currency';
+import CollateralDropdown from './components/CollateralDropdown';
+import { GradientContainer } from 'components/Common/GradientBorder';
+import Button from 'components/Button';
 
 const Deposit: React.FC = () => {
     const { t } = useTranslation();
@@ -53,7 +54,7 @@ const Deposit: React.FC = () => {
     const [selectedToken, setSelectedToken] = useState<number>(selectedTokenFromUrl || 0);
 
     useEffect(() => {
-        if (selectedTokenFromUrl != selectedToken.toString()) {
+        if (selectedTokenFromUrl && selectedTokenFromUrl != selectedToken.toString()) {
             setSelectedToken(Number(selectedTokenFromUrl));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -104,8 +105,6 @@ const Deposit: React.FC = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [totalBalanceValue]);
 
-    const inputRef = useRef<HTMLDivElement>(null);
-
     const walletAddressInputRef = useRef<HTMLInputElement>(null);
 
     const handleCopy = () => {
@@ -138,64 +137,72 @@ const Deposit: React.FC = () => {
             {isMobile && <PrimaryHeading>{t('deposit.deposit-crypto')}</PrimaryHeading>}
             <Wrapper>
                 <FormContainer>
-                    {!isMobile && <PrimaryHeading>{t('deposit.deposit-crypto')}</PrimaryHeading>}
-                    <InputLabel>{t('deposit.select-token')}</InputLabel>
-                    <InputContainer ref={inputRef}>
-                        <CollateralContainer ref={inputRef}>
-                            <CollateralSelector
-                                collateralArray={COLLATERALS[networkId]}
-                                selectedItem={selectedToken}
-                                onChangeCollateral={(index) => handleChangeCollateral(index)}
-                                disabled={false}
-                                collateralBalances={[multipleCollateralBalances.data]}
-                                exchangeRates={exchangeRates}
-                                dropDownWidth={inputRef.current?.getBoundingClientRect().width + 'px'}
-                            />
-                        </CollateralContainer>
-                    </InputContainer>
-                    <DepositAddressFormContainer>
-                        <InputLabel>
-                            {t('deposit.address-input-label', {
-                                token: getCollaterals(networkId)[selectedToken],
-                                network: getNetworkNameByNetworkId(networkId),
-                            })}
-                        </InputLabel>
-                        <WalletAddressInputWrapper>
-                            <InputContainer>
-                                <WalletAddressInput
-                                    type={'text'}
-                                    value={walletAddress}
-                                    readOnly
-                                    ref={walletAddressInputRef}
-                                />
-                                <QRIcon
-                                    onClick={() => {
-                                        setShowQRModal(!showQRModal);
-                                    }}
-                                    className="social-icon icon--qr-code"
-                                />
-                            </InputContainer>
-                            <CopyButton onClick={() => handleCopy()}>{'Copy'}</CopyButton>
-                        </WalletAddressInputWrapper>
-                        <WarningContainer>
-                            <WarningIcon className={'icon icon--warning'} />
-                            {t('deposit.send', {
-                                token: getCollaterals(networkId)[selectedToken],
-                                network: getNetworkNameByNetworkId(networkId),
-                            })}
-                        </WarningContainer>
-                    </DepositAddressFormContainer>
-                    <BuyWithText>Or buy with</BuyWithText>
-                    <OnramperDiv
-                        onClick={() => {
-                            setShowOnramper(true);
-                        }}
-                    >
-                        <OnramperIcons className={`social-icon icon--visa`} />
-                        <OnramperIcons className={`social-icon icon--master`} />
-                        <OnramperIcons className={`social-icon icon--applepay`} />
-                        <OnramperIcons className={`social-icon icon--googlepay`} />
-                    </OnramperDiv>
+                    <div>
+                        {!isMobile && <PrimaryHeading>{t('deposit.deposit-crypto')}</PrimaryHeading>}
+                        <InputLabel>{t('deposit.select-token')}</InputLabel>
+
+                        <CollateralDropdown
+                            onChangeCollateral={handleChangeCollateral}
+                            collateralArray={COLLATERALS[networkId]}
+                            selectedItem={selectedToken}
+                        />
+
+                        <DepositAddressFormContainer>
+                            <InputLabel>
+                                {t('deposit.address-input-label', {
+                                    token: getCollaterals(networkId)[selectedToken],
+                                    network: getNetworkNameByNetworkId(networkId),
+                                })}
+                            </InputLabel>
+                            <WalletAddressInputWrapper>
+                                <InputContainer>
+                                    <WalletAddressInput
+                                        type={'text'}
+                                        value={walletAddress}
+                                        readOnly
+                                        ref={walletAddressInputRef}
+                                    />
+                                    <QRIcon
+                                        onClick={() => {
+                                            setShowQRModal(!showQRModal);
+                                        }}
+                                        className="social-icon icon--qr-code"
+                                    />
+                                </InputContainer>
+                                <GradientContainer width={68}>
+                                    <CopyButton onClick={() => handleCopy()}>{'Copy'}</CopyButton>
+                                </GradientContainer>
+                            </WalletAddressInputWrapper>
+                            <WarningContainer>
+                                <WarningIcon className={'icon icon--warning'} />
+                                {t('deposit.send', {
+                                    token: getCollaterals(networkId)[selectedToken],
+                                    network: getNetworkNameByNetworkId(networkId),
+                                })}
+                            </WarningContainer>
+                        </DepositAddressFormContainer>
+                    </div>
+                    <div>
+                        <BuyWithText>{t('deposit.buy-with')}</BuyWithText>
+                    </div>
+                    <div>
+                        <Description>{t('deposit.description')}</Description>
+                        <OnramperDiv
+                            onClick={() => {
+                                setShowOnramper(true);
+                            }}
+                        >
+                            <OnramperDiv>
+                                <OnramperIcons className={`social-icon icon--visa`} />
+                                <OnramperIcons className={`social-icon icon--master`} />
+                                <OnramperIcons className={`social-icon icon--applepay`} />
+                                <OnramperIcons className={`social-icon icon--googlepay`} />
+                            </OnramperDiv>
+                            <Button width="100%" fontSize="14px">
+                                Buy Crypto
+                            </Button>
+                        </OnramperDiv>
+                    </div>
                 </FormContainer>
                 <BalanceSection>
                     <BalanceDetails />
@@ -243,22 +250,23 @@ const DepositAddressFormContainer = styled(FlexDiv)`
 `;
 
 const BuyWithText = styled.span`
+    display: block;
     font-size: 20px;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
     text-transform: capitalize;
     margin: auto;
-    margin-top: 55px;
-    margin-bottom: 30px;
     color: ${(props) => props.theme.textColor.primary};
+    width: 100%;
+    text-align: center;
 `;
 
 const OnramperIcons = styled.i`
-    font-size: 100px;
+    font-size: 70px;
     color: ${(props) => props.theme.textColor.primary};
     @media (max-width: 500px) {
-        font-size: 75px;
+        font-size: 45px;
     }
 `;
 
@@ -274,10 +282,6 @@ const OnramperDiv = styled(FlexDiv)`
     justify-content: center;
     gap: 10px;
     cursor: pointer;
-    transition: transform 0.3s ease-out;
-    :hover {
-        transform: scale(1.2);
-    }
 `;
 
 const ModalWrapper = styled(FlexDiv)`
@@ -296,32 +300,34 @@ const WalletAddressInput = styled.input`
     opacity: 0.75;
     border-radius: 5px;
     color: ${(props) => props.theme.input.textColor.primary};
-    background-color: ${(props) => props.theme.input.background.primary};
+    background-color: ${(props) => props.theme.background.primary};
     border: ${(props) => `1px ${props.theme.input.borderColor.secondary} solid`};
 `;
 
 const QRIcon = styled.i`
-    font-size: 24px;
+    font-size: 20px;
     position: absolute;
     cursor: pointer;
     right: 5px;
-    top: 5px;
+    top: 7px;
     color: ${(props) => props.theme.input.textColor.primary};
 `;
 
 const CopyButton = styled(FlexDiv)`
-    font-size: 18px;
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 100%;
+    text-transform: uppercase;
     border-radius: 5px;
-    font-weight: 700;
     padding: 7px 20px;
     height: auto;
     cursor: pointer;
-    text-transform: uppercase;
-    line-height: 18px;
+    border-radius: 8px;
     align-items: center;
     justify-content: center;
     color: ${(props) => props.theme.button.textColor.primary};
     background-color: ${(props) => props.theme.button.background.primary};
+    font-family: ${(props) => props.theme.fontFamily.tertiary};
 `;
 
 const SectionLabel = styled.span`
@@ -350,5 +356,14 @@ const Link = styled.a`
     text-transform: capitalize;
     padding-bottom: 15px;
     color: ${(props) => props.theme.textColor.primary};
+`;
+
+const Description = styled.p`
+    color: ${(props) => props.theme.textColor.primary};
+    font-family: ${(props) => props.theme.fontFamily.primary};
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
 `;
 export default Deposit;

@@ -397,5 +397,10 @@
                 "trade": "Trade on speedmarkets"
             }
         }
+    },
+    "deposit": {
+        "send": "Make sure you are depositing {{ network }} {{ token }} to the address above!",
+        "buy-with": "or",
+        "description": "Don't have crypto wallet? No worries, you can buy any of above mentioned cryptocurrencies with your credit card."
     }
 }

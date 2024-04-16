@@ -19,6 +19,7 @@ import { RootState } from 'types/ui';
 import { getClassNameForParticalLogin, getSpecificConnectorFromConnectorsArray } from 'utils/biconomy';
 import { navigateTo } from 'utils/routes';
 import { Connector, useConnect } from 'wagmi';
+import { GradientContainer } from 'components/Common/GradientBorder';
 
 ReactModal.setAppElement('#root');
 
@@ -369,13 +370,6 @@ const LoaderContainer = styled.div`
     height: 180px !important;
     width: 80px;
     overflow: none;
-`;
-
-const GradientContainer = styled.div`
-    padding: 1px;
-    background: linear-gradient(90deg, #a764b7 0%, #169cd2 100%);
-    border-radius: 8px;
-    width: 100%;
 `;
 
 export default ConnectWalletModal;

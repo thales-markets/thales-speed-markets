@@ -15,7 +15,11 @@ export const Wrapper = styled(FlexDiv)`
 
 export const FormContainer = styled(FlexDiv)`
     flex-direction: column;
+    align-items: stretch;
+    justify-content: space-between;
+    height: 100%;
     width: 100%;
+    height: 527px;
     @media (max-width: 600px) {
         width: 100%;
     }
@@ -65,8 +69,6 @@ export const CollateralContainer = styled.div`
     border: 1px solid ${(props) => props.theme.input.borderColor.secondary};
     padding: 8px 0;
     max-height: 34px;
-    display: flex;
-    justify-content: end;
     align-items: center;
     background: ${(props) => props.theme.input.background.primary};
     cursor: pointer;
@@ -74,15 +76,16 @@ export const CollateralContainer = styled.div`
 
 export const WarningContainer = styled(FlexDiv)`
     width: 100%;
-    background-color: ${(props) => props.theme.warning.background};
-    color: ${(props) => props.theme.warning.textColor};
+    background-color: ${(props) => props.theme.background.quinary};
+    color: ${(props) => props.theme.background.primary};
+    font-family: ${(props) => props.theme.fontFamily.tertiary};
     padding: 5px;
     align-items: center;
     font-weight: 400;
     text-transform: capitalize;
     font-size: 18px;
     border-radius: 5px;
-    margin-top: 18px;
+    margin-top: 12px;
     @media (max-width: 600px) {
         font-size: 12px;
     }
@@ -91,4 +94,5 @@ export const WarningContainer = styled(FlexDiv)`
 export const WarningIcon = styled.i`
     padding-right: 12px;
     padding-left: 5px;
+    color: ${(props) => props.theme.background.primary};
 `;

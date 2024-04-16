@@ -9,12 +9,12 @@ const OutsideClickHandler: React.FC<any> = ({ children, onOutsideClick }) => {
                 onOutsideClick();
             }
         };
-        document.addEventListener('mousedown', handleOutsideClick);
-        document.addEventListener('touchstart', handleOutsideClick);
+        document.addEventListener('mouseup', handleOutsideClick);
+        document.addEventListener('touchend', handleOutsideClick);
 
         return () => {
-            document.removeEventListener('mousedown', handleOutsideClick);
-            document.removeEventListener('touchstart', handleOutsideClick);
+            document.removeEventListener('mouseup', handleOutsideClick);
+            document.removeEventListener('touchend', handleOutsideClick);
         };
     }, [onOutsideClick]);
 
