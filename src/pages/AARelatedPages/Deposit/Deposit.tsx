@@ -14,7 +14,10 @@ import {
     FormContainer,
     InputContainer,
     InputLabel,
+    Link,
     PrimaryHeading,
+    SectionLabel,
+    TutorialLinksContainer,
     WarningContainer,
     WarningIcon,
     Wrapper,
@@ -39,7 +42,8 @@ import Button from 'components/Button';
 const Deposit: React.FC = () => {
     const { t } = useTranslation();
     const networkId = useChainId();
-    const { address: walletAddress, isConnected: isWalletConnected } = useAccount();
+    const walletAddress = biconomyConnector.address;
+    const { isConnected: isWalletConnected } = useAccount();
     const client = useClient();
     const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
@@ -301,7 +305,7 @@ const WalletAddressInput = styled.input`
     border-radius: 5px;
     color: ${(props) => props.theme.input.textColor.primary};
     background-color: ${(props) => props.theme.background.primary};
-    border: ${(props) => `1px ${props.theme.input.borderColor.secondary} solid`};
+    border: 1px solid ${(props) => props.theme.background.secondary};
 `;
 
 const QRIcon = styled.i`
@@ -328,34 +332,6 @@ const CopyButton = styled(FlexDiv)`
     color: ${(props) => props.theme.button.textColor.primary};
     background-color: ${(props) => props.theme.button.background.primary};
     font-family: ${(props) => props.theme.fontFamily.tertiary};
-`;
-
-const SectionLabel = styled.span`
-    font-size: 13px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    margin-bottom: 24px;
-    color: ${(props) => props.theme.textColor.secondary};
-`;
-
-const TutorialLinksContainer = styled(FlexDiv)`
-    flex-direction: column;
-    border-radius: 5px;
-    margin-bottom: 13px;
-
-    padding: 19px;
-    border: 1px ${(props) => props.theme.borderColor.primary} solid;
-`;
-
-const Link = styled.a`
-    width: fit-content;
-    font-size: 12px;
-    font-weight: 700;
-    text-decoration: underline;
-    text-transform: capitalize;
-    padding-bottom: 15px;
-    color: ${(props) => props.theme.textColor.primary};
 `;
 
 const Description = styled.p`

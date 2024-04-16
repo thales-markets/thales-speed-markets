@@ -46,10 +46,12 @@ export const PrimaryHeading = styled.h1`
     color: ${(props) => props.theme.textColor.primary};
 `;
 
-export const InputLabel = styled.span<{ marginTop?: string }>`
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: capitalize;
+export const InputLabel = styled.p<{ marginTop?: string }>`
+    font-family: ${(props) => props.theme.fontFamily.primary};
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
     margin-top: ${(props) => (props.marginTop ? props.marginTop : '')};
     margin-bottom: 5px;
     color: ${(props) => props.theme.textColor.primary};
@@ -66,7 +68,7 @@ export const CollateralContainer = styled.div`
     width: 100%;
     margin-left: auto;
     border-radius: 8px;
-    border: 1px solid ${(props) => props.theme.input.borderColor.secondary};
+    border: 1px solid ${(props) => props.theme.background.secondary};
     padding: 8px 0;
     max-height: 34px;
     align-items: center;
@@ -95,4 +97,32 @@ export const WarningIcon = styled.i`
     padding-right: 12px;
     padding-left: 5px;
     color: ${(props) => props.theme.background.primary};
+`;
+
+export const SectionLabel = styled.p`
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    margin-bottom: 24px;
+    color: ${(props) => props.theme.textColor.secondary};
+`;
+
+export const TutorialLinksContainer = styled(FlexDiv)`
+    flex-direction: column;
+    border-radius: 5px;
+    margin-bottom: 13px;
+
+    padding: 19px;
+    border: 1px ${(props) => props.theme.borderColor.primary} solid;
+`;
+
+export const Link = styled.a`
+    width: fit-content;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: underline;
+    text-transform: capitalize;
+    padding-bottom: 15px;
+    color: ${(props) => props.theme.textColor.primary};
 `;

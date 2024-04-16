@@ -1,24 +1,24 @@
 import Button from 'components/Button';
-import CollateralSelector from 'components/CollateralSelector';
 import NumericInput from 'components/fields/NumericInput';
 import TextInput from 'components/fields/TextInput';
 import BalanceDetails from 'pages/AARelatedPages/Deposit/components/BalanceDetails';
-import useExchangeRatesQuery, { Rates } from 'queries/rates/useExchangeRatesQuery';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import { FlexDiv } from 'styles/common';
-import { RootState, ThemeInterface } from 'types/ui';
+import { RootState } from 'types/ui';
 import { getNetworkNameByNetworkId } from 'utils/network';
 import queryString from 'query-string';
 import {
     BalanceSection,
-    CollateralContainer,
     FormContainer,
     InputContainer,
     InputLabel,
+    Link,
     PrimaryHeading,
+    SectionLabel,
+    TutorialLinksContainer,
     WarningContainer,
     WarningIcon,
     Wrapper,
@@ -32,6 +32,7 @@ import { getIsBiconomy } from 'redux/modules/wallet';
 import biconomyConnector from 'utils/biconomyWallet';
 import { isAddress } from 'viem';
 import { COLLATERALS } from 'constants/currency';
+import CollateralDropdown from '../Deposit/components/CollateralDropdown';
 
 type FormValidation = {
     walletAddress: boolean;
@@ -39,10 +40,10 @@ type FormValidation = {
 };
 
 const Withdraw: React.FC = () => {
-    const theme: ThemeInterface = useTheme();
     const { t } = useTranslation();
     const networkId = useChainId();
-    const { address: walletAddress, isConnected: isWalletConnected } = useAccount();
+    const walletAddress = biconomyConnector.address;
+    const { isConnected: isWalletConnected } = useAccount();
     const client = useClient();
     const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
@@ -56,20 +57,11 @@ const Withdraw: React.FC = () => {
     const [selectedToken, setSelectedToken] = useState<number>(selectedTokenFromUrl || 0);
 
     useEffect(() => {
-        if (selectedTokenFromUrl != selectedToken.toString()) {
+        if (selectedTokenFromUrl && selectedTokenFromUrl != selectedToken.toString()) {
             setSelectedToken(Number(selectedTokenFromUrl));
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedTokenFromUrl]);
-
-    useEffect(() => {
-        if (selectedTokenFromUrl != selectedToken.toString()) {
-            setSelectedToken(Number(selectedTokenFromUrl));
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedTokenFromUrl]);
-
-    const inputRef = useRef<HTMLDivElement>(null);
 
     const multipleCollateralBalances = useMultipleCollateralBalanceQuery(
         (isBiconomy ? biconomyConnector.address : walletAddress) as string,
@@ -86,15 +78,6 @@ const Withdraw: React.FC = () => {
         }
         return 0;
     }, [multipleCollateralBalances.data, multipleCollateralBalances.isSuccess, networkId, selectedToken]);
-
-    const exchangeRatesQuery = useExchangeRatesQuery(
-        { networkId, client },
-        {
-            enabled: isAppReady,
-        }
-    );
-    const exchangeRates: Rates | null =
-        exchangeRatesQuery.isSuccess && exchangeRatesQuery.data ? exchangeRatesQuery.data : null;
 
     useEffect(() => {
         let walletValidation = false;
@@ -121,61 +104,61 @@ const Withdraw: React.FC = () => {
             <Wrapper>
                 <FormContainer>
                     <PrimaryHeading>{t('withdraw.heading-withdraw')}</PrimaryHeading>
-                    <InputLabel>{t('deposit.select-token')}</InputLabel>
-                    <CollateralContainer ref={inputRef}>
-                        <CollateralSelector
+
+                    <div>
+                        <InputLabel>{t('deposit.select-token')}</InputLabel>
+                        <CollateralDropdown
+                            onChangeCollateral={handleChangeCollateral}
                             collateralArray={COLLATERALS[networkId]}
                             selectedItem={selectedToken}
-                            onChangeCollateral={(index) => handleChangeCollateral(index)}
-                            disabled={false}
-                            collateralBalances={[multipleCollateralBalances.data]}
-                            exchangeRates={exchangeRates}
-                            dropDownWidth={inputRef.current?.getBoundingClientRect().width + 'px'}
-                            isDetailedView
                         />
-                    </CollateralContainer>
-                    <InputLabel marginTop="20px">
-                        {t('withdraw.address-input-label', {
-                            token: selectedToken,
-                            network: getNetworkNameByNetworkId(networkId),
-                        })}
-                    </InputLabel>
-                    <InputContainer>
-                        <TextInput
-                            value={withdrawalWalletAddress}
-                            onChange={(el: { target: { value: React.SetStateAction<string> } }) =>
-                                setWithdrawalWalletAddress(el.target.value)
-                            }
-                            placeholder={t('withdraw.paste-address')}
-                        />
-                    </InputContainer>
-                    <InputLabel marginTop="10px">{t('withdraw.amount')}</InputLabel>
-                    <InputContainer>
-                        <NumericInput
-                            value={amount}
-                            onChange={(el) => setAmount(Number(el.target.value))}
-                            placeholder={t('withdraw.paste-address')}
-                            onMaxButton={() => setAmount(paymentTokenBalance)}
-                            currencyLabel={getCollaterals(networkId)[selectedToken]}
-                            showValidation={!validation.amount && amount > 0}
-                            validationMessage={t('withdraw.validation.amount')}
-                        />
-                    </InputContainer>
-                    <WarningContainer>
-                        <WarningIcon className={'icon icon--warning'} />
-                        {t('deposit.send', {
-                            token: getCollaterals(networkId)[selectedToken],
-                            network: getNetworkNameByNetworkId(networkId),
-                        })}
-                    </WarningContainer>
+                    </div>
+
+                    <div>
+                        <InputLabel marginTop="20px">
+                            {t('withdraw.address-input-label', {
+                                token: selectedToken,
+                                network: getNetworkNameByNetworkId(networkId),
+                            })}
+                        </InputLabel>
+                        <InputContainer>
+                            <TextInput
+                                value={withdrawalWalletAddress}
+                                onChange={(el: { target: { value: React.SetStateAction<string> } }) =>
+                                    setWithdrawalWalletAddress(el.target.value)
+                                }
+                                placeholder={t('withdraw.paste-address')}
+                                width="100%"
+                            />
+                        </InputContainer>
+                    </div>
+                    <div>
+                        <InputLabel marginTop="10px">{t('withdraw.amount')}</InputLabel>
+                        <InputContainer>
+                            <NumericInput
+                                value={amount}
+                                onChange={(el) => setAmount(Number(el.target.value))}
+                                placeholder={t('withdraw.paste-address')}
+                                onMaxButton={() => setAmount(paymentTokenBalance)}
+                                currencyLabel={getCollaterals(networkId)[selectedToken]}
+                                showValidation={!validation.amount && amount > 0}
+                                validationMessage={t('withdraw.validation.amount')}
+                            />
+                        </InputContainer>
+                        <WarningContainer>
+                            <WarningIcon className={'icon icon--warning'} />
+                            {t('deposit.send', {
+                                token: getCollaterals(networkId)[selectedToken],
+                                network: getNetworkNameByNetworkId(networkId),
+                            })}
+                        </WarningContainer>
+                    </div>
+
                     <ButtonContainer>
                         <Button
-                            backgroundColor={theme.button.background.primary}
                             disabled={!validation.amount || !validation.walletAddress}
-                            textColor={theme.button.textColor.primary}
-                            borderColor={theme.button.borderColor.secondary}
-                            padding={'5px 60px'}
                             fontSize={'22px'}
+                            width="220px"
                             onClick={() => setWithdrawalConfirmationModalVisibility(true)}
                         >
                             {t('withdraw.button-label-withdraw')}
@@ -184,6 +167,13 @@ const Withdraw: React.FC = () => {
                 </FormContainer>
                 <BalanceSection>
                     <BalanceDetails />
+                    <TutorialLinksContainer>
+                        <SectionLabel>{'Tutorials'}</SectionLabel>
+                        <Link href={'#'}>{'Coinbase'}</Link>
+                        <Link href={'#'}>{'Coinbase'}</Link>
+                        <Link href={'#'}>{'Coinbase'}</Link>
+                        <Link href={'#'}>{'Coinbase'}</Link>
+                    </TutorialLinksContainer>
                 </BalanceSection>
             </Wrapper>
             {showWithdrawalConfirmationModal && (
