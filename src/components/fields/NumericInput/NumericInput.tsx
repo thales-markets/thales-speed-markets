@@ -126,15 +126,19 @@ const CurrencyLabel = styled.label<{ $hasSeparator?: boolean }>`
 `;
 
 const MaxButton = styled.button`
-    background: transparent;
+    font-family: ${(props) => props.theme.fontFamily.primary};
+    background: ${(props) => props.theme.button.borderColor.primary};
+    border-radius: 17px;
     border: none;
+    width: 50px;
+    height: 22px;
     font-weight: 700;
     font-size: 13px;
-    line-height: 20px;
-    color: ${(props) => props.theme.button.textColor.quaternary};
-    text-transform: uppercase;
+    line-height: normal;
+    color: ${(props) => props.theme.button.textColor.primary};
+    text-transform: capitalize;
     cursor: pointer;
-    padding-right: 8px;
+    margin-right: 4px;
     &:disabled {
         opacity: 0.4;
         cursor: default;
