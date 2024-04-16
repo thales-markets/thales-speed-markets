@@ -2,7 +2,6 @@ import { Positions } from 'enums/market';
 import { SpeedMarket } from './market';
 
 export type UserPosition = {
-    positionAddress: string;
     currencyKey: string;
     strikePrice: number;
     finalPrice: number;

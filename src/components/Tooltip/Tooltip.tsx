@@ -19,10 +19,13 @@ const Tooltip: React.FC<TooltipProps> = ({ overlay, customIconStyling, children 
 };
 
 const InfoIcon = styled.i`
+    position: relative;
     font-size: 15px;
+    line-height: 100%;
+    vertical-align: middle;
     font-weight: normal;
     cursor: pointer;
-    position: relative;
+    margin-top: 1px;
     margin-left: 4px;
     color: ${(props) => props.theme.textColor.primary};
     &:before {

@@ -285,6 +285,7 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                     {deltaTimesMinutes.map((deltaMinutes, index) => (
                         <DeltaTime
                             key={'minutes' + index}
+                            $isInitial={selectedDeltaSec === 0}
                             $isSelected={isDeltaSelected && selectedDeltaSec === minutesToSeconds(deltaMinutes)}
                             onClick={() => onDeltaTimeClickHandler(0, deltaMinutes)}
                         >{`${deltaMinutes}m`}</DeltaTime>
@@ -297,6 +298,7 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                         {deltaTimesMinutes.map((deltaMinutes, index) => (
                             <DeltaTime
                                 key={'minutes' + index}
+                                $isInitial={selectedDeltaSec === 0 && isDeltaSelected}
                                 $isSelected={isDeltaSelected && selectedDeltaSec === minutesToSeconds(deltaMinutes)}
                                 onClick={() => onDeltaTimeClickHandler(0, deltaMinutes)}
                             >{`${deltaMinutes}m`}</DeltaTime>
@@ -304,11 +306,16 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                         {deltaTimesHours.map((deltaHours, index) => (
                             <DeltaTime
                                 key={'hours' + index}
+                                $isInitial={selectedDeltaSec === 0 && isDeltaSelected}
                                 $isSelected={isDeltaSelected && selectedDeltaSec === hoursToSeconds(deltaHours)}
                                 onClick={() => onDeltaTimeClickHandler(deltaHours, 0)}
                             >{`${deltaHours}h`}</DeltaTime>
                         ))}
-                        <Time $isSelected={!isDeltaSelected} onClick={onSwitchTimeClickHandler}>
+                        <Time
+                            $isInitial={selectedDeltaSec === 0 && isDeltaSelected}
+                            $isSelected={!isDeltaSelected}
+                            onClick={onSwitchTimeClickHandler}
+                        >
                             <Icon className="icon icon--clock" />
                         </Time>
                     </Row>
@@ -332,14 +339,20 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                                 <Button
                                     height="13px"
                                     width={isMobile ? '60px' : '70px'}
-                                    padding="0"
+                                    padding={isDeltaMinutesSelected ? '0' : '1px'}
                                     fontSize="13px"
                                     backgroundColor={
-                                        !isDeltaMinutesSelected ? theme.button.background.tertiary : undefined
+                                        isDeltaMinutesSelected
+                                            ? theme.button.background.secondary
+                                            : theme.button.background.primary
                                     }
-                                    borderColor={!isDeltaMinutesSelected ? theme.button.background.tertiary : undefined}
                                     borderRadius="4px"
-                                    textColor={!isDeltaMinutesSelected ? theme.button.textColor.tertiary : undefined}
+                                    borderColor={isDeltaMinutesSelected ? undefined : theme.button.borderColor.tertiary}
+                                    textColor={
+                                        isDeltaMinutesSelected
+                                            ? theme.button.textColor.secondary
+                                            : theme.button.textColor.primary
+                                    }
                                     onClick={onMinutesButtonClikHandler}
                                 >
                                     {t('common.time-remaining.minutes')}
@@ -347,14 +360,20 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                                 <Button
                                     height="13px"
                                     width={isMobile ? '60px' : '70px'}
-                                    padding="0"
+                                    padding={isDeltaMinutesSelected ? '1px' : '0'}
                                     fontSize="13px"
                                     backgroundColor={
-                                        isDeltaMinutesSelected ? theme.button.background.tertiary : undefined
+                                        isDeltaMinutesSelected
+                                            ? theme.button.background.primary
+                                            : theme.button.background.secondary
                                     }
-                                    borderColor={isDeltaMinutesSelected ? theme.button.background.tertiary : undefined}
-                                    textColor={isDeltaMinutesSelected ? theme.button.textColor.tertiary : undefined}
                                     borderRadius="4px"
+                                    borderColor={isDeltaMinutesSelected ? theme.button.borderColor.tertiary : undefined}
+                                    textColor={
+                                        isDeltaMinutesSelected
+                                            ? theme.button.textColor.primary
+                                            : theme.button.textColor.secondary
+                                    }
                                     onClick={onHoursButtonClikHandler}
                                 >
                                     {t('common.time-remaining.hours')}
@@ -389,12 +408,14 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                                 <Button
                                     height="13px"
                                     width={isMobile ? '60px' : '70px'}
-                                    padding="0"
+                                    padding={isAM ? '0' : '1px'}
                                     fontSize="13px"
-                                    backgroundColor={!isAM ? theme.button.background.tertiary : undefined}
-                                    borderColor={!isAM ? theme.button.background.tertiary : undefined}
-                                    textColor={!isAM ? theme.button.textColor.tertiary : undefined}
+                                    backgroundColor={
+                                        isAM ? theme.button.background.secondary : theme.button.background.primary
+                                    }
                                     borderRadius="4px"
+                                    borderColor={isAM ? undefined : theme.button.borderColor.tertiary}
+                                    textColor={isAM ? theme.button.textColor.secondary : theme.button.textColor.primary}
                                     onClick={() => setIsAM(true)}
                                 >
                                     {'AM'}
@@ -402,12 +423,14 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                                 <Button
                                     height="13px"
                                     width={isMobile ? '60px' : '70px'}
-                                    padding="0"
+                                    padding={isAM ? '1px' : '0'}
                                     fontSize="13px"
-                                    backgroundColor={isAM ? theme.button.background.tertiary : undefined}
-                                    borderColor={isAM ? theme.button.background.tertiary : undefined}
-                                    textColor={isAM ? theme.button.textColor.tertiary : undefined}
+                                    backgroundColor={
+                                        isAM ? theme.button.background.primary : theme.button.background.secondary
+                                    }
                                     borderRadius="4px"
+                                    borderColor={isAM ? theme.button.borderColor.tertiary : undefined}
+                                    textColor={isAM ? theme.button.textColor.primary : theme.button.textColor.secondary}
                                     onClick={() => setIsAM(false)}
                                 >
                                     {'PM'}
@@ -444,14 +467,24 @@ const InputWrapper = styled.div`
     width: 100%;
 `;
 
-const Time = styled(FlexDivCentered)<{ $isSelected: boolean }>`
+const Time = styled(FlexDivCentered)<{ $isInitial: boolean; $isSelected: boolean }>`
     width: 70px;
     height: 31px;
     border-radius: 8px;
+    ${(props) =>
+        !props.$isInitial && !props.$isSelected ? `border: 1px solid ${props.theme.button.borderColor.tertiary};` : ''}
     background: ${(props) =>
-        props.$isSelected ? props.theme.button.background.primary : props.theme.button.background.tertiary};
+        props.$isInitial
+            ? props.theme.button.background.tertiary
+            : props.$isSelected
+            ? props.theme.button.background.secondary
+            : props.theme.button.background.primary};
     color: ${(props) =>
-        props.$isSelected ? props.theme.button.textColor.primary : props.theme.button.textColor.secondary};
+        props.$isInitial
+            ? props.theme.button.textColor.secondary
+            : props.$isSelected
+            ? props.theme.button.textColor.secondary
+            : props.theme.button.textColor.primary};
     cursor: pointer;
     font-weight: ${(props) => (props.$isSelected ? '600' : '300')};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {

@@ -98,7 +98,6 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
                                             }}
                                         />
                                     }
-                                    customIconStyling={{ marginLeft: '0' }}
                                 />
                             </TooltipWrapper>
                         )}

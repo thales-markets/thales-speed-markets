@@ -150,7 +150,6 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
             .filter((marketData) => marketData.maturityDate > Date.now())
             .map((marketData) => {
                 return {
-                    positionAddress: marketData.positionAddress,
                     currencyKey: marketData.currencyKey,
                     strikePrice: marketData.strikePrice,
                     leftPrice: 0,
@@ -173,7 +172,6 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
             .filter((marketData) => !marketData.userLost)
             .map((marketData) => {
                 return {
-                    positionAddress: marketData.address,
                     currencyKey: marketData.currencyKey,
                     strikePrice: marketData.lastStrikePrice,
                     leftPrice: 0,

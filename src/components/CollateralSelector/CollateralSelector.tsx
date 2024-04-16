@@ -66,7 +66,9 @@ const CollateralSelector: React.FC<CollateralSelectorProps> = ({
             <OutsideClickHandler onOutsideClick={() => setOpen(false)}>
                 <SelectedCollateral disabled={!!disabled} onClick={() => !disabled && setOpen(!open)}>
                     <TextCollateralWrapper>
-                        <TextCollateral color={additionalStyles?.color}>{collateralArray[selectedItem]}</TextCollateral>
+                        <SelectedTextCollateral color={additionalStyles?.color}>
+                            {collateralArray[selectedItem]}
+                        </SelectedTextCollateral>
                     </TextCollateralWrapper>
                     {collateralArray.length > 1 && (
                         <Arrow
@@ -155,12 +157,16 @@ const Text = styled.span<{ fontWeight?: string }>`
 `;
 
 const TextCollateral = styled(Text)<{ color?: string }>`
-    color: ${(props) => (props.color ? props.color : props.theme.textColor.primary)};
+    color: ${(props) => (props.color ? props.color : props.theme.dropDown.textColor.secondary)};
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     -o-user-select: none;
     user-select: none;
+`;
+
+const SelectedTextCollateral = styled(TextCollateral)`
+    color: ${(props) => (props.color ? props.color : props.theme.dropDown.textColor.primary)};
 `;
 
 const TextCollateralWrapper = styled.div`
@@ -170,7 +176,7 @@ const TextCollateralWrapper = styled.div`
 const Arrow = styled.i<{ color?: string }>`
     font-size: 10px;
     text-transform: none;
-    color: ${(props) => (props.color ? props.color : props.theme.textColor.primary)};
+    color: ${(props) => (props.color ? props.color : props.theme.dropDown.textColor.primary)};
 `;
 
 const SelectedCollateral = styled(FlexDivRowCentered)<{ disabled: boolean }>`
@@ -185,7 +191,7 @@ const Dropdown = styled(FlexDivColumnCentered)<{ isDropDownAbove?: boolean; widt
     width: ${(props) => (props.width ? props.width : '71px')};
     padding: 5px 3px;
     border-radius: 8px;
-    background: ${(props) => props.theme.background.secondary};
+    background: ${(props) => props.theme.dropDown.background.secondary};
     z-index: 100;
 `;
 
@@ -196,7 +202,7 @@ const DetailedDropdown = styled(FlexDivColumnCentered)<{ width?: string }>`
     width: ${(props) => (props.width ? props.width : '350px')};
     padding: 5px 3px;
     border-radius: 8px;
-    background: ${(props) => props.theme.background.secondary};
+    background: ${(props) => props.theme.dropDown.background.primary};
     z-index: 100;
 `;
 
@@ -207,7 +213,7 @@ const CollateralOption = styled.div`
     border-radius: 8px;
     cursor: pointer;
     &:hover {
-        background: ${(props) => props.theme.background.primary};
+        background: ${(props) => props.theme.dropDown.background.secondary};
     }
 `;
 
@@ -216,7 +222,7 @@ const DetailedCollateralOption = styled(FlexDivSpaceBetween)`
     border-radius: 8px;
     cursor: pointer;
     &:hover {
-        background: ${(props) => props.theme.background.primary};
+        background: ${(props) => props.theme.dropDown.background.secondary};
     }
 `;
 
@@ -224,6 +230,9 @@ const Icon = styled.i`
     font-size: 25px;
     line-height: 100%;
     margin-right: 10px;
+    background: ${(props) => props.theme.icon.background.primary};
+    color: ${(props) => props.theme.icon.textColor.secondary};
+    border-radius: 50%;
 `;
 
 export default CollateralSelector;

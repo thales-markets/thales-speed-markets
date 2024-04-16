@@ -13,7 +13,6 @@ export type MarketInfo = {
 };
 
 export type UserOpenPositions = {
-    positionAddress: string;
     currencyKey: string;
     strikePrice: number;
     payout: number;

@@ -49,7 +49,7 @@ const Content = styled(FlexDivCentered)`
 `;
 
 const Text = styled.span<{ $noWrap?: boolean }>`
-    color: ${(props) => props.theme.button.textColor.primary};
+    color: ${(props) => props.theme.button.textColor.secondary};
     text-align: center;
     font-size: 13px;
     font-weight: 400;

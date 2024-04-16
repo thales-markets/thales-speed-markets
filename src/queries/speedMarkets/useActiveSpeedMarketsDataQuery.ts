@@ -80,7 +80,6 @@ const useActiveSpeedMarketsDataQuery = (
                     const fees = lpFee + safeBoxImpact;
 
                     const userData: UserOpenPositions = {
-                        positionAddress: ZERO_ADDRESS,
                         currencyKey: parseBytes32String(marketData.asset),
                         strikePrice: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS),
                         payout: payout,
@@ -122,7 +121,6 @@ const useActiveSpeedMarketsDataQuery = (
                     const fees = lpFee + safeBoxImpact;
 
                     const userData: UserOpenPositions = {
-                        positionAddress: ZERO_ADDRESS,
                         currencyKey: currencyKey,
                         strikePrice: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS),
                         payout: payout,

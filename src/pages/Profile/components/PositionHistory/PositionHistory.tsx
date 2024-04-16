@@ -1,6 +1,5 @@
 import TileTable from 'components/TileTable';
 import { USD_SIGN } from 'constants/currency';
-import { ZERO_ADDRESS } from 'constants/network';
 import { orderBy } from 'lodash';
 import useUserResolvedChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserResolvedChainedSpeedMarketsDataQuery';
 import useUserResolvedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserResolvedSpeedMarketsDataQuery';
@@ -69,7 +68,6 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
     const data: UserPosition[] = useMemo(() => {
         const speedMarketsClosedPositions: UserPosition[] = closedSpeedMarketsData.map((marketData) => {
             return {
-                positionAddress: ZERO_ADDRESS,
                 currencyKey: marketData.currencyKey,
                 strikePrice: marketData.strikePrice,
                 leftPrice: 0,
@@ -94,7 +92,6 @@ const PositionHistory: React.FC<PositionHistoryProps> = ({ searchAddress, search
                 1 -
                 [...marketData.strikePrices].reverse().findIndex((strikePrice) => strikePrice);
             return {
-                positionAddress: ZERO_ADDRESS,
                 currencyKey: marketData.currencyKey,
                 strikePrice: marketData.strikePrices[lastPositivePriceIndex],
                 leftPrice: 0,

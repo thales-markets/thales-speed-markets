@@ -19,22 +19,28 @@ const SelectAsset: React.FC<SelectAssetProps> = ({ selectedAsset, allAssets, onC
 
     return (
         <Container>
-            {allAssets.map((currentAsset, index) => (
-                <Asset
-                    key={index}
-                    $isSelected={asset === currentAsset || selectedAsset === currentAsset}
-                    onClick={() => {
-                        onChange(currentAsset);
-                        setAsset(currentAsset);
-                    }}
-                >
-                    <IconWrapper>
-                        <AssetIcon className={`currency-icon currency-icon--${currentAsset.toLowerCase()}`} />
-                    </IconWrapper>
-                    <AssetName>{getSynthAsset(currentAsset)}</AssetName>
-                    <AssetFullName>{getSynthName(currentAsset)}</AssetFullName>
-                </Asset>
-            ))}
+            {allAssets.map((currentAsset, index) => {
+                const isSelected = asset === currentAsset || selectedAsset === currentAsset;
+                return (
+                    <Asset
+                        key={index}
+                        $isSelected={isSelected}
+                        onClick={() => {
+                            onChange(currentAsset);
+                            setAsset(currentAsset);
+                        }}
+                    >
+                        <IconWrapper>
+                            <AssetIcon
+                                $isSelected={isSelected}
+                                className={`currency-icon currency-icon--${currentAsset.toLowerCase()}`}
+                            />
+                        </IconWrapper>
+                        <AssetName>{getSynthAsset(currentAsset)}</AssetName>
+                        <AssetFullName>{getSynthName(currentAsset)}</AssetFullName>
+                    </Asset>
+                );
+            })}
         </Container>
     );
 };
@@ -50,10 +56,11 @@ const Asset = styled(FlexDivCentered)<{ $isSelected: boolean }>`
     width: 190px;
     height: 36px;
     border-radius: 8px;
+    ${(props) => (props.$isSelected ? '' : `border: 1px solid ${props.theme.button.borderColor.tertiary};`)}
     background: ${(props) =>
-        props.$isSelected ? props.theme.button.background.primary : props.theme.button.background.tertiary};
+        props.$isSelected ? props.theme.button.background.secondary : props.theme.button.background.primary};
     color: ${(props) =>
-        props.$isSelected ? props.theme.button.textColor.primary : props.theme.button.textColor.secondary};
+        props.$isSelected ? props.theme.button.textColor.secondary : props.theme.button.textColor.primary};
     cursor: pointer;
     font-size: 18px;
     line-height: 90%;
@@ -73,9 +80,12 @@ const IconWrapper = styled.div`
     }
 `;
 
-const AssetIcon = styled.i`
+const AssetIcon = styled.i<{ $isSelected: boolean }>`
     font-size: 28px;
     line-height: 100%;
+    ${(props) => (props.$isSelected ? `background: ${props.theme.icon.background.primary};` : '')};
+    ${(props) => (props.$isSelected ? `color: ${props.theme.icon.textColor.secondary};` : '')};
+    ${(props) => (props.$isSelected ? 'border-radius: 50%;' : '')};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         font-size: 24px;
     }

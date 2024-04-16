@@ -272,8 +272,8 @@ const SpeedMarkets: React.FC = () => {
                     firstLabel: t(`speed-markets.single`),
                     secondLabel: t(`speed-markets.chained.label`),
                     fontSize: '18px',
-                    firstLabelColor: isChained ? undefined : theme.textColor.quaternary,
-                    secondLabelColor: isChained ? theme.textColor.quaternary : undefined,
+                    firstLabelColor: isChained ? undefined : theme.input.textColor.secondary,
+                    secondLabelColor: isChained ? theme.input.textColor.secondary : undefined,
                 }}
                 handleClick={() => {
                     setIsChained(!isChained);
@@ -317,10 +317,7 @@ const SpeedMarkets: React.FC = () => {
                                             : '...',
                                     }}
                                 />
-                                <Tooltip
-                                    overlay={t('speed-markets.tooltips.buyin-fees')}
-                                    customIconStyling={{ top: '1px' }}
-                                />
+                                <Tooltip overlay={t('speed-markets.tooltips.buyin-fees')} />
                             </Info>
                             <LightweightChart
                                 position={isChained ? undefined : positionType}

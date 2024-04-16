@@ -2,7 +2,6 @@ import Button from 'components/Button';
 import CollateralSelector from 'components/CollateralSelector';
 import SimpleLoader from 'components/SimpleLoader/SimpleLoader';
 import { USD_SIGN } from 'constants/currency';
-import { ZERO_ADDRESS } from 'constants/network';
 import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import { CollateralSelectorContainer, InLabel } from 'pages/Profile/components/MyPositionAction/MyPositionAction';
@@ -22,8 +21,8 @@ import { RootState, ThemeInterface } from 'types/ui';
 import { getDefaultCollateral } from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
 import { resolveAllChainedMarkets, resolveAllSpeedPositions } from 'utils/speedAmm';
+import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 import OpenPosition from '../OpenPosition';
-import { useChainId, useAccount, useClient, useWalletClient } from 'wagmi';
 import { getIsBiconomy } from 'redux/modules/wallet';
 import biconomyConnector from 'utils/biconomyWallet';
 
@@ -178,6 +177,8 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
             disabled={isSubmitting}
             additionalStyles={additionalButtonStyle}
             backgroundColor={theme.button.textColor.quaternary}
+            borderColor={theme.button.textColor.quaternary}
+            textColor={theme.button.textColor.secondary}
             onClick={handleSubmit}
         >
             {`${
@@ -241,7 +242,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
                                       maxPriceDelayForResolvingSec={maxPriceDelayForResolvingSec}
                                       currentPrices={currentPrices}
                                       isMultipleMarkets={positions.length > 3}
-                                      key={`position${position.market}${position.positionAddress}${index}`}
+                                      key={`position${position.market}${index}`}
                                   />
                               ))}
                     </PositionsWrapper>
@@ -254,7 +255,6 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
 
 const dummyPositions: UserOpenPositions[] = [
     {
-        positionAddress: ZERO_ADDRESS,
         market: '0x1',
         currencyKey: 'BTC',
         payout: 15,
@@ -265,7 +265,6 @@ const dummyPositions: UserOpenPositions[] = [
         value: 0,
     },
     {
-        positionAddress: ZERO_ADDRESS,
         market: '0x2',
         currencyKey: 'BTC',
         payout: 10,
