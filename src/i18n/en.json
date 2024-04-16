@@ -359,19 +359,22 @@
         }
     },
     "get-started": {
+        "title": "Get started on speedmarkets",
         "steps": {
             "action": {
                 "deposit": "Deposit now",
                 "trade": "Trade on speedmarkets"
             },
             "title": {
-                "logged-in": "Log in",
+                "sign-up": "Sign up",
+                "logged-in": "Logged in",
                 "deposit": "Deposit funds",
                 "trade": "Speedmarkets"
             },
             "description": {
+                "sign-up": "Sign up to start using speedmarkets",
                 "logged-in": "You have successfully created your Speedmarkets Smart Account on the blockchain and are logged in.",
-                "deposit": "To start using Overtime, you have to fund your new account with USDT or USDC. Click on the Deposit Now button and choose between a Direct Deposit to Address or Buy With Credit Card.",
+                "deposit": "To start using speedmarkets, you have to fund your new account with USDT or USDC. Click on the Deposit Now button and choose between a Direct Deposit to Address or Buy With Credit Card.",
                 "trade": "Trade on speedmarkets"
             }
         }

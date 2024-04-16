@@ -102,7 +102,7 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
             <StepAction>
                 <StepActionIconWrapper isActive={isActive} pulsate={!isMobile}>
                     {stepType === GetStartedStep.DEPOSIT ? (
-                        <StyledInsertCard />
+                        <StyledInsertCard isActive={isActive} />
                     ) : (
                         <StepActionIcon className={`icon ${className}`} isDisabled={isDisabled} isActive={isActive} />
                     )}
@@ -269,7 +269,8 @@ const StepActionIcon = styled.i<{ isDisabled?: boolean; isActive?: boolean }>`
     font-size: 35px;
     padding-bottom: 15px;
     cursor: ${(props) => (props.isDisabled ? 'not-allowed' : 'pointer')};
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => (props.isActive ? props.theme.textColor.quinary : props.theme.textColor.primary)};
+    opacity: ${(props) => (props.isActive ? 1 : 0.7)};
 `;
 
 const StepActionLabel = styled.div<{ isDisabled?: boolean }>`
@@ -283,7 +284,8 @@ const StepActionName = styled.span<{ isActive?: boolean; completed?: boolean }>`
     font-weight: 600;
     font-size: 14px;
     line-height: 16px;
-    color: ${(props) => props.theme.background.quinary};
+    color: ${(props) => (props.isActive ? props.theme.textColor.quinary : props.theme.textColor.primary)};
+    opacity: ${(props) => (props.isActive ? 1 : 0.7)};
     white-space: nowrap;
     @media (max-width: 600px) {
         display: none;
@@ -295,7 +297,8 @@ const LinkIcon = styled.i<{ isActive: boolean }>`
     margin-left: 10px;
     animation: ${(props) => (props.isActive ? 'pulsing 1s ease-in' : '')};
     animation-iteration-count: ${(props) => (props.isActive ? 'infinite;' : '')};
-    color: ${(props) => props.theme.textColor.quinary};
+    opacity: ${(props) => (props.isActive ? 1 : 0.7)};
+    color: ${(props) => (props.isActive ? props.theme.textColor.quinary : props.theme.textColor.primary)};
 `;
 
 const CorrectIcon = styled.i`
@@ -303,12 +306,13 @@ const CorrectIcon = styled.i`
     color: ${(props) => props.theme.background.primary};
 `;
 
-const StyledInsertCard = styled(InsertCard)`
+const StyledInsertCard = styled(InsertCard)<{ isActive: boolean }>`
     width: 54px;
     height: 44px;
     margin-bottom: 4px;
+    opacity: ${(props) => (props.isActive ? 1 : 0.7)};
     path {
-        fill: ${(props) => props.theme.textColor.quinary};
+        fill: ${(props) => (props.isActive ? props.theme.textColor.quinary : props.theme.textColor.primary)};
     }
 `;
 
