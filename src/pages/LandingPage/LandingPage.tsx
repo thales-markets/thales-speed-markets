@@ -1,5 +1,6 @@
 import BlueTriangle from 'assets/images/landing/blue-triangle.png';
 import Blurry from 'assets/images/landing/blurry.svg';
+import Coins from 'assets/images/landing/crypto-coins.png';
 import PurpleTriangle from 'assets/images/landing/purple-triangle.png';
 import Rocket from 'assets/images/landing/rocket.png';
 import Zeus from 'assets/images/landing/zeus-hero.webp';
@@ -15,9 +16,11 @@ import {
     BigRocketWrapper,
     BlueTriangleImg,
     BlurImg,
+    BlurImgWrapper,
     Button,
     ButtonContainer,
     ButtonWrapper,
+    CoinsImg,
     Container,
     Content,
     ContentIcon,
@@ -39,6 +42,8 @@ import {
     TitleDesc,
     TitleWrapper,
     Video,
+    VideoRocketWrapper,
+    VideoWrapper,
     ZeusImg,
 } from './styled-components';
 
@@ -152,9 +157,19 @@ const LandingPage: React.FC = () => {
                         </ContentTextDesc>
                     </ContentTextWrapper>
                 </ContentRow>
-            </Content>
-            <Video>VIDEO</Video>
-            <Content>
+
+                <VideoWrapper>
+                    <BlurImgWrapper>
+                        <BlurImg src={Blurry} scale={4.5} />
+                    </BlurImgWrapper>
+                    <CoinsImg src={Coins} />
+                    <VideoRocketWrapper>
+                        <RocketImg src={Rocket} width="180px" />
+                    </VideoRocketWrapper>
+
+                    <Video>VIDEO</Video>
+                </VideoWrapper>
+
                 <ContentRow>
                     <ContentIconWrapper>
                         <ContentIcon
@@ -227,7 +242,7 @@ const LandingPage: React.FC = () => {
                     </ContentTextWrapper>
                 </ContentRow>
             </Content>
-            <ButtonContainer margin="232px 0 88px 0">
+            <ButtonContainer isBottom={true}>
                 <BlurImg src={Blurry} />
                 <ButtonWrapper>
                     <SPAAnchor href={ROUTES.Markets.Home}>

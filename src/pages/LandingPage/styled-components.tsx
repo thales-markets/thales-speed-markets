@@ -55,9 +55,19 @@ export const PurpleTriangleImg = styled.img`
     }
 `;
 
-export const BlurImg = styled.img<{ zIndex?: number }>`
+export const BlurImgWrapper = styled.div`
     position: absolute;
-    transform: scale(0.7);
+    width: 100vw;
+    overflow: clip;
+    @media screen and (max-width: ${ScreenSizeBreakpoint.EXTRA_LARGE}px) {
+    }
+    @media screen and (max-width: ${ScreenSizeBreakpoint.LARGE}px) {
+    }
+`;
+
+export const BlurImg = styled.img<{ scale?: number; zIndex?: number }>`
+    position: absolute;
+    transform: scale(${(props) => props.scale || 0.7});
     z-index: ${(props) => props.zIndex || -1};
 `;
 
@@ -121,8 +131,14 @@ export const RocketWrapper = styled.div`
     }
 `;
 
-export const RocketImg = styled.img`
-    width: 240px;
+export const VideoRocketWrapper = styled.div`
+    position: absolute;
+    right: -100px;
+    bottom: -300px;
+`;
+
+export const RocketImg = styled.img<{ width?: string }>`
+    width: ${(props) => (props.width ? props.width : '240px')};
     position: relative;
     z-index: 1;
     @media screen and (max-width: ${ScreenSizeBreakpoint.LARGE}px) {
@@ -132,11 +148,11 @@ export const RocketImg = styled.img`
 
 export const BigRocketWrapper = styled.div`
     position: absolute;
-    top: 2150px;
+    bottom: 1012px;
     right: 0;
     z-index: -1;
     @media screen and (max-width: ${ScreenSizeBreakpoint.LARGE}px) {
-        top: 2600px;
+        bottom: 600px;
     }
     @media screen and (max-width: ${ScreenSizeBreakpoint.MEDIUM}px) {
         display: none;
@@ -218,8 +234,11 @@ export const TitleDesc = styled.p`
     color: ${(props) => props.theme.textColor.primary};
 `;
 
-export const ButtonContainer = styled(FlexDivCentered)<{ margin?: string }>`
-    margin: ${(props) => (props.margin ? props.margin : '73px 0 70px 0')};
+export const ButtonContainer = styled(FlexDivCentered)<{ isBottom?: boolean }>`
+    margin: ${(props) => (props.isBottom ? '232px 0px 88px' : '73px 0 70px 0')};
+    @media screen and (max-width: ${ScreenSizeBreakpoint.LARGE}px) {
+        margin: ${(props) => (props.isBottom ? '132px 0px 88px' : '73px 0 70px 0')};
+    }
 `;
 
 export const ButtonWrapper = styled(FlexDivCentered)`
@@ -293,10 +312,28 @@ export const ContentTextDesc = styled.p`
     color: ${(props) => props.theme.textColor.primary};
 `;
 
-export const Video = styled(FlexDivCentered)`
-    height: 300px;
+export const VideoWrapper = styled(FlexDivCentered)`
+    position: relative;
+    width: 947px;
+    height: 513px;
     margin-top: 126px;
     margin-bottom: 127px;
+    background: ${(props) => props.theme.button.borderColor.primary};
+    padding: 2px;
+    border-radius: 10px;
+`;
+
+export const Video = styled(FlexDivCentered)`
+    width: 100%;
+    height: 100%;
+    background: ${(props) => props.theme.background.primary};
+    border-radius: 10px;
+`;
+
+export const CoinsImg = styled.img`
+    position: absolute;
+    top: -140px;
+    left: -190px;
 `;
 
 export const LogoText = styled.span`

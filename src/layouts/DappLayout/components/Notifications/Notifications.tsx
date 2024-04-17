@@ -134,7 +134,7 @@ const Wrapper = styled(FlexDivCentered)`
     width: 42px;
     height: inherit;
     gap: 2px;
-    background: ${(props) => props.theme.background.quaternary};
+    background: ${(props) => props.theme.button.background.secondary};
     border-radius: 24px;
 `;
 

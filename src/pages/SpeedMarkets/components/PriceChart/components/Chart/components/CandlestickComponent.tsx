@@ -18,7 +18,7 @@ export const CandlestickComponent: React.FC<{ data: any; asset: string }> = ({ d
             wickVisible: true,
             wickUpColor: Colors.GREEN,
             wickDownColor: Colors.RED,
-            priceLineColor: theme.borderColor.tertiary,
+            priceLineColor: theme.background.quaternary,
             priceLineWidth: 1,
             lastValueVisible: true,
         });
