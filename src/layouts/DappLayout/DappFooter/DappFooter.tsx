@@ -102,7 +102,7 @@ const FooterIcon = styled.i`
 `;
 
 const DescriptionWrapper = styled(FlexDivRow)`
-    padding: 10px;
+    padding: 0 10px;
 `;
 
 const Description = styled.p`
