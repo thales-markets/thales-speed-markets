@@ -40,7 +40,7 @@ const PageLinkBanner: React.FC<PageLinkBannerProps> = ({ link }) => {
 const Content = styled(FlexDivCentered)`
     position: relative;
     height: 30px;
-    background: ${(props) => props.theme.borderColor.tertiary};
+    background: ${(props) => props.theme.background.quaternary};
     border-radius: 8px;
     padding: 5px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {

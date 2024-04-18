@@ -10,7 +10,7 @@ export default {
         primary: Colors.BLACK,
         secondary: Colors.GRAY,
         tertiary: Colors.GRAY_LIGHT,
-        quaternary: Colors.PURPLE,
+        quaternary: Colors.ORANGE,
         quinary: Colors.PURPLE,
     },
     textColor: {
@@ -23,7 +23,7 @@ export default {
     borderColor: {
         primary: Colors.GRAY,
         secondary: Colors.GRAY_LIGHT,
-        tertiary: Colors.ORANGE,
+        tertiary: '',
         quaternary: Colors.PURPLE,
     },
     button: {

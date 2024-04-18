@@ -263,7 +263,7 @@ const SpeedMarkets: React.FC = () => {
                 width="80px"
                 height="30px"
                 dotSize="20px"
-                dotBackground={theme.background.quaternary}
+                dotBackground={theme.button.background.secondary}
                 borderColor={theme.borderColor.primary}
                 borderWidth="2px"
                 borderRadius="50px"

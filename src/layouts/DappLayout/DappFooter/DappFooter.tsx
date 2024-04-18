@@ -51,9 +51,9 @@ const DappFooter: React.FC = () => {
                     </TextLink>
                 </Item>
             </Items>
-            <FlexDivRow>
+            <DescriptionWrapper>
                 <Description>{t('common.footer.description')}</Description>
-            </FlexDivRow>
+            </DescriptionWrapper>
         </Container>
     );
 };
@@ -69,7 +69,8 @@ const Container = styled.div`
 `;
 
 const Items = styled(FlexDivRow)`
-    width: 585px;
+    max-width: 585px;
+    min-width: 350px;
 `;
 
 const Item = styled(FlexDivColumn)`
@@ -98,6 +99,10 @@ const FooterIcon = styled.i`
     }
     font-size: 27px;
     color: ${(props) => props.theme.textColor.primary};
+`;
+
+const DescriptionWrapper = styled(FlexDivRow)`
+    padding: 0 10px;
 `;
 
 const Description = styled.p`

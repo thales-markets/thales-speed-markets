@@ -1,5 +1,6 @@
 import BlueTriangle from 'assets/images/landing/blue-triangle.png';
 import Blurry from 'assets/images/landing/blurry.svg';
+import Coins from 'assets/images/landing/crypto-coins.png';
 import PurpleTriangle from 'assets/images/landing/purple-triangle.png';
 import Rocket from 'assets/images/landing/rocket.png';
 import Zeus from 'assets/images/landing/zeus-hero.webp';
@@ -15,32 +16,45 @@ import {
     BigRocketWrapper,
     BlueTriangleImg,
     BlurImg,
+    BlurImgWrapper,
     Button,
     ButtonContainer,
     ButtonWrapper,
+    CacheBagContentIcon,
+    ChainedContentIcon,
+    CoinsImg,
     Container,
     Content,
-    ContentIcon,
     ContentIconWrapper,
     ContentRow,
     ContentTextDesc,
     ContentTextTitle,
     ContentTextWrapper,
+    CryptoContentIcon,
+    DetectiveContentIcon,
     Header,
+    Link,
     LogoText,
     MediumBlurImg,
     PurpleTriangleImg,
     PurpleTriangleImgWrapper,
+    PythContentIcon,
     RocketImg,
     RocketWrapper,
+    SecureContentIcon,
+    SpedeContentIcon,
     SpeedLogo,
     ThalesLogo,
     Title,
     TitleDesc,
     TitleWrapper,
     Video,
+    VideoRocketWrapper,
+    VideoWrapper,
     ZeusImg,
+    ZeusImgWrapper,
 } from './styled-components';
+import { LINKS } from 'constants/links';
 
 const LandingPage: React.FC = () => {
     const { t } = useTranslation();
@@ -48,7 +62,9 @@ const LandingPage: React.FC = () => {
     return (
         <Container>
             <BlueTriangleImg src={BlueTriangle} />
-            <ZeusImg src={Zeus} />
+            <ZeusImgWrapper>
+                <ZeusImg src={Zeus} />
+            </ZeusImgWrapper>
             <RocketWrapper>
                 <MediumBlurImg src={Blurry} />
                 <RocketImg src={Rocket} />
@@ -98,12 +114,7 @@ const LandingPage: React.FC = () => {
                 </PurpleTriangleImgWrapper>
                 <ContentRow>
                     <ContentIconWrapper>
-                        <ContentIcon
-                            className="icon-home icon-home--speed-logo"
-                            fontSize="148"
-                            isRotating={true}
-                            margin="-4px -22px -18px 0px"
-                        />
+                        <SpedeContentIcon className="icon-home icon-home--speed-logo" />
                     </ContentIconWrapper>
                     <ContentTextWrapper>
                         <ContentTextTitle>{t('landing.content.title-1')}</ContentTextTitle>
@@ -120,7 +131,7 @@ const LandingPage: React.FC = () => {
                 </ContentRow>
                 <ContentRow>
                     <ContentIconWrapper>
-                        <ContentIcon className="icon-home icon-home--chained" margin="-2px -4px -14px 0px" />
+                        <ChainedContentIcon className="icon-home icon-home--chained" />
                     </ContentIconWrapper>
                     <ContentTextWrapper>
                         <ContentTextTitle>{t('landing.content.title-2')}</ContentTextTitle>
@@ -137,7 +148,7 @@ const LandingPage: React.FC = () => {
                 </ContentRow>
                 <ContentRow>
                     <ContentIconWrapper>
-                        <ContentIcon className="icon-home icon-home--any-crypto" margin="-8px -8px -20px 0px" />
+                        <CryptoContentIcon className="icon-home icon-home--any-crypto" />
                     </ContentIconWrapper>
                     <ContentTextWrapper>
                         <ContentTextTitle>{t('landing.content.title-3')}</ContentTextTitle>
@@ -152,16 +163,22 @@ const LandingPage: React.FC = () => {
                         </ContentTextDesc>
                     </ContentTextWrapper>
                 </ContentRow>
-            </Content>
-            <Video>VIDEO</Video>
-            <Content>
+
+                <VideoWrapper>
+                    <BlurImgWrapper>
+                        <BlurImg src={Blurry} scale={4.5} />
+                    </BlurImgWrapper>
+                    <CoinsImg src={Coins} />
+                    <VideoRocketWrapper>
+                        <RocketImg src={Rocket} isVideo={true} />
+                    </VideoRocketWrapper>
+
+                    <Video>VIDEO</Video>
+                </VideoWrapper>
+
                 <ContentRow>
                     <ContentIconWrapper>
-                        <ContentIcon
-                            className="icon-home icon-home--cache-bag"
-                            isBold={true}
-                            margin="0 -10px -10px 0"
-                        />
+                        <CacheBagContentIcon className="icon-home icon-home--cache-bag" />
                     </ContentIconWrapper>
                     <ContentTextWrapper>
                         <ContentTextTitle>{t('landing.content.title-4')}</ContentTextTitle>
@@ -178,7 +195,7 @@ const LandingPage: React.FC = () => {
                 </ContentRow>
                 <ContentRow>
                     <ContentIconWrapper>
-                        <ContentIcon className="icon-home icon-home--pyth" margin="-8px -15px -18px 0" />
+                        <PythContentIcon className="icon-home icon-home--pyth" />
                     </ContentIconWrapper>
                     <ContentTextWrapper>
                         <ContentTextTitle>{t('landing.content.title-5')}</ContentTextTitle>
@@ -187,7 +204,7 @@ const LandingPage: React.FC = () => {
                                 i18nKey="landing.content.text-5"
                                 components={{
                                     br: <br />,
-                                    bold: <ExtraBoldText />,
+                                    bold: <Link href={LINKS.Pyth.Benchmarks} target="_blank" rel="noreferrer" />,
                                 }}
                             />
                         </ContentTextDesc>
@@ -195,7 +212,7 @@ const LandingPage: React.FC = () => {
                 </ContentRow>
                 <ContentRow>
                     <ContentIconWrapper>
-                        <ContentIcon className="icon-home icon-home--secure" margin="-4px -6px -12px 0px" />
+                        <SecureContentIcon className="icon-home icon-home--secure" />
                     </ContentIconWrapper>
                     <ContentTextWrapper>
                         <ContentTextDesc>
@@ -211,7 +228,7 @@ const LandingPage: React.FC = () => {
                 </ContentRow>
                 <ContentRow>
                     <ContentIconWrapper>
-                        <ContentIcon className="icon-home icon-home--detective" margin="-8px -4px -18px 0px" />
+                        <DetectiveContentIcon className="icon-home icon-home--detective" />
                     </ContentIconWrapper>
                     <ContentTextWrapper>
                         <ContentTextTitle>{t('landing.content.title-7')}</ContentTextTitle>
@@ -227,7 +244,7 @@ const LandingPage: React.FC = () => {
                     </ContentTextWrapper>
                 </ContentRow>
             </Content>
-            <ButtonContainer margin="232px 0 88px 0">
+            <ButtonContainer isBottom={true}>
                 <BlurImg src={Blurry} />
                 <ButtonWrapper>
                     <SPAAnchor href={ROUTES.Markets.Home}>
