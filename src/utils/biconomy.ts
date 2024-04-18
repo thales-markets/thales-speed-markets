@@ -59,7 +59,10 @@ export const executeBiconomyTransaction = async (
         const userOp = await biconomyConnector.wallet.buildUserOp([transaction]);
         const quotes = await biconomyPaymaster.getPaymasterFeeQuotesOrData(userOp, {
             mode: PaymasterMode.ERC20,
-            preferredToken: collateral,
+            preferredToken:
+                collateral === '0x8c6f28f2F1A3C87F0f938b96d27520d9751ec8d9'
+                    ? '0x7F5c764cBc14f9669B88837ca1490cCa17c31607'
+                    : collateral,
         });
 
         console.log('quotes: ', quotes);
@@ -67,7 +70,10 @@ export const executeBiconomyTransaction = async (
         const { wait } = await biconomyConnector.wallet.sendTransaction(transaction, {
             paymasterServiceData: {
                 mode: PaymasterMode.ERC20,
-                preferredToken: collateral,
+                preferredToken:
+                    collateral === '0x8c6f28f2F1A3C87F0f938b96d27520d9751ec8d9'
+                        ? '0x7F5c764cBc14f9669B88837ca1490cCa17c31607'
+                        : collateral,
             },
         });
 
