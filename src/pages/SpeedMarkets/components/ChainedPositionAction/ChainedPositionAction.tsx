@@ -255,17 +255,18 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
 
                 const isEth = collateralAddress === ZERO_ADDRESS;
 
-                hash = isDefaultCollateral
-                    ? await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarket(
-                          [position.address, priceUpdateDataArray],
-                          {
-                              value: totalUpdateFee,
-                          }
-                      )
-                    : await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarketWithOfframp(
-                          [position.address, priceUpdateDataArray, collateralAddress, isEth],
-                          { value: totalUpdateFee }
-                      );
+                hash =
+                    isDefaultCollateral || isOverview
+                        ? await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarket(
+                              [position.address, priceUpdateDataArray],
+                              {
+                                  value: totalUpdateFee,
+                              }
+                          )
+                        : await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarketWithOfframp(
+                              [position.address, priceUpdateDataArray, collateralAddress, isEth],
+                              { value: totalUpdateFee }
+                          );
             }
 
             const txReceipt = await waitForTransactionReceipt(client as Client, {
@@ -306,9 +307,9 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 {...getDefaultButtonProps(isMobile)}
                 disabled={isSubmitting || (isOverview && !position.canResolve)}
                 additionalStyles={additionalButtonStyle}
-                backgroundColor={!isOverview ? theme.button.textColor.quaternary : undefined}
-                borderColor={theme.button.textColor.quaternary}
-                textColor={theme.button.textColor.secondary}
+                backgroundColor={isOverview ? undefined : theme.button.textColor.quaternary}
+                borderColor={isOverview ? undefined : theme.button.textColor.quaternary}
+                textColor={isOverview ? undefined : theme.button.textColor.secondary}
                 onClick={() =>
                     hasAllowance || isDefaultCollateral || isOverview ? handleResolve() : setOpenApprovalModal(true)
                 }
