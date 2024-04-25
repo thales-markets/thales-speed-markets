@@ -1,11 +1,11 @@
 import Modal from 'components/Modal';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import { FlexDiv } from 'styles/common';
 
-import { executeBiconomyTransaction, getGasFeesForTx } from 'utils/biconomy';
+import { executeBiconomyTransaction } from 'utils/biconomy';
 import { Coins, NetworkId, coinParser, formatCurrencyWithKey } from 'thales-utils';
 import { getNetworkNameByNetworkId } from 'utils/network';
 import { getErrorToastOptions, getSuccessToastOptions } from 'components/ToastMessage/ToastMessage';
@@ -30,7 +30,6 @@ const WithdrawalConfirmationModal: React.FC<WithdrawalConfirmationModalProps> = 
     onClose,
 }) => {
     const { t } = useTranslation();
-    const [gas, setGas] = useState(0);
 
     const walletClient = useWalletClient();
     const networkId = useChainId();
@@ -42,22 +41,6 @@ const WithdrawalConfirmationModal: React.FC<WithdrawalConfirmationModalProps> = 
     const parsedAmount = useMemo(() => {
         return coinParser('' + amount, network, token);
     }, [amount, network, token]);
-
-    useEffect(() => {
-        if (multipleCollateral && walletClient.data) {
-            const collateralContractWithSigner = getContract({
-                abi: multipleCollateral[token].abi,
-                address: multipleCollateral[token].addresses[networkId] as any,
-                client: walletClient.data as any,
-            }) as ViemContract;
-            getGasFeesForTx(collateralContractWithSigner?.address as string, collateralContractWithSigner, 'transfer', [
-                withdrawalAddress,
-                parsedAmount,
-            ]).then((estimateGas) => {
-                setGas(estimateGas as number);
-            });
-        }
-    }, [token, parsedAmount, withdrawalAddress, networkId, walletClient.data]);
 
     const handleSubmit = async () => {
         const id = toast.loading(t('withdraw.toast-messages.pending'));
@@ -108,7 +91,7 @@ const WithdrawalConfirmationModal: React.FC<WithdrawalConfirmationModalProps> = 
                             {formatCurrencyWithKey(token, amount)}
                             {` (${t('withdraw.confirmation-modal.withdrawal-fee')}: ${formatCurrencyWithKey(
                                 token,
-                                gas,
+                                0,
                                 4
                             )})`}
                         </ItemDescription>

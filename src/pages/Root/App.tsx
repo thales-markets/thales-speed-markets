@@ -81,7 +81,6 @@ const App = () => {
 
             const createSmartAccount = async () => {
                 const PAYMASTER_API_KEY = import.meta.env['VITE_APP_PAYMASTER_KEY_' + networkId];
-                console.log(PAYMASTER_API_KEY);
                 const smartAccount = await createSmartAccountClient({
                     signer: walletClient,
                     bundlerUrl: bundlerUrl,
@@ -89,6 +88,7 @@ const App = () => {
                 });
                 const smartAddress = await smartAccount.getAccountAddress();
                 console.log(smartAddress);
+
                 biconomyConnector.setWallet(smartAccount, smartAddress);
                 dispatch(setIsBiconomy(true));
             };

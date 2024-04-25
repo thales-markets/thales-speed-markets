@@ -459,7 +459,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             address: collateralAddress,
             client: client as Client,
         });
-        console.log(erc20Instance);
+
         const addressToApprove = isChained
             ? chainedSpeedMarketsAMMContract.addresses[networkId]
             : speedMarketsAMMContract.addresses[networkId];
