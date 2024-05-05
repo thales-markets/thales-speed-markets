@@ -9,6 +9,7 @@ import './styles/icons.css';
 import './styles/main.css';
 import './styles/sidebar-icons.css';
 import './styles/social-icons.css';
+import './styles/network-icons.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(

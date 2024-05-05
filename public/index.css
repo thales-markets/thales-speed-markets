@@ -17,3 +17,8 @@
     font-family: 'SidebarIcons';
     src: local('SidebarIcons'), url(/fonts/sidebar.ttf) format('truetype');
 }
+
+@font-face {
+    font-family: 'NetworkIcons';
+    src: local('NetworkIcons'), url(/fonts/speedmarkets.ttf) format('truetype');
+}
