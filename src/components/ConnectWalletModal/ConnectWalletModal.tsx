@@ -16,10 +16,10 @@ import { useSelector } from 'react-redux';
 import { getIsMobile } from 'redux/modules/ui';
 import { getWalletConnectModalOrigin } from 'redux/modules/wallet';
 import { RootState } from 'types/ui';
-import { getClassNameForParticalLogin, getSpecificConnectorFromConnectorsArray } from 'utils/biconomy';
 import { navigateTo } from 'utils/routes';
 import { Connector, useConnect } from 'wagmi';
 import { GradientContainer } from 'components/Common/GradientBorder';
+import { getClassNameForParticalLogin, getSpecificConnectorFromConnectorsArray } from 'utils/particleWallet/utils';
 
 ReactModal.setAppElement('#root');
 
@@ -105,7 +105,7 @@ const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({ isOpen, onClose
                                         );
                                         if (index == 0 && connector) {
                                             return (
-                                                <GradientContainer key={index}>
+                                                <GradientContainer borderRadius="30px" key={index}>
                                                     <Button
                                                         onClick={() => handleConnect(connector)}
                                                         oneButtoninRow={true}
@@ -127,7 +127,7 @@ const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({ isOpen, onClose
                                         );
                                         if (index > 0 && index < 3 && connector) {
                                             return (
-                                                <GradientContainer key={index}>
+                                                <GradientContainer borderRadius="30px" key={index}>
                                                     <Button onClick={() => handleConnect(connector)}>
                                                         <SocialIcon className={getClassNameForParticalLogin(item)} />
                                                         {item}
@@ -146,7 +146,7 @@ const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({ isOpen, onClose
                                         );
                                         if (index > 2 && index < 5 && connector) {
                                             return (
-                                                <GradientContainer key={index}>
+                                                <GradientContainer borderRadius="30px" key={index}>
                                                     <Button onClick={() => handleConnect(connector)}>
                                                         <SocialIcon className={getClassNameForParticalLogin(item)} />
                                                         {item}
@@ -253,7 +253,7 @@ const Link = styled.a`
 `;
 
 const SecondaryText = styled.p`
-    color: ${(props) => props.theme.button.textColor.secondary};
+    color: ${(props) => props.theme.button.textColor.primary};
     font-size: 13px;
     font-weight: 400;
 `;
@@ -350,7 +350,7 @@ const SocialIcon = styled.i`
 `;
 
 const Button = styled(FlexDivCentered)<{ oneButtoninRow?: boolean; active?: boolean }>`
-    border-radius: 8px;
+    border-radius: 30px;
     width: 100%;
     height: 34px;
     color: ${(props) => props.theme.textColor.primary};

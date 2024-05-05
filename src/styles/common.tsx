@@ -83,7 +83,7 @@ export const Colors = {
     RED_START: 'rgb(109, 18, 40, 0.4)',
     RED_END: 'rgb(222, 73, 109, 0)',
 
-    ORANGE: '#F7B91A',
+    ORANGE: '#E27A93',
     ORANGE_LIGHT: '#FFB866',
     ORANGE_DARK: '#FF8800',
 

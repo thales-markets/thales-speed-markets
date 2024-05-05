@@ -12,13 +12,20 @@ import Logo from '../components/Logo';
 import Notifications from '../components/Notifications';
 import ReferralModal from '../components/ReferralModal';
 import UserWallet from '../components/UserWallet';
+import NetworkSwitch from 'components/NetworkSwitch';
+import { useAccount } from 'wagmi';
+import { getIsBiconomy } from 'redux/modules/wallet';
+import GetStarted from 'pages/AARelatedPages/GetStarted';
 
 const DappHeader: React.FC = () => {
     const { t } = useTranslation();
 
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
+    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
+    const { isConnected } = useAccount();
 
     const [openReferralModal, setOpenReferralModal] = useState(false);
+    const [openGetStarted, setOpenGetStarted] = useState(false);
 
     return (
         <Container $maxWidth={getMaxWidth()}>
@@ -26,23 +33,37 @@ const DappHeader: React.FC = () => {
                 <FlexDivRow>
                     {isMobile && <Icon className="sidebar-icon icon--nav-menu" onClick={sidebarMenuClickHandler} />}
                     <Logo />
-                    <Button
-                        width="121px"
-                        height="21px"
-                        margin="0 0 0 15px"
-                        fontSize="13px"
-                        onClick={() => setOpenReferralModal(true)}
-                    >
-                        {t('common.header.refer-earn')}
-                    </Button>
+                    {isBiconomy && (
+                        <Button
+                            width="140px"
+                            height="30px"
+                            margin="10px 0"
+                            fontSize="12px"
+                            onClick={() => setOpenGetStarted(true)}
+                        >
+                            {t('common.header.get-started')}
+                        </Button>
+                    )}
                 </FlexDivRow>
                 {isMobile && <Notifications />}
             </LeftContainer>
             <RightContainer>
+                <Button width="140px" height="30px" fontSize="12px" onClick={() => setOpenReferralModal(true)}>
+                    {t('common.header.refer-earn')}
+                </Button>
                 <UserWallet />
+                <NetworkSwitch />
+                {isConnected && (
+                    <>
+                        <HeaderIcons className={`network-icon network-icon--settings`} />
+                        <HeaderIcons className={`network-icon network-icon--home`} />
+                    </>
+                )}
+
                 {!isMobile && <Notifications />}
             </RightContainer>
             {openReferralModal && <ReferralModal onClose={() => setOpenReferralModal(false)} />}
+            {openGetStarted && <GetStarted isOpen={openGetStarted} onClose={() => setOpenGetStarted(false)} />}
         </Container>
     );
 };
@@ -77,10 +98,10 @@ const Container = styled(FlexDivRowCentered)<{ $maxWidth: string }>`
     max-width: ${(props) => props.$maxWidth};
     margin-left: auto;
     margin-right: auto;
-    margin-bottom: 25px;
+    max-height: 40px;
+    margin-bottom: 6px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         flex-direction: column;
-        margin-bottom: 10px;
     }
 `;
 
@@ -95,11 +116,18 @@ const RightContainer = styled(FlexDivRowCentered)`
     @media (max-width: 500px) {
         width: 100%;
     }
+    gap: 10px;
 `;
 
 const Icon = styled.i`
     margin-right: 13px;
     font-size: 26px;
+`;
+
+const HeaderIcons = styled.i`
+    font-size: 26px;
+    color: ${(props) => props.theme.button.textColor.tertiary};
+    margin-left: 10px;
 `;
 
 export default DappHeader;

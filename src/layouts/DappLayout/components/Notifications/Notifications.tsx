@@ -119,7 +119,7 @@ const Notifications: React.FC = () => {
                         </Wrapper>
                     </Tooltip>
                 ) : (
-                    <Icon className={`icon icon--user-avatar`} />
+                    <Icon className={`network-icon network-icon--avatar`} />
                 )}
             </Container>
         </SPAAnchor>
@@ -149,7 +149,7 @@ const Number = styled.span`
 
 const Bell = styled.i`
     color: ${(props) => props.theme.background.primary};
-    font-size: 13px;
+    font-size: 18px;
     animation: shake 1s linear infinite;
 
     @keyframes shake {
@@ -169,8 +169,8 @@ const Bell = styled.i`
 `;
 
 const Icon = styled.i`
-    font-size: 22px;
-    color: ${(props) => props.theme.textColor.primary};
+    font-size: 26px;
+    color: ${(props) => props.theme.textColor.quinary};
 `;
 
 export default Notifications;

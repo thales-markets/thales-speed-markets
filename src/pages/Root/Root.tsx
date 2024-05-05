@@ -40,6 +40,9 @@ const Root: React.FC<RootProps> = ({ store }) => {
                             clientKey: 'cS3khABdBgfK4m8CzYcL1xcgVM6cuflmNY6dFxdY',
                             appId: 'aab773d8-c4e9-43ae-aa57-0d898f3dbf46',
                             language: 'en',
+                            wallet: {
+                                visible: false,
+                            },
                         }}
                     >
                         <WagmiProvider config={wagmiConfig}>

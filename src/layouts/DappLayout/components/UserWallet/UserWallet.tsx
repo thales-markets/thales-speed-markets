@@ -1,5 +1,4 @@
 import { useAccountModal } from '@rainbow-me/rainbowkit';
-import NetworkSwitch from 'components/NetworkSwitch';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -28,7 +27,6 @@ const UserWallet: React.FC = () => {
     return (
         <Container>
             <Wrapper>
-                <UserCollaterals />
                 <WalletContainer
                     $connected={isConnected}
                     onClick={() => {
@@ -54,7 +52,8 @@ const UserWallet: React.FC = () => {
                           )
                         : t('common.wallet.connect-your-wallet')}
                 </WalletContainer>
-                <NetworkSwitch />
+                {isConnected && <UserCollaterals />}
+
                 <ConnectWalletModal
                     isOpen={connectWalletModalVisibility}
                     onClose={() => {
@@ -71,7 +70,6 @@ const UserWallet: React.FC = () => {
 };
 
 const Container = styled.div`
-    width: 408px;
     z-index: 10000;
     @media (max-width: 500px) {
         width: 100%;
@@ -82,27 +80,25 @@ const Wrapper = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 1px solid ${(props) => props.theme.borderColor.secondary};
-    border-radius: 8px;
-    @media (max-width: 500px) {
-        height: 26px;
-    }
+    border: 2px solid ${(props) => props.theme.borderColor.quaternary};
+    border-radius: 20px;
+    height: 30px;
 `;
 
 const WalletContainer = styled.div<{ $connected: boolean }>`
     width: 100%;
     min-width: 120px;
     cursor: ${(props) => (props.$connected ? 'text' : 'pointer')};
-    padding: 4px 13px;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    border-left: 2px solid ${(props) => props.theme.borderColor.secondary};
-    border-right: 2px solid ${(props) => props.theme.borderColor.secondary};
-    color: ${(props) => props.theme.textColor.primary};
-    font-weight: normal;
-    font-size: 13px;
+    border-right: ${(props) => (props.$connected ? ` 2px solid ${props.theme.borderColor.quaternary}` : 'none')};
+    color: ${(props) => props.theme.textColor.quinary};
+    font-family: ${(props) => props.theme.fontFamily.secondary};
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: lowercase;
     text-align: center;
     @media (max-width: 500px) {
         min-width: fit-content;

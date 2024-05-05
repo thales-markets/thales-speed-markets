@@ -1,0 +1,47 @@
+.network-icon {
+    display: inline-block;
+    font-family: NetworkIcons !important;
+    vertical-align: middle;
+    font-size: 32px;
+    color: #ffffff;
+}
+
+.network-icon--op:before {
+    content: '\0041';
+}
+
+.network-icon--arb:before {
+    content: '\0042';
+}
+
+.network-icon--base:before {
+    content: '\0043';
+}
+
+.network-icon--polygon:before {
+    content: '\0044';
+}
+
+.network-icon--zk:before {
+    content: '\0045';
+}
+
+.network-icon--settings:before {
+    content: '\0064';
+}
+
+.network-icon--home:before {
+    content: '\0065';
+}
+
+.network-icon--avatar:before {
+    content: '\0066';
+}
+
+.network-icon--minus:before {
+    content: '\0069';
+}
+
+.network-icon--plus:before {
+    content: '\006A';
+}

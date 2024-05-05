@@ -26,10 +26,6 @@ import { useChainId, useConnect, useDisconnect, useSwitchChain, useWalletClient 
 import enTranslation from '../../i18n/en.json';
 import biconomyConnector from 'utils/biconomyWallet';
 import { setIsBiconomy } from 'redux/modules/wallet';
-
-import Deposit from 'pages/AARelatedPages/Deposit';
-import Withdraw from 'pages/AARelatedPages/Withdraw';
-import GetStarted from 'pages/AARelatedPages/GetStarted';
 import { particleWagmiWallet } from 'utils/particleWallet/particleWagmiWallet';
 import { useConnect as useParticleConnect } from '@particle-network/auth-core-modal';
 import {
@@ -182,29 +178,6 @@ const App = () => {
                             </Suspense>
                         </Route>
                     )}
-
-                    <Route exact path={ROUTES.Deposit}>
-                        <Suspense fallback={<Loader />}>
-                            <DappLayout>
-                                <Deposit />
-                            </DappLayout>
-                        </Suspense>
-                    </Route>
-
-                    <Route exact path={ROUTES.Withdraw}>
-                        <Suspense fallback={<Loader />}>
-                            <DappLayout>
-                                <Withdraw />
-                            </DappLayout>
-                        </Suspense>
-                    </Route>
-                    <Route exact path={ROUTES.Wizard}>
-                        <Suspense fallback={<Loader />}>
-                            <DappLayout>
-                                <GetStarted />
-                            </DappLayout>
-                        </Suspense>
-                    </Route>
 
                     <Route>
                         <Redirect to={ROUTES.Markets.SpeedMarkets} />

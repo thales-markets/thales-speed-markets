@@ -52,7 +52,7 @@ const Modal: React.FC<ModalProps> = ({ title, onClose, children, shouldCloseOnOv
 };
 
 const Container = styled.div`
-    border: 1px solid ${(props) => props.theme.borderColor.secondary};
+    border: 2px solid ${(props) => props.theme.borderColor.secondary};
     background: ${(props) => props.theme.background.primary};
     padding: 20px;
     border-radius: 8px;

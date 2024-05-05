@@ -7,7 +7,6 @@ import { toast } from 'react-toastify';
 import { getIsAppReady } from 'redux/modules/app';
 import styled from 'styled-components';
 import { FlexDiv } from 'styles/common';
-import { getOnRamperUrl } from 'utils/biconomy';
 import { getNetworkNameByNetworkId } from 'utils/network';
 import {
     BalanceSection,
@@ -38,6 +37,7 @@ import { COLLATERALS } from 'constants/currency';
 import CollateralDropdown from './components/CollateralDropdown';
 import { GradientContainer } from 'components/Common/GradientBorder';
 import Button from 'components/Button';
+import { getOnRamperUrl } from 'utils/particleWallet/utils';
 
 const Deposit: React.FC = () => {
     const { t } = useTranslation();
@@ -305,7 +305,7 @@ const WalletAddressInput = styled.input`
     border-radius: 5px;
     color: ${(props) => props.theme.input.textColor.primary};
     background-color: ${(props) => props.theme.background.primary};
-    border: 1px solid ${(props) => props.theme.background.secondary};
+    border: 2px solid ${(props) => props.theme.background.secondary};
 `;
 
 const QRIcon = styled.i`

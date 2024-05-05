@@ -140,10 +140,8 @@ const UserCollaterals: React.FC = () => {
                                 : onCollateralClickHandler(collateral.name))
                         }
                     >
-                        {assetIcon(collateral.name)}
-                        <BalanceTextWrapper>
-                            <BalanceText>{formatCurrencyWithKey(collateral.name, collateral.balance, 2)}</BalanceText>
-                        </BalanceTextWrapper>
+                        <BalanceText>{formatCurrencyWithKey(collateral.name, collateral.balance, 2)}</BalanceText>
+
                         {isConnected && isMultiCollateralSupported && (
                             <Icon className={isDropdownOpen ? `icon icon--caret-up` : `icon icon--caret-down`} />
                         )}
@@ -157,9 +155,8 @@ const UserCollaterals: React.FC = () => {
                                     onClick={() => onCollateralClickHandler(coin.name)}
                                 >
                                     {assetIcon(coin.name)}
-                                    <BalanceTextWrapper>
-                                        <BalanceText>{formatCurrencyWithKey(coin.name, coin.balance)}</BalanceText>
-                                    </BalanceTextWrapper>
+
+                                    <BalanceText>{formatCurrencyWithKey(coin.name, coin.balance)}</BalanceText>
                                 </BalanceWrapper>
                             ))}
                         </Dropdown>
@@ -177,7 +174,7 @@ const Container = styled.div`
 const Wrapper = styled(FlexDivRow)`
     position: relative;
     display: flex;
-    width: 150px;
+
     @media (max-width: 500px) {
         min-width: 124px;
         width: 100%;
@@ -187,12 +184,12 @@ const Wrapper = styled(FlexDivRow)`
 const SwapWrapper = styled.div<{ $clickable: boolean }>`
     display: flex;
     align-items: center;
+    justify-content: center;
+    gap: 8px;
     width: 100%;
+    width: 120px;
+    height: 12px;
     cursor: ${(props) => (props.$clickable ? 'pointer' : 'default')};
-    padding: 4px 13px;
-    @media (max-width: 500px) {
-        padding: 4px 7px;
-    }
 `;
 
 const Dropdown = styled.div`
@@ -227,22 +224,19 @@ const BalanceWrapper = styled.div<{ $clickable: boolean }>`
     }
 `;
 
-const BalanceTextWrapper = styled.div`
-    text-align: center;
-    margin: auto;
-`;
-
 const BalanceText = styled.span`
-    font-size: 13px;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.quinary};
+    font-family: ${(props) => props.theme.fontFamily.secondary};
+    font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
 `;
 
 const AssetIconStyle = { width: '16px', height: '16px', marginRight: '5px' };
 
 const Icon = styled.i`
-    margin-left: auto;
     font-size: 10px;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.quinary};
 `;
 
 export default UserCollaterals;

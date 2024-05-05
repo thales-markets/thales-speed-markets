@@ -1,11 +1,5 @@
-import ArbitrumLogo from 'assets/images/arbitrum-circle-logo.svg?react';
-import BaseLogo from 'assets/images/base-circle-logo.svg?react';
-import OpLogo from 'assets/images/optimism-circle-logo.svg?react';
-import PolygonLogo from 'assets/images/polygon-circle-logo.svg?react';
-import ZkSyncLogo from 'assets/images/zksync-circle-logo.svg?react';
 import { SUPPORTED_NETWORKS, SUPPORTED_NETWORKS_PARAMS } from 'constants/network';
 import ROUTES from 'constants/routes';
-import { FunctionComponent, SVGProps } from 'react';
 import { NetworkId } from 'thales-utils';
 import { NetworkParams, SupportedNetwork } from '../types/network';
 import { getCollaterals } from './currency';
@@ -56,7 +50,7 @@ const changeNetwork = async (network: NetworkParams, callback: VoidFunction): Pr
 
 type DropdownNetwork = {
     name: string;
-    icon: FunctionComponent<SVGProps<SVGSVGElement>>;
+    icon: string;
     changeNetwork: (networkId: number, callback: VoidFunction) => Promise<void>;
     order: number;
 };
@@ -64,7 +58,7 @@ type DropdownNetwork = {
 export const SUPPORTED_NETWORK_IDS_MAP: Record<number, DropdownNetwork> = {
     [NetworkId.OptimismMainnet]: {
         name: 'Optimism',
-        icon: OpLogo,
+        icon: 'network-icon network-icon--op',
         changeNetwork: async (networkId: number, callback: VoidFunction) => {
             await changeNetwork(SUPPORTED_NETWORKS_PARAMS[networkId], callback);
         },
@@ -72,7 +66,7 @@ export const SUPPORTED_NETWORK_IDS_MAP: Record<number, DropdownNetwork> = {
     },
     [NetworkId.PolygonMainnet]: {
         name: 'Polygon',
-        icon: PolygonLogo,
+        icon: 'network-icon network-icon--polygon',
         changeNetwork: async (networkId: number, callback: VoidFunction) => {
             await changeNetwork(SUPPORTED_NETWORKS_PARAMS[networkId], callback);
         },
@@ -80,7 +74,7 @@ export const SUPPORTED_NETWORK_IDS_MAP: Record<number, DropdownNetwork> = {
     },
     [NetworkId.Arbitrum]: {
         name: 'Arbitrum',
-        icon: ArbitrumLogo,
+        icon: 'network-icon network-icon--arb',
         changeNetwork: async (networkId: number, callback: VoidFunction) => {
             await changeNetwork(SUPPORTED_NETWORKS_PARAMS[networkId], callback);
         },
@@ -88,7 +82,7 @@ export const SUPPORTED_NETWORK_IDS_MAP: Record<number, DropdownNetwork> = {
     },
     [NetworkId.Base]: {
         name: 'Base',
-        icon: BaseLogo,
+        icon: 'network-icon network-icon--base',
         changeNetwork: async (networkId: number, callback: VoidFunction) => {
             await changeNetwork(SUPPORTED_NETWORKS_PARAMS[networkId], callback);
         },
@@ -96,7 +90,7 @@ export const SUPPORTED_NETWORK_IDS_MAP: Record<number, DropdownNetwork> = {
     },
     [NetworkId.ZkSync]: {
         name: 'ZkSync',
-        icon: ZkSyncLogo,
+        icon: 'network-icon network-icon--zk',
         changeNetwork: async (networkId: number, callback: VoidFunction) => {
             await changeNetwork(SUPPORTED_NETWORKS_PARAMS[networkId], callback);
         },

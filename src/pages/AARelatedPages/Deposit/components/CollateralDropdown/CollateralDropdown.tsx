@@ -60,7 +60,7 @@ const Container = styled.div`
     justify-content: flex-start;
     padding: 7px;
     border-radius: 8px;
-    border: 1px solid ${(props) => props.theme.background.secondary};
+    border: 2px solid ${(props) => props.theme.background.secondary};
     color: ${(props) => props.theme.textColor.primary};
     font-family: ${(props) => props.theme.fontFamily.tertiary};
     position: relative;
@@ -82,7 +82,7 @@ const DropdownContainer = styled.div`
     padding: 20px;
 
     border-radius: 8px;
-    border: 1px solid ${(props) => props.theme.background.secondary};
+    border: 2px solid ${(props) => props.theme.background.secondary};
     width: 400px;
     background: ${(props) => props.theme.background.primary};
 `;

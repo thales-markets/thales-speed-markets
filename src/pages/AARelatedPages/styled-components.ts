@@ -68,7 +68,7 @@ export const CollateralContainer = styled.div`
     width: 100%;
     margin-left: auto;
     border-radius: 8px;
-    border: 1px solid ${(props) => props.theme.background.secondary};
+    border: 2px solid ${(props) => props.theme.background.secondary};
     padding: 8px 0;
     max-height: 34px;
     align-items: center;

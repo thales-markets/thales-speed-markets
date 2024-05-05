@@ -13,8 +13,39 @@ import { getIsBiconomy } from 'redux/modules/wallet';
 import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
 import { GetStartedStep } from 'enums/wizard';
+import ReactModal from 'react-modal';
+import OutsideClick from 'components/OutsideClick';
 
-const GetStarted: React.FC = () => {
+ReactModal.setAppElement('#root');
+
+const defaultStyle = {
+    content: {
+        top: '50%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        padding: '2px',
+        background: 'linear-gradient(90deg, #a764b7 0%, #169cd2 100%)',
+        width: '720px',
+        borderRadius: '15px',
+        marginRight: '-50%',
+        transform: 'translate(-50%, -50%)',
+        overflow: 'none',
+        height: 'auto',
+        border: 'none',
+    },
+    overlay: {
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        zIndex: 200,
+    },
+};
+
+type GetStartedProps = {
+    isOpen: boolean;
+    onClose: () => void;
+};
+
+const GetStarted: React.FC<GetStartedProps> = ({ isOpen, onClose }) => {
     const { t } = useTranslation();
     const networkId = useChainId();
     const { address: walletAddress, isConnected: isWalletConnected } = useAccount();
@@ -73,36 +104,45 @@ const GetStarted: React.FC = () => {
     }, [isWalletConnected, totalBalanceValue]);
 
     return (
-        <Container>
-            <Title>{t('get-started.title')}</Title>
-            <ProgressDisplayWrapper>
-                {steps.map((step, index) => {
-                    return <ProgressBar key={`progress-${index}`} selected={step <= currentStep} />;
-                })}
-            </ProgressDisplayWrapper>
-            {steps.map((step, index) => {
-                const stepNumber = index + 1;
-                return (
-                    <React.Fragment key={index}>
-                        <Step
-                            stepNumber={stepNumber}
-                            stepType={step}
-                            currentStep={currentStep}
-                            setCurrentStep={setCurrentStep}
-                            hasFunds={totalBalanceValue > 0}
-                        />
-                        {stepNumber !== steps.length && <HorizontalLine />}
-                    </React.Fragment>
-                );
-            })}
-        </Container>
+        <ReactModal isOpen={isOpen} shouldCloseOnOverlayClick={true} style={defaultStyle}>
+            <OutsideClick onOutsideClick={onClose}>
+                <Container>
+                    <CloseIconContainer>
+                        <CloseIcon onClick={onClose} />
+                    </CloseIconContainer>
+                    <Title>{t('get-started.title')}</Title>
+                    <ProgressDisplayWrapper>
+                        {steps.map((step, index) => {
+                            return <ProgressBar key={`progress-${index}`} selected={step <= currentStep} />;
+                        })}
+                    </ProgressDisplayWrapper>
+                    {steps.map((step, index) => {
+                        const stepNumber = index + 1;
+                        return (
+                            <React.Fragment key={index}>
+                                <Step
+                                    stepNumber={stepNumber}
+                                    stepType={step}
+                                    currentStep={currentStep}
+                                    setCurrentStep={setCurrentStep}
+                                    hasFunds={totalBalanceValue > 0}
+                                />
+                                {stepNumber !== steps.length && <HorizontalLine />}
+                            </React.Fragment>
+                        );
+                    })}
+                </Container>
+            </OutsideClick>
+        </ReactModal>
     );
 };
 
 const Container = styled(FlexDivColumn)`
-    margin-bottom: 40px;
     max-width: 900px;
     width: 100%;
+    background-color: ${(props) => props.theme.background.primary};
+    border-radius: 15px;
+    padding: 25px;
 `;
 
 const Title = styled(FlexDivStart)`
@@ -110,11 +150,7 @@ const Title = styled(FlexDivStart)`
     font-size: 20px;
     line-height: 24px;
     color: ${(props) => props.theme.textColor.primary};
-    margin-top: 20px;
-    margin-bottom: 40px;
-    @media (max-width: 950px) {
-        margin: 20px auto;
-    }
+    margin: auto;
 `;
 
 const ProgressDisplayWrapper = styled(FlexDiv)`
@@ -126,7 +162,7 @@ const ProgressDisplayWrapper = styled(FlexDiv)`
 `;
 
 const ProgressBar = styled(FlexDiv)<{ selected?: boolean }>`
-    height: 10px;
+    height: 6px;
     width: 32%;
     border-radius: 10px;
     background: ${(props) =>
@@ -138,6 +174,24 @@ const HorizontalLine = styled.hr`
     border: 1.5px solid ${(props) => props.theme.borderColor.secondary};
     background: ${(props) => props.theme.background.tertiary};
     border-radius: 3px;
+`;
+
+const CloseIconContainer = styled(FlexDiv)`
+    justify-content: flex-end;
+`;
+
+const CloseIcon = styled.i`
+    font-size: 16px;
+    margin-top: 1px;
+    cursor: pointer;
+    &:before {
+        font-family: Icons !important;
+        content: '\\0042';
+        color: ${(props) => props.theme.textColor.primary};
+    }
+    @media (max-width: 575px) {
+        padding: 15px;
+    }
 `;
 
 export default GetStarted;

@@ -63,7 +63,7 @@ export default {
             quaternary: Colors.RED,
         },
         borderColor: {
-            primary: Colors.WHITE,
+            primary: Colors.PURPLE,
             focus: {
                 primary: Colors.PURPLE,
             },
@@ -91,6 +91,8 @@ export default {
     icon: {
         background: {
             primary: Colors.WHITE,
+            secondary: Colors.BLACK,
+            tertiary: Colors.PURPLE,
         },
         textColor: {
             primary: `linear-gradient(180deg, ${Colors.PURPLE_DARK_2} 0%, ${Colors.BLUE_DEEP_SKY_2} 100%)`,
@@ -143,8 +145,8 @@ export default {
         },
     },
     positionColor: {
-        up: Colors.GREEN,
-        down: Colors.RED,
+        up: Colors.PURPLE,
+        down: Colors.PURPLE,
     },
     toastMessages: {
         success: {
