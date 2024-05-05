@@ -89,7 +89,7 @@
             "wallet-options": "Wallet options",
             "disclaimer-info": "By connecting a wallet you agree to Thales DAO <terms>Terms of Use</terms> and Privacy Policy and acknowledge that you have read and understand the Thales DAO protocol <disclaimer>disclaimer</disclaimer>",
             "balance": "Wallet balance",
-            "connect-wallet-modal-title": "Sign Up to speeddmarkets",
+            "connect-wallet-modal-title": "Sign Up to speed markets",
             "connect-with-wallet": "Connect with wallet",
             "or-connect-with": "Or"
         },
@@ -126,6 +126,7 @@
         },
         "header": {
             "refer-earn": "Refer & earn",
+            "get-started": "Get started",
             "notification": { "tooltip": "You have {{count}} claimable position(s)" }
         },
         "footer": {
@@ -225,8 +226,9 @@
         "steps": {
             "choose-asset": "Asset",
             "choose-direction": "Direction",
-            "choose-time": "Time",
-            "enter-buyin": "Amount"
+            "choose-direction-sub": "(You can add up to 6 chained positions for bigger profit)",
+            "choose-time": "Duration",
+            "enter-buyin": "Trade size"
         },
         "amm-trading": {
             "asset-price": "If {{asset}} price is",
