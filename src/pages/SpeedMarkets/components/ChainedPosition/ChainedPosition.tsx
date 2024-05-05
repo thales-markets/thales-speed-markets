@@ -23,7 +23,7 @@ import { isUserWinner } from 'utils/speedAmm';
 import { getColorPerPosition } from 'utils/style';
 import { useChainId } from 'wagmi';
 import ChainedPositionAction from '../ChainedPositionAction';
-import { AssetIcon, Icon, PositionSymbolDown, PositionSymbolUp } from '../SelectPosition/styled-components';
+import { AssetIcon, Icon, PositionsSymbol } from '../SelectPosition/styled-components';
 
 type ChainedPositionProps = {
     position: ChainedSpeedMarket;
@@ -231,13 +231,13 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                                         </Chain>
                                     )}
                                     {side === Positions.UP ? (
-                                        <PositionSymbolUp size={30} $isSelected>
+                                        <PositionsSymbol size={30} $isSelected>
                                             <Icon size={16} className="icon icon--caret-up" />
-                                        </PositionSymbolUp>
+                                        </PositionsSymbol>
                                     ) : (
-                                        <PositionSymbolDown size={30} $isSelected>
+                                        <PositionsSymbol size={30} $isSelected>
                                             <Icon size={16} className="icon icon--caret-down" />
-                                        </PositionSymbolDown>
+                                        </PositionsSymbol>
                                     )}
                                     <Text fontWeight={400} lineHeight="14px" padding="1px 0 0 0">
                                         {formatShortDate(positionWithPrices.strikeTimes[index])}

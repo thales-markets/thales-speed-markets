@@ -2,7 +2,7 @@ import { ScreenSizeBreakpoint } from 'enums/ui';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
-import { getSynthAsset, getSynthName } from 'utils/currency';
+import { getSynthAsset } from 'utils/currency';
 
 type SelectAssetProps = {
     selectedAsset: string;
@@ -37,7 +37,6 @@ const SelectAsset: React.FC<SelectAssetProps> = ({ selectedAsset, allAssets, onC
                             />
                         </IconWrapper>
                         <AssetName>{getSynthAsset(currentAsset)}</AssetName>
-                        <AssetFullName>{getSynthName(currentAsset)}</AssetFullName>
                     </Asset>
                 );
             })}
@@ -46,25 +45,25 @@ const SelectAsset: React.FC<SelectAssetProps> = ({ selectedAsset, allAssets, onC
 };
 
 const Container = styled(FlexDivCentered)`
-    gap: 15px;
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        gap: 10px;
-    }
+    gap: 10px;
 `;
 
-const Asset = styled(FlexDivCentered)<{ $isSelected: boolean }>`
-    width: 190px;
-    height: 36px;
+const Asset = styled.div<{ $isSelected: boolean }>`
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    padding-left: 15px;
+    width: 165px;
+    height: 40px;
     border-radius: 8px;
-    ${(props) => (props.$isSelected ? '' : `border: 1px solid ${props.theme.button.borderColor.tertiary};`)}
+    ${(props) => (props.$isSelected ? '' : `border: 2px solid ${props.theme.button.borderColor.secondary};`)}
     background: ${(props) =>
         props.$isSelected ? props.theme.button.background.secondary : props.theme.button.background.primary};
     color: ${(props) =>
-        props.$isSelected ? props.theme.button.textColor.secondary : props.theme.button.textColor.primary};
+        props.$isSelected ? props.theme.button.textColor.secondary : props.theme.button.textColor.tertiary};
     cursor: pointer;
     font-size: 18px;
     line-height: 90%;
-    padding-left: 1px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         width: 160px;
         font-size: 16px;
@@ -81,24 +80,21 @@ const IconWrapper = styled.div`
 `;
 
 const AssetIcon = styled.i<{ $isSelected: boolean }>`
-    font-size: 28px;
+    font-size: 24px;
     line-height: 100%;
-    ${(props) => (props.$isSelected ? `background: ${props.theme.icon.background.primary};` : '')};
-    ${(props) => (props.$isSelected ? `color: ${props.theme.icon.textColor.secondary};` : '')};
-    ${(props) => (props.$isSelected ? 'border-radius: 50%;' : '')};
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        font-size: 24px;
-    }
+    border-radius: 50%;
+    background: ${(props) =>
+        props.$isSelected ? props.theme.icon.textColor.tertiary : props.theme.icon.textColor.secondary};
+    color: ${(props) =>
+        props.$isSelected ? props.theme.icon.textColor.secondary : props.theme.icon.textColor.tertiary};
 `;
 
 const AssetName = styled.p`
-    font-weight: 700;
-    text-transform: uppercase;
-`;
-
-const AssetFullName = styled.p`
-    font-weight: 400;
-    margin-left: 4px;
+    font-family: ${(props) => props.theme.fontFamily.tertiary};
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 100%; /* 18px */
     text-transform: uppercase;
 `;
 

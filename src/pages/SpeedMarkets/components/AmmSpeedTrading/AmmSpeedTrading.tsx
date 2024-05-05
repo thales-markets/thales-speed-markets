@@ -1,17 +1,13 @@
 import PythInterfaceAbi from '@pythnetwork/pyth-sdk-solidity/abis/IPyth.json';
 import ApprovalModal from 'components/ApprovalModal';
 import Button from 'components/Button';
-import CollateralSelector from 'components/CollateralSelector';
 import {
     getDefaultToastContent,
     getErrorToastOptions,
     getLoadingToastOptions,
     getSuccessToastOptions,
 } from 'components/ToastMessage/ToastMessage';
-import Tooltip from 'components/Tooltip/Tooltip';
-import NumericInput from 'components/fields/NumericInput';
-// import { PLAUSIBLE, PLAUSIBLE_KEYS } from 'constants/analytics';
-import { CRYPTO_CURRENCY_MAP, USD_SIGN } from 'constants/currency';
+import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
 import {
     ALTCOIN_CONVERSION_BUFFER_PERCENTAGE,
     POSITIONS_TO_SIDE_MAP,
@@ -30,7 +26,7 @@ import useExchangeRatesQuery, { Rates } from 'queries/rates/useExchangeRatesQuer
 import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipleCollateralBalanceQuery';
 import useStableBalanceQuery from 'queries/walletBalances/useStableBalanceQuery';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsAppReady } from 'redux/modules/app';
@@ -44,9 +40,6 @@ import {
     bigNumberFormatter,
     ceilNumberToDecimals,
     coinParser,
-    formatCurrencyWithKey,
-    formatCurrencyWithSign,
-    formatPercentage,
     truncToDecimals,
 } from 'thales-utils';
 import { AmmChainedSpeedMarketsLimits, AmmSpeedMarketsLimits } from 'types/market';
@@ -57,7 +50,7 @@ import chainedSpeedMarketsAMMContract from 'utils/contracts/chainedSpeedMarketsA
 import erc20Contract from 'utils/contracts/collateralContract';
 import multipleCollateral from 'utils/contracts/multipleCollateralContract';
 import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
-import { getCoinBalance, getCollateral, getCollaterals, getDefaultCollateral, isStableCurrency } from 'utils/currency';
+import { getCoinBalance, getCollateral, getDefaultCollateral, isStableCurrency } from 'utils/currency';
 import { checkAllowance, getIsMultiCollateralSupported } from 'utils/network';
 import { getPriceId, getPriceServiceEndpoint } from 'utils/pyth';
 import { refetchBalances, refetchSpeedMarketsLimits, refetchUserSpeedMarkets } from 'utils/queryConnector';
@@ -71,6 +64,7 @@ import { SelectedPosition } from '../SelectPosition/SelectPosition';
 import { executeBiconomyTransaction } from 'utils/biconomy';
 import biconomyConnector from 'utils/biconomyWallet';
 import { PLAUSIBLE, PLAUSIBLE_KEYS } from 'constants/analytics';
+import { GradientContainer } from 'components/Common/GradientBorder';
 
 type AmmSpeedTradingProps = {
     isChained: boolean;
@@ -96,7 +90,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     strikeTimeSec,
     deltaTimeSec,
     selectedStableBuyinAmount,
-    setSelectedStableBuyinAmount,
     ammSpeedMarketsLimits,
     ammChainedSpeedMarketsLimits,
     currentPrice,
@@ -146,15 +139,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         !hasAllowance ||
         !!errorMessageKey ||
         outOfLiquidity;
-
-    const isButtonBuyAvailable =
-        isConnected &&
-        isPositionSelected &&
-        !!(strikeTimeSec || deltaTimeSec) &&
-        isPaidAmountEntered &&
-        !outOfLiquidityPerDirection &&
-        !outOfLiquidity &&
-        hasAllowance;
 
     const chainedQuote =
         isChained && ammChainedSpeedMarketsLimits
@@ -699,14 +683,14 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     const getSubmitButton = () => {
         if (!isConnected) {
             return (
-                <Button onClick={() => dispatch(setWalletConnectModalVisibility({ visibility: true }))}>
+                <Button height="40px" onClick={() => dispatch(setWalletConnectModalVisibility({ visibility: true }))}>
                     {t('common.wallet.connect-your-wallet')}
                 </Button>
             );
         }
         if (isMintAvailable) {
             return (
-                <Button onClick={handleMint}>
+                <Button height="40px" onClick={handleMint}>
                     {isSubmitting ? t('common.mint.progress-label') : t('common.mint.label')}
                     <CollateralText>&nbsp;{selectedCollateral}</CollateralText>
                     {isSubmitting ? '...' : ''}
@@ -715,7 +699,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         }
         if (!isPositionSelected) {
             return (
-                <Button disabled={true}>
+                <Button height="40px" disabled={true}>
                     {isChained
                         ? t('speed-markets.chained.errors.choose-directions')
                         : t('speed-markets.amm-trading.choose-direction')}
@@ -723,20 +707,36 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             );
         }
         if (!(strikeTimeSec || deltaTimeSec)) {
-            return <Button disabled={true}>{t('speed-markets.amm-trading.choose-time')}</Button>;
+            return (
+                <Button height="40px" disabled={true}>
+                    {t('speed-markets.amm-trading.choose-time')}
+                </Button>
+            );
         }
         if (!isPaidAmountEntered) {
-            return <Button disabled={true}>{t('common.enter-amount')}</Button>;
+            return (
+                <Button height="40px" disabled={true}>
+                    {t('common.enter-amount')}
+                </Button>
+            );
         }
         if (outOfLiquidityPerDirection) {
-            return <Button disabled={true}>{t('speed-markets.errors.out-of-liquidity-direction')}</Button>;
+            return (
+                <Button height="40px" disabled={true}>
+                    {t('speed-markets.errors.out-of-liquidity-direction')}
+                </Button>
+            );
         }
         if (outOfLiquidity) {
-            return <Button disabled={true}>{t('common.errors.out-of-liquidity')}</Button>;
+            return (
+                <Button height="40px" disabled={true}>
+                    {t('common.errors.out-of-liquidity')}
+                </Button>
+            );
         }
         if (!hasAllowance) {
             return (
-                <Button disabled={isAllowing} onClick={() => setOpenApprovalModal(true)}>
+                <Button height="40px" disabled={isAllowing} onClick={() => setOpenApprovalModal(true)}>
                     {isAllowing
                         ? t('common.enable-wallet-access.approve-progress')
                         : t('common.enable-wallet-access.approve')}
@@ -753,230 +753,50 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         );
     };
 
-    const onMaxClick = () => {
-        if (collateralBalance > 0 && totalFee) {
-            const maxWalletAmount =
-                selectedCollateral === defaultCollateral
-                    ? Number(truncToDecimals(collateralBalance / (1 + totalFee)))
-                    : isStableCurrency(selectedCollateral)
-                    ? Number(
-                          truncToDecimals(collateralBalance / (1 + totalFee + STABLECOIN_CONVERSION_BUFFER_PERCENTAGE))
-                      )
-                    : Number(truncToDecimals(collateralBalance / (1 + totalFee), 18));
-
-            let maxLiquidity, maxLiquidityPerDirection: number;
-            if (isChained) {
-                maxLiquidity =
-                    ammChainedSpeedMarketsLimits !== undefined
-                        ? Number(ammChainedSpeedMarketsLimits?.risk.max) -
-                          Number(ammChainedSpeedMarketsLimits?.risk.current)
-                        : Infinity;
-                maxLiquidityPerDirection = Infinity;
-            } else {
-                const riskPerAsset = ammSpeedMarketsLimits?.risksPerAssetAndDirection.filter(
-                    (data) => data.currency === currencyKey
-                )[0];
-                maxLiquidity = riskPerAsset !== undefined ? riskPerAsset.max - riskPerAsset.current : Infinity;
-
-                const riskPerAssetAndDirection = ammSpeedMarketsLimits?.risksPerAssetAndDirection.filter(
-                    (data) => data.currency === currencyKey && data.position === Positions.UP
-                )[0];
-                maxLiquidityPerDirection =
-                    riskPerAssetAndDirection !== undefined
-                        ? riskPerAssetAndDirection.max - riskPerAssetAndDirection.current
-                        : Infinity;
-            }
-
-            const maxPaidAmount = Math.floor(
-                Math.min(maxBuyinAmount, maxWalletAmount, maxLiquidity, maxLiquidityPerDirection)
-            );
-            setPaidAmount(maxPaidAmount);
-            setSelectedStableBuyinAmount(Math.min(maxPaidAmount, convertToStable(maxWalletAmount)));
-        }
-    };
-
     const getTradingDetails = () => {
         return (
-            <TradingDetailsContainer>
-                <TradingDetailsSentence
-                    currencyKey={currencyKey}
-                    maturityDate={secondsToMilliseconds(strikeTimeSec)}
-                    deltaTimeSec={deltaTimeSec}
-                    market={{
-                        address: 'Any',
-                        strikePrice: submittedStrikePrice ? submittedStrikePrice : currentPrice,
-                        positionType: isChained ? undefined : positionType,
-                        chainedPositions: isChained ? chainedPositions : undefined,
-                    }}
-                    isFetchingQuote={false}
-                    priceProfit={(isChained ? chainedQuote : SPEED_MARKETS_QUOTE) - 1}
-                    paidAmount={selectedStableBuyinAmount || convertToStable(Number(paidAmount))}
-                    hasCollateralConversion={selectedCollateral !== defaultCollateral}
-                />
-                {!isChained && (
-                    <ShareIcon
-                        className="icon-home icon-home--twitter-x"
-                        disabled={isButtonDisabled}
-                        onClick={() => !isButtonDisabled && setOpenTwitterShareModal(true)}
+            <GradientContainer width={640}>
+                <TradingDetailsContainer>
+                    <TradingDetailsSentence
+                        currencyKey={currencyKey}
+                        maturityDate={secondsToMilliseconds(strikeTimeSec)}
+                        deltaTimeSec={deltaTimeSec}
+                        market={{
+                            address: 'Any',
+                            strikePrice: submittedStrikePrice ? submittedStrikePrice : currentPrice,
+                            positionType: isChained ? undefined : positionType,
+                            chainedPositions: isChained ? chainedPositions : undefined,
+                        }}
+                        isFetchingQuote={false}
+                        priceProfit={(isChained ? chainedQuote : SPEED_MARKETS_QUOTE) - 1}
+                        paidAmount={selectedStableBuyinAmount || convertToStable(Number(paidAmount))}
+                        hasCollateralConversion={selectedCollateral !== defaultCollateral}
                     />
-                )}
-            </TradingDetailsContainer>
+                    {!isChained && (
+                        <ShareIcon
+                            className="icon-home icon-home--twitter-x"
+                            disabled={isButtonDisabled}
+                            onClick={() => !isButtonDisabled && setOpenTwitterShareModal(true)}
+                        />
+                    )}
+                </TradingDetailsContainer>
+            </GradientContainer>
         );
     };
 
     const inputWrapperRef = useRef<HTMLDivElement>(null);
-
-    const dynamicFeesTooltipData =
-        !isChained && ammSpeedMarketsLimits && ammSpeedMarketsLimits?.lpFees.length > 4
-            ? {
-                  firstPerc: formatPercentage(
-                      ammSpeedMarketsLimits?.lpFees[0] + ammSpeedMarketsLimits?.safeBoxImpact,
-                      0
-                  ),
-                  secondPerc: formatPercentage(
-                      ammSpeedMarketsLimits?.lpFees[1] + ammSpeedMarketsLimits?.safeBoxImpact,
-                      0
-                  ),
-                  thirdPerc: formatPercentage(
-                      ammSpeedMarketsLimits?.lpFees[3] + ammSpeedMarketsLimits?.safeBoxImpact,
-                      0
-                  ),
-                  fourthPerc: formatPercentage(
-                      ammSpeedMarketsLimits?.lpFees[4] + ammSpeedMarketsLimits?.safeBoxImpact,
-                      0
-                  ),
-                  firstTime: ammSpeedMarketsLimits?.timeThresholdsForFees[0],
-                  secondTime: ammSpeedMarketsLimits?.timeThresholdsForFees[1],
-                  thirdTime: ammSpeedMarketsLimits?.timeThresholdsForFees[3],
-                  fourthTime: ammSpeedMarketsLimits?.timeThresholdsForFees[4],
-                  maxSkewImpact: formatPercentage(ammSpeedMarketsLimits?.maxSkewImpact, 0),
-              }
-            : {};
 
     return (
         <Container $isChained={isChained}>
             {!isMobile && getTradingDetails()}
             <FinalizeTrade>
                 <ColumnSpaceBetween ref={inputWrapperRef}>
-                    <NumericInput
-                        value={paidAmount}
-                        disabled={isSubmitting}
-                        placeholder={t('common.enter-amount')}
-                        onChange={(_, value) => {
-                            setPaidAmount(value);
-                            setSelectedStableBuyinAmount(isStableCurrency(selectedCollateral) ? Number(value) : 0);
-                        }}
-                        onMaxButton={onMaxClick}
-                        showValidation={!!errorMessageKey}
-                        validationMessage={t(errorMessageKey, {
-                            currencyKey: selectedCollateral,
-                            minAmount: convertFromStable(minBuyinAmount),
-                            maxAmount: convertFromStable(maxBuyinAmount),
-                            fee: totalFee ? formatPercentage(totalFee) : '...',
-                        })}
-                        currencyComponent={
-                            isMultiCollateralSupported ? (
-                                <CollateralSelector
-                                    collateralArray={getCollaterals(networkId)}
-                                    selectedItem={selectedCollateralIndex}
-                                    onChangeCollateral={() => {}}
-                                    disabled={isSubmitting}
-                                    isDetailedView
-                                    collateralBalances={multipleCollateralBalances.data}
-                                    exchangeRates={exchangeRates}
-                                    dropDownWidth={inputWrapperRef.current?.getBoundingClientRect().width + 'px'}
-                                />
-                            ) : undefined
-                        }
-                        currencyLabel={!isMultiCollateralSupported ? defaultCollateral : undefined}
-                    />
                     {isMobile && getTradingDetails()}
+                    <QuoteContainer>
+                        <QuoteLabel>Potential profit</QuoteLabel>
+                        <QuoteText>5.4x</QuoteText>
+                    </QuoteContainer>
                     {getSubmitButton()}
-                    {isButtonBuyAvailable && (
-                        <BuyInfo>
-                            {t('speed-markets.buy-info', { value: ammSpeedMarketsLimits?.maxPriceDelaySec })}
-                        </BuyInfo>
-                    )}
-                    <PaymentInfo>
-                        {!isChained && !totalFee ? (
-                            t('speed-markets.fee-info')
-                        ) : isStableCurrency(selectedCollateral) ? (
-                            <Trans
-                                i18nKey={`speed-markets${isChained ? '.chained' : ''}.total-pay`}
-                                values={{
-                                    amount: selectedStableBuyinAmount
-                                        ? formatCurrencyWithSign(USD_SIGN, selectedStableBuyinAmount)
-                                        : formatCurrencyWithSign(USD_SIGN, Number(paidAmount)),
-                                    fee: formatPercentage(totalFee),
-                                    totalAmount: selectedStableBuyinAmount
-                                        ? formatCurrencyWithSign(USD_SIGN, selectedStableBuyinAmount * (1 + totalFee))
-                                        : formatCurrencyWithSign(USD_SIGN, Number(paidAmount) * (1 + totalFee)),
-                                }}
-                                components={{
-                                    tooltip:
-                                        positionType && skewImpact[positionType] ? (
-                                            <Tooltip overlay={t('speed-markets.tooltips.skew-slippage')} />
-                                        ) : (
-                                            <></>
-                                        ),
-                                }}
-                            />
-                        ) : (
-                            <Trans
-                                i18nKey={`speed-markets${isChained ? '.chained' : ''}.to-pay-with-conversion`}
-                                values={{
-                                    amount: formatCurrencyWithKey(selectedCollateral, Number(paidAmount)),
-                                    stableAmount: selectedStableBuyinAmount
-                                        ? formatCurrencyWithSign(USD_SIGN, selectedStableBuyinAmount)
-                                        : formatCurrencyWithSign(USD_SIGN, convertToStable(Number(paidAmount))),
-                                    fee: formatPercentage(totalFee),
-                                }}
-                                components={{
-                                    tooltip:
-                                        positionType && skewImpact[positionType] ? (
-                                            <Tooltip overlay={t('speed-markets.tooltips.skew-slippage')} />
-                                        ) : (
-                                            <></>
-                                        ),
-                                }}
-                            />
-                        )}
-                        {!isChained && !totalFee ? (
-                            <Tooltip
-                                overlay={
-                                    Object.keys(dynamicFeesTooltipData).length ? (
-                                        <Trans
-                                            i18nKey="speed-markets.tooltips.fee-info"
-                                            components={{
-                                                br: <br />,
-                                            }}
-                                            values={{ ...dynamicFeesTooltipData }}
-                                        />
-                                    ) : (
-                                        t('common.progress')
-                                    )
-                                }
-                            />
-                        ) : (
-                            isStableCurrency(selectedCollateral) &&
-                            selectedCollateral !== defaultCollateral && (
-                                <Tooltip overlay={t('speed-markets.tooltips.paid-conversion')} />
-                            )
-                        )}
-                    </PaymentInfo>
-                    {!!totalFee && !isStableCurrency(selectedCollateral) && (
-                        <PaymentInfo>
-                            {t('speed-markets.total-pay-with-conversion', {
-                                amount: formatCurrencyWithKey(selectedCollateral, totalPaidAmount),
-                                stableAmount: selectedStableBuyinAmount
-                                    ? formatCurrencyWithSign(USD_SIGN, selectedStableBuyinAmount * (1 + totalFee))
-                                    : formatCurrencyWithSign(USD_SIGN, convertToStable(totalPaidAmount)),
-                            })}
-                            {selectedCollateral !== defaultCollateral && (
-                                <Tooltip overlay={t('speed-markets.tooltips.paid-conversion')} />
-                            )}
-                        </PaymentInfo>
-                    )}
                 </ColumnSpaceBetween>
             </FinalizeTrade>
             {openTwitterShareModal && positionType && (
@@ -1013,7 +833,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 const Container = styled(FlexDivRow)<{ $isChained: boolean }>`
     position: relative;
     z-index: 4;
-    height: ${(props) => (props.$isChained ? '98' : '78')}px;
+    height: 140px;
     margin-bottom: ${(props) => (props.$isChained ? '48' : '68')}px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         min-width: initial;
@@ -1026,9 +846,11 @@ const Container = styled(FlexDivRow)<{ $isChained: boolean }>`
 const TradingDetailsContainer = styled(FlexDivRowCentered)`
     position: relative;
     width: 640px;
-    background: ${(props) => props.theme.background.secondary};
+    height: 100%;
+    background: ${(props) => props.theme.background.primary};
     border-radius: 8px;
-    padding: 10px;
+    padding: 20px;
+
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         width: 100%;
         margin-bottom: 10px;
@@ -1036,7 +858,7 @@ const TradingDetailsContainer = styled(FlexDivRowCentered)`
 `;
 
 const FinalizeTrade = styled(FlexDivCentered)`
-    width: 410px;
+    width: 340px;
     color: ${(props) => props.theme.textColor.primary};
     font-size: 13px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
@@ -1046,26 +868,8 @@ const FinalizeTrade = styled(FlexDivCentered)`
 
 const ColumnSpaceBetween = styled(FlexDivColumn)`
     width: 100%;
-    height: 100%;
     justify-content: space-between;
-`;
-
-const BuyInfo = styled.span`
-    font-size: 13px;
-    font-weight: 600;
-    line-height: 110%;
-    text-align: center;
-    color: ${(props) => props.theme.textColor.secondary};
-    margin-top: 6px;
-`;
-
-const PaymentInfo = styled.span`
-    font-size: 13px;
-    font-weight: 600;
-    line-height: 110%;
-    text-align: center;
-    color: ${(props) => props.theme.textColor.secondary};
-    margin-top: 6px;
+    height: 100%;
 `;
 
 const ShareIcon = styled.i<{ disabled: boolean }>`
@@ -1080,6 +884,36 @@ const ShareIcon = styled.i<{ disabled: boolean }>`
 
 const CollateralText = styled.span`
     text-transform: none;
+`;
+
+const QuoteContainer = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 90px;
+    padding: 20px;
+    border-radius: 8px;
+    background: ${(props) => props.theme.background.quinary};
+    color: ${(props) => props.theme.input.textColor.tertiary};
+`;
+
+const QuoteLabel = styled.span`
+    font-family: ${(props) => props.theme.fontFamily.tertiary};
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 100%; /* 13px */
+    text-transform: capitalize;
+`;
+
+const QuoteText = styled.span`
+    font-family: ${(props) => props.theme.fontFamily.tertiary};
+    font-size: 30px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 100%; /* 13px */
+    text-transform: capitalize;
 `;
 
 export default AmmSpeedTrading;

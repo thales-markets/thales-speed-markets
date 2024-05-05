@@ -2,16 +2,16 @@ import styled from 'styled-components';
 import { FlexDivColumn } from 'styles/common';
 
 export const Text = styled.span`
-    font-weight: 700;
-    font-size: 13px;
-    line-height: 15px;
+    font-family: ${(props) => props.theme.fontFamily.tertiary};
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 130%;
+    color: ${(props) => props.theme.textColor.quinary};
 `;
 
-export const TextLabel = styled(Text)`
-    color: ${(props) => props.theme.textColor.secondary};
-`;
+export const TextLabel = styled(Text)``;
 export const TextValue = styled(Text)<{ $isProfit?: boolean; $uppercase?: boolean; $lowercase?: boolean }>`
-    color: ${(props) => (props.$isProfit ? props.theme.textColor.quaternary : props.theme.textColor.primary)};
+    font-weight: ${(props) => (props.$uppercase || [props.$isProfit] ? '800' : '400')};
     text-transform: ${(props) => (props.$uppercase ? 'uppercase' : props.$lowercase ? 'lowercase' : 'initial')};
 `;
 

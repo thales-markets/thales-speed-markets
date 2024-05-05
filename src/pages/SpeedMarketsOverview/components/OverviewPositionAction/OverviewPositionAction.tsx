@@ -78,7 +78,7 @@ const OverviewPositionAction: React.FC<OverviewPositionActionProps> = ({
             if (isAdmin) {
                 if (isBiconomy) {
                     hash = await executeBiconomyTransaction(
-                        'todo: add collateral addres',
+                        '0x7F5c764cBc14f9669B88837ca1490cCa17c31607', // TODO:
                         speedMarketsAMMContractWithSigner,
                         'resolveMarketManually',
                         [position.market, Number(priceParser(position.finalPrice || 0))]
@@ -118,11 +118,10 @@ const OverviewPositionAction: React.FC<OverviewPositionActionProps> = ({
 
                 if (isBiconomy) {
                     hash = await executeBiconomyTransaction(
-                        'todo: add collateral addres',
+                        '0x7F5c764cBc14f9669B88837ca1490cCa17c31607', // TODO:
                         speedMarketsAMMContractWithSigner,
                         'resolveMarket',
-                        [position.market, priceUpdateData],
-                        updateFee
+                        [position.market, priceUpdateData]
                     );
                 } else {
                     hash = await speedMarketsAMMContractWithSigner.write.resolveMarket(

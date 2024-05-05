@@ -24,7 +24,7 @@ const SelectInput: React.FC<SelectInputProps> = ({ options, handleChange, defaul
             width: '100%',
             // color: props.selectProps.menuColor,
             backgroundColor: theme.background.secondary,
-            border: `1px solid ${theme.borderColor.primary}`,
+            border: `2px solid ${theme.borderColor.primary}`,
             marginTop: 5,
             borderRadius: 8,
             overflow: 'auto',
@@ -53,7 +53,7 @@ const SelectInput: React.FC<SelectInputProps> = ({ options, handleChange, defaul
             cursor: 'pointer',
             boxShadow: 'none',
             '&:hover': {
-                border: `1px solid ${theme.borderColor.quaternary}`,
+                border: `2px solid ${theme.borderColor.quaternary}`,
                 boxShadow: 'none',
             },
             opacity: props.isDisabled ? 0.4 : 1,

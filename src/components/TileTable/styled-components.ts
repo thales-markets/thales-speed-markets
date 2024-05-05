@@ -80,7 +80,7 @@ export const Title = styled(FlexDiv)<{
     font-weight: bold;
     height: 50px;
     position: relative;
-    border: 2px solid transparent;
+    border: 1px solid transparent;
     margin-bottom: 15px;
     width: 100%;
     align-items: center;

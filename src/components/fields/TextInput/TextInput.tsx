@@ -33,7 +33,7 @@ const TextInput: React.FC<TextInputProps> = ({ value, placeholder, onChange, inp
 const StyledInput = styled(Input)<{ padding?: string; readOnly: boolean }>`
     padding: ${(props) => props.padding || '5px 10px 5px 10px'};
     &:focus {
-        ${(props) => (props.readOnly ? `border: 1px solid ${props.theme.input.borderColor.primary};` : '')}
+        ${(props) => (props.readOnly ? `border: 2px solid ${props.theme.input.borderColor.primary};` : '')}
     }
 `;
 

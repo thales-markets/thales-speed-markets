@@ -5,15 +5,38 @@ import styled from 'styled-components';
 import { FlexDivCentered, FlexDivRow } from 'styles/common';
 import { AmmChainedSpeedMarketsLimits, AmmSpeedMarketsLimits } from 'types/market';
 import { SelectedPosition } from '../SelectPosition/SelectPosition';
-import { roundNumberToDecimals } from 'thales-utils';
+import { ceilNumberToDecimals, roundNumberToDecimals, truncToDecimals } from 'thales-utils';
+import { Header, HeaderText } from '../SelectPosition/styled-components';
+import { t } from 'i18next';
+import { useSelector } from 'react-redux';
+import { RootState } from 'types/ui';
+import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
+import { useAccount, useChainId, useClient } from 'wagmi';
+import { getCoinBalance, getCollateral, getCollaterals, getDefaultCollateral, isStableCurrency } from 'utils/currency';
+import CollateralSelector from 'components/CollateralSelector';
+import NumericInput from 'components/fields/NumericInput';
+import useExchangeRatesQuery, { Rates } from 'queries/rates/useExchangeRatesQuery';
+import { getIsAppReady } from 'redux/modules/app';
+import { getIsMultiCollateralSupported } from 'utils/network';
+import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipleCollateralBalanceQuery';
+import biconomyConnector from 'utils/biconomyWallet';
+import { STABLECOIN_CONVERSION_BUFFER_PERCENTAGE } from 'constants/market';
+import { Positions } from 'enums/market';
+import useStableBalanceQuery from 'queries/walletBalances/useStableBalanceQuery';
+import { getFeeByTimeThreshold } from 'utils/speedAmm';
 
 type SelectBuyinProps = {
     value: number;
     onChange: React.Dispatch<number>;
     isChained: boolean;
+    positionType: SelectedPosition;
     chainedPositions: SelectedPosition[];
     ammSpeedMarketsLimits: AmmSpeedMarketsLimits | null;
     ammChainedSpeedMarketsLimits: AmmChainedSpeedMarketsLimits | null;
+
+    strikeTimeSec: number;
+    deltaTimeSec: number;
+    currencyKey: string;
 };
 
 const roundMaxBuyin = (maxBuyin: number) => Math.floor(maxBuyin / 10) * 10;
@@ -25,8 +48,70 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
     chainedPositions,
     ammSpeedMarketsLimits,
     ammChainedSpeedMarketsLimits,
+    currencyKey,
+    strikeTimeSec,
+    deltaTimeSec,
+    positionType,
 }) => {
     const [buyinAmount, setBuyinAmount] = useState(0);
+
+    const selectedCollateralIndex = useSelector((rootState: RootState) => getSelectedCollateralIndex(rootState));
+    const isBiconomy = useSelector((rootState: RootState) => getIsBiconomy(rootState));
+    const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
+    const { address: walletAddress, isConnected } = useAccount();
+    const networkId = useChainId();
+    const client = useClient();
+    const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
+
+    const defaultCollateral = useMemo(() => getDefaultCollateral(networkId), [networkId]);
+    const selectedCollateral = useMemo(() => getCollateral(networkId, selectedCollateralIndex), [
+        networkId,
+        selectedCollateralIndex,
+    ]);
+
+    const stableBalanceQuery = useStableBalanceQuery(
+        (isBiconomy ? biconomyConnector.address : walletAddress) as string,
+        { networkId, client },
+        {
+            enabled: isAppReady && isConnected && !isMultiCollateralSupported,
+        }
+    );
+    const multipleCollateralBalances = useMultipleCollateralBalanceQuery(
+        (isBiconomy ? biconomyConnector.address : walletAddress) as string,
+        { networkId, client },
+        {
+            enabled: isAppReady && isConnected && isMultiCollateralSupported,
+        }
+    );
+
+    const walletBalancesMap = useMemo(() => {
+        return stableBalanceQuery.isSuccess ? stableBalanceQuery.data : null;
+    }, [stableBalanceQuery]);
+
+    const collateralBalance = useMemo(() => {
+        return isMultiCollateralSupported
+            ? multipleCollateralBalances.isSuccess
+                ? getCoinBalance(multipleCollateralBalances?.data, selectedCollateral)
+                : null
+            : (walletBalancesMap && walletBalancesMap[defaultCollateral]?.balance) || 0;
+    }, [
+        multipleCollateralBalances,
+        walletBalancesMap,
+        isMultiCollateralSupported,
+        defaultCollateral,
+        selectedCollateral,
+    ]);
+
+    const exchangeRatesMarketDataQuery = useExchangeRatesQuery(
+        { networkId, client },
+        {
+            enabled: isAppReady,
+        }
+    );
+    const exchangeRates: Rates | null =
+        exchangeRatesMarketDataQuery.isSuccess && exchangeRatesMarketDataQuery.data
+            ? exchangeRatesMarketDataQuery.data
+            : null;
 
     const payoutMultiplier = useMemo(
         () =>
@@ -90,41 +175,164 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
         setBuyinAmount(value);
     }, [value]);
 
-    return (
-        <Container>
-            {buyinAmounts.map((amount, index) => {
-                return (
-                    <Amount
-                        key={index}
-                        $isSelected={buyinAmount === amount || (value > 0 && value === amount)}
-                        onClick={() => {
-                            onChange(amount);
-                            setBuyinAmount(amount);
-                        }}
-                    >
-                        <DollarSign>{USD_SIGN}</DollarSign>
-                        {amount}
-                    </Amount>
+    const skewImpact = useMemo(() => {
+        const skewPerPosition = { [Positions.UP]: 0, [Positions.DOWN]: 0 };
+
+        const riskPerUp = ammSpeedMarketsLimits?.risksPerAssetAndDirection.filter(
+            (data) => data.currency === currencyKey && data.position === Positions.UP
+        )[0];
+        const riskPerDown = ammSpeedMarketsLimits?.risksPerAssetAndDirection.filter(
+            (data) => data.currency === currencyKey && data.position === Positions.DOWN
+        )[0];
+
+        if (riskPerUp && riskPerDown) {
+            skewPerPosition[Positions.UP] = ceilNumberToDecimals(
+                (riskPerUp.current / riskPerUp.max) * ammSpeedMarketsLimits?.maxSkewImpact,
+                4
+            );
+            skewPerPosition[Positions.DOWN] = ceilNumberToDecimals(
+                (riskPerDown.current / riskPerDown.max) * ammSpeedMarketsLimits?.maxSkewImpact,
+                4
+            );
+        }
+
+        return skewPerPosition;
+    }, [ammSpeedMarketsLimits?.maxSkewImpact, ammSpeedMarketsLimits?.risksPerAssetAndDirection, currencyKey]);
+
+    const totalFee = useMemo(() => {
+        if (ammSpeedMarketsLimits) {
+            if (isChained) {
+                return ammSpeedMarketsLimits.safeBoxImpact;
+            } else if (deltaTimeSec || strikeTimeSec) {
+                const lpFee = getFeeByTimeThreshold(
+                    deltaTimeSec,
+                    ammSpeedMarketsLimits?.timeThresholdsForFees,
+                    ammSpeedMarketsLimits?.lpFees,
+                    ammSpeedMarketsLimits?.defaultLPFee
                 );
-            })}
-        </Container>
+                const skew = positionType ? skewImpact[positionType] : 0;
+                const oppositePosition = positionType
+                    ? positionType === Positions.UP
+                        ? Positions.DOWN
+                        : Positions.UP
+                    : undefined;
+                const discount = oppositePosition ? skewImpact[oppositePosition] / 2 : 0;
+
+                return lpFee + skew - discount + Number(ammSpeedMarketsLimits?.safeBoxImpact);
+            }
+        }
+        return 0;
+    }, [isChained, ammSpeedMarketsLimits, deltaTimeSec, strikeTimeSec, skewImpact, positionType]);
+
+    const onMaxClick = () => {
+        if (collateralBalance > 0) {
+            const maxWalletAmount =
+                selectedCollateral === defaultCollateral
+                    ? Number(truncToDecimals(collateralBalance / (1 + totalFee)))
+                    : isStableCurrency(selectedCollateral)
+                    ? Number(
+                          truncToDecimals(collateralBalance / (1 + totalFee + STABLECOIN_CONVERSION_BUFFER_PERCENTAGE))
+                      )
+                    : Number(truncToDecimals(collateralBalance / (1 + totalFee), 18));
+
+            let maxLiquidity, maxLiquidityPerDirection: number;
+            if (isChained) {
+                maxLiquidity =
+                    ammChainedSpeedMarketsLimits !== undefined
+                        ? Number(ammChainedSpeedMarketsLimits?.risk.max) -
+                          Number(ammChainedSpeedMarketsLimits?.risk.current)
+                        : Infinity;
+                maxLiquidityPerDirection = Infinity;
+            } else {
+                const riskPerAsset = ammSpeedMarketsLimits?.risksPerAssetAndDirection.filter(
+                    (data) => data.currency === currencyKey
+                )[0];
+                maxLiquidity = riskPerAsset !== undefined ? riskPerAsset.max - riskPerAsset.current : Infinity;
+
+                const riskPerAssetAndDirection = ammSpeedMarketsLimits?.risksPerAssetAndDirection.filter(
+                    (data) => data.currency === currencyKey && data.position === Positions.UP
+                )[0];
+                maxLiquidityPerDirection =
+                    riskPerAssetAndDirection !== undefined
+                        ? riskPerAssetAndDirection.max - riskPerAssetAndDirection.current
+                        : Infinity;
+            }
+
+            const maxPaidAmount = Math.floor(
+                Math.min(buyinAmounts[buyinAmounts.length - 1], maxWalletAmount, maxLiquidity, maxLiquidityPerDirection)
+            );
+            onChange(maxPaidAmount);
+            setBuyinAmount(maxPaidAmount);
+        }
+    };
+
+    return (
+        <div>
+            <Header>
+                <HeaderText> {t('speed-markets.steps.enter-buyin')}</HeaderText>
+            </Header>
+            <Container>
+                {buyinAmounts.map((amount, index) => {
+                    return (
+                        <Amount
+                            key={index}
+                            $isSelected={buyinAmount === amount || (value > 0 && value === amount)}
+                            onClick={() => {
+                                onChange(amount);
+                                setBuyinAmount(amount);
+                            }}
+                        >
+                            <DollarSign>{USD_SIGN}</DollarSign>
+                            {amount}
+                        </Amount>
+                    );
+                })}
+            </Container>
+            <NumericInput
+                value={buyinAmount}
+                placeholder={t('common.enter-amount')}
+                onChange={(_, value) => {
+                    onChange(Number(value));
+                    setBuyinAmount(Number(value));
+                }}
+                onMaxButton={onMaxClick}
+                currencyComponent={
+                    isMultiCollateralSupported ? (
+                        <CollateralSelector
+                            collateralArray={getCollaterals(networkId)}
+                            selectedItem={selectedCollateralIndex}
+                            onChangeCollateral={() => {}}
+                            isDetailedView
+                            collateralBalances={multipleCollateralBalances.data}
+                            exchangeRates={exchangeRates}
+                        />
+                    ) : undefined
+                }
+                currencyLabel={!isMultiCollateralSupported ? defaultCollateral : undefined}
+            />
+        </div>
     );
 };
 
-const Container = styled(FlexDivRow)``;
+const Container = styled(FlexDivRow)`
+    margin-bottom: 10px;
+`;
 
 const Amount = styled(FlexDivCentered)<{ $isSelected: boolean }>`
-    width: 70px;
-    height: 31px;
+    width: 60px;
+    height: 40px;
     border-radius: 8px;
-    background: ${(props) =>
-        props.$isSelected ? props.theme.button.background.secondary : props.theme.button.background.tertiary};
-    color: ${(props) => props.theme.button.textColor.secondary};
-    cursor: pointer;
-    font-weight: 600;
+    font-family: ${(props) => props.theme.fontFamily.tertiary};
     font-size: 13px;
-    line-height: 90%;
-    padding-left: 1px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 100%;
+    ${(props) => (props.$isSelected ? '' : `border: 2px solid ${props.theme.button.borderColor.secondary};`)}
+    background: ${(props) =>
+        props.$isSelected ? props.theme.button.background.secondary : props.theme.button.background.primary};
+    color: ${(props) =>
+        props.$isSelected ? props.theme.button.textColor.secondary : props.theme.button.textColor.tertiary};
+    cursor: pointer;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         width: 60px;
     }

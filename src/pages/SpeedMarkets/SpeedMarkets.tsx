@@ -3,7 +3,6 @@ import banner from 'assets/images/speed-markets-banner.png';
 import PageLinkBanner from 'components/PageLinkBanner';
 import SPAAnchor from 'components/SPAAnchor/SPAAnchor';
 import SimpleLoader from 'components/SimpleLoader';
-import SwitchInput from 'components/SwitchInput';
 import Tooltip from 'components/Tooltip';
 import { LINKS } from 'constants/links';
 import { CONNECTION_TIMEOUT_MS, SUPPORTED_ASSETS } from 'constants/pyth';
@@ -22,14 +21,13 @@ import { Trans, useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { getIsAppReady } from 'redux/modules/app';
-import { getIsMobile } from 'redux/modules/ui';
-import styled, { useTheme } from 'styled-components';
-import { BoldText, FlexDivCentered, FlexDivRowCentered, FlexDivSpaceBetween, FlexDivStart } from 'styles/common';
+import styled from 'styled-components';
+import { BoldText } from 'styles/common';
 import { roundNumberToDecimals } from 'thales-utils';
-import { RootState, ThemeInterface } from 'types/ui';
+import { RootState } from 'types/ui';
 import { getSupportedNetworksByRoute } from 'utils/network';
 import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAssetsAsObject } from 'utils/pyth';
-import { buildHref, history } from 'utils/routes';
+import { buildHref } from 'utils/routes';
 import AmmSpeedTrading from './components/AmmSpeedTrading';
 import ClosedPositions from './components/ClosedPositions';
 import SelectAsset from './components/SelectAsset';
@@ -43,13 +41,11 @@ import { useAccount } from 'wagmi';
 const SpeedMarkets: React.FC = () => {
     const { t } = useTranslation();
     const location = useLocation();
-    const theme: ThemeInterface = useTheme();
 
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const networkId = useChainId();
     const client = useClient();
     const { isConnected } = useAccount();
-    const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const isChainedSupported = getSupportedNetworksByRoute(ROUTES.Markets.ChainedSpeedMarkets).includes(networkId);
     const isChainedMarkets = isChainedSupported && queryString.parse(location.search).isChained === 'true';
@@ -159,71 +155,30 @@ const SpeedMarkets: React.FC = () => {
         setSelectedStableBuyinAmount(0);
     }, [isChained]);
 
-    const getStep = (stepNumber: number, name: string) => {
+    const getStep = (stepNumber: number) => {
         const isAssetStep = stepNumber === 1;
         const isDirectionsStep = stepNumber === 2;
         const isTimeStep = stepNumber === 3;
         const isBuyinStep = stepNumber === 4;
         return (
             <>
-                <Step>
-                    <FlexDivRowCentered>
-                        <StepNumber>{stepNumber}</StepNumber>
-                        <StepName>{name}</StepName>
-                    </FlexDivRowCentered>
-                    {isChained && isDirectionsStep && (
-                        <>
-                            <AddRemoveWrapper>
-                                <AddRemove
-                                    isDisabled={
-                                        chainedPositions.length ===
-                                        (ammChainedSpeedMarketsLimitsData?.minChainedMarkets || 0)
-                                    }
-                                    onClick={() => {
-                                        if (
-                                            chainedPositions.length >
-                                            (ammChainedSpeedMarketsLimitsData?.minChainedMarkets || 0)
-                                        ) {
-                                            setChainedPositions(chainedPositions.slice(0, -1));
-                                        }
-                                    }}
-                                >
-                                    {'-'}
-                                </AddRemove>
-                                <Separator />
-                                <AddRemove
-                                    isDisabled={chainedPositions.length === 6}
-                                    onClick={() => {
-                                        if (
-                                            chainedPositions.length <
-                                            (ammChainedSpeedMarketsLimitsData?.maxChainedMarkets || 0)
-                                        ) {
-                                            setChainedPositions([...chainedPositions, undefined]);
-                                        }
-                                    }}
-                                >
-                                    {'+'}
-                                </AddRemove>
-                            </AddRemoveWrapper>
-                            <AddRemoveLabel>{t('speed-markets.chained.add-directions')}</AddRemoveLabel>
-                        </>
-                    )}
-                    {isChained && isTimeStep && (
-                        <SelectTime
-                            selectedDeltaSec={deltaTimeSec}
-                            onDeltaChange={setDeltaTimeSec}
-                            onExactTimeChange={setStrikeTimeSec}
-                            ammSpeedMarketsLimits={ammSpeedMarketsLimitsData}
-                            isResetTriggered={isResetTriggered}
-                            isChained={isChained}
-                        />
-                    )}
-                </Step>
+                {isChained && isTimeStep && (
+                    <SelectTime
+                        selectedDeltaSec={deltaTimeSec}
+                        onDeltaChange={setDeltaTimeSec}
+                        onExactTimeChange={setStrikeTimeSec}
+                        ammSpeedMarketsLimits={ammSpeedMarketsLimitsData}
+                        isResetTriggered={isResetTriggered}
+                        isChained={isChained}
+                    />
+                )}
+
                 {isAssetStep && (
                     <SelectAsset selectedAsset={currencyKey} allAssets={SUPPORTED_ASSETS} onChange={setCurrencyKey} />
                 )}
                 {isDirectionsStep && (
                     <SelectPosition
+                        setIsChained={setIsChained}
                         selected={isChained ? chainedPositions : [positionType]}
                         onChange={setPositionType}
                         onChainedChange={setChainedPositions}
@@ -249,42 +204,13 @@ const SpeedMarkets: React.FC = () => {
                         chainedPositions={chainedPositions}
                         ammSpeedMarketsLimits={ammSpeedMarketsLimitsData}
                         ammChainedSpeedMarketsLimits={ammChainedSpeedMarketsLimitsData}
+                        currencyKey={currencyKey}
+                        positionType={positionType}
+                        strikeTimeSec={strikeTimeSec}
+                        deltaTimeSec={deltaTimeSec}
                     />
                 )}
             </>
-        );
-    };
-
-    const getToggle = () => {
-        return (
-            <SwitchInput
-                active={isChained}
-                disabled={!isChainedSupported}
-                width="80px"
-                height="30px"
-                dotSize="20px"
-                dotBackground={theme.button.background.secondary}
-                borderColor={theme.borderColor.primary}
-                borderWidth="2px"
-                borderRadius="50px"
-                margin={isMobile ? '0 0 10px 0' : undefined}
-                label={{
-                    firstLabel: t(`speed-markets.single`),
-                    secondLabel: t(`speed-markets.chained.label`),
-                    fontSize: '18px',
-                    firstLabelColor: isChained ? undefined : theme.input.textColor.secondary,
-                    secondLabelColor: isChained ? theme.input.textColor.secondary : undefined,
-                }}
-                handleClick={() => {
-                    setIsChained(!isChained);
-                    history.push({
-                        pathname: location.pathname,
-                        search: queryString.stringify({
-                            isChained: !isChained,
-                        }),
-                    });
-                }}
-            />
         );
     };
 
@@ -338,15 +264,14 @@ const SpeedMarkets: React.FC = () => {
                             ></LightweightChart>
                         </LeftSide>
                         <RightSide>
-                            {getToggle()}
                             {/* Asset */}
-                            {getStep(1, t('speed-markets.steps.choose-asset'))}
+                            {getStep(1)}
                             {/* Direction */}
-                            {getStep(2, t('speed-markets.steps.choose-direction'))}
+                            {getStep(2)}
                             {/* Time */}
-                            {getStep(3, t('speed-markets.steps.choose-time'))}
+                            {getStep(3)}
                             {/* Buyin */}
-                            {getStep(4, t('speed-markets.steps.enter-buyin'))}
+                            {getStep(4)}
                         </RightSide>
                     </ContentWrapper>
 
@@ -409,6 +334,7 @@ const HeaderImage = styled.div`
     height: 120px;
     background-image: url(${banner});
     background-position: center;
+    border: 2px solid ${(props) => props.theme.borderColor.secondary};
     border-radius: 11px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         display: none;
@@ -440,61 +366,12 @@ const LeftSide = styled.div`
 const RightSide = styled.div`
     width: 100%;
     height: 100%;
-    max-width: 410px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 340px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         max-width: initial;
-    }
-`;
-
-const Step = styled(FlexDivStart)`
-    align-items: center;
-    :not(:first-child) {
-        margin-top: 15px;
-    }
-    margin-bottom: 11px;
-`;
-const StepNumber = styled(FlexDivCentered)`
-    width: 36px;
-    height: 36px;
-    border: 3px solid ${(props) => props.theme.borderColor.primary};
-    border-radius: 50%;
-    color: ${(props) => props.theme.textColor.primary};
-    font-weight: 700;
-    font-size: 18px;
-    line-height: 100%;
-`;
-const StepName = styled.span`
-    font-weight: 400;
-    font-size: 18px;
-    line-height: 100%;
-    color: ${(props) => props.theme.textColor.primary};
-    padding-left: 8px;
-    text-transform: capitalize;
-`;
-
-const AddRemoveWrapper = styled(FlexDivSpaceBetween)`
-    width: 80px;
-    height: 35px;
-    border-radius: 30px;
-    border: 2px solid ${(props) => props.theme.borderColor.quaternary};
-    margin: 0 6px;
-`;
-
-const AddRemove = styled.div<{ isDisabled: boolean }>`
-    width: 100%;
-    color: ${(props) => (props.isDisabled ? props.theme.textColor.secondary : props.theme.textColor.primary)};
-    text-align: center;
-    font-size: 30px;
-    font-weight: 500;
-    line-height: 90%;
-    cursor: ${(props) => (props.isDisabled ? 'default' : 'pointer')};
-`;
-
-const AddRemoveLabel = styled(StepName)`
-    padding: 0;
-    text-transform: lowercase;
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        font-size: 13px;
     }
 `;
 
@@ -526,13 +403,6 @@ const ArrowRight = styled.i`
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         margin-bottom: 4px;
     }
-`;
-
-const Separator = styled.div`
-    background: ${(props) => props.theme.borderColor.primary};
-    width: 2px;
-    height: 23px;
-    border-radius: 6px;
 `;
 
 export default SpeedMarkets;

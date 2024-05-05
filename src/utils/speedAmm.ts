@@ -61,7 +61,7 @@ export const getTransactionForSpeedAMM = async (
                         isEth,
                         referral ? referral : ZERO_ADDRESS,
                     ],
-                    isEth ? buyInAmount + pythUpdateFee : pythUpdateFee
+                    isEth ? buyInAmount + pythUpdateFee : undefined
                 );
             } else {
                 txHash = await speedMarketsAMMContractWithSigner.write.createNewMarketWithDifferentCollateral(
@@ -96,7 +96,7 @@ export const getTransactionForSpeedAMM = async (
                         referral ? referral : ZERO_ADDRESS,
                         skewImpact,
                     ],
-                    isEth ? buyInAmount + pythUpdateFee : pythUpdateFee
+                    isEth ? buyInAmount + pythUpdateFee : undefined
                 );
             } else {
                 txHash = await speedMarketsAMMContractWithSigner.write.createNewMarketWithDifferentCollateral(
@@ -289,17 +289,16 @@ export const resolveAllSpeedPositions = async (
             if (isBiconomy) {
                 txHash = isAdmin
                     ? await executeBiconomyTransaction(
-                          'todo: add collateral addres',
+                          '0x7F5c764cBc14f9669B88837ca1490cCa17c31607', // TODO:
                           speedMarketsAMMContractWithSigner,
                           'resolveMarketManuallyBatch',
                           [marketsToResolve, manualFinalPrices]
                       )
                     : await executeBiconomyTransaction(
-                          'todo: add collateral addres',
+                          '0x7F5c764cBc14f9669B88837ca1490cCa17c31607', // TODO:
                           speedMarketsAMMContractWithSigner,
                           'resolveMarketsBatch',
-                          [marketsToResolve, priceUpdateDataArray],
-                          totalUpdateFee
+                          [marketsToResolve, priceUpdateDataArray]
                       );
             } else {
                 txHash = isAdmin
@@ -415,17 +414,16 @@ export const resolveAllChainedMarkets = async (
             if (isBiconomy) {
                 txHash = isAdmin
                     ? await executeBiconomyTransaction(
-                          'todo: add collateral addres',
+                          '0x7F5c764cBc14f9669B88837ca1490cCa17c31607', // TODO:
                           chainedSpeedMarketsAMMContractWithSigner,
                           'resolveMarketManuallyBatch',
                           [marketsToResolve, manualFinalPrices]
                       )
                     : await executeBiconomyTransaction(
-                          'todo: add collateral addres',
+                          '0x7F5c764cBc14f9669B88837ca1490cCa17c31607', // TODO:
                           chainedSpeedMarketsAMMContractWithSigner,
                           'resolveMarketsBatch',
-                          [marketsToResolve, priceUpdateDataArray],
-                          totalUpdateFee
+                          [marketsToResolve, priceUpdateDataArray]
                       );
             } else {
                 txHash = isAdmin

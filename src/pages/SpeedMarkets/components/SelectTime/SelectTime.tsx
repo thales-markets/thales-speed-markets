@@ -1,6 +1,5 @@
 import Button from 'components/Button';
 import NumericInput from 'components/fields/NumericInput/NumericInput';
-import TimeInput from 'components/fields/TimeInput';
 import {
     hoursToMinutes,
     hoursToSeconds,
@@ -22,6 +21,7 @@ import { FlexDivCentered, FlexDivColumnCentered, FlexDivEnd, FlexDivRow } from '
 import { AmmSpeedMarketsLimits } from 'types/market';
 import { RootState, ThemeInterface } from 'types/ui';
 import { useAccount } from 'wagmi';
+import { Header, HeaderText } from '../SelectPosition/styled-components';
 
 type SelectTimeProps = {
     selectedDeltaSec: number;
@@ -32,7 +32,7 @@ type SelectTimeProps = {
     isChained: boolean;
 };
 
-const SPEED_NUMBER_OF_BUTTONS = 4;
+const SPEED_NUMBER_OF_BUTTONS = 3;
 
 const CHAINED_TIMEFRAMES_MINUTES = [2, 5, 10];
 
@@ -278,169 +278,114 @@ const SelectTime: React.FC<SelectTimeProps> = ({
     };
 
     return (
-        <Container>
-            {isChained ? (
-                // Chained
-                <ChainedRow>
-                    {deltaTimesMinutes.map((deltaMinutes, index) => (
-                        <DeltaTime
-                            key={'minutes' + index}
-                            $isInitial={selectedDeltaSec === 0}
-                            $isSelected={isDeltaSelected && selectedDeltaSec === minutesToSeconds(deltaMinutes)}
-                            onClick={() => onDeltaTimeClickHandler(0, deltaMinutes)}
-                        >{`${deltaMinutes}m`}</DeltaTime>
-                    ))}
-                </ChainedRow>
-            ) : (
-                // Single
-                <>
-                    <Row>
+        <div>
+            <Header>
+                <HeaderText> {t('speed-markets.steps.choose-time')}</HeaderText>
+            </Header>
+            <Container>
+                {isChained ? (
+                    // Chained
+                    <ChainedRow>
                         {deltaTimesMinutes.map((deltaMinutes, index) => (
-                            <DeltaTime
+                            <Time
                                 key={'minutes' + index}
-                                $isInitial={selectedDeltaSec === 0 && isDeltaSelected}
                                 $isSelected={isDeltaSelected && selectedDeltaSec === minutesToSeconds(deltaMinutes)}
                                 onClick={() => onDeltaTimeClickHandler(0, deltaMinutes)}
-                            >{`${deltaMinutes}m`}</DeltaTime>
+                            >{`${deltaMinutes}m`}</Time>
                         ))}
-                        {deltaTimesHours.map((deltaHours, index) => (
-                            <DeltaTime
-                                key={'hours' + index}
-                                $isInitial={selectedDeltaSec === 0 && isDeltaSelected}
-                                $isSelected={isDeltaSelected && selectedDeltaSec === hoursToSeconds(deltaHours)}
-                                onClick={() => onDeltaTimeClickHandler(deltaHours, 0)}
-                            >{`${deltaHours}h`}</DeltaTime>
-                        ))}
-                        <Time
-                            $isInitial={selectedDeltaSec === 0 && isDeltaSelected}
-                            $isSelected={!isDeltaSelected}
-                            onClick={onSwitchTimeClickHandler}
-                        >
-                            <Icon className="icon icon--clock" />
-                        </Time>
-                    </Row>
+                    </ChainedRow>
+                ) : (
+                    // Single
+                    <>
+                        <FlexDivRow>
+                            {deltaTimesMinutes.map((deltaMinutes, index) => (
+                                <Time
+                                    key={'minutes' + index}
+                                    $isSelected={isDeltaSelected && selectedDeltaSec === minutesToSeconds(deltaMinutes)}
+                                    onClick={() => onDeltaTimeClickHandler(0, deltaMinutes)}
+                                >{`${deltaMinutes}m`}</Time>
+                            ))}
+                            {deltaTimesHours.map((deltaHours, index) => (
+                                <Time
+                                    key={'hours' + index}
+                                    $isSelected={isDeltaSelected && selectedDeltaSec === hoursToSeconds(deltaHours)}
+                                    onClick={() => onDeltaTimeClickHandler(deltaHours, 0)}
+                                >{`${deltaHours}h`}</Time>
+                            ))}
+                            <Time $isSelected={!isDeltaSelected} onClick={onSwitchTimeClickHandler}>
+                                {'CUSTOM'}
+                            </Time>
+                        </FlexDivRow>
 
-                    {isDeltaSelected ? (
-                        <Row>
-                            <InputWrapper>
-                                <NumericInput
-                                    value={customDeltaTime}
-                                    placeholder={
-                                        isDeltaMinutesSelected ? t('common.enter-minutes') : t('common.enter-hours')
-                                    }
-                                    onChange={(_, value) => onDeltaTimeInputChange(value)}
-                                    showValidation={!!errorMessage}
-                                    validationMessage={errorMessage}
-                                    margin="0"
-                                    inputPadding="5px 40px 5px 10px"
-                                />
-                            </InputWrapper>
-                            <Column>
-                                <Button
-                                    height="13px"
-                                    width={isMobile ? '60px' : '70px'}
-                                    padding={isDeltaMinutesSelected ? '0' : '1px'}
-                                    fontSize="13px"
-                                    backgroundColor={
-                                        isDeltaMinutesSelected
-                                            ? theme.button.background.secondary
-                                            : theme.button.background.primary
-                                    }
-                                    borderRadius="4px"
-                                    borderColor={isDeltaMinutesSelected ? undefined : theme.button.borderColor.tertiary}
-                                    textColor={
-                                        isDeltaMinutesSelected
-                                            ? theme.button.textColor.secondary
-                                            : theme.button.textColor.primary
-                                    }
-                                    onClick={onMinutesButtonClikHandler}
-                                >
-                                    {t('common.time-remaining.minutes')}
-                                </Button>
-                                <Button
-                                    height="13px"
-                                    width={isMobile ? '60px' : '70px'}
-                                    padding={isDeltaMinutesSelected ? '1px' : '0'}
-                                    fontSize="13px"
-                                    backgroundColor={
-                                        isDeltaMinutesSelected
-                                            ? theme.button.background.primary
-                                            : theme.button.background.secondary
-                                    }
-                                    borderRadius="4px"
-                                    borderColor={isDeltaMinutesSelected ? theme.button.borderColor.tertiary : undefined}
-                                    textColor={
-                                        isDeltaMinutesSelected
-                                            ? theme.button.textColor.primary
-                                            : theme.button.textColor.secondary
-                                    }
-                                    onClick={onHoursButtonClikHandler}
-                                >
-                                    {t('common.time-remaining.hours')}
-                                </Button>
-                            </Column>
-                        </Row>
-                    ) : (
-                        <Row>
-                            <TimeInput
-                                value={exactTimeHours}
-                                onChange={(_, value) => setExactTimeHours(value)}
-                                showValidation={!!errorMessage}
-                                validationMessage={errorMessage}
-                                min="1"
-                                max="12"
-                                margin="0"
-                                inputPadding="5px 10px"
-                                zIndex={2}
-                            />
-                            <TimeSeparator>:</TimeSeparator>
-                            <TimeInput
-                                value={exactTimeMinutes}
-                                onChange={(_, value) => setExactTimeMinutes(value)}
-                                showValidation={!!errorMessage}
-                                min="0"
-                                max="59"
-                                margin="0"
-                                inputPadding="5px 10px"
-                                zIndex={1}
-                            />
-                            <Column>
-                                <Button
-                                    height="13px"
-                                    width={isMobile ? '60px' : '70px'}
-                                    padding={isAM ? '0' : '1px'}
-                                    fontSize="13px"
-                                    backgroundColor={
-                                        isAM ? theme.button.background.secondary : theme.button.background.primary
-                                    }
-                                    borderRadius="4px"
-                                    borderColor={isAM ? undefined : theme.button.borderColor.tertiary}
-                                    textColor={isAM ? theme.button.textColor.secondary : theme.button.textColor.primary}
-                                    onClick={() => setIsAM(true)}
-                                >
-                                    {'AM'}
-                                </Button>
-                                <Button
-                                    height="13px"
-                                    width={isMobile ? '60px' : '70px'}
-                                    padding={isAM ? '1px' : '0'}
-                                    fontSize="13px"
-                                    backgroundColor={
-                                        isAM ? theme.button.background.primary : theme.button.background.secondary
-                                    }
-                                    borderRadius="4px"
-                                    borderColor={isAM ? theme.button.borderColor.tertiary : undefined}
-                                    textColor={isAM ? theme.button.textColor.primary : theme.button.textColor.secondary}
-                                    onClick={() => setIsAM(false)}
-                                >
-                                    {'PM'}
-                                </Button>
-                            </Column>
-                        </Row>
-                    )}
-                </>
-            )}
-        </Container>
+                        {!isDeltaSelected && (
+                            <Row>
+                                <InputWrapper>
+                                    <NumericInput
+                                        value={customDeltaTime}
+                                        placeholder={
+                                            isDeltaMinutesSelected ? t('common.enter-minutes') : t('common.enter-hours')
+                                        }
+                                        onChange={(_, value) => onDeltaTimeInputChange(value)}
+                                        showValidation={!!errorMessage}
+                                        validationMessage={errorMessage}
+                                        margin="0"
+                                        inputPadding="5px 40px 5px 10px"
+                                    />
+                                </InputWrapper>
+                                <Column>
+                                    <Button
+                                        height="13px"
+                                        width={isMobile ? '60px' : '70px'}
+                                        padding={isDeltaMinutesSelected ? '0' : '1px'}
+                                        fontSize="12px"
+                                        backgroundColor={
+                                            isDeltaMinutesSelected
+                                                ? theme.button.background.secondary
+                                                : theme.button.background.primary
+                                        }
+                                        borderRadius="4px"
+                                        borderColor={
+                                            isDeltaMinutesSelected ? undefined : theme.button.borderColor.secondary
+                                        }
+                                        textColor={
+                                            isDeltaMinutesSelected
+                                                ? theme.button.textColor.secondary
+                                                : theme.button.textColor.tertiary
+                                        }
+                                        onClick={onMinutesButtonClikHandler}
+                                    >
+                                        {t('common.time-remaining.minutes')}
+                                    </Button>
+                                    <Button
+                                        height="13px"
+                                        width={isMobile ? '60px' : '70px'}
+                                        padding={isDeltaMinutesSelected ? '1px' : '0'}
+                                        fontSize="12px"
+                                        backgroundColor={
+                                            isDeltaMinutesSelected
+                                                ? theme.button.background.primary
+                                                : theme.button.background.secondary
+                                        }
+                                        borderRadius="4px"
+                                        borderColor={
+                                            isDeltaMinutesSelected ? theme.button.borderColor.secondary : undefined
+                                        }
+                                        textColor={
+                                            isDeltaMinutesSelected
+                                                ? theme.button.textColor.tertiary
+                                                : theme.button.textColor.secondary
+                                        }
+                                        onClick={onHoursButtonClikHandler}
+                                    >
+                                        {t('common.time-remaining.hours')}
+                                    </Button>
+                                </Column>
+                            </Row>
+                        )}
+                    </>
+                )}
+            </Container>
+        </div>
     );
 };
 
@@ -449,9 +394,7 @@ const Container = styled.div`
 `;
 
 const Row = styled(FlexDivRow)`
-    :first-child {
-        margin-bottom: 11px;
-    }
+    margin-top: 10px;
 `;
 
 const ChainedRow = styled(FlexDivEnd)`
@@ -467,49 +410,24 @@ const InputWrapper = styled.div`
     width: 100%;
 `;
 
-const Time = styled(FlexDivCentered)<{ $isInitial: boolean; $isSelected: boolean }>`
-    width: 70px;
-    height: 31px;
+const Time = styled(FlexDivCentered)<{ $isSelected: boolean }>`
+    width: 75px;
+    height: 40px;
     border-radius: 8px;
-    ${(props) =>
-        !props.$isInitial && !props.$isSelected ? `border: 1px solid ${props.theme.button.borderColor.tertiary};` : ''}
+    font-family: ${(props) => props.theme.fontFamily.tertiary};
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 100%;
+    ${(props) => (props.$isSelected ? '' : `border: 2px solid ${props.theme.button.borderColor.secondary};`)}
     background: ${(props) =>
-        props.$isInitial
-            ? props.theme.button.background.tertiary
-            : props.$isSelected
-            ? props.theme.button.background.secondary
-            : props.theme.button.background.primary};
+        props.$isSelected ? props.theme.button.background.secondary : props.theme.button.background.primary};
     color: ${(props) =>
-        props.$isInitial
-            ? props.theme.button.textColor.secondary
-            : props.$isSelected
-            ? props.theme.button.textColor.secondary
-            : props.theme.button.textColor.primary};
+        props.$isSelected ? props.theme.button.textColor.secondary : props.theme.button.textColor.tertiary};
     cursor: pointer;
-    font-weight: ${(props) => (props.$isSelected ? '600' : '300')};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         width: 60px;
     }
-`;
-
-const DeltaTime = styled(Time)`
-    font-weight: 600;
-    font-size: 13px;
-    line-height: 90%;
-    padding-left: 1px;
-`;
-
-const Icon = styled.i`
-    font-size: 20px;
-    line-height: 100%;
-    color: inherit;
-`;
-
-const TimeSeparator = styled(FlexDivCentered)`
-    color: ${(props) => props.theme.textColor.primary};
-    font-size: 16px;
-    font-weight: 500;
-    margin: 0 7px;
 `;
 
 export default SelectTime;
