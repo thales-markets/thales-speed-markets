@@ -402,7 +402,7 @@ const ChainedRow = styled(FlexDivEnd)`
 `;
 
 const Column = styled(FlexDivColumnCentered)`
-    justify-content: space-between;
+    justify-content: space-evenly;
     margin-left: 10px;
 `;
 

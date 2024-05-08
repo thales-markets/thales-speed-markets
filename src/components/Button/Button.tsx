@@ -14,6 +14,7 @@ type ButtonProps = {
     borderRadius?: string;
     onClick?: () => void;
     fontSize?: string;
+    fontWeight?: number;
     disabled?: boolean;
     additionalStyles?: CSSProperties;
     children?: any;
@@ -33,6 +34,7 @@ const Button: React.FC<ButtonProps> = ({
     disabled,
     additionalStyles,
     fontSize,
+    fontWeight,
     children,
 }) => {
     return (
@@ -57,6 +59,7 @@ const Button: React.FC<ButtonProps> = ({
                 onClick={onClick}
                 disabled={disabled}
                 $fontSize={fontSize}
+                $fontWeight={fontWeight}
                 style={additionalStyles}
             >
                 {children}
@@ -65,7 +68,7 @@ const Button: React.FC<ButtonProps> = ({
     );
 };
 
-const DEFAULT_MIN_HEIGHT = '34px';
+const DEFAULT_MIN_HEIGHT = '40px';
 const DEFAULT_PADDING = '2px';
 const DEFAULT_BORDER_RADIUS = '30px';
 
@@ -83,6 +86,9 @@ const Container = styled(FlexDivCentered)<{
     ${(props) => (props.minWidth ? `min-width: ${props.minWidth};` : '')};
     min-height: ${(props) => props.height || DEFAULT_MIN_HEIGHT};
     background: ${(props) => props.$borderColor || props.theme.button.borderColor.primary};
+    &:hover {
+        background: ${(props) => props.theme.button.textColor.tertiary};
+    }
     border-radius: ${(props) => props.$borderRadius || DEFAULT_BORDER_RADIUS};
     padding: ${(props) => props.padding || DEFAULT_PADDING};
     margin: ${(props) => props.margin || ''};
@@ -103,6 +109,7 @@ const ButtonWrapper = styled.button<{
     $textColor?: string;
     $backgroundColor?: string;
     $fontSize?: string;
+    $fontWeight?: number;
 }>`
     display: flex;
     text-transform: uppercase;
@@ -117,7 +124,7 @@ const ButtonWrapper = styled.button<{
             : `calc(${DEFAULT_MIN_HEIGHT} - 2 * ${DEFAULT_PADDING})`};
     border-radius: ${(props) => props.$borderRadius || DEFAULT_BORDER_RADIUS};
     border-width: 0;
-    font-weight: 700;
+    font-weight: ${(props) => props.$fontWeight || '700'};
     font-size: ${(props) => props.$fontSize || '18px'};
     font-family: ${(props) => props.theme.fontFamily.secondary};
     line-height: 100%;
@@ -127,6 +134,9 @@ const ButtonWrapper = styled.button<{
     outline: none;
     &:disabled {
         cursor: default;
+    }
+    &:hover {
+        color: ${(props) => props.theme.button.textColor.tertiary};
     }
 `;
 

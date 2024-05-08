@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 
-const OutsideClickHandler: React.FC<any> = ({ children, onOutsideClick }) => {
+const OutsideClickHandler: React.FC<any & { onOutisdeClick: void }> = ({ children, onOutsideClick }) => {
     const wrapperRef = useRef(null);
 
     useEffect(() => {

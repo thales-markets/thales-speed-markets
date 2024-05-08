@@ -1,31 +1,44 @@
 import Button from 'components/Button';
 import ROUTES from 'constants/routes';
 import { ScreenSizeBreakpoint } from 'enums/ui';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
 import { RootState } from 'types/ui';
-import { getIsMobile } from '../../../redux/modules/ui';
-import { FlexDivRow, FlexDivRowCentered } from '../../../styles/common';
+import { getIsMobile } from 'redux/modules/ui';
+import { FlexDivRow, FlexDivRowCentered } from 'styles/common';
 import Logo from '../components/Logo';
 import Notifications from '../components/Notifications';
 import ReferralModal from '../components/ReferralModal';
 import UserWallet from '../components/UserWallet';
 import NetworkSwitch from 'components/NetworkSwitch';
 import { useAccount } from 'wagmi';
-import { getIsBiconomy } from 'redux/modules/wallet';
 import GetStarted from 'pages/AARelatedPages/GetStarted';
+import { getIsBiconomy, getWalletConnectModalVisibility, setWalletConnectModalVisibility } from 'redux/modules/wallet';
+import Deposit from 'pages/AARelatedPages/Deposit';
+import ConnectWalletModal from 'components/ConnectWalletModal';
 
 const DappHeader: React.FC = () => {
     const { t } = useTranslation();
 
+    const dispatch = useDispatch();
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
+    const connectWalletModalVisibility = useSelector((state: RootState) => getWalletConnectModalVisibility(state));
     const { isConnected } = useAccount();
 
     const [openReferralModal, setOpenReferralModal] = useState(false);
     const [openGetStarted, setOpenGetStarted] = useState(false);
+    const [openDeposit, setOpenDeposit] = useState(false);
+
+    const connected = useRef(isConnected);
+
+    useEffect(() => {
+        if (isBiconomy && isConnected && !connected.current) {
+            setOpenGetStarted(true);
+        }
+    }, [isBiconomy, isConnected]);
 
     return (
         <Container $maxWidth={getMaxWidth()}>
@@ -33,30 +46,53 @@ const DappHeader: React.FC = () => {
                 <FlexDivRow>
                     {isMobile && <Icon className="sidebar-icon icon--nav-menu" onClick={sidebarMenuClickHandler} />}
                     <Logo />
-                    {isBiconomy && (
-                        <Button
-                            width="140px"
-                            height="30px"
-                            margin="10px 0"
-                            fontSize="12px"
-                            onClick={() => setOpenGetStarted(true)}
-                        >
-                            {t('common.header.get-started')}
-                        </Button>
-                    )}
+                    <Button
+                        width="140px"
+                        height="30px"
+                        margin="10px 0"
+                        fontSize="12px"
+                        onClick={() => setOpenGetStarted(true)}
+                    >
+                        {t('common.header.get-started')}
+                    </Button>
                 </FlexDivRow>
                 {isMobile && <Notifications />}
             </LeftContainer>
             <RightContainer>
-                <Button width="140px" height="30px" fontSize="12px" onClick={() => setOpenReferralModal(true)}>
-                    {t('common.header.refer-earn')}
-                </Button>
-                <UserWallet />
+                {isConnected ? (
+                    <Button
+                        fontWeight={800}
+                        width="140px"
+                        height="30px"
+                        fontSize="12px"
+                        onClick={() => setOpenDeposit(true)}
+                    >
+                        {t('common.header.deposit')}
+                    </Button>
+                ) : (
+                    <Button
+                        width="140px"
+                        height="30px"
+                        fontSize="12px"
+                        fontWeight={800}
+                        onClick={() =>
+                            dispatch(
+                                setWalletConnectModalVisibility({
+                                    visibility: true,
+                                })
+                            )
+                        }
+                    >
+                        <LoginIcon className={`network-icon network-icon--login`} />
+                        {t('common.wallet.connect-your-wallet')}
+                    </Button>
+                )}
+
                 <NetworkSwitch />
                 {isConnected && (
                     <>
+                        <UserWallet />
                         <HeaderIcons className={`network-icon network-icon--settings`} />
-                        <HeaderIcons className={`network-icon network-icon--home`} />
                     </>
                 )}
 
@@ -64,6 +100,17 @@ const DappHeader: React.FC = () => {
             </RightContainer>
             {openReferralModal && <ReferralModal onClose={() => setOpenReferralModal(false)} />}
             {openGetStarted && <GetStarted isOpen={openGetStarted} onClose={() => setOpenGetStarted(false)} />}
+            {openDeposit && <Deposit isOpen={openDeposit} onClose={() => setOpenDeposit(false)} />}
+            <ConnectWalletModal
+                isOpen={connectWalletModalVisibility}
+                onClose={() => {
+                    dispatch(
+                        setWalletConnectModalVisibility({
+                            visibility: !connectWalletModalVisibility,
+                        })
+                    );
+                }}
+            />
         </Container>
     );
 };
@@ -128,6 +175,12 @@ const HeaderIcons = styled.i`
     font-size: 26px;
     color: ${(props) => props.theme.button.textColor.tertiary};
     margin-left: 10px;
+`;
+
+const LoginIcon = styled.i`
+    font-size: 18px;
+    position: relative;
+    left: -10px;
 `;
 
 export default DappHeader;

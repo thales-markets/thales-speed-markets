@@ -107,14 +107,14 @@ const StyledInput = styled(Input)<{ padding?: string }>`
 const RightContainer = styled(FlexDivCentered)`
     position: absolute;
     right: 0;
-    bottom: 6px;
+    bottom: 10px;
 `;
 
 const CurrencyLabel = styled.label<{ $hasSeparator?: boolean }>`
-    border-left: ${(props) => (props.$hasSeparator ? `2px solid ${props.theme.input.borderColor.primary}` : 'none')};
+    border-left: ${(props) => (props.$hasSeparator ? `2px solid ${props.theme.textColor.primary}` : 'none')};
     font-weight: bold;
     font-size: 13px;
-    line-height: 20px;
+    line-height: 26px;
     color: ${(props) => props.theme.input.textColor.primary};
     padding-left: 8px;
     padding-right: 12px;
@@ -127,15 +127,15 @@ const CurrencyLabel = styled.label<{ $hasSeparator?: boolean }>`
 
 const MaxButton = styled.button`
     font-family: ${(props) => props.theme.fontFamily.primary};
-    background: ${(props) => props.theme.button.borderColor.primary};
+    background: ${(props) => props.theme.button.borderColor.secondary};
     border-radius: 17px;
     border: none;
     width: 50px;
-    height: 22px;
+    height: 20px;
     font-weight: 700;
     font-size: 13px;
     line-height: normal;
-    color: ${(props) => props.theme.button.textColor.primary};
+    color: ${(props) => props.theme.button.textColor.secondary};
     text-transform: capitalize;
     cursor: pointer;
     margin-right: 4px;
@@ -162,7 +162,7 @@ const ValidationText = styled.span`
 `;
 
 const CurrencyComponentContainer = styled(FlexDivCentered)<{ $hasSeparator?: boolean }>`
-    ${(props) => (props.$hasSeparator ? `border-left: 2px solid ${props.theme.input.borderColor.primary};` : '')}
+    ${(props) => (props.$hasSeparator ? `border-left: 2px solid ${props.theme.textColor.primary};` : '')}
     line-height: 15px;
     padding-right: 2px;
     &.disabled {

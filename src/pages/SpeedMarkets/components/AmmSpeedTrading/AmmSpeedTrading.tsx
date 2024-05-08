@@ -61,7 +61,7 @@ import { Client, getContract, parseUnits, stringToHex } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 import { SelectedPosition } from '../SelectPosition/SelectPosition';
-import { executeBiconomyTransaction } from 'utils/biconomy';
+import { createSession, executeBiconomyTransaction } from 'utils/biconomy';
 import biconomyConnector from 'utils/biconomyWallet';
 import { PLAUSIBLE, PLAUSIBLE_KEYS } from 'constants/analytics';
 import { GradientContainer } from 'components/Common/GradientBorder';
@@ -735,15 +735,29 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             );
         }
         if (!hasAllowance) {
-            return (
-                <Button height="40px" disabled={isAllowing} onClick={() => setOpenApprovalModal(true)}>
-                    {isAllowing
-                        ? t('common.enable-wallet-access.approve-progress')
-                        : t('common.enable-wallet-access.approve')}
-                    <CollateralText>&nbsp;{selectedCollateral}</CollateralText>
-                    {isAllowing ? '...' : ''}
-                </Button>
-            );
+            if (isBiconomy) {
+                return (
+                    <Button
+                        onClick={async () => {
+                            console.log('enable session');
+                            await createSession(networkId, collateralAddress);
+                            // await handleSubmit();
+                        }}
+                    >
+                        {isSubmitting ? t(`common.buy.progress-label`) : t(`common.buy.label`)}
+                    </Button>
+                );
+            } else {
+                return (
+                    <Button height="40px" disabled={isAllowing} onClick={() => setOpenApprovalModal(true)}>
+                        {isAllowing
+                            ? t('common.enable-wallet-access.approve-progress')
+                            : t('common.enable-wallet-access.approve')}
+                        <CollateralText>&nbsp;{selectedCollateral}</CollateralText>
+                        {isAllowing ? '...' : ''}
+                    </Button>
+                );
+            }
         }
 
         return (

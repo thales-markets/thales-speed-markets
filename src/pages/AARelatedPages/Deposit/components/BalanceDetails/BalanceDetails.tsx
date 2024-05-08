@@ -64,12 +64,23 @@ const BalanceDetails: React.FC = () => {
         [multipleCollateralBalances, exchangeRates]
     );
 
+    const collateralsDetailsSorted = useMemo(() => {
+        const mappedCollaterals = getCollaterals(networkId).map((collateral, index) => ({
+            name: collateral as Coins,
+            index,
+        }));
+
+        return mappedCollaterals.sort(
+            (collateralA, collateralB) => getUSDForCollateral(collateralB.name) - getUSDForCollateral(collateralA.name)
+        );
+    }, [networkId, getUSDForCollateral]);
+
     return (
         <BalanceWrapper>
-            <SectionLabel>{t('my-portfolio.estimated-balance')}</SectionLabel>
+            <SectionLabel>{t('deposit.balance')}</SectionLabel>
             <TotalBalance>{formatCurrencyWithSign(USD_SIGN, totalBalanceValue)}</TotalBalance>
             <TokenBalancesWrapper>
-                {getCollaterals(networkId).map((token, index) => {
+                {collateralsDetailsSorted.map(({ name: token }, index) => {
                     return (
                         <IndividualTokenBalanceWrapper key={`ind-token-${index}`}>
                             <Token>
@@ -96,11 +107,9 @@ const BalanceDetails: React.FC = () => {
 
 const BalanceWrapper = styled(FlexDiv)`
     flex-direction: column;
-    border: 1px ${(props) => props.theme.borderColor.primary} solid;
-    border-radius: 20px;
+
     padding: 19px;
     margin-bottom: 20px;
-    background-color: ${(props) => props.theme.textColor.primary};
 `;
 
 const SectionLabel = styled.span`
@@ -109,7 +118,7 @@ const SectionLabel = styled.span`
     text-transform: capitalize;
     letter-spacing: 3px;
     margin-bottom: 13px;
-    color: ${(props) => props.theme.background.primary};
+    color: ${(props) => props.theme.textColor.primary};
 `;
 
 const TotalBalance = styled.span`
@@ -119,7 +128,7 @@ const TotalBalance = styled.span`
     border-bottom: 2px ${(props) => props.theme.background.primary} solid;
     margin-bottom: 20px;
     padding-bottom: 20px;
-    color: ${(props) => props.theme.background.primary};
+    color: ${(props) => props.theme.textColor.primary};
 `;
 
 const TokenBalancesWrapper = styled(FlexDiv)`
@@ -147,13 +156,13 @@ const Token = styled(FlexDiv)`
 const TokenName = styled.span`
     font-weight: 700;
     font-size: 12px;
-    color: ${(props) => props.theme.background.primary};
+    color: ${(props) => props.theme.textColor.primary};
 `;
 
 const TokenIcon = styled.i`
     font-size: 20px;
     margin-right: 5px;
-    color: ${(props) => props.theme.background.primary};
+    color: ${(props) => props.theme.textColor.primary};
     font-weight: 100;
 `;
 
@@ -161,7 +170,7 @@ const IndividualTokenBalance = styled.span`
     font-size: 12px;
     font-weight: 600;
     text-align: right;
-    color: ${(props) => props.theme.background.primary};
+    color: ${(props) => props.theme.textColor.primary};
 `;
 
 export default BalanceDetails;

@@ -70,7 +70,8 @@ const App = () => {
                 switchChain({ chainId: ethereumChainId as SupportedNetwork });
             });
         }
-        if (walletClient) {
+
+        if (walletClient && isSocialAuthType(getLatestAuthType())) {
             const bundlerUrl = `https://bundler.biconomy.io/api/v2/${networkId}/${
                 import.meta.env.VITE_APP_BICONOMY_BUNDLE_KEY
             }`;

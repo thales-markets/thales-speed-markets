@@ -25,7 +25,7 @@ const AllSetModal: React.FC<AllSetModalProps> = ({ onClose }) => {
                     <Button
                         onClick={() => {}}
                         width="220px"
-                        height="34px"
+                        height="40px"
                         backgroundColor={theme.background.quaternary}
                     >
                         {t('deposit.go')}

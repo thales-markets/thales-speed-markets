@@ -1,17 +1,46 @@
+import Button from 'components/Button';
+import { GradientContainer } from 'components/Common/GradientBorder';
+import OutsideClick from 'components/OutsideClick';
+import { getErrorToastOptions, getInfoToastOptions } from 'components/ToastMessage/ToastMessage';
 import ROUTES from 'constants/routes';
 import { GetStartedStep } from 'enums/wizard';
-import React, { useMemo } from 'react';
+import QRCodeModal from 'pages/AARelatedPages/Deposit/components/QRCodeModal';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch, useSelector } from 'react-redux';
+import ReactModal from 'react-modal';
+import { useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
 
-import { getIsBiconomy, setWalletConnectModalVisibility } from 'redux/modules/wallet';
+import { setWalletConnectModalVisibility } from 'redux/modules/wallet';
 import styled from 'styled-components';
-import { FlexDivCentered, FlexDivColumn } from 'styles/common';
-import { RootState } from 'types/ui';
+import { FlexDiv, FlexDivCentered, FlexDivColumn } from 'styles/common';
+import biconomyConnector from 'utils/biconomyWallet';
 import { getDefaultCollateral } from 'utils/currency';
 import { getNetworkNameByNetworkId } from 'utils/network';
+import { getOnRamperUrl } from 'utils/particleWallet/utils';
 import { buildHref, navigateTo } from 'utils/routes';
 import { useAccount, useChainId } from 'wagmi';
+
+ReactModal.setAppElement('#root');
+
+const defaultStyle = {
+    content: {
+        top: '50%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        padding: 2,
+        paddingBottom: 0,
+        background: 'linear-gradient(90deg, #a764b7 0%, #169cd2 100%)',
+        transform: 'translate(-50%, -50%)',
+        overflow: 'none',
+        border: 'none',
+    },
+    overlay: {
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        zIndex: 200,
+    },
+};
 
 type StepProps = {
     stepNumber: number;
@@ -25,8 +54,9 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
     const networkId = useChainId();
     const dispatch = useDispatch();
     const { isConnected: isWalletConnected } = useAccount();
-    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
     const { t } = useTranslation();
+    const [showQRModal, setShowQRModal] = useState<boolean>(false);
+    const [showOnramper, setShowOnramper] = useState<boolean>(false);
 
     const isActive = currentStep === stepType;
     const isDisabled = !isWalletConnected && stepType !== GetStartedStep.LOG_IN;
@@ -35,7 +65,7 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
         let transKey = 'get-started.steps.title';
         switch (stepType) {
             case GetStartedStep.LOG_IN:
-                transKey += isBiconomy && isWalletConnected ? '.logged-in' : '.sign-up';
+                transKey += isWalletConnected ? '.logged-in' : '.sign-up';
                 break;
             case GetStartedStep.DEPOSIT:
                 transKey += '.deposit';
@@ -45,13 +75,13 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
                 break;
         }
         return t(transKey);
-    }, [isBiconomy, isWalletConnected, stepType, t]);
+    }, [isWalletConnected, stepType, t]);
 
     const stepDescription = useMemo(() => {
         let transKey = 'get-started.steps.description';
         switch (stepType) {
             case GetStartedStep.LOG_IN:
-                transKey += isBiconomy && isWalletConnected ? '.logged-in' : '.sign-up';
+                transKey += isWalletConnected ? '.logged-in' : '.sign-up';
                 break;
             case GetStartedStep.DEPOSIT:
                 transKey += '.deposit';
@@ -65,7 +95,7 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
             network: getNetworkNameByNetworkId(networkId, true),
             collateral: getDefaultCollateral(networkId),
         });
-    }, [stepType, networkId, isBiconomy, isWalletConnected, t]);
+    }, [stepType, networkId, isWalletConnected, t]);
 
     const showStepIcon = useMemo(() => {
         if (isWalletConnected) {
@@ -96,7 +126,6 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
                 );
                 break;
             case GetStartedStep.DEPOSIT:
-                navigateTo(buildHref(ROUTES.Deposit));
                 break;
             case GetStartedStep.TRADE:
                 navigateTo(buildHref(ROUTES.Home));
@@ -106,33 +135,108 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
 
     const changeCurrentStep = () => (isDisabled ? null : setCurrentStep(stepType));
 
+    const handleCopy = () => {
+        const id = toast.loading(t('deposit.copying-address'));
+        try {
+            navigator.clipboard.writeText(biconomyConnector.address);
+            toast.update(id, getInfoToastOptions(t('deposit.copied'), ''));
+        } catch (e) {
+            toast.update(id, getErrorToastOptions('Error', ''));
+        }
+    };
+
+    const apiKey = import.meta.env.VITE_APP_ONRAMPER_KEY || '';
+
+    const onramperUrl = useMemo(() => {
+        return getOnRamperUrl(apiKey, biconomyConnector.address as string, networkId);
+    }, [networkId, apiKey]);
+
     return (
-        <Container onClick={isActive ? onStepActionClickHandler : () => {}}>
-            <StepNumberSection>
-                <StepNumberWrapper
-                    completed={!isActive && showStepIcon}
-                    isActive={isActive}
-                    isDisabled={isDisabled}
-                    onClick={changeCurrentStep}
-                >
-                    <StepNumber isActive={isActive}>
-                        {!isActive && showStepIcon ? <CorrectIcon className="icon icon--correct" /> : stepNumber}
-                    </StepNumber>
-                </StepNumberWrapper>
-            </StepNumberSection>
-            <StepDescriptionSection isActive={isActive} isDisabled={isDisabled} onClick={changeCurrentStep}>
-                <StepTitle completed={!isActive && showStepIcon}>{stepTitle}</StepTitle>
-                <StepDescription completed={!isActive && showStepIcon}>{stepDescription}</StepDescription>
-            </StepDescriptionSection>
-        </Container>
+        <>
+            <Container onClick={isActive ? onStepActionClickHandler : () => {}}>
+                <StepNumberSection>
+                    <StepNumberWrapper
+                        completed={!isActive && showStepIcon}
+                        isActive={isActive}
+                        isDisabled={isDisabled}
+                        onClick={changeCurrentStep}
+                    >
+                        <StepNumber isActive={isActive}>
+                            {!isActive && showStepIcon ? <CorrectIcon className="icon icon--correct" /> : stepNumber}
+                        </StepNumber>
+                    </StepNumberWrapper>
+                </StepNumberSection>
+                <StepDescriptionSection isActive={isActive} isDisabled={isDisabled} onClick={changeCurrentStep}>
+                    <StepTitle completed={!isActive && showStepIcon}>{stepTitle}</StepTitle>
+                    <StepDescription completed={!isActive && showStepIcon}>{stepDescription}</StepDescription>
+                    {stepType === GetStartedStep.DEPOSIT && (
+                        <DepositContainer>
+                            <GradientContainer>
+                                <AddressContainer>
+                                    <Address> {biconomyConnector.address}</Address>
+                                    <CopyText onClick={handleCopy}>COPY</CopyText>
+                                    <QRIcon
+                                        onClick={() => {
+                                            setShowQRModal(!showQRModal);
+                                        }}
+                                        className="social-icon icon--qr-code"
+                                    />
+                                    <CopyIcon onClick={handleCopy} className="network-icon network-icon--copy" />
+                                </AddressContainer>
+                            </GradientContainer>
+                            <Separator />
+                            <OnramperDiv
+                                onClick={() => {
+                                    setShowOnramper(true);
+                                }}
+                            >
+                                <OnramperDiv>
+                                    <OnramperIcons className={`social-icon icon--visa`} />
+                                    <OnramperIcons className={`social-icon icon--master`} />
+                                    <OnramperIcons className={`social-icon icon--applepay`} />
+                                    <OnramperIcons className={`social-icon icon--googlepay`} />
+                                </OnramperDiv>
+                                <Button width="100%" fontSize="14px">
+                                    Buy Crypto
+                                </Button>
+                            </OnramperDiv>
+                        </DepositContainer>
+                    )}
+                </StepDescriptionSection>
+            </Container>
+
+            {showQRModal && (
+                <QRCodeModal
+                    onClose={() => setShowQRModal(false)}
+                    walletAddress={biconomyConnector.address as string}
+                    title={t('deposit.qr-modal-title')}
+                />
+            )}
+            {showOnramper && (
+                <ReactModal isOpen={showOnramper} shouldCloseOnOverlayClick={true} style={defaultStyle}>
+                    <OutsideClick onOutsideClick={() => setShowOnramper(false)}>
+                        <div style={{ background: 'black', marginBottom: '2px' }}>
+                            <iframe
+                                src={onramperUrl}
+                                title="Onramper Widget"
+                                height="630px"
+                                width="420px"
+                                allow="accelerometer; autoplay; camera; gyroscope; payment"
+                            />
+                        </div>
+                    </OutsideClick>
+                </ReactModal>
+            )}
+        </>
     );
 };
 
 const Container = styled.div`
     display: flex;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    gap: 30px;
+    margin: 10px 0;
+
+    gap: 10px;
+    align-items: flex-start;
     @media (max-width: 600px) {
         gap: 16px;
     }
@@ -193,6 +297,100 @@ const StepNumber = styled.span<{ isActive: boolean }>`
 const CorrectIcon = styled.i`
     font-size: 20px;
     color: ${(props) => props.theme.background.primary};
+`;
+
+const AddressContainer = styled.div`
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 36px;
+    border-radius: 6px;
+    padding: 12px;
+    background: ${(props) => props.theme.background.primary};
+    color: ${(props) => props.theme.textColor.primary};
+`;
+
+const Address = styled.span`
+    font-family: ${(props) => props.theme.fontFamily.tertiary};
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: normal;
+    letter-spacing: -0.28px;
+    text-transform: lowercase;
+`;
+
+const QRIcon = styled.i`
+    font-size: 20px;
+    position: absolute;
+    cursor: pointer;
+    right: 90px;
+    top: 8px;
+    color: ${(props) => props.theme.input.textColor.secondary};
+`;
+
+const CopyText = styled.span`
+    font-family: ${(props) => props.theme.fontFamily.secondary};
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 100%; /* 14px */
+    text-transform: uppercase;
+    cursor: pointer;
+`;
+
+const Separator = styled.div`
+    height: 1px;
+    margin: 20px 6px 4px;
+    background: ${(props) => props.theme.button.borderColor.primary};
+    position: relative;
+    &:after {
+        position: absolute;
+
+        content: 'or';
+        font-family: ${(props) => props.theme.fontFamily.secondary};
+        font-size: 14px;
+        font-style: normal;
+        font-weight: 800;
+        line-height: 12px; /* 85.714% */
+        letter-spacing: -0.5px;
+        color: ${(props) => props.theme.textColor.primary};
+        background: ${(props) => props.theme.background.primary};
+        top: 50%; /* position the top  edge of the element at the middle of the parent */
+        left: 50%; /* position the left edge of the element at the middle of the parent */
+
+        transform: translate(-50%, -50%);
+        padding: 0 11px;
+    }
+`;
+
+const OnramperDiv = styled(FlexDiv)`
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+`;
+
+const OnramperIcons = styled.i`
+    font-size: 70px;
+    color: ${(props) => props.theme.textColor.primary};
+    @media (max-width: 500px) {
+        font-size: 45px;
+    }
+`;
+
+const DepositContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+`;
+
+const CopyIcon = styled.i`
+    position: absolute;
+    right: 60px;
+    top: 6px;
+    font-size: 22px;
 `;
 
 export default Step;

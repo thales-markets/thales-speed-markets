@@ -5,8 +5,13 @@ export const Wrapper = styled(FlexDiv)`
     align-items: flex-start;
     flex-direction: row;
     gap: 20px;
+
+    max-width: 900px;
     width: 100%;
-    max-width: 1080px;
+    background-color: ${(props) => props.theme.background.primary};
+    border-radius: 15px;
+    padding: 25px;
+
     @media (max-width: 600px) {
         margin-top: 20px;
         flex-wrap: wrap-reverse;
@@ -28,7 +33,6 @@ export const FormContainer = styled(FlexDiv)`
 export const BalanceSection = styled(FlexDiv)`
     flex-direction: column;
     width: 100%;
-    max-width: 400px;
     margin-top: 20px;
     @media (max-width: 600px) {
         padding: 0;
@@ -70,7 +74,7 @@ export const CollateralContainer = styled.div`
     border-radius: 8px;
     border: 2px solid ${(props) => props.theme.background.secondary};
     padding: 8px 0;
-    max-height: 34px;
+    max-height: 40px;
     align-items: center;
     background: ${(props) => props.theme.input.background.primary};
     cursor: pointer;

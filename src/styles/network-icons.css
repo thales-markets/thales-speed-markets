@@ -26,6 +26,14 @@
     content: '\0045';
 }
 
+.network-icon--login:before {
+    content: '\0050';
+}
+
+.network-icon--copy:before {
+    content: '\0051';
+}
+
 .network-icon--settings:before {
     content: '\0064';
 }

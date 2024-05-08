@@ -13,10 +13,7 @@ import {
     FormContainer,
     InputContainer,
     InputLabel,
-    Link,
     PrimaryHeading,
-    SectionLabel,
-    TutorialLinksContainer,
     WarningContainer,
     WarningIcon,
     Wrapper,
@@ -36,10 +33,41 @@ import { getCollaterals } from 'utils/currency';
 import { COLLATERALS } from 'constants/currency';
 import CollateralDropdown from './components/CollateralDropdown';
 import { GradientContainer } from 'components/Common/GradientBorder';
-import Button from 'components/Button';
-import { getOnRamperUrl } from 'utils/particleWallet/utils';
 
-const Deposit: React.FC = () => {
+import { getOnRamperUrl } from 'utils/particleWallet/utils';
+import ReactModal from 'react-modal';
+import OutsideClick from 'components/OutsideClick';
+
+ReactModal.setAppElement('#root');
+
+const defaultStyle = {
+    content: {
+        top: '50%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        padding: '2px',
+        background: 'linear-gradient(90deg, #a764b7 0%, #169cd2 100%)',
+        width: '720px',
+        borderRadius: '15px',
+        marginRight: '-50%',
+        transform: 'translate(-50%, -50%)',
+        overflow: 'none',
+        height: 'auto',
+        border: 'none',
+    },
+    overlay: {
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        zIndex: 200,
+    },
+};
+
+type DepositProps = {
+    isOpen: boolean;
+    onClose: () => void;
+};
+
+const Deposit: React.FC<DepositProps> = ({ isOpen, onClose }) => {
     const { t } = useTranslation();
     const networkId = useChainId();
     const walletAddress = biconomyConnector.address;
@@ -128,122 +156,92 @@ const Deposit: React.FC = () => {
     const apiKey = process.env.REACT_APP_ONRAMPER_KEY || '';
 
     const onramperUrl = useMemo(() => {
-        return getOnRamperUrl(
-            apiKey,
-            (isBiconomy ? biconomyConnector.address : walletAddress) as string,
-            networkId,
-            selectedToken
-        );
-    }, [walletAddress, networkId, apiKey, selectedToken, isBiconomy]);
+        return getOnRamperUrl(apiKey, (isBiconomy ? biconomyConnector.address : walletAddress) as string, networkId);
+    }, [walletAddress, networkId, apiKey, isBiconomy]);
 
     return (
-        <>
-            {isMobile && <PrimaryHeading>{t('deposit.deposit-crypto')}</PrimaryHeading>}
-            <Wrapper>
-                <FormContainer>
-                    <div>
-                        {!isMobile && <PrimaryHeading>{t('deposit.deposit-crypto')}</PrimaryHeading>}
-                        <InputLabel>{t('deposit.select-token')}</InputLabel>
+        <ReactModal isOpen={isOpen} shouldCloseOnOverlayClick={true} style={defaultStyle}>
+            <OutsideClick onOutsideClick={onClose}>
+                {isMobile && <PrimaryHeading>{t('deposit.deposit-crypto')}</PrimaryHeading>}
+                <Wrapper>
+                    <FormContainer>
+                        <div>
+                            {!isMobile && <PrimaryHeading>{t('deposit.deposit-crypto')}</PrimaryHeading>}
+                            <InputLabel>{t('deposit.select-token')}</InputLabel>
 
-                        <CollateralDropdown
-                            onChangeCollateral={handleChangeCollateral}
-                            collateralArray={COLLATERALS[networkId]}
-                            selectedItem={selectedToken}
-                        />
+                            <CollateralDropdown
+                                onChangeCollateral={handleChangeCollateral}
+                                collateralArray={COLLATERALS[networkId]}
+                                selectedItem={selectedToken}
+                            />
 
-                        <DepositAddressFormContainer>
-                            <InputLabel>
-                                {t('deposit.address-input-label', {
-                                    token: getCollaterals(networkId)[selectedToken],
-                                    network: getNetworkNameByNetworkId(networkId),
-                                })}
-                            </InputLabel>
-                            <WalletAddressInputWrapper>
-                                <InputContainer>
-                                    <WalletAddressInput
-                                        type={'text'}
-                                        value={walletAddress}
-                                        readOnly
-                                        ref={walletAddressInputRef}
-                                    />
-                                    <QRIcon
-                                        onClick={() => {
-                                            setShowQRModal(!showQRModal);
-                                        }}
-                                        className="social-icon icon--qr-code"
-                                    />
-                                </InputContainer>
-                                <GradientContainer width={68}>
-                                    <CopyButton onClick={() => handleCopy()}>{'Copy'}</CopyButton>
-                                </GradientContainer>
-                            </WalletAddressInputWrapper>
-                            <WarningContainer>
-                                <WarningIcon className={'icon icon--warning'} />
-                                {t('deposit.send', {
-                                    token: getCollaterals(networkId)[selectedToken],
-                                    network: getNetworkNameByNetworkId(networkId),
-                                })}
-                            </WarningContainer>
-                        </DepositAddressFormContainer>
-                    </div>
-                    <div>
-                        <BuyWithText>{t('deposit.buy-with')}</BuyWithText>
-                    </div>
-                    <div>
-                        <Description>{t('deposit.description')}</Description>
-                        <OnramperDiv
-                            onClick={() => {
-                                setShowOnramper(true);
-                            }}
-                        >
-                            <OnramperDiv>
-                                <OnramperIcons className={`social-icon icon--visa`} />
-                                <OnramperIcons className={`social-icon icon--master`} />
-                                <OnramperIcons className={`social-icon icon--applepay`} />
-                                <OnramperIcons className={`social-icon icon--googlepay`} />
-                            </OnramperDiv>
-                            <Button width="100%" fontSize="14px">
-                                Buy Crypto
-                            </Button>
-                        </OnramperDiv>
-                    </div>
-                </FormContainer>
-                <BalanceSection>
-                    <BalanceDetails />
-                    <TutorialLinksContainer>
-                        <SectionLabel>{'Tutorials'}</SectionLabel>
-                        <Link href={'#'}>{'Coinbase'}</Link>
-                        <Link href={'#'}>{'Coinbase'}</Link>
-                        <Link href={'#'}>{'Coinbase'}</Link>
-                        <Link href={'#'}>{'Coinbase'}</Link>
-                    </TutorialLinksContainer>
-                </BalanceSection>
-            </Wrapper>
-            {showQRModal && (
-                <QRCodeModal
-                    onClose={() => setShowQRModal(false)}
-                    walletAddress={(isBiconomy ? biconomyConnector.address : walletAddress) as string}
-                    title={t('deposit.qr-modal-title', {
-                        token: getCollaterals(networkId)[selectedToken],
-                        network: getNetworkNameByNetworkId(networkId),
-                    })}
-                />
-            )}
-            {showSuccessfulDepositModal && <AllSetModal onClose={() => setShowSuccessfulDepositModal(false)} />}
-            {showOnramper && (
-                <Modal title={''} onClose={() => setShowOnramper(false)}>
-                    <ModalWrapper>
-                        <iframe
-                            src={onramperUrl}
-                            title="Onramper Widget"
-                            height="630px"
-                            width="420px"
-                            allow="accelerometer; autoplay; camera; gyroscope; payment"
-                        />
-                    </ModalWrapper>
-                </Modal>
-            )}
-        </>
+                            <DepositAddressFormContainer>
+                                <InputLabel>
+                                    {t('deposit.address-input-label', {
+                                        token: getCollaterals(networkId)[selectedToken],
+                                        network: getNetworkNameByNetworkId(networkId),
+                                    })}
+                                </InputLabel>
+                                <WalletAddressInputWrapper>
+                                    <InputContainer>
+                                        <WalletAddressInput
+                                            type={'text'}
+                                            value={walletAddress}
+                                            readOnly
+                                            ref={walletAddressInputRef}
+                                        />
+                                        <QRIcon
+                                            onClick={() => {
+                                                setShowQRModal(!showQRModal);
+                                            }}
+                                            className="social-icon icon--qr-code"
+                                        />
+                                    </InputContainer>
+                                    <GradientContainer width={68}>
+                                        <CopyButton onClick={() => handleCopy()}>{'Copy'}</CopyButton>
+                                    </GradientContainer>
+                                </WalletAddressInputWrapper>
+                                <WarningContainer>
+                                    <WarningIcon className={'icon icon--warning'} />
+                                    {t('deposit.send', {
+                                        token: getCollaterals(networkId)[selectedToken],
+                                        network: getNetworkNameByNetworkId(networkId),
+                                    })}
+                                </WarningContainer>
+                            </DepositAddressFormContainer>
+                        </div>
+                        <BalanceSection>
+                            <BalanceDetails />
+                        </BalanceSection>
+                    </FormContainer>
+                </Wrapper>
+
+                {showQRModal && (
+                    <QRCodeModal
+                        onClose={() => setShowQRModal(false)}
+                        walletAddress={(isBiconomy ? biconomyConnector.address : walletAddress) as string}
+                        title={t('deposit.qr-modal-title', {
+                            token: getCollaterals(networkId)[selectedToken],
+                            network: getNetworkNameByNetworkId(networkId),
+                        })}
+                    />
+                )}
+                {showSuccessfulDepositModal && <AllSetModal onClose={() => setShowSuccessfulDepositModal(false)} />}
+                {showOnramper && (
+                    <Modal title={''} onClose={() => setShowOnramper(false)}>
+                        <ModalWrapper>
+                            <iframe
+                                src={onramperUrl}
+                                title="Onramper Widget"
+                                height="630px"
+                                width="420px"
+                                allow="accelerometer; autoplay; camera; gyroscope; payment"
+                            />
+                        </ModalWrapper>
+                    </Modal>
+                )}
+            </OutsideClick>
+        </ReactModal>
     );
 };
 
@@ -253,39 +251,11 @@ const DepositAddressFormContainer = styled(FlexDiv)`
     margin-top: 20px;
 `;
 
-const BuyWithText = styled.span`
-    display: block;
-    font-size: 20px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-    text-transform: capitalize;
-    margin: auto;
-    color: ${(props) => props.theme.textColor.primary};
-    width: 100%;
-    text-align: center;
-`;
-
-const OnramperIcons = styled.i`
-    font-size: 70px;
-    color: ${(props) => props.theme.textColor.primary};
-    @media (max-width: 500px) {
-        font-size: 45px;
-    }
-`;
-
 const WalletAddressInputWrapper = styled(FlexDiv)`
     flex-direction: row;
     width: 100%;
     justify-content: space-between;
     align-items: center;
-`;
-
-const OnramperDiv = styled(FlexDiv)`
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    cursor: pointer;
 `;
 
 const ModalWrapper = styled(FlexDiv)`
@@ -334,12 +304,4 @@ const CopyButton = styled(FlexDiv)`
     font-family: ${(props) => props.theme.fontFamily.tertiary};
 `;
 
-const Description = styled.p`
-    color: ${(props) => props.theme.textColor.primary};
-    font-family: ${(props) => props.theme.fontFamily.primary};
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-`;
 export default Deposit;

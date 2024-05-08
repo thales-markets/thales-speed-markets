@@ -64,7 +64,7 @@ const Container = styled.div`
     color: ${(props) => props.theme.textColor.primary};
     font-family: ${(props) => props.theme.fontFamily.tertiary};
     position: relative;
-    max-height: 34px;
+    max-height: 40px;
     cursor: pointer;
 `;
 

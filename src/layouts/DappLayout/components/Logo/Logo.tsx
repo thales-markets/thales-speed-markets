@@ -17,8 +17,7 @@ const Container = styled.div``;
 
 const LogoIcon = styled.i`
     font-size: 125px;
-    line-height: 0px;
-    margin-top: 30px;
+    line-height: 50px;
     margin-right: 10px;
 `;
 

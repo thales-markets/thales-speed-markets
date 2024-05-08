@@ -4,8 +4,10 @@ import { SupportedNetwork } from 'types/network';
 import { ViemContract } from 'types/viem';
 import {
     concat,
+    createWalletClient,
     encodeFunctionData,
     erc20Abi,
+    http,
     maxUint256,
     pad,
     parseEther,
@@ -17,8 +19,12 @@ import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import { DEFAULT_SESSION_KEY_MANAGER_MODULE, createSessionKeyManagerModule } from '@biconomy/account';
 
 import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
+import { RPC_LIST } from 'constants/network';
+import { arbitrum } from 'viem/chains';
+import { NetworkId } from 'thales-utils';
 
-const abiSVMAddress = '0x9bfe7FE082695ac3Ff1833B6f764Cc870901b042';
+// const abiSVMAddress = '0x9bfe7FE082695ac3Ff1833B6f764Cc870901b042'; //optimism
+const abiSVMAddress = '0x6984DCbE83966Cfe35B906E097b1D771fAAb6F1e'; //arbitrum
 
 export const executeBiconomyTransaction = async (
     collateral: string,
@@ -45,21 +51,25 @@ export const executeBiconomyTransaction = async (
         };
 
         // generate sessionModule
-        // const sessionModule = await createSessionKeyManagerModule({
-        //     moduleAddress: DEFAULT_SESSION_KEY_MANAGER_MODULE,
-        //     smartAccountAddress: biconomyConnector.address,
-        // });
+        const sessionModule = await createSessionKeyManagerModule({
+            moduleAddress: DEFAULT_SESSION_KEY_MANAGER_MODULE,
+            smartAccountAddress: biconomyConnector.address,
+        });
 
-        // biconomyConnector.wallet.setActiveValidationModule(sessionModule);
-        // const sessionAccount = privateKeyToAccount(sessionKeyPrivKey as any);
+        const sessionKeyPrivKey = window.localStorage.getItem('sessionPKey');
 
-        // const sessionSigner = createWalletClient({
-        //     account: sessionAccount,
-        //     chain: optimism,
-        //     transport: http(RPC_LIST.CHAINNODE[NetworkId.OptimismMainnet]),
-        // });
+        biconomyConnector.wallet.setActiveValidationModule(sessionModule);
+        const sessionAccount = privateKeyToAccount(sessionKeyPrivKey as any);
 
-        // console.log(sessionModule);
+        // const chainId: 10 | 42161 | 137 | 8453 = biconomyConnector.wallet.biconomySmartAccountConfig.chainId as any;
+
+        const sessionSigner = createWalletClient({
+            account: sessionAccount,
+            chain: arbitrum,
+            transport: http(RPC_LIST.CHAINNODE[NetworkId.Arbitrum]),
+        });
+
+        console.log(sessionSigner);
 
         const { wait } = await biconomyConnector.wallet.sendTransaction(transaction, {
             paymasterServiceData: {
@@ -69,10 +79,10 @@ export const executeBiconomyTransaction = async (
                         ? '0x7F5c764cBc14f9669B88837ca1490cCa17c31607'
                         : collateral,
             },
-            // params: {
-            //     sessionSigner: sessionSigner,
-            //     sessionValidationModule: abiSVMAddress,
-            // },
+            params: {
+                sessionSigner: sessionSigner,
+                sessionValidationModule: abiSVMAddress,
+            },
         });
 
         const {
@@ -110,9 +120,6 @@ export const createSession = async (networkId: SupportedNetwork, collateralAddre
                 smartAccountAddress: biconomyConnector.address,
             });
 
-            const isEnabled = await biconomyConnector.wallet?.isModuleEnabled(DEFAULT_SESSION_KEY_MANAGER_MODULE);
-            console.log('isSessionKeyModuleEnabled', isEnabled);
-
             const ammAddress = '0xe16b8a01490835ec1e76babbb3cadd8921b32001';
 
             // get only first 4 bytes for function selector
@@ -146,6 +153,7 @@ export const createSession = async (networkId: SupportedNetwork, collateralAddre
                     sessionKeyData: sessionKeyData as `0x${string}`,
                 },
             ]);
+
             console.log('sessionTxData', sessionTxData);
 
             // tx to set session key
@@ -155,8 +163,6 @@ export const createSession = async (networkId: SupportedNetwork, collateralAddre
             };
 
             const transactionArray = [];
-
-            transactionArray.push(setSessiontrx);
 
             const encodedCall = encodeFunctionData({
                 abi: erc20Abi,
@@ -169,11 +175,18 @@ export const createSession = async (networkId: SupportedNetwork, collateralAddre
                 data: encodedCall,
             };
 
+            // -----> enableModule session manager module
+            // const enableModuleTrx = await biconomyConnector.wallet.getEnableModuleData(
+            //     DEFAULT_SESSION_KEY_MANAGER_MODULE
+            // );
+
+            // transactionArray.push(enableModuleTrx);
+            transactionArray.push(setSessiontrx);
             transactionArray.push(transaction);
 
-            console.log(`send tx`);
+            console.log(`send tx: `, collateralAddress);
 
-            const { wait } = await biconomyConnector.wallet?.sendTransaction(setSessiontrx, {
+            const { wait } = await biconomyConnector.wallet?.sendTransaction(transactionArray, {
                 paymasterServiceData: {
                     mode: PaymasterMode.ERC20,
                     preferredToken: collateralAddress,
@@ -186,6 +199,10 @@ export const createSession = async (networkId: SupportedNetwork, collateralAddre
                 success,
                 reason,
             } = await wait();
+
+            if (success) {
+                window.localStorage.setItem('seassionValidUntil', Math.floor(dateAfter.getTime() / 1000).toString());
+            }
 
             console.log('TX was succesful: ', success);
 

@@ -22,7 +22,7 @@ export const Input = styled.input<{ fontSize?: string; width?: string; height?: 
     mix-blend-mode: normal;
     box-sizing: border-box;
 
-    height: ${(props) => props.height || '34px'};
+    height: ${(props) => props.height || '40px'};
     width: ${(props) => props.width || '100%'};
     padding: 5px 10px;
     border: 2px solid ${(props) => props.theme.input.borderColor.primary};
@@ -45,7 +45,7 @@ export const Input = styled.input<{ fontSize?: string; width?: string; height?: 
         background: ${(props) => props.theme.input.background.selection.primary};
     }
     &:focus {
-        color: ${(props) => props.theme.input.textColor.secondary};
+        color: ${(props) => props.theme.input.textColor.primary};
         border: 2px solid ${(props) => props.theme.input.borderColor.focus.primary};
         box-sizing: border-box;
     }

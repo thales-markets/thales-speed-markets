@@ -321,7 +321,7 @@ const Title = styled.span`
 const ButtonWrapper = styled(FlexDivRow)`
     height: 27px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        height: 34px;
+        height: 40px;
         margin-left: 5px;
         padding: 5px 0;
     }

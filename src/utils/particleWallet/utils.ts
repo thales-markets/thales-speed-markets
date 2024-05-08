@@ -1,7 +1,6 @@
 import { PARTICAL_LOGINS_CLASSNAMES } from 'constants/wallet';
 import { SupportedNetwork } from 'types/network';
 import { ParticalTypes } from 'types/wallet';
-import { getCollaterals } from 'utils/currency';
 import { getNetworkNameByNetworkId } from 'utils/network';
 import { Connector } from 'wagmi';
 
@@ -10,15 +9,8 @@ export const getClassNameForParticalLogin = (socialId: ParticalTypes) => {
     return label ? label : '';
 };
 
-export const getOnRamperUrl = (
-    apiKey: string,
-    walletAddress: string,
-    networkId: SupportedNetwork,
-    selectedToken: number
-) => {
-    return `https://buy.onramper.com?apiKey=${apiKey}&mode=buy&onlyCryptos=${
-        getCollaterals(networkId)[selectedToken]
-    }_${getNetworkNameByNetworkId(networkId, true)}&networkWallets=${getNetworkNameByNetworkId(
+export const getOnRamperUrl = (apiKey: string, walletAddress: string, networkId: SupportedNetwork) => {
+    return `https://buy.onramper.com?apiKey=${apiKey}&mode=buy&onlyCryptos=usdc_arbitrum,usdt_arbitrum,usdc_base,usdc_optimism,usdt_optimism&networkWallets=${getNetworkNameByNetworkId(
         networkId,
         true
     )}:${walletAddress}'&themeName=dark&containerColor=181a20&primaryColor=1D976C&secondaryColor=2b3139&cardColor=2b3139&primaryTextColor=ffffff&secondaryTextColor=848e9c&borderRadius=0.5&wgBorderRadius=1'`;

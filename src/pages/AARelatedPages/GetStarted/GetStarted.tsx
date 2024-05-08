@@ -14,7 +14,6 @@ import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
 import { GetStartedStep } from 'enums/wizard';
 import ReactModal from 'react-modal';
-import OutsideClick from 'components/OutsideClick';
 
 ReactModal.setAppElement('#root');
 
@@ -102,37 +101,35 @@ const GetStarted: React.FC<GetStartedProps> = ({ isOpen, onClose }) => {
             setCurrentStep(GetStartedStep.LOG_IN);
         }
     }, [isWalletConnected, totalBalanceValue]);
+    console.log(isOpen);
 
     return (
-        <ReactModal isOpen={isOpen} shouldCloseOnOverlayClick={true} style={defaultStyle}>
-            <OutsideClick onOutsideClick={onClose}>
-                <Container>
-                    <CloseIconContainer>
-                        <CloseIcon onClick={onClose} />
-                    </CloseIconContainer>
-                    <Title>{t('get-started.title')}</Title>
-                    <ProgressDisplayWrapper>
-                        {steps.map((step, index) => {
-                            return <ProgressBar key={`progress-${index}`} selected={step <= currentStep} />;
-                        })}
-                    </ProgressDisplayWrapper>
+        <ReactModal isOpen={isOpen} shouldCloseOnOverlayClick={false} style={defaultStyle}>
+            <Container>
+                <CloseIconContainer>
+                    <CloseIcon onClick={onClose} />
+                </CloseIconContainer>
+                <Title>{t('get-started.title')}</Title>
+                <ProgressDisplayWrapper>
                     {steps.map((step, index) => {
-                        const stepNumber = index + 1;
-                        return (
-                            <React.Fragment key={index}>
-                                <Step
-                                    stepNumber={stepNumber}
-                                    stepType={step}
-                                    currentStep={currentStep}
-                                    setCurrentStep={setCurrentStep}
-                                    hasFunds={totalBalanceValue > 0}
-                                />
-                                {stepNumber !== steps.length && <HorizontalLine />}
-                            </React.Fragment>
-                        );
+                        return <ProgressBar key={`progress-${index}`} selected={step < currentStep} />;
                     })}
-                </Container>
-            </OutsideClick>
+                </ProgressDisplayWrapper>
+                {steps.map((step, index) => {
+                    const stepNumber = index + 1;
+                    return (
+                        <React.Fragment key={index}>
+                            <Step
+                                stepNumber={stepNumber}
+                                stepType={step}
+                                currentStep={currentStep}
+                                setCurrentStep={setCurrentStep}
+                                hasFunds={totalBalanceValue > 0}
+                            />
+                        </React.Fragment>
+                    );
+                })}
+            </Container>
         </ReactModal>
     );
 };
@@ -142,7 +139,8 @@ const Container = styled(FlexDivColumn)`
     width: 100%;
     background-color: ${(props) => props.theme.background.primary};
     border-radius: 15px;
-    padding: 25px;
+    padding: 20px 60px;
+    position: relative;
 `;
 
 const Title = styled(FlexDivStart)`
@@ -165,29 +163,24 @@ const ProgressBar = styled(FlexDiv)<{ selected?: boolean }>`
     height: 6px;
     width: 32%;
     border-radius: 10px;
-    background: ${(props) =>
-        props.selected ? 'linear-gradient(90deg, #a764b7 0%, #169cd2 100%)' : props.theme.textColor.primary};
-`;
-
-const HorizontalLine = styled.hr`
-    width: 100%;
-    border: 1.5px solid ${(props) => props.theme.borderColor.secondary};
-    background: ${(props) => props.theme.background.tertiary};
-    border-radius: 3px;
+    background: ${(props) => (props.selected ? props.theme.textColor.quinary : props.theme.textColor.primary)};
 `;
 
 const CloseIconContainer = styled(FlexDiv)`
-    justify-content: flex-end;
+    position: absolute;
+    top: 20px;
+    right: 20px;
 `;
 
 const CloseIcon = styled.i`
     font-size: 16px;
     margin-top: 1px;
     cursor: pointer;
+
     &:before {
         font-family: Icons !important;
         content: '\\0042';
-        color: ${(props) => props.theme.textColor.primary};
+        color: ${(props) => props.theme.textColor.quinary};
     }
     @media (max-width: 575px) {
         padding: 15px;

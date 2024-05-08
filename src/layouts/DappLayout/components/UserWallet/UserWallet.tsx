@@ -7,9 +7,9 @@ import UserCollaterals from '../UserCollaterals';
 import { useAccount } from 'wagmi';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'types/ui';
-import { getIsBiconomy, getWalletConnectModalVisibility, setWalletConnectModalVisibility } from 'redux/modules/wallet';
-import biconomyConnector from 'utils/biconomyWallet';
-import ConnectWalletModal from 'components/ConnectWalletModal';
+import { getIsBiconomy, setWalletConnectModalVisibility } from 'redux/modules/wallet';
+
+import { getUserInfo } from '@particle-network/auth-core';
 
 const TRUNCATE_ADDRESS_NUMBER_OF_CHARS = 5;
 
@@ -20,7 +20,6 @@ const UserWallet: React.FC = () => {
 
     const { isConnected, address: walletAddress } = useAccount();
     const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
-    const connectWalletModalVisibility = useSelector((state: RootState) => getWalletConnectModalVisibility(state));
 
     const [walletText, setWalletText] = useState('');
 
@@ -43,27 +42,18 @@ const UserWallet: React.FC = () => {
                     onMouseOver={() => setWalletText(t('common.wallet.wallet-options'))}
                     onMouseLeave={() => setWalletText('')}
                 >
-                    {isConnected
-                        ? walletText ||
-                          truncateAddress(
-                              (isBiconomy ? biconomyConnector.address : walletAddress) as string,
-                              TRUNCATE_ADDRESS_NUMBER_OF_CHARS,
-                              TRUNCATE_ADDRESS_NUMBER_OF_CHARS
-                          )
-                        : t('common.wallet.connect-your-wallet')}
+                    {isConnected ? (
+                        walletText ||
+                        truncateAddress(
+                            (isBiconomy ? getUserInfo()?.google_email : walletAddress) as string,
+                            TRUNCATE_ADDRESS_NUMBER_OF_CHARS,
+                            TRUNCATE_ADDRESS_NUMBER_OF_CHARS
+                        )
+                    ) : (
+                        <div style={{ textTransform: 'uppercase' }}>{t('common.wallet.connect-your-wallet')}</div>
+                    )}
                 </WalletContainer>
                 {isConnected && <UserCollaterals />}
-
-                <ConnectWalletModal
-                    isOpen={connectWalletModalVisibility}
-                    onClose={() => {
-                        dispatch(
-                            setWalletConnectModalVisibility({
-                                visibility: !connectWalletModalVisibility,
-                            })
-                        );
-                    }}
-                />
             </Wrapper>
         </Container>
     );
