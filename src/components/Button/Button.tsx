@@ -136,7 +136,10 @@ const ButtonWrapper = styled.button<{
         cursor: default;
     }
     &:hover {
-        color: ${(props) => props.theme.button.textColor.tertiary};
+        color: ${(props) => props.theme.button.textColor.tertiary}; // // color on hover for text inside button
+        i {
+            color: ${(props) => props.theme.button.textColor.tertiary}; // color on hover for icons inside button
+        }
     }
 `;
 
