@@ -61,17 +61,7 @@ const DappHeader: React.FC = () => {
                 {isMobile && <Notifications />}
             </LeftContainer>
             <RightContainer>
-                {isConnected ? (
-                    <Button
-                        fontWeight={800}
-                        width="140px"
-                        height="30px"
-                        fontSize="12px"
-                        onClick={() => setOpenDeposit(true)}
-                    >
-                        {t('common.header.deposit')}
-                    </Button>
-                ) : (
+                {!isConnected && (
                     <Button
                         width="140px"
                         height="30px"
