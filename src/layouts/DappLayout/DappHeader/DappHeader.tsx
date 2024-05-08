@@ -18,6 +18,7 @@ import GetStarted from 'pages/AARelatedPages/GetStarted';
 import { getIsBiconomy, getWalletConnectModalVisibility, setWalletConnectModalVisibility } from 'redux/modules/wallet';
 import Deposit from 'pages/AARelatedPages/Deposit';
 import ConnectWalletModal from 'components/ConnectWalletModal';
+import UserInfo from '../components/UserInfo';
 
 const DappHeader: React.FC = () => {
     const { t } = useTranslation();
@@ -31,6 +32,7 @@ const DappHeader: React.FC = () => {
     const [openReferralModal, setOpenReferralModal] = useState(false);
     const [openGetStarted, setOpenGetStarted] = useState(false);
     const [openDeposit, setOpenDeposit] = useState(false);
+    const [userInfoOpen, setUserInfoOpen] = useState(false);
 
     const connected = useRef(isConnected);
 
@@ -92,15 +94,20 @@ const DappHeader: React.FC = () => {
                 {isConnected && (
                     <>
                         <UserWallet />
-                        <HeaderIcons className={`network-icon network-icon--settings`} />
+                        <HeaderIcons
+                            onClick={() => setUserInfoOpen(!userInfoOpen)}
+                            className={`network-icon network-icon--settings`}
+                        />
                     </>
                 )}
 
                 {!isMobile && <Notifications />}
+                {userInfoOpen && <UserInfo />}
             </RightContainer>
             {openReferralModal && <ReferralModal onClose={() => setOpenReferralModal(false)} />}
             {openGetStarted && <GetStarted isOpen={openGetStarted} onClose={() => setOpenGetStarted(false)} />}
             {openDeposit && <Deposit isOpen={openDeposit} onClose={() => setOpenDeposit(false)} />}
+
             <ConnectWalletModal
                 isOpen={connectWalletModalVisibility}
                 onClose={() => {
@@ -160,6 +167,7 @@ const LeftContainer = styled(FlexDivRowCentered)`
 `;
 
 const RightContainer = styled(FlexDivRowCentered)`
+    position: relative;
     @media (max-width: 500px) {
         width: 100%;
     }
@@ -175,6 +183,7 @@ const HeaderIcons = styled.i`
     font-size: 26px;
     color: ${(props) => props.theme.button.textColor.tertiary};
     margin-left: 10px;
+    cursor: pointer;
 `;
 
 const LoginIcon = styled.i`

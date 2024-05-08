@@ -114,6 +114,11 @@ export const executeBiconomyTransaction = async (
                 success,
             } = await wait();
 
+            if (!success) {
+                window.localStorage.removeItem('sessionPKey');
+                window.localStorage.removeItem('seassionValidUntil');
+            }
+
             console.log('TX was succesful: ', success);
             console.log('Transaction receipt', transactionHash);
 
@@ -158,30 +163,6 @@ export const executeBiconomyTransaction = async (
 
             return transactionHash;
         }
-    }
-};
-
-export const createSession = async (networkId: SupportedNetwork, collateralAddress: string) => {
-    try {
-        if (biconomyConnector.wallet) {
-            const transactionArray = await getCreateSessionTxs(networkId, collateralAddress);
-            const { wait } = await biconomyConnector.wallet?.sendTransaction(transactionArray, {
-                paymasterServiceData: {
-                    mode: PaymasterMode.ERC20,
-                    preferredToken: collateralAddress,
-                },
-            });
-
-            const {
-                receipt: { transactionHash },
-                success,
-            } = await wait();
-
-            console.log('TX was succesful: ', success);
-            console.log('Transaction receipt', transactionHash);
-        }
-    } catch (err: any) {
-        console.error(err);
     }
 };
 
