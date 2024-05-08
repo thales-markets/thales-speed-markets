@@ -167,7 +167,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
             setIsAllowing(true);
             let hash;
             if (isBiconomy) {
-                hash = await executeBiconomyTransaction(collateralAddress, erc20Instance, 'approve', [
+                hash = await executeBiconomyTransaction(networkId, collateralAddress, erc20Instance, 'approve', [
                     addressToApprove,
                     approveAmount,
                 ]);
@@ -219,6 +219,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                     .map((finalPrice) => Number(priceParser(finalPrice)));
                 if (isBiconomy) {
                     hash = executeBiconomyTransaction(
+                        networkId,
                         collateralAddress,
                         chainedSpeedMarketsAMMContractWithSigner,
                         'resolveMarketManually',
@@ -278,6 +279,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 if (isBiconomy) {
                     if (isDefaultCollateral) {
                         hash = await executeBiconomyTransaction(
+                            networkId,
                             collateralAddress,
                             chainedSpeedMarketsAMMContractWithSigner,
                             'resolveMarket',
@@ -286,6 +288,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                         );
                     } else {
                         hash = await executeBiconomyTransaction(
+                            networkId,
                             collateralAddress,
                             chainedSpeedMarketsAMMContractWithSigner,
                             'resolveMarketWithOfframp',

@@ -146,7 +146,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
             setIsAllowing(true);
             let hash;
             if (isBiconomy) {
-                hash = await executeBiconomyTransaction(erc20Instance.address, erc20Instance, 'approve', [
+                hash = await executeBiconomyTransaction(networkId, erc20Instance.address, erc20Instance, 'approve', [
                     addressToApprove,
                     approveAmount,
                 ]);
@@ -216,12 +216,14 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
             if (isBiconomy) {
                 hash = isDefaultCollateral
                     ? await executeBiconomyTransaction(
+                          networkId,
                           collateralAddress,
                           speedMarketsAMMContractWithSigner,
                           'resolveMarket',
                           [position.market, priceUpdateData]
                       )
                     : await executeBiconomyTransaction(
+                          networkId,
                           collateralAddress,
                           speedMarketsAMMContractWithSigner,
                           'resolveMarketWithOfframp',

@@ -61,7 +61,7 @@ import { Client, getContract, parseUnits, stringToHex } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 import { SelectedPosition } from '../SelectPosition/SelectPosition';
-import { createSession, executeBiconomyTransaction } from 'utils/biconomy';
+import { executeBiconomyTransaction } from 'utils/biconomy';
 import biconomyConnector from 'utils/biconomyWallet';
 import { PLAUSIBLE, PLAUSIBLE_KEYS } from 'constants/analytics';
 import { GradientContainer } from 'components/Common/GradientBorder';
@@ -508,7 +508,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             setIsAllowing(true);
             let hash;
             if (isBiconomy) {
-                hash = await executeBiconomyTransaction(erc20Instance.address, erc20Instance, 'approve', [
+                hash = await executeBiconomyTransaction(networkId, erc20Instance.address, erc20Instance, 'approve', [
                     addressToApprove,
                     approveAmount,
                 ]);
@@ -536,7 +536,8 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     };
 
     const handleSubmit = async () => {
-        if (isButtonDisabled) return;
+        console.log(isButtonDisabled);
+        if (!isBiconomy && isButtonDisabled) return;
 
         setIsSubmitting(true);
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
@@ -737,13 +738,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         if (!hasAllowance) {
             if (isBiconomy) {
                 return (
-                    <Button
-                        onClick={async () => {
-                            console.log('enable session');
-                            await createSession(networkId, collateralAddress);
-                            // await handleSubmit();
-                        }}
-                    >
+                    <Button onClick={handleSubmit}>
                         {isSubmitting ? t(`common.buy.progress-label`) : t(`common.buy.label`)}
                     </Button>
                 );

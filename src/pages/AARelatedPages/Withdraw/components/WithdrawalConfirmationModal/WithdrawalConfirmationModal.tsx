@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import { FlexDiv } from 'styles/common';
 
-import { executeBiconomyTransaction } from 'utils/biconomy';
+import { executeBiconomyTransactionWithConfirmation } from 'utils/biconomy';
 import { Coins, NetworkId, coinParser, formatCurrencyWithKey } from 'thales-utils';
 import { getNetworkNameByNetworkId } from 'utils/network';
 import { getErrorToastOptions, getSuccessToastOptions } from 'components/ToastMessage/ToastMessage';
@@ -53,7 +53,7 @@ const WithdrawalConfirmationModal: React.FC<WithdrawalConfirmationModalProps> = 
                     client: walletClient.data as any,
                 }) as ViemContract;
 
-                await executeBiconomyTransaction(
+                await executeBiconomyTransactionWithConfirmation(
                     collateralContractWithSigner?.address as string,
                     collateralContractWithSigner,
                     'transfer',

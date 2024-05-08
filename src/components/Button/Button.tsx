@@ -137,7 +137,8 @@ const ButtonWrapper = styled.button<{
     }
     &:hover {
         color: ${(props) => props.theme.button.textColor.tertiary}; // // color on hover for text inside button
-        i {
+        i,
+        span {
             color: ${(props) => props.theme.button.textColor.tertiary}; // color on hover for icons inside button
         }
     }

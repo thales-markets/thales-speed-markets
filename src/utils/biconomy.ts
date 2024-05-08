@@ -20,13 +20,10 @@ import { DEFAULT_SESSION_KEY_MANAGER_MODULE, createSessionKeyManagerModule } fro
 
 import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
 import { RPC_LIST } from 'constants/network';
-import { arbitrum } from 'viem/chains';
-import { NetworkId } from 'thales-utils';
+import chainedSpeedMarketsAMMContract from './contracts/chainedSpeedMarketsAMMContract';
+import erc20Contract from './contracts/collateralContract';
 
-// const abiSVMAddress = '0x9bfe7FE082695ac3Ff1833B6f764Cc870901b042'; //optimism
-const abiSVMAddress = '0x6984DCbE83966Cfe35B906E097b1D771fAAb6F1e'; //arbitrum
-
-export const executeBiconomyTransaction = async (
+export const executeBiconomyTransactionWithConfirmation = async (
     collateral: string,
     contract: ViemContract | undefined,
     methodName: string,
@@ -50,38 +47,10 @@ export const executeBiconomyTransaction = async (
             value,
         };
 
-        // generate sessionModule
-        const sessionModule = await createSessionKeyManagerModule({
-            moduleAddress: DEFAULT_SESSION_KEY_MANAGER_MODULE,
-            smartAccountAddress: biconomyConnector.address,
-        });
-
-        const sessionKeyPrivKey = window.localStorage.getItem('sessionPKey');
-
-        biconomyConnector.wallet.setActiveValidationModule(sessionModule);
-        const sessionAccount = privateKeyToAccount(sessionKeyPrivKey as any);
-
-        // const chainId: 10 | 42161 | 137 | 8453 = biconomyConnector.wallet.biconomySmartAccountConfig.chainId as any;
-
-        const sessionSigner = createWalletClient({
-            account: sessionAccount,
-            chain: arbitrum,
-            transport: http(RPC_LIST.CHAINNODE[NetworkId.Arbitrum]),
-        });
-
-        console.log(sessionSigner);
-
         const { wait } = await biconomyConnector.wallet.sendTransaction(transaction, {
             paymasterServiceData: {
                 mode: PaymasterMode.ERC20,
-                preferredToken:
-                    collateral === '0x8c6f28f2F1A3C87F0f938b96d27520d9751ec8d9'
-                        ? '0x7F5c764cBc14f9669B88837ca1490cCa17c31607'
-                        : collateral,
-            },
-            params: {
-                sessionSigner: sessionSigner,
-                sessionValidationModule: abiSVMAddress,
+                preferredToken: collateral,
             },
         });
 
@@ -101,91 +70,101 @@ export const executeBiconomyTransaction = async (
     }
 };
 
-export const createSession = async (networkId: SupportedNetwork, collateralAddress: string) => {
-    try {
-        if (biconomyConnector.wallet) {
-            // Address of ABI Session Validation Module
+export const executeBiconomyTransaction = async (
+    networkId: SupportedNetwork,
+    collateral: string,
+    contract: ViemContract | undefined,
+    methodName: string,
+    data?: ReadonlyArray<any>,
+    value?: any
+): Promise<any | undefined> => {
+    if (biconomyConnector.wallet && contract) {
+        const encodedCall = encodeFunctionData({
+            abi: contract.abi,
+            functionName: methodName,
+            args: data ? data : ([] as any),
+        });
 
-            // -----> setMerkle tree tx flow
-            // create dapp side session key
-            const privateKey = generatePrivateKey();
-            const sessionKeyEOA = privateKeyToAccount(privateKey);
-            console.log('sessionKeyEOA', sessionKeyEOA);
-            // BREWARE JUST FOR DEMO: update local storage with session key
-            window.localStorage.setItem('sessionPKey', privateKey);
+        const transaction = {
+            to: contract.address,
+            data: encodedCall,
+            value,
+        };
 
+        const sessionKeyPrivKey = window.localStorage.getItem('sessionPKey');
+        const validUntil = window.localStorage.getItem('seassionValidUntil');
+
+        const dateUntilValid = new Date(Number(validUntil) * 1000);
+        const nowDate = new Date();
+        if (!validUntil || Number(nowDate) > Number(dateUntilValid)) {
+            const transactionArray = await getCreateSessionTxs(
+                biconomyConnector.wallet.biconomySmartAccountConfig.chainId,
+                collateral
+            );
+            transactionArray.push(transaction);
+            const { wait } = await biconomyConnector.wallet.sendTransaction(transactionArray, {
+                paymasterServiceData: {
+                    mode: PaymasterMode.ERC20,
+                    preferredToken: collateral,
+                },
+            });
+
+            const {
+                receipt: { transactionHash },
+                success,
+            } = await wait();
+
+            console.log('TX was succesful: ', success);
+            console.log('Transaction receipt', transactionHash);
+
+            return transactionHash;
+        } else {
             // generate sessionModule
             const sessionModule = await createSessionKeyManagerModule({
                 moduleAddress: DEFAULT_SESSION_KEY_MANAGER_MODULE,
                 smartAccountAddress: biconomyConnector.address,
             });
+            biconomyConnector.wallet.setActiveValidationModule(sessionModule);
+            const sessionAccount = privateKeyToAccount(sessionKeyPrivKey as any);
 
-            const ammAddress = '0xe16b8a01490835ec1e76babbb3cadd8921b32001';
+            const transport = RPC_LIST.CHAINNODE[networkId];
 
-            // get only first 4 bytes for function selector
-            const functionSelector = slice(
-                toFunctionSelector(
-                    'createNewMarketWithDifferentCollateral(bytes32,uint64,uint64,uint8,bytes[],address,uint256,bool,address,uint256)'
-                ),
-                0,
-                4
-            );
-
-            // create session key data
-            const sessionKeyData = await getABISVMSessionKeyData(sessionKeyEOA.address, {
-                destContract: ammAddress, // destination contract to call
-                functionSelector: functionSelector, // function selector allowed
-                valueLimit: parseEther('0'), // no native value is sent
-                // In rules, we make sure that referenceValue is equal to recipient
-                rules: [],
+            const sessionSigner = createWalletClient({
+                account: sessionAccount,
+                chain: networkId as any,
+                transport: http(transport),
             });
 
-            const dateAfter = new Date();
-            const dateUntil = new Date();
-            dateUntil.setHours(dateAfter.getHours() + 1);
+            console.log(sessionSigner);
 
-            const sessionTxData = await sessionModule.createSessionData([
-                {
-                    validUntil: Math.floor(dateUntil.getTime() / 1000),
-                    validAfter: Math.floor(dateAfter.getTime() / 1000),
-                    sessionValidationModule: abiSVMAddress,
-                    sessionPublicKey: sessionKeyEOA.address as `0x${string}`,
-                    sessionKeyData: sessionKeyData as `0x${string}`,
+            const { wait } = await biconomyConnector.wallet.sendTransaction(transaction, {
+                paymasterServiceData: {
+                    mode: PaymasterMode.ERC20,
+                    preferredToken: collateral,
                 },
-            ]);
-
-            console.log('sessionTxData', sessionTxData);
-
-            // tx to set session key
-            const setSessiontrx = {
-                to: DEFAULT_SESSION_KEY_MANAGER_MODULE, // session manager module address
-                data: sessionTxData.data,
-            };
-
-            const transactionArray = [];
-
-            const encodedCall = encodeFunctionData({
-                abi: erc20Abi,
-                functionName: 'approve',
-                args: [speedMarketsAMMContract.addresses[networkId], maxUint256],
+                params: {
+                    sessionSigner: sessionSigner,
+                    sessionValidationModule: import.meta.env['VITE_APP_SVM_ADDRESS_' + networkId],
+                },
             });
 
-            const transaction = {
-                to: collateralAddress,
-                data: encodedCall,
-            };
+            const {
+                receipt: { transactionHash },
+                success,
+            } = await wait();
 
-            // -----> enableModule session manager module
-            // const enableModuleTrx = await biconomyConnector.wallet.getEnableModuleData(
-            //     DEFAULT_SESSION_KEY_MANAGER_MODULE
-            // );
+            console.log('TX was succesful: ', success);
+            console.log('Transaction receipt', transactionHash);
 
-            // transactionArray.push(enableModuleTrx);
-            transactionArray.push(setSessiontrx);
-            transactionArray.push(transaction);
+            return transactionHash;
+        }
+    }
+};
 
-            console.log(`send tx: `, collateralAddress);
-
+export const createSession = async (networkId: SupportedNetwork, collateralAddress: string) => {
+    try {
+        if (biconomyConnector.wallet) {
+            const transactionArray = await getCreateSessionTxs(networkId, collateralAddress);
             const { wait } = await biconomyConnector.wallet?.sendTransaction(transactionArray, {
                 paymasterServiceData: {
                     mode: PaymasterMode.ERC20,
@@ -195,24 +174,122 @@ export const createSession = async (networkId: SupportedNetwork, collateralAddre
 
             const {
                 receipt: { transactionHash },
-                userOpHash,
                 success,
-                reason,
             } = await wait();
 
-            if (success) {
-                window.localStorage.setItem('seassionValidUntil', Math.floor(dateAfter.getTime() / 1000).toString());
-            }
-
             console.log('TX was succesful: ', success);
-
-            console.log('TX has failed cause of: ', reason);
-            console.log('UserOp receipt', userOpHash);
             console.log('Transaction receipt', transactionHash);
         }
     } catch (err: any) {
         console.error(err);
     }
+};
+
+const getCreateSessionTxs = async (networkId: SupportedNetwork, collateralAddress: string) => {
+    if (biconomyConnector.wallet) {
+        const privateKey = generatePrivateKey();
+        const sessionKeyEOA = privateKeyToAccount(privateKey);
+        window.localStorage.setItem('sessionPKey', privateKey);
+
+        const sessionModule = await createSessionKeyManagerModule({
+            moduleAddress: DEFAULT_SESSION_KEY_MANAGER_MODULE,
+            smartAccountAddress: biconomyConnector.address,
+        });
+
+        const ammAddress = speedMarketsAMMContract.addresses[networkId];
+
+        // get only first 4 bytes for function selector
+        const functionSelector = slice(
+            toFunctionSelector(
+                'createNewMarketWithDifferentCollateral(bytes32,uint64,uint64,uint8,bytes[],address,uint256,bool,address,uint256)'
+            ),
+            0,
+            4
+        );
+
+        // create session key data
+        const sessionKeyData = await getABISVMSessionKeyData(sessionKeyEOA.address, {
+            destContract: ammAddress, // destination contract to call
+            functionSelector: functionSelector, // function selector allowed
+            valueLimit: parseEther('0'), // no native value is sent
+            // In rules, we make sure that referenceValue is equal to recipient
+            rules: [],
+        });
+
+        const dateAfter = new Date();
+        const dateUntil = new Date();
+        dateUntil.setHours(dateAfter.getHours() + 1);
+
+        const sessionTxData = await sessionModule.createSessionData([
+            {
+                validUntil: Math.floor(dateUntil.getTime() / 1000),
+                validAfter: Math.floor(dateAfter.getTime() / 1000),
+                sessionValidationModule: import.meta.env['VITE_APP_SVM_ADDRESS_' + networkId],
+                sessionPublicKey: sessionKeyEOA.address as `0x${string}`,
+                sessionKeyData: sessionKeyData as `0x${string}`,
+            },
+        ]);
+
+        // tx to set session key
+        const setSessiontrx = {
+            to: DEFAULT_SESSION_KEY_MANAGER_MODULE, // session manager module address
+            data: sessionTxData.data,
+        };
+
+        const transactionArray = [];
+
+        const encodedCall = encodeFunctionData({
+            abi: erc20Abi,
+            functionName: 'approve',
+            args: [speedMarketsAMMContract.addresses[networkId], maxUint256],
+        });
+
+        const approvalTxSingle = {
+            to: collateralAddress,
+            data: encodedCall,
+        };
+
+        const encodedCallChained = encodeFunctionData({
+            abi: erc20Abi,
+            functionName: 'approve',
+            args: [chainedSpeedMarketsAMMContract.addresses[networkId], maxUint256],
+        });
+
+        const approvalTxChained = {
+            to: collateralAddress,
+            data: encodedCallChained,
+        };
+
+        const approvalTxSingleClaim = {
+            to: erc20Contract.addresses[networkId],
+            data: encodedCall,
+        };
+
+        const approvalTxChainedClaim = {
+            to: erc20Contract.addresses[networkId],
+            data: encodedCallChained,
+        };
+
+        // enableModule session manager module
+        try {
+            await biconomyConnector.wallet.isModuleEnabled(DEFAULT_SESSION_KEY_MANAGER_MODULE);
+        } catch (e) {
+            const enableModuleTrx = await biconomyConnector.wallet.getEnableModuleData(
+                DEFAULT_SESSION_KEY_MANAGER_MODULE
+            );
+
+            transactionArray.push(enableModuleTrx);
+        }
+
+        window.localStorage.setItem('seassionValidUntil', Math.floor(dateUntil.getTime() / 1000).toString());
+
+        transactionArray.push(
+            ...[setSessiontrx, approvalTxSingle, approvalTxChained, approvalTxSingleClaim, approvalTxChainedClaim]
+        );
+
+        return transactionArray;
+    }
+    return [];
 };
 
 interface Rule {

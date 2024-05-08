@@ -24,6 +24,7 @@ import { getContarctAbi } from './contracts/abi';
 import chainedSpeedMarketsAMMContract from './contracts/chainedSpeedMarketsAMMContract';
 import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
 import { executeBiconomyTransaction } from './biconomy';
+import biconomyConnector from './biconomyWallet';
 
 export const getTransactionForSpeedAMM = async (
     speedMarketsAMMContractWithSigner: any, // speed or chained
@@ -48,6 +49,7 @@ export const getTransactionForSpeedAMM = async (
         if (isChained) {
             if (isBiconomy) {
                 txHash = await executeBiconomyTransaction(
+                    biconomyConnector.wallet?.biconomySmartAccountConfig.chainId as any,
                     collateralAddress,
                     speedMarketsAMMContractWithSigner,
                     'createNewMarketWithDifferentCollateral',
@@ -81,6 +83,7 @@ export const getTransactionForSpeedAMM = async (
         } else {
             if (isBiconomy) {
                 txHash = await executeBiconomyTransaction(
+                    biconomyConnector.wallet?.biconomySmartAccountConfig.chainId as any,
                     collateralAddress,
                     speedMarketsAMMContractWithSigner,
                     'createNewMarketWithDifferentCollateral',
@@ -120,6 +123,8 @@ export const getTransactionForSpeedAMM = async (
         if (isChained) {
             if (isBiconomy) {
                 txHash = await executeBiconomyTransaction(
+                    biconomyConnector.wallet?.biconomySmartAccountConfig.chainId as any,
+
                     collateralAddress,
                     speedMarketsAMMContractWithSigner,
                     'createNewMarket',
@@ -135,6 +140,7 @@ export const getTransactionForSpeedAMM = async (
         } else {
             if (isBiconomy) {
                 txHash = await executeBiconomyTransaction(
+                    biconomyConnector.wallet?.biconomySmartAccountConfig.chainId as any,
                     collateralAddress,
                     speedMarketsAMMContractWithSigner,
                     'createNewMarket',
@@ -289,12 +295,14 @@ export const resolveAllSpeedPositions = async (
             if (isBiconomy) {
                 txHash = isAdmin
                     ? await executeBiconomyTransaction(
+                          queryConfig.networkId,
                           '0x7F5c764cBc14f9669B88837ca1490cCa17c31607', // TODO:
                           speedMarketsAMMContractWithSigner,
                           'resolveMarketManuallyBatch',
                           [marketsToResolve, manualFinalPrices]
                       )
                     : await executeBiconomyTransaction(
+                          queryConfig.networkId,
                           '0x7F5c764cBc14f9669B88837ca1490cCa17c31607', // TODO:
                           speedMarketsAMMContractWithSigner,
                           'resolveMarketsBatch',
@@ -414,12 +422,14 @@ export const resolveAllChainedMarkets = async (
             if (isBiconomy) {
                 txHash = isAdmin
                     ? await executeBiconomyTransaction(
+                          queryConfig.networkId,
                           '0x7F5c764cBc14f9669B88837ca1490cCa17c31607', // TODO:
                           chainedSpeedMarketsAMMContractWithSigner,
                           'resolveMarketManuallyBatch',
                           [marketsToResolve, manualFinalPrices]
                       )
                     : await executeBiconomyTransaction(
+                          queryConfig.networkId,
                           '0x7F5c764cBc14f9669B88837ca1490cCa17c31607', // TODO:
                           chainedSpeedMarketsAMMContractWithSigner,
                           'resolveMarketsBatch',
