@@ -1,12 +1,10 @@
-import { TBD_ADDRESS } from 'constants/network';
 import { NetworkId } from 'thales-utils';
 import { Address } from 'viem';
 
 const erc20Contract = {
     addresses: {
         [NetworkId.OptimismMainnet]: '0x8c6f28f2F1A3C87F0f938b96d27520d9751ec8d9' as Address, // sUSD
-        [NetworkId.OptimismGoerli]: '0xE1ceaa829525a08C1d39A5CEBe4b42aF58d77198' as Address, // exoticSUSD
-        [NetworkId.OptimismSepolia]: TBD_ADDRESS,
+        [NetworkId.OptimismSepolia]: '0xc4fa91b895fb66e8aafff9791f1018c2053db71f' as Address, // exoticSUSD
         [NetworkId.PolygonMainnet]: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174' as Address, //USDCe
         [NetworkId.Arbitrum]: '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8' as Address, //USDCe
         [NetworkId.Base]: '0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA' as Address, // USDbC

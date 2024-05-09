@@ -1107,8 +1107,7 @@ const multipleCollateral = {
     sUSD: {
         addresses: {
             [NetworkId.OptimismMainnet]: '0x8c6f28f2F1A3C87F0f938b96d27520d9751ec8d9' as Address, // sUSD
-            [NetworkId.OptimismGoerli]: '0xE1ceaa829525a08C1d39A5CEBe4b42aF58d77198' as Address, // exoticSUSD
-            [NetworkId.OptimismSepolia]: TBD_ADDRESS,
+            [NetworkId.OptimismSepolia]: '0xc4fa91b895fb66e8aafff9791f1018c2053db71f' as Address, // exoticSUSD
             [NetworkId.PolygonMainnet]: TBD_ADDRESS,
             [NetworkId.Arbitrum]: TBD_ADDRESS,
             [NetworkId.Base]: TBD_ADDRESS,
@@ -1121,7 +1120,6 @@ const multipleCollateral = {
     DAI: {
         addresses: {
             [NetworkId.OptimismMainnet]: '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1' as Address,
-            [NetworkId.OptimismGoerli]: TBD_ADDRESS,
             [NetworkId.OptimismSepolia]: TBD_ADDRESS,
             [NetworkId.PolygonMainnet]: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063' as Address,
             [NetworkId.Arbitrum]: '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1' as Address,
@@ -1135,7 +1133,6 @@ const multipleCollateral = {
     USDCe: {
         addresses: {
             [NetworkId.OptimismMainnet]: TBD_ADDRESS,
-            [NetworkId.OptimismGoerli]: TBD_ADDRESS,
             [NetworkId.OptimismSepolia]: TBD_ADDRESS,
             [NetworkId.PolygonMainnet]: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174' as Address,
             [NetworkId.Arbitrum]: '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8' as Address,
@@ -1149,7 +1146,6 @@ const multipleCollateral = {
     USDbC: {
         addresses: {
             [NetworkId.OptimismMainnet]: TBD_ADDRESS,
-            [NetworkId.OptimismGoerli]: TBD_ADDRESS,
             [NetworkId.OptimismSepolia]: TBD_ADDRESS,
             [NetworkId.PolygonMainnet]: TBD_ADDRESS,
             [NetworkId.Arbitrum]: TBD_ADDRESS,
@@ -1163,7 +1159,6 @@ const multipleCollateral = {
     USDC: {
         addresses: {
             [NetworkId.OptimismMainnet]: '0x7F5c764cBc14f9669B88837ca1490cCa17c31607' as Address,
-            [NetworkId.OptimismGoerli]: TBD_ADDRESS,
             [NetworkId.OptimismSepolia]: TBD_ADDRESS,
             [NetworkId.PolygonMainnet]: TBD_ADDRESS,
             [NetworkId.Arbitrum]: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831' as Address,
@@ -1177,7 +1172,6 @@ const multipleCollateral = {
     USDT: {
         addresses: {
             [NetworkId.OptimismMainnet]: '0x94b008aA00579c1307B0EF2c499aD98a8ce58e58' as Address,
-            [NetworkId.OptimismGoerli]: TBD_ADDRESS,
             [NetworkId.OptimismSepolia]: TBD_ADDRESS,
             [NetworkId.PolygonMainnet]: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f' as Address,
             [NetworkId.Arbitrum]: '0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9' as Address,
@@ -1191,7 +1185,6 @@ const multipleCollateral = {
     OP: {
         addresses: {
             [NetworkId.OptimismMainnet]: '0x4200000000000000000000000000000000000042' as Address,
-            [NetworkId.OptimismGoerli]: TBD_ADDRESS,
             [NetworkId.OptimismSepolia]: TBD_ADDRESS,
             [NetworkId.PolygonMainnet]: TBD_ADDRESS,
             [NetworkId.Arbitrum]: TBD_ADDRESS,
@@ -1205,7 +1198,6 @@ const multipleCollateral = {
     ARB: {
         addresses: {
             [NetworkId.OptimismMainnet]: TBD_ADDRESS,
-            [NetworkId.OptimismGoerli]: TBD_ADDRESS,
             [NetworkId.OptimismSepolia]: TBD_ADDRESS,
             [NetworkId.PolygonMainnet]: TBD_ADDRESS,
             [NetworkId.Arbitrum]: '0x912CE59144191C1204E64559FE8253a0e49E6548' as Address,
@@ -1219,7 +1211,6 @@ const multipleCollateral = {
     WETH: {
         addresses: {
             [NetworkId.OptimismMainnet]: '0x4200000000000000000000000000000000000006' as Address,
-            [NetworkId.OptimismGoerli]: TBD_ADDRESS,
             [NetworkId.OptimismSepolia]: TBD_ADDRESS,
             [NetworkId.PolygonMainnet]: TBD_ADDRESS,
             [NetworkId.Arbitrum]: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1' as Address,
@@ -1233,7 +1224,6 @@ const multipleCollateral = {
     ETH: {
         addresses: {
             [NetworkId.OptimismMainnet]: ZERO_ADDRESS,
-            [NetworkId.OptimismGoerli]: ZERO_ADDRESS,
             [NetworkId.OptimismSepolia]: ZERO_ADDRESS,
             [NetworkId.PolygonMainnet]: ZERO_ADDRESS,
             [NetworkId.Arbitrum]: ZERO_ADDRESS,

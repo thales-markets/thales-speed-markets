@@ -28,7 +28,6 @@ import {
     base,
     blastSepolia,
     optimism,
-    optimismGoerli,
     optimismSepolia,
     polygon,
     zkSync,
@@ -59,17 +58,7 @@ const socialWallets = [
 !isMobile() && wallets.push(injectedWallet);
 
 export const wagmiConfig = createConfig({
-    chains: [
-        optimism,
-        arbitrum,
-        base,
-        polygon,
-        zkSync,
-        zkSyncSepoliaTestnet,
-        blastSepolia,
-        optimismSepolia,
-        optimismGoerli,
-    ],
+    chains: [optimism, arbitrum, base, polygon, zkSync, zkSyncSepoliaTestnet, blastSepolia, optimismSepolia],
     connectors: connectorsForWallets(
         [
             {
@@ -106,8 +95,7 @@ export const wagmiConfig = createConfig({
         [zkSync.id]: http(),
         [zkSyncSepoliaTestnet.id]: http(),
         [blastSepolia.id]: http(),
-        [optimismSepolia.id]: http(),
-        [optimismGoerli.id]: http(),
+        [optimismSepolia.id]: fallback([http(RPC_LIST.INFURA[NetworkId.OptimismSepolia]), http()]),
     },
 });
 

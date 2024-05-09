@@ -61,7 +61,7 @@ const useUserResolvedChainedSpeedMarketsDataQuery = (
                     const batchMarkets = maturedMarkets
                         .slice(start, start + BATCH_NUMBER_OF_SPEED_MARKETS)
                         .map((market: string) => {
-                            let marketAddresss;
+                            let marketAddress;
                             // Hot fix for 2 markets when resolved with final price 0 and fetching data for that market is failing
                             if (
                                 queryConfig.networkId === NetworkId.OptimismMainnet &&
@@ -69,19 +69,19 @@ const useUserResolvedChainedSpeedMarketsDataQuery = (
                                 market === '0x79F6f48410fC659a274c0A236e19e581373bf2f9'
                             ) {
                                 // some other market address of this user
-                                marketAddresss = '0x6A01283c0F4579B55FB7214CaF619CFe72044b68';
+                                marketAddress = '0x6A01283c0F4579B55FB7214CaF619CFe72044b68';
                             } else if (
                                 queryConfig.networkId === NetworkId.PolygonMainnet &&
                                 walletAddress === '0x8AAcec3D7077D04F19aC924d2743fc0DE1456941' &&
                                 market === '0x1e195Ea2ABf23C1A793F01c934692A230bb5Fc40'
                             ) {
                                 // some other market address of this user
-                                marketAddresss = '0x9c5e5c979dbcab721336ad3ed6eac76650f7eb2c';
+                                marketAddress = '0x9c5e5c979dbcab721336ad3ed6eac76650f7eb2c';
                             } else {
-                                marketAddresss = market;
+                                marketAddress = market;
                             }
 
-                            return marketAddresss;
+                            return marketAddress;
                         });
 
                     promises.push(speedMarketDataContract.read.getChainedMarketsData([batchMarkets]));

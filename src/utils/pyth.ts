@@ -6,11 +6,7 @@ import { NetworkId, bigNumberFormatter, floorNumberToDecimals } from 'thales-uti
 import { parseUnits } from 'viem';
 
 export const getPriceServiceEndpoint = (networkId: NetworkId) => {
-    if (
-        [NetworkId.OptimismGoerli, NetworkId.OptimismSepolia, NetworkId.ZkSyncSepolia, NetworkId.BlastSepolia].includes(
-            networkId
-        )
-    ) {
+    if ([NetworkId.OptimismSepolia, NetworkId.ZkSyncSepolia, NetworkId.BlastSepolia].includes(networkId)) {
         return PRICE_SERVICE_ENDPOINTS.testnet;
     } else {
         return PRICE_SERVICE_ENDPOINTS.mainnet;
@@ -18,11 +14,7 @@ export const getPriceServiceEndpoint = (networkId: NetworkId) => {
 };
 
 export const getPriceId = (networkId: NetworkId, currency: typeof CRYPTO_CURRENCY_MAP[number]) => {
-    if (
-        [NetworkId.OptimismGoerli, NetworkId.OptimismSepolia, NetworkId.ZkSyncSepolia, NetworkId.BlastSepolia].includes(
-            networkId
-        )
-    ) {
+    if ([NetworkId.OptimismSepolia, NetworkId.ZkSyncSepolia, NetworkId.BlastSepolia].includes(networkId)) {
         return PRICE_ID.testnet[currency];
     } else {
         return PRICE_ID.mainnet[currency];
@@ -30,11 +22,7 @@ export const getPriceId = (networkId: NetworkId, currency: typeof CRYPTO_CURRENC
 };
 
 const getCurrencyByPriceId = (networkId: NetworkId, priceId: string) => {
-    if (
-        [NetworkId.OptimismGoerli, NetworkId.OptimismSepolia, NetworkId.ZkSyncSepolia, NetworkId.BlastSepolia].includes(
-            networkId
-        )
-    ) {
+    if ([NetworkId.OptimismSepolia, NetworkId.ZkSyncSepolia, NetworkId.BlastSepolia].includes(networkId)) {
         return (
             Object.keys(PRICE_ID.testnet).find((key) => PRICE_ID.testnet[key] === '0x' + priceId) || 'currencyNotFound'
         );

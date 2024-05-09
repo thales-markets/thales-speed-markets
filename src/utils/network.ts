@@ -106,7 +106,6 @@ export const getSupportedNetworksByRoute = (route: string): NetworkId[] => {
         case ROUTES.Markets.Profile:
             return [
                 NetworkId.OptimismMainnet,
-                NetworkId.OptimismGoerli,
                 NetworkId.Arbitrum,
                 NetworkId.Base,
                 NetworkId.PolygonMainnet,
@@ -116,13 +115,7 @@ export const getSupportedNetworksByRoute = (route: string): NetworkId[] => {
             ];
         case ROUTES.Markets.ChainedSpeedMarkets:
         case ROUTES.Markets.ChainedSpeedMarketsOverview:
-            return [
-                NetworkId.OptimismMainnet,
-                NetworkId.OptimismGoerli,
-                NetworkId.Arbitrum,
-                NetworkId.Base,
-                NetworkId.PolygonMainnet,
-            ];
+            return [NetworkId.OptimismMainnet, NetworkId.Arbitrum, NetworkId.Base, NetworkId.PolygonMainnet];
         default:
             return Object.keys(SUPPORTED_NETWORKS).map((network) => Number(network) as NetworkId);
     }
