@@ -321,20 +321,20 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     }, secondsToMilliseconds(5));
 
     useEffect(() => {
-        let buyinAmount = 0;
-
-        if (selectedCollateral !== defaultCollateral && isStableCurrency(selectedCollateral)) {
+        if (selectedCollateral === defaultCollateral) {
+            setTotalPaidAmount(Number(paidAmount));
+            setBuyinAmount(Number(paidAmount) / (1 + totalFee));
+        } else if (isStableCurrency(selectedCollateral)) {
             // add half percent to amount to take into account collateral conversion
             setTotalPaidAmount(Number(paidAmount) * (1 + STABLECOIN_CONVERSION_BUFFER_PERCENTAGE));
-            buyinAmount = Number(paidAmount) / (1 + totalFee + STABLECOIN_CONVERSION_BUFFER_PERCENTAGE);
+            setBuyinAmount(Number(paidAmount) / (1 + totalFee + STABLECOIN_CONVERSION_BUFFER_PERCENTAGE));
         } else {
             setTotalPaidAmount(Number(paidAmount));
-            buyinAmount = Number(paidAmount) / (1 + totalFee);
+            setBuyinAmount(Number(paidAmount));
         }
 
-        if (buyinAmount && Number(paidAmount)) {
-            setBuyinAmount(buyinAmount);
-            setPotentialProfit((buyinAmount * 2) / Number(paidAmount));
+        if (totalFee) {
+            setPotentialProfit(SPEED_MARKETS_QUOTE / (1 + totalFee));
         }
     }, [paidAmount, totalFee, selectedCollateral, defaultCollateral, selectedStableBuyinAmount]);
 
@@ -802,7 +802,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                     {isMobile && getTradingDetails()}
                     <QuoteContainer>
                         <QuoteLabel>{t('speed-markets.profit')}</QuoteLabel>
-                        <QuoteText>{truncToDecimals(potentialProfit, 2)}x</QuoteText>
+                        <QuoteText>{truncToDecimals(potentialProfit)}x</QuoteText>
                     </QuoteContainer>
                     {getSubmitButton()}
                 </ColumnSpaceBetween>

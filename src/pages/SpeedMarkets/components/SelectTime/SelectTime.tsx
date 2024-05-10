@@ -310,7 +310,7 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                                     onClick={() => onDeltaTimeClickHandler(deltaHours, 0)}
                                 >{`${deltaHours}h`}</Time>
                             ))}
-                            <Time $isSelected={!isDeltaSelected} onClick={onCustomTimeClickHandler}>
+                            <Time $isSelected={showCustomDeltaTime} onClick={onCustomTimeClickHandler}>
                                 {'CUSTOM'}
                             </Time>
                         </FlexDivRow>
