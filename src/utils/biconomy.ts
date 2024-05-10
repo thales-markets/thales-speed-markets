@@ -20,8 +20,8 @@ import { DEFAULT_SESSION_KEY_MANAGER_MODULE, createSessionKeyManagerModule } fro
 
 import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
 import { RPC_LIST } from 'constants/network';
-import chainedSpeedMarketsAMMContract from './contracts/chainedSpeedMarketsAMMContract';
 import erc20Contract from './contracts/collateralContract';
+import chainedSpeedMarketsAMMContract from './contracts/chainedSpeedMarketsAMMContract';
 
 export const executeBiconomyTransactionWithConfirmation = async (
     collateral: string,
@@ -90,6 +90,7 @@ export const executeBiconomyTransaction = async (
         const nowDate = new Date();
 
         if (!validUntil || Number(nowDate) > Number(dateUntilValid)) {
+            console.log('try without session');
             biconomyConnector.wallet.setActiveValidationModule(biconomyConnector.wallet.defaultValidationModule);
             const transactionArray = await getCreateSessionTxs(
                 biconomyConnector.wallet.biconomySmartAccountConfig.chainId,
@@ -110,7 +111,7 @@ export const executeBiconomyTransaction = async (
 
             console.log('success: ', success);
 
-            if (!success) {
+            if (success === 'false') {
                 console.log('remove');
                 window.localStorage.removeItem('sessionPKey');
                 window.localStorage.removeItem('seassionValidUntil');
@@ -121,6 +122,7 @@ export const executeBiconomyTransaction = async (
 
             return transactionHash;
         } else {
+            console.log('try with session');
             // try executing via Session module, if its not passing then enable session and execute with signing
             try {
                 // generate sessionModule
@@ -156,11 +158,17 @@ export const executeBiconomyTransaction = async (
                     success,
                 } = await wait();
 
+                if (success === 'false') {
+                    console.log('failed');
+                    throw new Error('tx failed');
+                }
+
                 console.log('TX was succesful: ', success);
                 console.log('Transaction receipt', transactionHash);
 
                 return transactionHash;
             } catch {
+                console.log('try without session after');
                 biconomyConnector.wallet.setActiveValidationModule(biconomyConnector.wallet.defaultValidationModule);
                 const transactionArray = await getCreateSessionTxs(
                     biconomyConnector.wallet.biconomySmartAccountConfig.chainId,
@@ -179,7 +187,7 @@ export const executeBiconomyTransaction = async (
                     success,
                 } = await wait();
 
-                if (!success) {
+                if (success === 'false') {
                     window.localStorage.removeItem('sessionPKey');
                     window.localStorage.removeItem('seassionValidUntil');
                 }
@@ -251,16 +259,16 @@ const getCreateSessionTxs = async (networkId: SupportedNetwork, collateralAddres
             args: [speedMarketsAMMContract.addresses[networkId], maxUint256],
         });
 
-        const approvalTxSingle = {
-            to: collateralAddress,
-            data: encodedCall,
-        };
-
         const encodedCallChained = encodeFunctionData({
             abi: erc20Abi,
             functionName: 'approve',
             args: [chainedSpeedMarketsAMMContract.addresses[networkId], maxUint256],
         });
+
+        const approvalTxSingle = {
+            to: collateralAddress,
+            data: encodedCall,
+        };
 
         const approvalTxChained = {
             to: collateralAddress,
@@ -279,7 +287,14 @@ const getCreateSessionTxs = async (networkId: SupportedNetwork, collateralAddres
 
         // enableModule session manager module
         try {
-            await biconomyConnector.wallet.isModuleEnabled(DEFAULT_SESSION_KEY_MANAGER_MODULE);
+            const enabled = await biconomyConnector.wallet.isModuleEnabled(DEFAULT_SESSION_KEY_MANAGER_MODULE);
+            if (!enabled) {
+                const enableModuleTrx = await biconomyConnector.wallet.getEnableModuleData(
+                    DEFAULT_SESSION_KEY_MANAGER_MODULE
+                );
+
+                transactionArray.push(enableModuleTrx);
+            }
         } catch (e) {
             const enableModuleTrx = await biconomyConnector.wallet.getEnableModuleData(
                 DEFAULT_SESSION_KEY_MANAGER_MODULE
