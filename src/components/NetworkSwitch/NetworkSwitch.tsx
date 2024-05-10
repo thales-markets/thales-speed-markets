@@ -1,10 +1,8 @@
 import OutsideClickHandler from 'components/OutsideClick';
 import React, { useState } from 'react';
-
 import styled from 'styled-components';
-
+import { NetworkId } from 'thales-utils';
 import { SupportedNetwork } from 'types/network';
-
 import { isMobile } from 'utils/device';
 import { SUPPORTED_NETWORK_IDS_MAP } from 'utils/network';
 import { useAccount, useChainId, useConfig, useSwitchChain } from 'wagmi';
@@ -20,16 +18,22 @@ const NetworkSwitcher: React.FC = () => {
     return (
         <OutsideClickHandler onOutsideClick={() => setDropDownOpen(false)}>
             <NetworkIconWrapper onClick={() => setDropDownOpen(!dropDownOpen)} isConnected={isConnected}>
-                <AssetIcon className={SUPPORTED_NETWORK_IDS_MAP[networkId].icon} />
+                <AssetIcon
+                    className={
+                        (SUPPORTED_NETWORK_IDS_MAP[networkId] || SUPPORTED_NETWORK_IDS_MAP[NetworkId.OptimismMainnet])
+                            .icon
+                    }
+                />
 
                 <DownIcon className={`icon icon--arrow-down`} />
                 {dropDownOpen && (
                     <NetworkDropDown>
                         {Object.keys(SUPPORTED_NETWORK_IDS_MAP)
                             .map((key) => {
+                                const supportedNetorkId = Number(key) as SupportedNetwork;
                                 return {
-                                    id: Number(key) as SupportedNetwork,
-                                    ...SUPPORTED_NETWORK_IDS_MAP[Number(key)],
+                                    id: supportedNetorkId,
+                                    ...SUPPORTED_NETWORK_IDS_MAP[supportedNetorkId],
                                 };
                             })
                             .sort((a, b) => a.order - b.order)
@@ -49,11 +53,9 @@ const NetworkSwitcher: React.FC = () => {
                                         }
                                     }}
                                 >
+                                    {networkId === network.id && <NetworkSelectedIndicator />}
                                     <AssetIcon className={SUPPORTED_NETWORK_IDS_MAP[network.id].icon} />
-                                    <NetworkText>
-                                        {networkId === network.id && <NetworkSelectedIndicator />}
-                                        {network.name}
-                                    </NetworkText>
+                                    <NetworkText>{network.name}</NetworkText>
                                 </NetworkWrapper>
                             ))}
                     </NetworkDropDown>
@@ -124,12 +126,16 @@ const NetworkWrapper = styled.div`
     gap: 6px;
     cursor: pointer;
     width: 100%;
+    padding-left: 10px;
 `;
 
 const NetworkSelectedIndicator = styled.div`
     position: absolute;
-    background: ${(props) => props.theme.background.primary};
+    left: 7px;
+    background: ${(props) => props.theme.button.textColor.tertiary};
     border-radius: 20px;
+    width: 6px;
+    height: 6px;
 `;
 
 export default NetworkSwitcher;

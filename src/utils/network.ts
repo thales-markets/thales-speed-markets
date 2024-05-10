@@ -112,10 +112,17 @@ export const getSupportedNetworksByRoute = (route: string): NetworkId[] => {
                 NetworkId.ZkSync,
                 NetworkId.ZkSyncSepolia,
                 NetworkId.BlastSepolia,
+                NetworkId.OptimismSepolia,
             ];
         case ROUTES.Markets.ChainedSpeedMarkets:
         case ROUTES.Markets.ChainedSpeedMarketsOverview:
-            return [NetworkId.OptimismMainnet, NetworkId.Arbitrum, NetworkId.Base, NetworkId.PolygonMainnet];
+            return [
+                NetworkId.OptimismMainnet,
+                NetworkId.Arbitrum,
+                NetworkId.Base,
+                NetworkId.PolygonMainnet,
+                NetworkId.OptimismSepolia,
+            ];
         default:
             return Object.keys(SUPPORTED_NETWORKS).map((network) => Number(network) as NetworkId);
     }

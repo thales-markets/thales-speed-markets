@@ -67,7 +67,7 @@ const UnsupportedNetwork: React.FC<UnsupportedNetworkProps> = ({ supportedNetwor
                 padding="0 18px"
                 additionalStyles={{ textTransform: 'none' }}
                 onClick={() =>
-                    SUPPORTED_NETWORK_IDS_MAP[networkId].changeNetwork(networkId, () =>
+                    SUPPORTED_NETWORK_IDS_MAP[networkId as SupportedNetwork].changeNetwork(networkId, () =>
                         switchChain?.({ chainId: networkId as SupportedNetwork })
                     )
                 }

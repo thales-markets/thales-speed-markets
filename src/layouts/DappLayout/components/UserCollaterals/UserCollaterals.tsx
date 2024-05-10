@@ -229,7 +229,6 @@ const BalanceText = styled.span`
     font-family: ${(props) => props.theme.fontFamily.secondary};
     font-weight: 700;
     font-size: 12px;
-    text-transform: uppercase;
 `;
 
 const AssetIconStyle = { width: '16px', height: '16px', marginRight: '5px' };
