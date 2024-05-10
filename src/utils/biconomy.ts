@@ -56,15 +56,7 @@ export const executeBiconomyTransactionWithConfirmation = async (
 
         const {
             receipt: { transactionHash },
-            userOpHash,
-            success,
-            reason,
         } = await wait();
-
-        console.log('TX was succesful: ', success);
-        console.log('TX has failed cause of: ', reason);
-        console.log('UserOp receipt', userOpHash);
-        console.log('Transaction receipt', transactionHash);
 
         return transactionHash;
     }
@@ -96,7 +88,9 @@ export const executeBiconomyTransaction = async (
 
         const dateUntilValid = new Date(Number(validUntil) * 1000);
         const nowDate = new Date();
+
         if (!validUntil || Number(nowDate) > Number(dateUntilValid)) {
+            biconomyConnector.wallet.setActiveValidationModule(biconomyConnector.wallet.defaultValidationModule);
             const transactionArray = await getCreateSessionTxs(
                 biconomyConnector.wallet.biconomySmartAccountConfig.chainId,
                 collateral
@@ -114,7 +108,10 @@ export const executeBiconomyTransaction = async (
                 success,
             } = await wait();
 
+            console.log('success: ', success);
+
             if (!success) {
+                console.log('remove');
                 window.localStorage.removeItem('sessionPKey');
                 window.localStorage.removeItem('seassionValidUntil');
             }
@@ -124,44 +121,74 @@ export const executeBiconomyTransaction = async (
 
             return transactionHash;
         } else {
-            // generate sessionModule
-            const sessionModule = await createSessionKeyManagerModule({
-                moduleAddress: DEFAULT_SESSION_KEY_MANAGER_MODULE,
-                smartAccountAddress: biconomyConnector.address,
-            });
-            biconomyConnector.wallet.setActiveValidationModule(sessionModule);
-            const sessionAccount = privateKeyToAccount(sessionKeyPrivKey as any);
+            // try executing via Session module, if its not passing then enable session and execute with signing
+            try {
+                // generate sessionModule
+                const sessionModule = await createSessionKeyManagerModule({
+                    moduleAddress: DEFAULT_SESSION_KEY_MANAGER_MODULE,
+                    smartAccountAddress: biconomyConnector.address,
+                });
+                biconomyConnector.wallet.setActiveValidationModule(sessionModule);
 
-            const transport = RPC_LIST.CHAINNODE[networkId];
+                const sessionAccount = privateKeyToAccount(sessionKeyPrivKey as any);
 
-            const sessionSigner = createWalletClient({
-                account: sessionAccount,
-                chain: networkId as any,
-                transport: http(transport),
-            });
+                const transport = RPC_LIST.CHAINNODE[networkId];
 
-            console.log(sessionSigner);
+                const sessionSigner = createWalletClient({
+                    account: sessionAccount,
+                    chain: networkId as any,
+                    transport: http(transport),
+                });
 
-            const { wait } = await biconomyConnector.wallet.sendTransaction(transaction, {
-                paymasterServiceData: {
-                    mode: PaymasterMode.ERC20,
-                    preferredToken: collateral,
-                },
-                params: {
-                    sessionSigner: sessionSigner,
-                    sessionValidationModule: import.meta.env['VITE_APP_SVM_ADDRESS_' + networkId],
-                },
-            });
+                const { wait } = await biconomyConnector.wallet.sendTransaction(transaction, {
+                    paymasterServiceData: {
+                        mode: PaymasterMode.ERC20,
+                        preferredToken: collateral,
+                    },
+                    params: {
+                        sessionSigner: sessionSigner,
+                        sessionValidationModule: import.meta.env['VITE_APP_SVM_ADDRESS_' + networkId],
+                    },
+                });
 
-            const {
-                receipt: { transactionHash },
-                success,
-            } = await wait();
+                const {
+                    receipt: { transactionHash },
+                    success,
+                } = await wait();
 
-            console.log('TX was succesful: ', success);
-            console.log('Transaction receipt', transactionHash);
+                console.log('TX was succesful: ', success);
+                console.log('Transaction receipt', transactionHash);
 
-            return transactionHash;
+                return transactionHash;
+            } catch {
+                biconomyConnector.wallet.setActiveValidationModule(biconomyConnector.wallet.defaultValidationModule);
+                const transactionArray = await getCreateSessionTxs(
+                    biconomyConnector.wallet.biconomySmartAccountConfig.chainId,
+                    collateral
+                );
+                transactionArray.push(transaction);
+                const { wait } = await biconomyConnector.wallet.sendTransaction(transactionArray, {
+                    paymasterServiceData: {
+                        mode: PaymasterMode.ERC20,
+                        preferredToken: collateral,
+                    },
+                });
+
+                const {
+                    receipt: { transactionHash },
+                    success,
+                } = await wait();
+
+                if (!success) {
+                    window.localStorage.removeItem('sessionPKey');
+                    window.localStorage.removeItem('seassionValidUntil');
+                }
+
+                console.log('TX was succesful: ', success);
+                console.log('Transaction receipt', transactionHash);
+
+                return transactionHash;
+            }
         }
     }
 };
@@ -170,7 +197,6 @@ const getCreateSessionTxs = async (networkId: SupportedNetwork, collateralAddres
     if (biconomyConnector.wallet) {
         const privateKey = generatePrivateKey();
         const sessionKeyEOA = privateKeyToAccount(privateKey);
-        window.localStorage.setItem('sessionPKey', privateKey);
 
         const sessionModule = await createSessionKeyManagerModule({
             moduleAddress: DEFAULT_SESSION_KEY_MANAGER_MODULE,
@@ -262,6 +288,7 @@ const getCreateSessionTxs = async (networkId: SupportedNetwork, collateralAddres
             transactionArray.push(enableModuleTrx);
         }
 
+        window.localStorage.setItem('sessionPKey', privateKey);
         window.localStorage.setItem('seassionValidUntil', Math.floor(dateUntil.getTime() / 1000).toString());
 
         transactionArray.push(
