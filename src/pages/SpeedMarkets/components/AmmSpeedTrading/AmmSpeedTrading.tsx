@@ -1,12 +1,13 @@
-import PythInterfaceAbi from '@pythnetwork/pyth-sdk-solidity/abis/IPyth.json';
 import ApprovalModal from 'components/ApprovalModal';
 import Button from 'components/Button';
+import { GradientContainer } from 'components/Common/GradientBorder';
 import {
     getDefaultToastContent,
     getErrorToastOptions,
     getLoadingToastOptions,
     getSuccessToastOptions,
 } from 'components/ToastMessage/ToastMessage';
+import { PLAUSIBLE, PLAUSIBLE_KEYS } from 'constants/analytics';
 import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
 import {
     ALTCOIN_CONVERSION_BUFFER_PERCENTAGE,
@@ -14,7 +15,7 @@ import {
     SPEED_MARKETS_QUOTE,
     STABLECOIN_CONVERSION_BUFFER_PERCENTAGE,
 } from 'constants/market';
-import { PYTH_CONTRACT_ADDRESS, PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
+import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import { millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
 import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
@@ -31,7 +32,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
-import { getSelectedCollateralIndex, getIsBiconomy, setWalletConnectModalVisibility } from 'redux/modules/wallet';
+import { getIsBiconomy, getSelectedCollateralIndex, setWalletConnectModalVisibility } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivCentered, FlexDivColumn, FlexDivRow, FlexDivRowCentered } from 'styles/common';
 import {
@@ -46,13 +47,16 @@ import { AmmChainedSpeedMarketsLimits, AmmSpeedMarketsLimits } from 'types/marke
 import { SupportedNetwork } from 'types/network';
 import { RootState } from 'types/ui';
 import { ViemContract } from 'types/viem';
+import { executeBiconomyTransaction } from 'utils/biconomy';
+import biconomyConnector from 'utils/biconomyWallet';
 import chainedSpeedMarketsAMMContract from 'utils/contracts/chainedSpeedMarketsAMMContract';
 import erc20Contract from 'utils/contracts/collateralContract';
 import multipleCollateral from 'utils/contracts/multipleCollateralContract';
 import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
+import speedMarketsAMMCreatorContract from 'utils/contracts/speedMarketsAMMCreatorContract';
 import { getCoinBalance, getCollateral, getDefaultCollateral, isStableCurrency } from 'utils/currency';
 import { checkAllowance, getIsMultiCollateralSupported } from 'utils/network';
-import { getPriceId, getPriceServiceEndpoint } from 'utils/pyth';
+import { getPriceId, getPriceServiceEndpoint, priceParser } from 'utils/pyth';
 import { refetchBalances, refetchSpeedMarketsLimits, refetchUserSpeedMarkets } from 'utils/queryConnector';
 import { getReferralWallet } from 'utils/referral';
 import { getFeeByTimeThreshold, getTransactionForSpeedAMM } from 'utils/speedAmm';
@@ -61,10 +65,6 @@ import { Client, getContract, parseUnits, stringToHex } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 import { SelectedPosition } from '../SelectPosition/SelectPosition';
-import { executeBiconomyTransaction } from 'utils/biconomy';
-import biconomyConnector from 'utils/biconomyWallet';
-import { PLAUSIBLE, PLAUSIBLE_KEYS } from 'constants/analytics';
-import { GradientContainer } from 'components/Common/GradientBorder';
 
 type AmmSpeedTradingProps = {
     isChained: boolean;
@@ -94,6 +94,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     ammChainedSpeedMarketsLimits,
     currentPrice,
     setSkewImpact,
+    resetData,
 }) => {
     const { t } = useTranslation();
     const dispatch = useDispatch();
@@ -108,6 +109,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
+    const [buyinAmount, setBuyinAmount] = useState(0);
     const [paidAmount, setPaidAmount] = useState<number | string>(
         selectedStableBuyinAmount ? selectedStableBuyinAmount : ''
     );
@@ -331,6 +333,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         }
 
         if (buyinAmount && Number(paidAmount)) {
+            setBuyinAmount(buyinAmount);
             setPotentialProfit((buyinAmount * 2) / Number(paidAmount));
         }
     }, [paidAmount, totalFee, selectedCollateral, defaultCollateral, selectedStableBuyinAmount]);
@@ -545,17 +548,14 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     };
 
     const handleSubmit = async () => {
-        console.log(isButtonDisabled);
         if (!isBiconomy && isButtonDisabled) return;
 
         setIsSubmitting(true);
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
 
         const speedMarketsAMMContractWithSigner = getContract({
-            abi: !isChained ? speedMarketsAMMContract.abi : chainedSpeedMarketsAMMContract.abi,
-            address: !isChained
-                ? speedMarketsAMMContract.addresses[networkId]
-                : chainedSpeedMarketsAMMContract.addresses[networkId],
+            abi: speedMarketsAMMCreatorContract.abi,
+            address: speedMarketsAMMCreatorContract.addresses[networkId],
             client: walletClient.data as Client,
         });
 
@@ -570,13 +570,8 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             const pythPrice = bigNumberFormatter(latestPriceUpdate.parsed[0].price.price, PYTH_CURRENCY_DECIMALS);
             setSubmittedStrikePrice(pythPrice);
 
-            const pythContract = getContract({
-                abi: PythInterfaceAbi,
-                address: PYTH_CONTRACT_ADDRESS[networkId],
-                client: client as Client,
-            });
-            const priceUpdateData = ['0x' + latestPriceUpdate.binary.data[0]];
-            const updateFee = await pythContract.read.getUpdateFee([priceUpdateData]);
+            const strikePrice = priceParser(pythPrice);
+            const strikePriceSlippage = parseUnits('0.02', 18); // TODO: add to UI custom slippage % (2%)
 
             const asset = stringToHex(currencyKey, { size: 32 });
 
@@ -585,36 +580,27 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             const singleSides = positionType !== undefined ? [POSITIONS_TO_SIDE_MAP[positionType]] : [];
             const sides = isChained ? chainedSides : singleSides;
 
-            const buyInAmountBigNum =
-                selectedCollateral === defaultCollateral
-                    ? coinParser(truncToDecimals(paidAmount), networkId, selectedCollateral)
-                    : isStableCurrency(selectedCollateral)
-                    ? coinParser(truncToDecimals(totalPaidAmount), networkId, selectedCollateral)
-                    : coinParser(
-                          truncToDecimals(totalPaidAmount, COLLATERAL_DECIMALS[selectedCollateral]),
-                          networkId,
-                          selectedCollateral
-                      );
-            const skewImpactBigNum = positionType ? parseUnits(skewImpact[positionType].toString(), 18) : undefined;
-            const isNonDefaultCollateral = selectedCollateral !== defaultCollateral;
+            const buyInAmountParam = coinParser(
+                truncToDecimals(buyinAmount, COLLATERAL_DECIMALS[selectedCollateral]),
+                networkId,
+                selectedCollateral
+            );
+            const skewImpactParam = positionType ? parseUnits(skewImpact[positionType].toString(), 18) : undefined;
 
             const hash = await getTransactionForSpeedAMM(
                 speedMarketsAMMContractWithSigner,
-                isNonDefaultCollateral,
                 asset,
                 deltaTimeSec,
                 strikeTimeSec,
                 sides,
-                buyInAmountBigNum,
-                priceUpdateData,
-                updateFee,
-                collateralAddress || '',
+                buyInAmountParam,
+                strikePrice,
+                strikePriceSlippage,
+                selectedCollateral !== defaultCollateral ? collateralAddress : '',
                 referral as string,
-                skewImpactBigNum as any,
+                skewImpactParam as any,
                 isBiconomy
             );
-
-            console.log(hash);
 
             const txReceipt = await waitForTransactionReceipt(client as Client, {
                 hash,
@@ -622,6 +608,11 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
             if (txReceipt.status === 'success') {
                 toast.update(id, getSuccessToastOptions(t(`common.buy.confirmation-message`), id));
+                resetData();
+                setPaidAmount('');
+
+                await delay(secondsToMilliseconds(10)); // wait some time for creator to pick up pending markets
+
                 refetchUserSpeedMarkets(
                     isChained,
                     networkId,
@@ -639,7 +630,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                         },
                     }
                 );
-                setPaidAmount('');
             } else {
                 console.log('Transaction status', txReceipt.status);
                 await delay(800);

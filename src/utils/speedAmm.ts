@@ -27,150 +27,93 @@ import { executeBiconomyTransaction } from './biconomy';
 import biconomyConnector from './biconomyWallet';
 
 export const getTransactionForSpeedAMM = async (
-    speedMarketsAMMContractWithSigner: any, // speed or chained
-    isNonDefaultCollateral: boolean,
+    creatorContractWithSigner: any,
     asset: string,
     deltaTimeSec: number,
     strikeTimeSec: number,
     sides: number[],
     buyInAmount: bigint,
-    pythPriceUpdateData: string[],
-    pythUpdateFee: any,
+    strikePrice: bigint,
+    strikePriceSlippage: bigint,
     collateralAddress: string,
     referral: string | null,
     skewImpact?: bigint,
     isBiconomy?: boolean
 ) => {
     let txHash;
-    const isEth = collateralAddress === ZERO_ADDRESS;
     const isChained = sides.length > 1;
 
-    if (isNonDefaultCollateral) {
-        if (isChained) {
-            if (isBiconomy) {
-                txHash = await executeBiconomyTransaction(
-                    biconomyConnector.wallet?.biconomySmartAccountConfig.chainId as any,
-                    collateralAddress,
-                    speedMarketsAMMContractWithSigner,
-                    'createNewMarketWithDifferentCollateral',
+    if (isChained) {
+        if (isBiconomy) {
+            txHash = await executeBiconomyTransaction(
+                biconomyConnector.wallet?.biconomySmartAccountConfig.chainId as any,
+                collateralAddress,
+                creatorContractWithSigner,
+                'addPendingChainedSpeedMarket',
+                [
                     [
                         asset,
                         deltaTimeSec,
+                        strikePrice,
+                        strikePriceSlippage,
                         sides,
-                        pythPriceUpdateData,
-                        collateralAddress,
+                        collateralAddress ? collateralAddress : ZERO_ADDRESS,
                         buyInAmount,
-                        isEth,
                         referral ? referral : ZERO_ADDRESS,
                     ],
-                    isEth ? buyInAmount + pythUpdateFee : undefined
-                );
-            } else {
-                txHash = await speedMarketsAMMContractWithSigner.write.createNewMarketWithDifferentCollateral(
-                    [
-                        asset,
-                        deltaTimeSec,
-                        sides,
-                        pythPriceUpdateData,
-                        collateralAddress,
-                        buyInAmount,
-                        isEth,
-                        referral ? referral : ZERO_ADDRESS,
-                    ],
-                    { value: isEth ? buyInAmount + pythUpdateFee : pythUpdateFee }
-                );
-            }
+                ]
+            );
         } else {
-            if (isBiconomy) {
-                txHash = await executeBiconomyTransaction(
-                    biconomyConnector.wallet?.biconomySmartAccountConfig.chainId as any,
-                    collateralAddress,
-                    speedMarketsAMMContractWithSigner,
-                    'createNewMarketWithDifferentCollateral',
-                    [
-                        asset,
-                        strikeTimeSec,
-                        deltaTimeSec,
-                        sides[0],
-                        pythPriceUpdateData,
-                        collateralAddress,
-                        buyInAmount,
-                        isEth,
-                        referral ? referral : ZERO_ADDRESS,
-                        skewImpact,
-                    ],
-                    isEth ? buyInAmount + pythUpdateFee : undefined
-                );
-            } else {
-                txHash = await speedMarketsAMMContractWithSigner.write.createNewMarketWithDifferentCollateral(
-                    [
-                        asset,
-                        strikeTimeSec,
-                        deltaTimeSec,
-                        sides[0],
-                        pythPriceUpdateData,
-                        collateralAddress,
-                        buyInAmount,
-                        isEth,
-                        referral ? referral : ZERO_ADDRESS,
-                        skewImpact,
-                    ],
-                    { value: isEth ? buyInAmount + pythUpdateFee : pythUpdateFee }
-                );
-            }
+            txHash = await creatorContractWithSigner.write.addPendingChainedSpeedMarket([
+                [
+                    asset,
+                    deltaTimeSec,
+                    strikePrice,
+                    strikePriceSlippage,
+                    sides,
+                    collateralAddress ? collateralAddress : ZERO_ADDRESS,
+                    buyInAmount,
+                    referral ? referral : ZERO_ADDRESS,
+                ],
+            ]);
         }
     } else {
-        if (isChained) {
-            if (isBiconomy) {
-                txHash = await executeBiconomyTransaction(
-                    biconomyConnector.wallet?.biconomySmartAccountConfig.chainId as any,
-
-                    collateralAddress,
-                    speedMarketsAMMContractWithSigner,
-                    'createNewMarket',
-                    [asset, deltaTimeSec, sides, buyInAmount, pythPriceUpdateData, referral ? referral : ZERO_ADDRESS],
-                    pythUpdateFee
-                );
-            } else {
-                txHash = await speedMarketsAMMContractWithSigner.write.createNewMarket(
-                    [asset, deltaTimeSec, sides, buyInAmount, pythPriceUpdateData, referral ? referral : ZERO_ADDRESS],
-                    { value: pythUpdateFee }
-                );
-            }
+        if (isBiconomy) {
+            txHash = await executeBiconomyTransaction(
+                biconomyConnector.wallet?.biconomySmartAccountConfig.chainId as any,
+                collateralAddress,
+                creatorContractWithSigner,
+                'addPendingSpeedMarket',
+                [
+                    [
+                        asset,
+                        strikeTimeSec,
+                        deltaTimeSec,
+                        strikePrice,
+                        strikePriceSlippage,
+                        sides[0],
+                        collateralAddress ? collateralAddress : ZERO_ADDRESS,
+                        buyInAmount,
+                        referral ? referral : ZERO_ADDRESS,
+                        skewImpact,
+                    ],
+                ]
+            );
         } else {
-            if (isBiconomy) {
-                txHash = await executeBiconomyTransaction(
-                    biconomyConnector.wallet?.biconomySmartAccountConfig.chainId as any,
-                    collateralAddress,
-                    speedMarketsAMMContractWithSigner,
-                    'createNewMarket',
-                    [
-                        asset,
-                        strikeTimeSec,
-                        deltaTimeSec,
-                        sides[0],
-                        buyInAmount,
-                        pythPriceUpdateData,
-                        referral ? referral : ZERO_ADDRESS,
-                        skewImpact,
-                    ],
-                    pythUpdateFee
-                );
-            } else {
-                txHash = await speedMarketsAMMContractWithSigner.write.createNewMarket(
-                    [
-                        asset,
-                        strikeTimeSec,
-                        deltaTimeSec,
-                        sides[0],
-                        buyInAmount,
-                        pythPriceUpdateData,
-                        referral ? referral : ZERO_ADDRESS,
-                        skewImpact,
-                    ],
-                    { value: pythUpdateFee }
-                );
-            }
+            txHash = await creatorContractWithSigner.write.addPendingSpeedMarket([
+                [
+                    asset,
+                    strikeTimeSec,
+                    deltaTimeSec,
+                    strikePrice,
+                    strikePriceSlippage,
+                    sides[0],
+                    collateralAddress ? collateralAddress : ZERO_ADDRESS,
+                    buyInAmount,
+                    referral ? referral : ZERO_ADDRESS,
+                    skewImpact,
+                ],
+            ]);
         }
     }
 

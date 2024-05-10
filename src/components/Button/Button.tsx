@@ -87,7 +87,7 @@ const Container = styled(FlexDivCentered)<{
     min-height: ${(props) => props.height || DEFAULT_MIN_HEIGHT};
     background: ${(props) => props.$borderColor || props.theme.button.borderColor.primary};
     &:hover {
-        background: ${(props) => props.theme.button.textColor.tertiary};
+        ${(props) => (!props.$disabled ? `background: ${props.theme.button.textColor.tertiary};` : '')}
     }
     border-radius: ${(props) => props.$borderRadius || DEFAULT_BORDER_RADIUS};
     padding: ${(props) => props.padding || DEFAULT_PADDING};
@@ -110,6 +110,7 @@ const ButtonWrapper = styled.button<{
     $backgroundColor?: string;
     $fontSize?: string;
     $fontWeight?: number;
+    disabled?: boolean;
 }>`
     display: flex;
     text-transform: uppercase;
@@ -136,10 +137,10 @@ const ButtonWrapper = styled.button<{
         cursor: default;
     }
     &:hover {
-        color: ${(props) => props.theme.button.textColor.tertiary}; // // color on hover for text inside button
-        i,
-        span {
-            color: ${(props) => props.theme.button.textColor.tertiary}; // color on hover for icons inside button
+        ${(props) => (!props.disabled ? `color: ${props.theme.button.textColor.tertiary};` : '')}
+        // color on hover for icons inside button
+        i, span {
+            ${(props) => (!props.disabled ? `color: ${props.theme.button.textColor.tertiary};` : '')}
         }
     }
 `;
