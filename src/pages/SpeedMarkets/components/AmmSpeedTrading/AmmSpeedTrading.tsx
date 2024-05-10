@@ -112,6 +112,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         selectedStableBuyinAmount ? selectedStableBuyinAmount : ''
     );
     const [totalPaidAmount, setTotalPaidAmount] = useState(0);
+    const [potentialProfit, setPotentialProfit] = useState(0);
     const [submittedStrikePrice, setSubmittedStrikePrice] = useState(0);
     const [deltaFromStrikeTime, setDeltaFromStrikeTime] = useState(0);
     const [isAllowing, setIsAllowing] = useState(false);
@@ -295,7 +296,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                     : undefined;
                 const discount = oppositePosition ? skewImpact[oppositePosition] / 2 : 0;
 
-                return lpFee + skew - discount + Number(ammSpeedMarketsLimits?.safeBoxImpact);
+                return ceilNumberToDecimals(lpFee + skew - discount + Number(ammSpeedMarketsLimits?.safeBoxImpact), 4);
             }
         }
         return 0;
@@ -318,11 +319,19 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     }, secondsToMilliseconds(5));
 
     useEffect(() => {
+        let buyinAmount = 0;
+
         if (selectedCollateral !== defaultCollateral && isStableCurrency(selectedCollateral)) {
             // add half percent to amount to take into account collateral conversion
-            setTotalPaidAmount(Number(paidAmount) * (1 + totalFee + STABLECOIN_CONVERSION_BUFFER_PERCENTAGE));
+            setTotalPaidAmount(Number(paidAmount) * (1 + STABLECOIN_CONVERSION_BUFFER_PERCENTAGE));
+            buyinAmount = Number(paidAmount) / (1 + totalFee + STABLECOIN_CONVERSION_BUFFER_PERCENTAGE);
         } else {
-            setTotalPaidAmount(Number(paidAmount) * (1 + totalFee));
+            setTotalPaidAmount(Number(paidAmount));
+            buyinAmount = Number(paidAmount) / (1 + totalFee);
+        }
+
+        if (buyinAmount && Number(paidAmount)) {
+            setPotentialProfit((buyinAmount * 2) / Number(paidAmount));
         }
     }, [paidAmount, totalFee, selectedCollateral, defaultCollateral, selectedStableBuyinAmount]);
 
@@ -802,8 +811,8 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 <ColumnSpaceBetween ref={inputWrapperRef}>
                     {isMobile && getTradingDetails()}
                     <QuoteContainer>
-                        <QuoteLabel>Potential profit</QuoteLabel>
-                        <QuoteText>5.4x</QuoteText>
+                        <QuoteLabel>{t('speed-markets.profit')}</QuoteLabel>
+                        <QuoteText>{truncToDecimals(potentialProfit, 2)}x</QuoteText>
                     </QuoteContainer>
                     {getSubmitButton()}
                 </ColumnSpaceBetween>
@@ -909,10 +918,10 @@ const QuoteContainer = styled.div`
 
 const QuoteLabel = styled.span`
     font-family: ${(props) => props.theme.fontFamily.tertiary};
-    font-size: 13px;
+    font-size: 18px;
     font-style: normal;
     font-weight: 800;
-    line-height: 100%; /* 13px */
+    line-height: 100%;
     text-transform: capitalize;
 `;
 

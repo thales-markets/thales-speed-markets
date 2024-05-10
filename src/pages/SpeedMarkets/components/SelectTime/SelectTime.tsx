@@ -32,7 +32,7 @@ type SelectTimeProps = {
     isChained: boolean;
 };
 
-const SPEED_NUMBER_OF_BUTTONS = 3;
+const SPEED_NUMBER_OF_BUTTONS = 4;
 
 const CHAINED_TIMEFRAMES_MINUTES = [2, 5, 10];
 
@@ -51,6 +51,7 @@ const SelectTime: React.FC<SelectTimeProps> = ({
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const [isDeltaSelected, setIsDeltaSelected] = useState(true); // false is when exact time is selected
+    const [showCustomDeltaTime, setShowCustomDeltaTime] = useState(false);
     const [customDeltaTime, setCustomDeltaTime] = useState<string | number>('');
     const [isDeltaMinutesSelected, setIsDeltaMinutesSelected] = useState(true); // false is when hours is selected
 
@@ -270,11 +271,8 @@ const SelectTime: React.FC<SelectTimeProps> = ({
         }
     };
 
-    const onSwitchTimeClickHandler = () => {
-        setIsDeltaSelected(!isDeltaSelected);
-        setCustomDeltaTime('');
-        onDeltaChange(0);
-        onExactTimeChange(0);
+    const onCustomTimeClickHandler = () => {
+        setShowCustomDeltaTime(!showCustomDeltaTime);
     };
 
     return (
@@ -312,12 +310,12 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                                     onClick={() => onDeltaTimeClickHandler(deltaHours, 0)}
                                 >{`${deltaHours}h`}</Time>
                             ))}
-                            <Time $isSelected={!isDeltaSelected} onClick={onSwitchTimeClickHandler}>
+                            <Time $isSelected={!isDeltaSelected} onClick={onCustomTimeClickHandler}>
                                 {'CUSTOM'}
                             </Time>
                         </FlexDivRow>
 
-                        {!isDeltaSelected && (
+                        {showCustomDeltaTime && (
                             <Row>
                                 <InputWrapper>
                                     <NumericInput
@@ -411,7 +409,7 @@ const InputWrapper = styled.div`
 `;
 
 const Time = styled(FlexDivCentered)<{ $isSelected: boolean }>`
-    width: 75px;
+    width: 60px;
     height: 40px;
     border-radius: 8px;
     font-family: ${(props) => props.theme.fontFamily.tertiary};

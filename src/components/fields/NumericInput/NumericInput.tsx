@@ -107,7 +107,8 @@ const StyledInput = styled(Input)<{ padding?: string }>`
 const RightContainer = styled(FlexDivCentered)`
     position: absolute;
     right: 0;
-    bottom: 10px;
+    top: 50%;
+    bottom: 50%;
 `;
 
 const CurrencyLabel = styled.label<{ $hasSeparator?: boolean }>`

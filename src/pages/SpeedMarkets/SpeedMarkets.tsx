@@ -8,7 +8,7 @@ import { LINKS } from 'constants/links';
 import { CONNECTION_TIMEOUT_MS, SUPPORTED_ASSETS } from 'constants/pyth';
 import ROUTES from 'constants/routes';
 import { secondsToMilliseconds } from 'date-fns';
-import { Positions } from 'enums/market';
+import { Positions, TradingSteps } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import useInterval from 'hooks/useInterval';
 import OpenPositions from 'pages/SpeedMarkets/components/OpenPositions';
@@ -156,10 +156,10 @@ const SpeedMarkets: React.FC = () => {
     }, [isChained]);
 
     const getStep = (stepNumber: number) => {
-        const isAssetStep = stepNumber === 1;
-        const isDirectionsStep = stepNumber === 2;
-        const isTimeStep = stepNumber === 3;
-        const isBuyinStep = stepNumber === 4;
+        const isAssetStep = stepNumber === TradingSteps.ASSET;
+        const isDirectionsStep = stepNumber === TradingSteps.DIRECTION;
+        const isTimeStep = stepNumber === TradingSteps.TIME;
+        const isBuyinStep = stepNumber === TradingSteps.BUYIN;
         return (
             <>
                 {isChained && isTimeStep && (
@@ -264,14 +264,10 @@ const SpeedMarkets: React.FC = () => {
                             ></LightweightChart>
                         </LeftSide>
                         <RightSide>
-                            {/* Asset */}
-                            {getStep(1)}
-                            {/* Direction */}
-                            {getStep(2)}
-                            {/* Time */}
-                            {getStep(3)}
-                            {/* Buyin */}
-                            {getStep(4)}
+                            {getStep(TradingSteps.ASSET)}
+                            {getStep(TradingSteps.DIRECTION)}
+                            {getStep(TradingSteps.TIME)}
+                            {getStep(TradingSteps.BUYIN)}
                         </RightSide>
                     </ContentWrapper>
 
