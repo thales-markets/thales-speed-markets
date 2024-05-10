@@ -145,9 +145,11 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
     const chainedQuote =
         isChained && ammChainedSpeedMarketsLimits
-            ? ammChainedSpeedMarketsLimits?.payoutMultipliers[
-                  chainedPositions.length - ammChainedSpeedMarketsLimits.minChainedMarkets
-              ] ** chainedPositions.length
+            ? ceilNumberToDecimals(
+                  ammChainedSpeedMarketsLimits?.payoutMultipliers[
+                      chainedPositions.length - ammChainedSpeedMarketsLimits.minChainedMarkets
+                  ] ** chainedPositions.length
+              )
             : 0;
 
     const minBuyinAmount = useMemo(
@@ -334,9 +336,17 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         }
 
         if (totalFee) {
-            setPotentialProfit(SPEED_MARKETS_QUOTE / (1 + totalFee));
+            setPotentialProfit(isChained ? chainedQuote : SPEED_MARKETS_QUOTE / (1 + totalFee));
         }
-    }, [paidAmount, totalFee, selectedCollateral, defaultCollateral, selectedStableBuyinAmount]);
+    }, [
+        paidAmount,
+        totalFee,
+        selectedCollateral,
+        defaultCollateral,
+        selectedStableBuyinAmount,
+        isChained,
+        chainedQuote,
+    ]);
 
     // when buttons are used to populate amount
     useEffect(() => {
