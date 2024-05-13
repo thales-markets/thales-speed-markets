@@ -7,10 +7,18 @@ import { toast } from 'react-toastify';
 import { getErrorToastOptions, getInfoToastOptions } from 'components/ToastMessage/ToastMessage';
 import { t } from 'i18next';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
-import { useAccount, useChainId } from 'wagmi';
+import { useAccount, useChainId, useDisconnect } from 'wagmi';
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
+import SPAAnchor from 'components/SPAAnchor';
+import { buildHref } from 'utils/routes';
+import ROUTES from 'constants/routes';
+import OutsideClick from 'components/OutsideClick';
 
-const UserInfo: React.FC = () => {
+type UserInfoProps = {
+    setUserInfoOpen: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const UserInfo: React.FC<UserInfoProps> = ({ setUserInfoOpen }) => {
     const handleCopy = () => {
         const id = toast.loading(t('user-info.copying-address'));
         try {
@@ -22,56 +30,68 @@ const UserInfo: React.FC = () => {
     };
 
     const networkId = useChainId();
+    const { disconnect } = useDisconnect();
     const { address } = useAccount();
 
     const validUntil = window.localStorage.getItem(LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId]);
 
     return (
-        <Container>
-            <FlexColumn>
-                <FlexDivRowCentered>
+        <OutsideClick onOutsideClick={() => setUserInfoOpen(false)}>
+            <Container>
+                <FlexColumn>
+                    <FlexDivRowCentered>
+                        <FlexDivColumn>
+                            <TextLabel>{getUserInfo()?.name} </TextLabel>
+                            <Value>{getUserInfo()?.google_email}</Value>
+                        </FlexDivColumn>
+                    </FlexDivRowCentered>
                     <FlexDivColumn>
-                        <TextLabel>{getUserInfo()?.name} </TextLabel>
-                        <Value>{getUserInfo()?.google_email}</Value>
+                        <TextLabel>{t('user-info.smart-account')} </TextLabel>
+                        <Value>
+                            {biconomyConnector.address.toLowerCase()}
+                            <CopyIcon onClick={handleCopy} className="network-icon network-icon--copy" />
+                        </Value>
                     </FlexDivColumn>
-                </FlexDivRowCentered>
-                <FlexDivColumn>
-                    <TextLabel>{t('user-info.smart-account')} </TextLabel>
-                    <Value>
-                        {biconomyConnector.address}{' '}
-                        <CopyIcon onClick={handleCopy} className="network-icon network-icon--copy" />
-                    </Value>
-                </FlexDivColumn>
-                <FlexDivColumn>
-                    <TextLabel>{t('user-info.eoa')} </TextLabel>
-                    <Value>{address}</Value>
-                </FlexDivColumn>
-                <SessionWrapper>
-                    <TextLabel>{t('user-info.session-valid')} </TextLabel>
-                    <Value>{formatShortDateWithFullTime(Number(validUntil) * 1000)}</Value>
-                </SessionWrapper>
-            </FlexColumn>
-            <FlexColumn>
-                <FlexStartCentered>
-                    <Icon className="network-icon network-icon--withdraw" />
-                    <Label>{t('user-info.withdraw')}</Label>
-                </FlexStartCentered>
-                <FlexStartCentered>
-                    <Icon className="network-icon network-icon--avatar" />
-                    <Label>{t('user-info.trading-profile')}</Label>
-                </FlexStartCentered>
-                <FlexStartCentered>
-                    <Icon className="network-icon network-icon--docs" />
-                    <Label>{t('user-info.docs')}</Label>
-                </FlexStartCentered>
-            </FlexColumn>
-            <FlexColumn>
-                <FlexStartCentered>
-                    <Icon className="network-icon network-icon--logout" />
-                    <Label>{t('user-info.logout')}</Label>
-                </FlexStartCentered>
-            </FlexColumn>
-        </Container>
+                    <FlexDivColumn>
+                        <TextLabel>{t('user-info.eoa')} </TextLabel>
+                        <Value>{address?.toLowerCase()}</Value>
+                    </FlexDivColumn>
+                    <SessionWrapper>
+                        <TextLabel>{t('user-info.session-valid')} </TextLabel>
+                        <Value>{formatShortDateWithFullTime(Number(validUntil) * 1000)}</Value>
+                    </SessionWrapper>
+                </FlexColumn>
+                <FlexColumn>
+                    <FlexStartCentered>
+                        <SPAAnchor href={buildHref(ROUTES.Withdraw)}>
+                            <Icon className="network-icon network-icon--withdraw" />
+                            <Label>{t('user-info.withdraw')}</Label>
+                        </SPAAnchor>
+                    </FlexStartCentered>
+                    <FlexStartCentered>
+                        <SPAAnchor href={buildHref(ROUTES.Markets.Profile)}>
+                            <Icon className="network-icon network-icon--avatar" />
+                            <Label>{t('user-info.trading-profile')}</Label>
+                        </SPAAnchor>
+                    </FlexStartCentered>
+                    <FlexStartCentered>
+                        <Icon className="network-icon network-icon--docs" />
+                        <Label>{t('user-info.docs')}</Label>
+                    </FlexStartCentered>
+                </FlexColumn>
+                <FlexColumn>
+                    <FlexStartCentered
+                        onClick={() => {
+                            setUserInfoOpen(false);
+                            disconnect();
+                        }}
+                    >
+                        <Icon className="network-icon network-icon--logout" />
+                        <Label>{t('user-info.logout')}</Label>
+                    </FlexStartCentered>
+                </FlexColumn>
+            </Container>
+        </OutsideClick>
     );
 };
 
@@ -100,6 +120,7 @@ const FlexColumn = styled(FlexDivColumn)`
 
 const FlexStartCentered = styled(FlexDivStart)`
     align-items: center;
+    cursor: pointer;
 `;
 
 const TextLabel = styled.span`
@@ -126,6 +147,7 @@ const CopyIcon = styled.i`
     color: ${(props) => props.theme.textColor.primary};
     font-size: 18px;
     cursor: pointer;
+    margin-left: 4px;
 `;
 const Label = styled.span`
     font-family: ${(props) => props.theme.fontFamily.tertiary};

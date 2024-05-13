@@ -86,13 +86,13 @@ const DappHeader: React.FC = () => {
                         <UserWallet />
                         <HeaderIcons
                             onClick={() => setUserInfoOpen(!userInfoOpen)}
-                            className={`network-icon network-icon--settings`}
+                            className={`network-icon network-icon--burger`}
                         />
                     </>
                 )}
 
                 {!isMobile && <Notifications />}
-                {userInfoOpen && <UserInfo />}
+                {userInfoOpen && <UserInfo setUserInfoOpen={setUserInfoOpen} />}
             </RightContainer>
             {openReferralModal && <ReferralModal onClose={() => setOpenReferralModal(false)} />}
             {openGetStarted && <GetStarted isOpen={openGetStarted} onClose={() => setOpenGetStarted(false)} />}
