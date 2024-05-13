@@ -197,9 +197,9 @@ const Dropdown = styled(FlexDivColumnCentered)<{ isDropDownAbove?: boolean; widt
 
 const DetailedDropdown = styled(FlexDivColumnCentered)<{ width?: string }>`
     position: absolute;
-    top: 35px;
+    top: 30px;
     right: 0px;
-    width: ${(props) => (props.width ? props.width : '350px')};
+    width: ${(props) => (props.width ? props.width : '340px')};
     padding: 5px 3px;
     border-radius: 8px;
     background: ${(props) => props.theme.dropDown.background.primary};

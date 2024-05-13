@@ -245,7 +245,7 @@ const Wrapper = styled.div`
 `;
 
 const ChartContainer = styled.div`
-    height: 284px;
+    height: 291px;
     margin-top: 15px;
 `;
 

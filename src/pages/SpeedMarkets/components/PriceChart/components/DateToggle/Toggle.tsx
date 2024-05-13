@@ -21,17 +21,15 @@ const Toggle: React.FC<ToggleProps> = ({ options, onChange, selectedIndex }) => 
             {options.map(({ label, resolution }, index) => (
                 <Button
                     key={resolution}
-                    width="35px"
+                    width="40px"
                     height="31px"
                     textColor={
-                        index === selectedIndex ? theme.button.textColor.secondary : theme.button.textColor.primary
+                        index === selectedIndex ? theme.button.textColor.secondary : theme.button.textColor.tertiary
                     }
                     backgroundColor={
                         index === selectedIndex ? theme.button.background.secondary : theme.button.background.primary
                     }
-                    borderColor={
-                        index === selectedIndex ? theme.button.borderColor.secondary : theme.button.borderColor.tertiary
-                    }
+                    borderColor={theme.button.borderColor.secondary}
                     fontSize="13px"
                     padding={index === selectedIndex ? '0' : '1px'}
                     borderRadius="8px"

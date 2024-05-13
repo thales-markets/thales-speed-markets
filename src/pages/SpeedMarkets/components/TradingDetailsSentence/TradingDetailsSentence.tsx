@@ -28,7 +28,7 @@ type TradingDetailsSentenceProps = {
     maturityDate: number;
     market: MarketInfo | SpeedMarketsTrade;
     isFetchingQuote: boolean;
-    priceProfit: number | string;
+    profit: number | string;
     paidAmount: number | string;
     deltaTimeSec?: number;
     hasCollateralConversion?: boolean;
@@ -39,7 +39,7 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
     maturityDate,
     market,
     isFetchingQuote,
-    priceProfit,
+    profit,
     paidAmount,
     deltaTimeSec,
     hasCollateralConversion,
@@ -71,7 +71,7 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
 
     const potentialWinFormatted = isFetchingQuote
         ? '...'
-        : `${formatCurrencyWithKey(getDefaultCollateral(networkId), (1 + Number(priceProfit)) * Number(paidAmount))}`;
+        : `${formatCurrencyWithKey(getDefaultCollateral(networkId), Number(profit) * Number(paidAmount))}`;
 
     const positionTypeFormatted =
         market.positionType === Positions.UP
@@ -190,11 +190,11 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
                     <TextLabel>{t('speed-markets.amm-trading.you-win')}</TextLabel>
                     {hasCollateralConversion && <TextLabel>{` ${t('speed-markets.amm-trading.at-least')}`}</TextLabel>}
                     <SentanceTextValue $isProfit>
-                        {Number(priceProfit) > 0 && Number(paidAmount) > 0
+                        {Number(profit) > 0 && Number(paidAmount) > 0
                             ? potentialWinFormatted
                             : '( ' + t('speed-markets.amm-trading.based-amount') + ' )'}
                     </SentanceTextValue>
-                    {hasCollateralConversion && Number(priceProfit) > 0 && Number(paidAmount) > 0 && (
+                    {hasCollateralConversion && Number(profit) > 0 && Number(paidAmount) > 0 && (
                         <Tooltip overlay={t('speed-markets.tooltips.payout-conversion')} />
                     )}
                 </Text>

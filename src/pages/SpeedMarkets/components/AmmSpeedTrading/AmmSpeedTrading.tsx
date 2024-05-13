@@ -336,7 +336,10 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         }
 
         if (totalFee) {
-            setPotentialProfit(isChained ? chainedQuote : SPEED_MARKETS_QUOTE / (1 + totalFee));
+            setPotentialProfit((isChained ? chainedQuote : SPEED_MARKETS_QUOTE) / (1 + totalFee));
+        } else {
+            // initial value
+            setPotentialProfit(0);
         }
     }, [
         paidAmount,
@@ -621,7 +624,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 resetData();
                 setPaidAmount('');
 
-                await delay(secondsToMilliseconds(10)); // wait some time for creator to pick up pending markets
+                await delay(secondsToMilliseconds(12)); // wait some time for creator to pick up pending markets
 
                 refetchUserSpeedMarkets(
                     isChained,
@@ -786,7 +789,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                             chainedPositions: isChained ? chainedPositions : undefined,
                         }}
                         isFetchingQuote={false}
-                        priceProfit={(isChained ? chainedQuote : SPEED_MARKETS_QUOTE) - 1}
+                        profit={potentialProfit}
                         paidAmount={selectedStableBuyinAmount || convertToStable(Number(paidAmount))}
                         hasCollateralConversion={selectedCollateral !== defaultCollateral}
                     />
@@ -805,7 +808,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     const inputWrapperRef = useRef<HTMLDivElement>(null);
 
     return (
-        <Container $isChained={isChained}>
+        <Container>
             {!isMobile && getTradingDetails()}
             <FinalizeTrade>
                 <ColumnSpaceBetween ref={inputWrapperRef}>
@@ -848,11 +851,11 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     );
 };
 
-const Container = styled(FlexDivRow)<{ $isChained: boolean }>`
+const Container = styled(FlexDivRow)`
     position: relative;
     z-index: 4;
     height: 140px;
-    margin-bottom: ${(props) => (props.$isChained ? '48' : '68')}px;
+    margin-bottom: 20px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         min-width: initial;
         height: 100%;

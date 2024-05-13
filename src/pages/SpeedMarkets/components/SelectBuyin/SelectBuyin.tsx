@@ -1,41 +1,36 @@
-import { USD_SIGN } from 'constants/currency';
-import { ScreenSizeBreakpoint } from 'enums/ui';
-import React, { useEffect, useMemo, useState } from 'react';
-import styled from 'styled-components';
-import { FlexDivCentered, FlexDivRow } from 'styles/common';
-import { AmmChainedSpeedMarketsLimits, AmmSpeedMarketsLimits } from 'types/market';
-import { SelectedPosition } from '../SelectPosition/SelectPosition';
-import { ceilNumberToDecimals, roundNumberToDecimals, truncToDecimals } from 'thales-utils';
-import { Header, HeaderText } from '../SelectPosition/styled-components';
-import { t } from 'i18next';
-import { useSelector } from 'react-redux';
-import { RootState } from 'types/ui';
-import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
-import { useAccount, useChainId, useClient } from 'wagmi';
-import { getCoinBalance, getCollateral, getCollaterals, getDefaultCollateral, isStableCurrency } from 'utils/currency';
 import CollateralSelector from 'components/CollateralSelector';
 import NumericInput from 'components/fields/NumericInput';
-import useExchangeRatesQuery, { Rates } from 'queries/rates/useExchangeRatesQuery';
-import { getIsAppReady } from 'redux/modules/app';
-import { getIsMultiCollateralSupported } from 'utils/network';
-import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipleCollateralBalanceQuery';
-import biconomyConnector from 'utils/biconomyWallet';
+import { USD_SIGN } from 'constants/currency';
 import { STABLECOIN_CONVERSION_BUFFER_PERCENTAGE } from 'constants/market';
 import { Positions } from 'enums/market';
+import { ScreenSizeBreakpoint } from 'enums/ui';
+import { t } from 'i18next';
+import useExchangeRatesQuery, { Rates } from 'queries/rates/useExchangeRatesQuery';
+import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipleCollateralBalanceQuery';
 import useStableBalanceQuery from 'queries/walletBalances/useStableBalanceQuery';
-import { getFeeByTimeThreshold } from 'utils/speedAmm';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { getIsAppReady } from 'redux/modules/app';
+import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
+import styled from 'styled-components';
+import { FlexDivCentered, FlexDivRow } from 'styles/common';
+import { roundNumberToDecimals, truncToDecimals } from 'thales-utils';
+import { AmmChainedSpeedMarketsLimits, AmmSpeedMarketsLimits } from 'types/market';
+import { RootState } from 'types/ui';
+import biconomyConnector from 'utils/biconomyWallet';
+import { getCoinBalance, getCollateral, getCollaterals, getDefaultCollateral, isStableCurrency } from 'utils/currency';
+import { getIsMultiCollateralSupported } from 'utils/network';
+import { useAccount, useChainId, useClient } from 'wagmi';
+import { SelectedPosition } from '../SelectPosition/SelectPosition';
+import { Header, HeaderText } from '../SelectPosition/styled-components';
 
 type SelectBuyinProps = {
     value: number;
     onChange: React.Dispatch<number>;
     isChained: boolean;
-    positionType: SelectedPosition;
     chainedPositions: SelectedPosition[];
     ammSpeedMarketsLimits: AmmSpeedMarketsLimits | null;
     ammChainedSpeedMarketsLimits: AmmChainedSpeedMarketsLimits | null;
-
-    strikeTimeSec: number;
-    deltaTimeSec: number;
     currencyKey: string;
 };
 
@@ -49,9 +44,6 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
     ammSpeedMarketsLimits,
     ammChainedSpeedMarketsLimits,
     currencyKey,
-    strikeTimeSec,
-    deltaTimeSec,
-    positionType,
 }) => {
     const [buyinAmount, setBuyinAmount] = useState(0);
 
@@ -175,65 +167,14 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
         setBuyinAmount(value);
     }, [value]);
 
-    const skewImpact = useMemo(() => {
-        const skewPerPosition = { [Positions.UP]: 0, [Positions.DOWN]: 0 };
-
-        const riskPerUp = ammSpeedMarketsLimits?.risksPerAssetAndDirection.filter(
-            (data) => data.currency === currencyKey && data.position === Positions.UP
-        )[0];
-        const riskPerDown = ammSpeedMarketsLimits?.risksPerAssetAndDirection.filter(
-            (data) => data.currency === currencyKey && data.position === Positions.DOWN
-        )[0];
-
-        if (riskPerUp && riskPerDown) {
-            skewPerPosition[Positions.UP] = ceilNumberToDecimals(
-                (riskPerUp.current / riskPerUp.max) * ammSpeedMarketsLimits?.maxSkewImpact,
-                4
-            );
-            skewPerPosition[Positions.DOWN] = ceilNumberToDecimals(
-                (riskPerDown.current / riskPerDown.max) * ammSpeedMarketsLimits?.maxSkewImpact,
-                4
-            );
-        }
-
-        return skewPerPosition;
-    }, [ammSpeedMarketsLimits?.maxSkewImpact, ammSpeedMarketsLimits?.risksPerAssetAndDirection, currencyKey]);
-
-    const totalFee = useMemo(() => {
-        if (ammSpeedMarketsLimits) {
-            if (isChained) {
-                return ammSpeedMarketsLimits.safeBoxImpact;
-            } else if (deltaTimeSec || strikeTimeSec) {
-                const lpFee = getFeeByTimeThreshold(
-                    deltaTimeSec,
-                    ammSpeedMarketsLimits?.timeThresholdsForFees,
-                    ammSpeedMarketsLimits?.lpFees,
-                    ammSpeedMarketsLimits?.defaultLPFee
-                );
-                const skew = positionType ? skewImpact[positionType] : 0;
-                const oppositePosition = positionType
-                    ? positionType === Positions.UP
-                        ? Positions.DOWN
-                        : Positions.UP
-                    : undefined;
-                const discount = oppositePosition ? skewImpact[oppositePosition] / 2 : 0;
-
-                return lpFee + skew - discount + Number(ammSpeedMarketsLimits?.safeBoxImpact);
-            }
-        }
-        return 0;
-    }, [isChained, ammSpeedMarketsLimits, deltaTimeSec, strikeTimeSec, skewImpact, positionType]);
-
     const onMaxClick = () => {
         if (collateralBalance > 0) {
             const maxWalletAmount =
                 selectedCollateral === defaultCollateral
-                    ? Number(truncToDecimals(collateralBalance / (1 + totalFee)))
+                    ? Number(truncToDecimals(collateralBalance))
                     : isStableCurrency(selectedCollateral)
-                    ? Number(
-                          truncToDecimals(collateralBalance / (1 + totalFee + STABLECOIN_CONVERSION_BUFFER_PERCENTAGE))
-                      )
-                    : Number(truncToDecimals(collateralBalance / (1 + totalFee), 18));
+                    ? Number(truncToDecimals(collateralBalance / (1 + STABLECOIN_CONVERSION_BUFFER_PERCENTAGE)))
+                    : Number(truncToDecimals(collateralBalance, 18));
 
             let maxLiquidity, maxLiquidityPerDirection: number;
             if (isChained) {
@@ -271,7 +212,7 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
             <Header>
                 <HeaderText> {t('speed-markets.steps.enter-buyin')}</HeaderText>
             </Header>
-            <Container>
+            <BuyinAmountsWrapper>
                 {buyinAmounts.map((amount, index) => {
                     return (
                         <Amount
@@ -287,9 +228,9 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
                         </Amount>
                     );
                 })}
-            </Container>
+            </BuyinAmountsWrapper>
             <NumericInput
-                value={buyinAmount}
+                value={buyinAmount || ''}
                 placeholder={t('common.enter-amount')}
                 onChange={(_, value) => {
                     onChange(Number(value));
@@ -309,12 +250,13 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
                     ) : undefined
                 }
                 currencyLabel={!isMultiCollateralSupported ? defaultCollateral : undefined}
+                margin="0"
             />
         </div>
     );
 };
 
-const Container = styled(FlexDivRow)`
+const BuyinAmountsWrapper = styled(FlexDivRow)`
     margin-bottom: 10px;
 `;
 

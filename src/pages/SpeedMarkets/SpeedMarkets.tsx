@@ -205,9 +205,6 @@ const SpeedMarkets: React.FC = () => {
                         ammSpeedMarketsLimits={ammSpeedMarketsLimitsData}
                         ammChainedSpeedMarketsLimits={ammChainedSpeedMarketsLimitsData}
                         currencyKey={currencyKey}
-                        positionType={positionType}
-                        strikeTimeSec={strikeTimeSec}
-                        deltaTimeSec={deltaTimeSec}
                     />
                 )}
             </>

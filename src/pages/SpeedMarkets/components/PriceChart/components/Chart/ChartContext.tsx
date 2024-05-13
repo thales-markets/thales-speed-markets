@@ -98,7 +98,7 @@ export const ChartComponent: React.FC<ChartProps> = ({
             </Chart>
             <ResetButton>
                 <Button
-                    width="35px"
+                    width="40px"
                     height="31px"
                     textColor={theme.button.textColor.tertiary}
                     backgroundColor={theme.button.background.primary}
@@ -127,7 +127,7 @@ export const ChartComponent: React.FC<ChartProps> = ({
 };
 
 const ChartContainer = styled.div`
-    height: 284px;
+    height: 291px;
     position: relative;
 `;
 

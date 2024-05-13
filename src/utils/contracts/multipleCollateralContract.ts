@@ -1120,7 +1120,7 @@ const multipleCollateral = {
     DAI: {
         addresses: {
             [NetworkId.OptimismMainnet]: '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1' as Address,
-            [NetworkId.OptimismSepolia]: TBD_ADDRESS,
+            [NetworkId.OptimismSepolia]: '0x0091f4e75a03C11cB9be8E3717219005eb780D89' as Address,
             [NetworkId.PolygonMainnet]: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063' as Address,
             [NetworkId.Arbitrum]: '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1' as Address,
             [NetworkId.Base]: TBD_ADDRESS,

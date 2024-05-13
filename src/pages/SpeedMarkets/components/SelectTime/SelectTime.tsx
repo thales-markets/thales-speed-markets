@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsMobile } from 'redux/modules/ui';
 import styled, { useTheme } from 'styled-components';
-import { FlexDivCentered, FlexDivColumnCentered, FlexDivEnd, FlexDivRow } from 'styles/common';
+import { FlexDivCentered, FlexDivColumnCentered, FlexDivRow, FlexDivStart } from 'styles/common';
 import { AmmSpeedMarketsLimits } from 'types/market';
 import { RootState, ThemeInterface } from 'types/ui';
 import { useAccount } from 'wagmi';
@@ -395,8 +395,8 @@ const Row = styled(FlexDivRow)`
     margin-top: 10px;
 `;
 
-const ChainedRow = styled(FlexDivEnd)`
-    gap: 15px;
+const ChainedRow = styled(FlexDivStart)`
+    gap: 10px;
 `;
 
 const Column = styled(FlexDivColumnCentered)`
