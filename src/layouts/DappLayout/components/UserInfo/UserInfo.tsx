@@ -63,13 +63,13 @@ const UserInfo: React.FC<UserInfoProps> = ({ setUserInfoOpen }) => {
                 </FlexColumn>
                 <FlexColumn>
                     <FlexStartCentered>
-                        <SPAAnchor href={buildHref(ROUTES.Withdraw)}>
+                        <SPAAnchor onClick={() => setUserInfoOpen(false)} href={buildHref(ROUTES.Withdraw)}>
                             <Icon className="network-icon network-icon--withdraw" />
                             <Label>{t('user-info.withdraw')}</Label>
                         </SPAAnchor>
                     </FlexStartCentered>
                     <FlexStartCentered>
-                        <SPAAnchor href={buildHref(ROUTES.Markets.Profile)}>
+                        <SPAAnchor onClick={() => setUserInfoOpen(false)} href={buildHref(ROUTES.Markets.Profile)}>
                             <Icon className="network-icon network-icon--avatar" />
                             <Label>{t('user-info.trading-profile')}</Label>
                         </SPAAnchor>
