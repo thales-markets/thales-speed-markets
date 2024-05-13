@@ -10,6 +10,7 @@ import {
 import { PLAUSIBLE, PLAUSIBLE_KEYS } from 'constants/analytics';
 import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
 import {
+    ALLOWANCE_BUFFER_PERCENTAGE,
     ALTCOIN_CONVERSION_BUFFER_PERCENTAGE,
     POSITIONS_TO_SIDE_MAP,
     SPEED_MARKETS_QUOTE,
@@ -476,9 +477,12 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         const getAllowance = async () => {
             try {
                 const parsedAmount: bigint = coinParser(
-                    isStableCurrency(selectedCollateral)
-                        ? ceilNumberToDecimals(totalPaidAmount).toString()
-                        : ceilNumberToDecimals(totalPaidAmount, COLLATERAL_DECIMALS[selectedCollateral]).toString(),
+                    (
+                        ALLOWANCE_BUFFER_PERCENTAGE *
+                        (isStableCurrency(selectedCollateral)
+                            ? ceilNumberToDecimals(totalPaidAmount)
+                            : ceilNumberToDecimals(totalPaidAmount, COLLATERAL_DECIMALS[selectedCollateral]))
+                    ).toString(),
                     networkId,
                     selectedCollateral
                 );
@@ -837,9 +841,10 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             {openApprovalModal && (
                 <ApprovalModal
                     defaultAmount={
-                        isStableCurrency(selectedCollateral)
+                        ALLOWANCE_BUFFER_PERCENTAGE *
+                        (isStableCurrency(selectedCollateral)
                             ? ceilNumberToDecimals(totalPaidAmount)
-                            : ceilNumberToDecimals(totalPaidAmount, COLLATERAL_DECIMALS[selectedCollateral])
+                            : ceilNumberToDecimals(totalPaidAmount, COLLATERAL_DECIMALS[selectedCollateral]))
                     }
                     tokenSymbol={selectedCollateral}
                     isAllowing={isAllowing}

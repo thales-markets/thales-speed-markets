@@ -332,9 +332,9 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                                 </InputWrapper>
                                 <Column>
                                     <Button
-                                        height="13px"
+                                        height="18px"
                                         width={isMobile ? '60px' : '70px'}
-                                        padding={isDeltaMinutesSelected ? '0' : '1px'}
+                                        borderWidth={isDeltaMinutesSelected ? '0px' : '1px'}
                                         fontSize="12px"
                                         backgroundColor={
                                             isDeltaMinutesSelected
@@ -355,9 +355,9 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                                         {t('common.time-remaining.minutes')}
                                     </Button>
                                     <Button
-                                        height="13px"
+                                        height="18px"
                                         width={isMobile ? '60px' : '70px'}
-                                        padding={isDeltaMinutesSelected ? '1px' : '0'}
+                                        borderWidth={isDeltaMinutesSelected ? '1px' : '0px'}
                                         fontSize="12px"
                                         backgroundColor={
                                             isDeltaMinutesSelected
@@ -400,7 +400,7 @@ const ChainedRow = styled(FlexDivStart)`
 `;
 
 const Column = styled(FlexDivColumnCentered)`
-    justify-content: space-evenly;
+    justify-content: space-between;
     margin-left: 10px;
 `;
 

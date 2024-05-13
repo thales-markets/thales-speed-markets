@@ -12,6 +12,7 @@ type ButtonProps = {
     backgroundColor?: string;
     borderColor?: string;
     borderRadius?: string;
+    borderWidth?: string;
     onClick?: () => void;
     fontSize?: string;
     fontWeight?: number;
@@ -29,6 +30,7 @@ const Button: React.FC<ButtonProps> = ({
     backgroundColor,
     borderColor,
     borderRadius,
+    borderWidth,
     margin,
     onClick,
     disabled,
@@ -42,10 +44,11 @@ const Button: React.FC<ButtonProps> = ({
             width={width}
             minWidth={minWidth}
             height={height}
-            padding={padding}
             margin={margin}
+            $textColor={textColor}
             $borderColor={borderColor}
             $borderRadius={borderRadius}
+            $borderWidth={borderWidth}
             $disabled={disabled}
             style={additionalStyles}
         >
@@ -56,6 +59,7 @@ const Button: React.FC<ButtonProps> = ({
                 $textColor={textColor}
                 $backgroundColor={backgroundColor}
                 $borderRadius={borderRadius}
+                $borderWidth={borderWidth}
                 onClick={onClick}
                 disabled={disabled}
                 $fontSize={fontSize}
@@ -69,17 +73,18 @@ const Button: React.FC<ButtonProps> = ({
 };
 
 const DEFAULT_MIN_HEIGHT = '40px';
-const DEFAULT_PADDING = '2px';
+const DEFAULT_BORDER_WIDTH = '2px'; // border width
 const DEFAULT_BORDER_RADIUS = '30px';
 
 const Container = styled(FlexDivCentered)<{
     width?: string;
     minWidth?: string;
     height?: string;
-    padding?: string;
     margin?: string;
+    $textColor?: string;
     $borderColor?: string;
     $borderRadius?: string;
+    $borderWidth?: string;
     $disabled?: boolean;
 }>`
     width: ${(props) => props.width || 'auto'};
@@ -87,10 +92,11 @@ const Container = styled(FlexDivCentered)<{
     min-height: ${(props) => props.height || DEFAULT_MIN_HEIGHT};
     background: ${(props) => props.$borderColor || props.theme.button.borderColor.primary};
     &:hover {
-        ${(props) => (!props.$disabled ? `background: ${props.theme.button.textColor.tertiary};` : '')}
+        ${(props) =>
+            !props.$disabled && !props.$textColor ? `background: ${props.theme.button.textColor.tertiary};` : ''}
     }
     border-radius: ${(props) => props.$borderRadius || DEFAULT_BORDER_RADIUS};
-    padding: ${(props) => props.padding || DEFAULT_PADDING};
+    padding: ${(props) => props.$borderWidth || DEFAULT_BORDER_WIDTH};
     margin: ${(props) => props.margin || ''};
     ${(props) =>
         props.$disabled
@@ -106,6 +112,7 @@ const ButtonWrapper = styled.button<{
     height?: string;
     padding?: string;
     $borderRadius?: string;
+    $borderWidth?: string;
     $textColor?: string;
     $backgroundColor?: string;
     $fontSize?: string;
@@ -117,12 +124,15 @@ const ButtonWrapper = styled.button<{
     align-items: center;
     justify-content: center;
     width: 100%;
+    padding: ${(props) => (props.padding ? props.padding : '1px 14px')};
     ${(props) =>
-        props.minWidth ? `min-width: calc(${props.minWidth} - 2 * ${props.padding || DEFAULT_PADDING});` : ''};
+        props.minWidth
+            ? `min-width: calc(${props.minWidth} - 2 * ${props.$borderWidth || DEFAULT_BORDER_WIDTH});`
+            : ''};
     min-height: ${(props) =>
         props.height
-            ? `calc(${props.height} - 2 * ${props.padding || DEFAULT_PADDING})`
-            : `calc(${DEFAULT_MIN_HEIGHT} - 2 * ${DEFAULT_PADDING})`};
+            ? `calc(${props.height} - 2 * ${props.$borderWidth || DEFAULT_BORDER_WIDTH})`
+            : `calc(${DEFAULT_MIN_HEIGHT} - 2 * ${DEFAULT_BORDER_WIDTH})`};
     border-radius: ${(props) => props.$borderRadius || DEFAULT_BORDER_RADIUS};
     border-width: 0;
     font-weight: ${(props) => props.$fontWeight || '700'};
@@ -137,10 +147,11 @@ const ButtonWrapper = styled.button<{
         cursor: default;
     }
     &:hover {
-        ${(props) => (!props.disabled ? `color: ${props.theme.button.textColor.tertiary};` : '')}
+        ${(props) => (!props.disabled && !props.$textColor ? `color: ${props.theme.button.textColor.tertiary};` : '')}
         // color on hover for icons inside button
         i, span {
-            ${(props) => (!props.disabled ? `color: ${props.theme.button.textColor.tertiary};` : '')}
+            ${(props) =>
+                !props.disabled && !props.$textColor ? `color: ${props.theme.button.textColor.tertiary};` : ''}
         }
     }
 `;

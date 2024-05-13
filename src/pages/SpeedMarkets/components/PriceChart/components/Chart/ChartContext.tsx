@@ -104,7 +104,7 @@ export const ChartComponent: React.FC<ChartProps> = ({
                     backgroundColor={theme.button.background.primary}
                     borderColor={theme.button.borderColor.secondary}
                     fontSize="13px"
-                    padding="1px"
+                    borderWidth="1px"
                     borderRadius="8px"
                     additionalStyles={{
                         transition: 'all 0.2s ease-in-out',

@@ -71,7 +71,7 @@ const NumericInput: React.FC<NumericInputProps> = ({
                 title=""
                 padding={inputPadding}
             />
-            <RightContainer>
+            <RightContainer hasLabel={!!label}>
                 {onMaxButton && (
                     <MaxButton disabled={disabled} onClick={onMaxButton}>
                         {t('common.max')}
@@ -104,10 +104,10 @@ const StyledInput = styled(Input)<{ padding?: string }>`
     padding: ${(props) => props.padding || '5px 120px 5px 10px'};
 `;
 
-const RightContainer = styled(FlexDivCentered)`
+const RightContainer = styled(FlexDivCentered)<{ hasLabel?: boolean }>`
     position: absolute;
     right: 0;
-    top: 50%;
+    top: ${(props) => (props.hasLabel ? 'calc(50% + 10px)' : '50%')}; // 10px half of label height and margin
     bottom: 50%;
 `;
 
