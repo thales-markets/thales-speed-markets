@@ -22,6 +22,7 @@ import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
 import { RPC_LIST } from 'constants/network';
 import erc20Contract from './contracts/collateralContract';
 import chainedSpeedMarketsAMMContract from './contracts/chainedSpeedMarketsAMMContract';
+import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 
 export const executeBiconomyTransactionWithConfirmation = async (
     collateral: string,
@@ -71,6 +72,7 @@ export const executeBiconomyTransaction = async (
     value?: any
 ): Promise<any | undefined> => {
     if (biconomyConnector.wallet && contract) {
+        console.log(value);
         const encodedCall = encodeFunctionData({
             abi: contract.abi,
             functionName: methodName,
@@ -80,11 +82,10 @@ export const executeBiconomyTransaction = async (
         const transaction = {
             to: contract.address,
             data: encodedCall,
-            value,
         };
 
-        const sessionKeyPrivKey = window.localStorage.getItem('sessionPKey');
-        const validUntil = window.localStorage.getItem('seassionValidUntil');
+        const sessionKeyPrivKey = window.localStorage.getItem(LOCAL_STORAGE_KEYS.SESSION_P_KEY[networkId]);
+        const validUntil = window.localStorage.getItem(LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId]);
 
         const dateUntilValid = new Date(Number(validUntil) * 1000);
         const nowDate = new Date();
@@ -97,6 +98,7 @@ export const executeBiconomyTransaction = async (
                 collateral
             );
             transactionArray.push(transaction);
+
             const { wait } = await biconomyConnector.wallet.sendTransaction(transactionArray, {
                 paymasterServiceData: {
                     mode: PaymasterMode.ERC20,
@@ -113,8 +115,8 @@ export const executeBiconomyTransaction = async (
 
             if (success === 'false') {
                 console.log('remove');
-                window.localStorage.removeItem('sessionPKey');
-                window.localStorage.removeItem('seassionValidUntil');
+                window.localStorage.removeItem(LOCAL_STORAGE_KEYS.SESSION_P_KEY[networkId]);
+                window.localStorage.removeItem(LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId]);
             }
 
             console.log('TX was succesful: ', success);
@@ -122,9 +124,9 @@ export const executeBiconomyTransaction = async (
 
             return transactionHash;
         } else {
-            console.log('try with session');
-            // try executing via Session module, if its not passing then enable session and execute with signing
             try {
+                console.log('try with session');
+                // try executing via Session module, if its not passing then enable session and execute with signing
                 // generate sessionModule
                 const sessionModule = await createSessionKeyManagerModule({
                     moduleAddress: DEFAULT_SESSION_KEY_MANAGER_MODULE,
@@ -188,8 +190,9 @@ export const executeBiconomyTransaction = async (
                 } = await wait();
 
                 if (success === 'false') {
-                    window.localStorage.removeItem('sessionPKey');
-                    window.localStorage.removeItem('seassionValidUntil');
+                    console.log('remove');
+                    window.localStorage.removeItem(LOCAL_STORAGE_KEYS.SESSION_P_KEY[networkId]);
+                    window.localStorage.removeItem(LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId]);
                 }
 
                 console.log('TX was succesful: ', success);
@@ -303,8 +306,11 @@ const getCreateSessionTxs = async (networkId: SupportedNetwork, collateralAddres
             transactionArray.push(enableModuleTrx);
         }
 
-        window.localStorage.setItem('sessionPKey', privateKey);
-        window.localStorage.setItem('seassionValidUntil', Math.floor(dateUntil.getTime() / 1000).toString());
+        window.localStorage.setItem(LOCAL_STORAGE_KEYS.SESSION_P_KEY[networkId], privateKey);
+        window.localStorage.setItem(
+            LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId],
+            Math.floor(dateUntil.getTime() / 1000).toString()
+        );
 
         transactionArray.push(
             ...[setSessiontrx, approvalTxSingle, approvalTxChained, approvalTxSingleClaim, approvalTxChainedClaim]
