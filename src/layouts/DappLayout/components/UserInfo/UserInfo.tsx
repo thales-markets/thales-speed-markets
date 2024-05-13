@@ -13,6 +13,9 @@ import SPAAnchor from 'components/SPAAnchor';
 import { buildHref } from 'utils/routes';
 import ROUTES from 'constants/routes';
 import OutsideClick from 'components/OutsideClick';
+import { useSelector } from 'react-redux';
+import { getIsBiconomy } from 'redux/modules/wallet';
+import { RootState } from 'types/ui';
 
 type UserInfoProps = {
     setUserInfoOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -32,6 +35,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ setUserInfoOpen }) => {
     const networkId = useChainId();
     const { disconnect } = useDisconnect();
     const { address } = useAccount();
+    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
 
     const validUntil = window.localStorage.getItem(LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId]);
 
@@ -39,19 +43,24 @@ const UserInfo: React.FC<UserInfoProps> = ({ setUserInfoOpen }) => {
         <OutsideClick onOutsideClick={() => setUserInfoOpen(false)}>
             <Container>
                 <FlexColumn>
-                    <FlexDivRowCentered>
-                        <FlexDivColumn>
-                            <TextLabel>{getUserInfo()?.name} </TextLabel>
-                            <Value>{getUserInfo()?.google_email}</Value>
-                        </FlexDivColumn>
-                    </FlexDivRowCentered>
-                    <FlexDivColumn>
-                        <TextLabel>{t('user-info.smart-account')} </TextLabel>
-                        <Value>
-                            {biconomyConnector.address.toLowerCase()}
-                            <CopyIcon onClick={handleCopy} className="network-icon network-icon--copy" />
-                        </Value>
-                    </FlexDivColumn>
+                    {isBiconomy && (
+                        <>
+                            <FlexDivRowCentered>
+                                <FlexDivColumn>
+                                    <TextLabel>{getUserInfo()?.name} </TextLabel>
+                                    <Value>{getUserInfo()?.google_email}</Value>
+                                </FlexDivColumn>
+                            </FlexDivRowCentered>
+                            <FlexDivColumn>
+                                <TextLabel>{t('user-info.smart-account')} </TextLabel>
+                                <Value>
+                                    {biconomyConnector.address.toLowerCase()}
+                                    <CopyIcon onClick={handleCopy} className="network-icon network-icon--copy" />
+                                </Value>
+                            </FlexDivColumn>
+                        </>
+                    )}
+
                     <FlexDivColumn>
                         <TextLabel>{t('user-info.eoa')} </TextLabel>
                         <Value>{address?.toLowerCase()}</Value>
@@ -62,12 +71,14 @@ const UserInfo: React.FC<UserInfoProps> = ({ setUserInfoOpen }) => {
                     </SessionWrapper>
                 </FlexColumn>
                 <FlexColumn>
-                    <FlexStartCentered>
-                        <SPAAnchor onClick={() => setUserInfoOpen(false)} href={buildHref(ROUTES.Withdraw)}>
-                            <Icon className="network-icon network-icon--withdraw" />
-                            <Label>{t('user-info.withdraw')}</Label>
-                        </SPAAnchor>
-                    </FlexStartCentered>
+                    {isBiconomy && (
+                        <FlexStartCentered>
+                            <SPAAnchor onClick={() => setUserInfoOpen(false)} href={buildHref(ROUTES.Withdraw)}>
+                                <Icon className="network-icon network-icon--withdraw" />
+                                <Label>{t('user-info.withdraw')}</Label>
+                            </SPAAnchor>
+                        </FlexStartCentered>
+                    )}
                     <FlexStartCentered>
                         <SPAAnchor onClick={() => setUserInfoOpen(false)} href={buildHref(ROUTES.Markets.Profile)}>
                             <Icon className="network-icon network-icon--avatar" />

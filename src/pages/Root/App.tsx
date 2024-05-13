@@ -105,6 +105,7 @@ const App = () => {
             });
         }
         const onDisconnect = () => {
+            dispatch(setIsBiconomy(false));
             disconnect();
         };
         particleAuth.on(AuthCoreEvent.ParticleAuthDisconnect, onDisconnect);
