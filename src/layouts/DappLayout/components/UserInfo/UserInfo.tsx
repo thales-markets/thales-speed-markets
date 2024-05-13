@@ -7,22 +7,24 @@ import { toast } from 'react-toastify';
 import { getErrorToastOptions, getInfoToastOptions } from 'components/ToastMessage/ToastMessage';
 import { t } from 'i18next';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
+import { useAccount, useChainId } from 'wagmi';
+import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 
 const UserInfo: React.FC = () => {
-    console.log(getUserInfo());
-
     const handleCopy = () => {
-        const id = toast.loading(t('deposit.copying-address'));
+        const id = toast.loading(t('user-info.copying-address'));
         try {
             navigator.clipboard.writeText(biconomyConnector.address);
-            toast.update(id, getInfoToastOptions(t('deposit.copied'), ''));
+            toast.update(id, getInfoToastOptions(t('user-info.copied'), ''));
         } catch (e) {
             toast.update(id, getErrorToastOptions('Error', ''));
         }
     };
 
-    const validUntil = window.localStorage.getItem('seassionValidUntil');
-    console.log(validUntil);
+    const networkId = useChainId();
+    const { address } = useAccount();
+
+    const validUntil = window.localStorage.getItem(LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId]);
 
     return (
         <Container>
@@ -30,37 +32,43 @@ const UserInfo: React.FC = () => {
                 <FlexDivRowCentered>
                     <FlexDivColumn>
                         <TextLabel>{getUserInfo()?.name} </TextLabel>
-                        <Value>{biconomyConnector.address}</Value>
+                        <Value>{getUserInfo()?.google_email}</Value>
                     </FlexDivColumn>
-                    <CopyIcon onClick={handleCopy} className="network-icon network-icon--copy" />
                 </FlexDivRowCentered>
                 <FlexDivColumn>
-                    <TextLabel>Email: </TextLabel>
-                    <Value>{getUserInfo()?.google_email}</Value>
+                    <TextLabel>{t('user-info.smart-account')} </TextLabel>
+                    <Value>
+                        {biconomyConnector.address}{' '}
+                        <CopyIcon onClick={handleCopy} className="network-icon network-icon--copy" />
+                    </Value>
                 </FlexDivColumn>
-                <FlexDivRowCentered>
-                    <TextLabel>Session valid until: </TextLabel>
+                <FlexDivColumn>
+                    <TextLabel>{t('user-info.eoa')} </TextLabel>
+                    <Value>{address}</Value>
+                </FlexDivColumn>
+                <SessionWrapper>
+                    <TextLabel>{t('user-info.session-valid')} </TextLabel>
                     <Value>{formatShortDateWithFullTime(Number(validUntil) * 1000)}</Value>
-                </FlexDivRowCentered>
+                </SessionWrapper>
             </FlexColumn>
             <FlexColumn>
                 <FlexStartCentered>
-                    <Icon className="network-icon network-icon--login" />
-                    <Label>Withdraw</Label>
+                    <Icon className="network-icon network-icon--withdraw" />
+                    <Label>{t('user-info.withdraw')}</Label>
                 </FlexStartCentered>
                 <FlexStartCentered>
                     <Icon className="network-icon network-icon--avatar" />
-                    <Label>Trading Profile</Label>
+                    <Label>{t('user-info.trading-profile')}</Label>
                 </FlexStartCentered>
                 <FlexStartCentered>
-                    <Icon className="network-icon network-icon--login" />
-                    <Label>Docs & Tutorials</Label>
+                    <Icon className="network-icon network-icon--docs" />
+                    <Label>{t('user-info.docs')}</Label>
                 </FlexStartCentered>
             </FlexColumn>
             <FlexColumn>
                 <FlexStartCentered>
-                    <Icon className="network-icon network-icon--login" />
-                    <Label>Logout</Label>
+                    <Icon className="network-icon network-icon--logout" />
+                    <Label>{t('user-info.logout')}</Label>
                 </FlexStartCentered>
             </FlexColumn>
         </Container>
@@ -117,8 +125,6 @@ const Icon = styled.i`
 const CopyIcon = styled.i`
     color: ${(props) => props.theme.textColor.primary};
     font-size: 18px;
-    margin-left: 6px;
-    margin-top: 10px;
     cursor: pointer;
 `;
 const Label = styled.span`
@@ -128,6 +134,10 @@ const Label = styled.span`
     font-style: normal;
     font-weight: 800;
     line-height: 300%;
+`;
+
+const SessionWrapper = styled(FlexDivRowCentered)`
+    margin-top: 8px;
 `;
 
 export default UserInfo;

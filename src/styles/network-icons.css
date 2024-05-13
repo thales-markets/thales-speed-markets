@@ -26,12 +26,28 @@
     content: '\0045';
 }
 
+.network-icon--burger:before {
+    content: '\004E';
+}
+
 .network-icon--login:before {
     content: '\0050';
 }
 
 .network-icon--copy:before {
     content: '\0051';
+}
+
+.network-icon--logout:before {
+    content: '\0052';
+}
+
+.network-icon--withdraw:before {
+    content: '\0053';
+}
+
+.network-icon--docs:before {
+    content: '\0056';
 }
 
 .network-icon--settings:before {
