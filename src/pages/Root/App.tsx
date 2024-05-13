@@ -112,7 +112,7 @@ const App = () => {
         return () => {
             particleAuth.off(AuthCoreEvent.ParticleAuthDisconnect, onDisconnect);
         };
-    }, [connect, connectionStatus, disconnect, networkId]);
+    }, [connect, connectionStatus, disconnect, networkId, dispatch]);
 
     useEffect(() => {
         const handlePageResized = () => {
