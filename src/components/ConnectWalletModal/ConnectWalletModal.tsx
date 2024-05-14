@@ -38,7 +38,7 @@ const defaultStyle = {
     },
     overlay: {
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        zIndex: 200,
+        zIndex: 201,
     },
 };
 

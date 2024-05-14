@@ -388,7 +388,9 @@
                 "deposit": "Deposit now",
                 "trade": "Trade on speedmarkets",
                 "deposit-crypto": "Deposit crypto",
-                "credit-card": "Credit card buy"
+                "credit-card": "Credit card buy",
+                "buy-crypto": "Buy crypto",
+                "copy": "Copy"
             },
             "title": {
                 "sign-up": "Sign up",

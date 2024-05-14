@@ -1,7 +1,7 @@
 import Button from 'components/Button';
 import ROUTES from 'constants/routes';
 import { ScreenSizeBreakpoint } from 'enums/ui';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
@@ -15,7 +15,7 @@ import UserWallet from '../components/UserWallet';
 import NetworkSwitch from 'components/NetworkSwitch';
 import { useAccount } from 'wagmi';
 import GetStarted from 'pages/AARelatedPages/GetStarted';
-import { getIsBiconomy, getWalletConnectModalVisibility, setWalletConnectModalVisibility } from 'redux/modules/wallet';
+import { getWalletConnectModalVisibility, setWalletConnectModalVisibility } from 'redux/modules/wallet';
 import Deposit from 'pages/AARelatedPages/Deposit';
 import ConnectWalletModal from 'components/ConnectWalletModal';
 import UserInfo from '../components/UserInfo';
@@ -25,7 +25,6 @@ const DappHeader: React.FC = () => {
 
     const dispatch = useDispatch();
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
-    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
     const connectWalletModalVisibility = useSelector((state: RootState) => getWalletConnectModalVisibility(state));
     const { isConnected } = useAccount();
 
@@ -33,14 +32,6 @@ const DappHeader: React.FC = () => {
     const [openGetStarted, setOpenGetStarted] = useState(false);
     const [openDeposit, setOpenDeposit] = useState(false);
     const [userInfoOpen, setUserInfoOpen] = useState(false);
-
-    const connected = useRef(isConnected);
-
-    useEffect(() => {
-        if (isBiconomy && isConnected && !connected.current) {
-            setOpenGetStarted(true);
-        }
-    }, [isBiconomy, isConnected]);
 
     return (
         <Container $maxWidth={getMaxWidth()}>
