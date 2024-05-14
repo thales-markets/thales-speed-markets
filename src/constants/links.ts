@@ -6,9 +6,10 @@ export const LINKS = {
         Speed: 'https://speedmarkets.xyz/speed-markets',
         ChainedSpeed: 'https://speedmarkets.xyz/speed-markets?isChained=true',
     },
+    ThalesIo: 'https://thales.io/',
     GitHub: 'https://github.com/thales-markets/thales-speed-markets',
     Medium: 'https://thalesmarket.medium.com/',
-    Docs: 'https://docs.thales.io/thales-speed-markets/',
+    Docs: 'https://docs.thales.io/thales-speed-markets/introduction-to-speed-markets',
     Discord: {
         SpeedMarkets: 'https://discord.com/channels/906484044915687464/1143628798571577475',
         Help: 'https://discord.com/channels/906484044915687464/906723153349316638',

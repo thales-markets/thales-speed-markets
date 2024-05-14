@@ -254,12 +254,14 @@ const LandingPage: React.FC = () => {
             </ButtonContainer>
 
             <FlexDivColumn>
-                <FlexDivCentered>
-                    <LogoText>{t('landing.powered-by')}</LogoText>
-                </FlexDivCentered>
-                <FlexDivCentered>
-                    <ThalesLogo className="icon-home icon-home--thales" />
-                </FlexDivCentered>
+                <a target="_blank" rel="noreferrer" href={LINKS.ThalesIo}>
+                    <FlexDivCentered>
+                        <LogoText>{t('landing.powered-by')}</LogoText>
+                    </FlexDivCentered>
+                    <FlexDivCentered>
+                        <ThalesLogo className="icon-home icon-home--thales" />
+                    </FlexDivCentered>
+                </a>
             </FlexDivColumn>
         </Container>
     );

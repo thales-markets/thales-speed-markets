@@ -152,6 +152,10 @@
     content: '\006A';
 }
 
+.icon-home--documentation:before {
+    content: '\006C';
+}
+
 .icon-home--pyth:before {
     content: '\0071';
 }

@@ -44,7 +44,7 @@ const DappFooter: React.FC = () => {
                 </Item>
                 <Item>
                     <a target="_blank" rel="noreferrer" href={LINKS.Docs}>
-                        <FooterIcon className="icon-home icon-home--docs" />
+                        <FooterIcon className="icon-home icon-home--documentation" />
                     </a>
                     <TextLink target="_blank" rel="noreferrer" href={LINKS.Docs}>
                         {t('common.footer.docs')}
