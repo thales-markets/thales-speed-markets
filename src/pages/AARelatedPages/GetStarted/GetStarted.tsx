@@ -101,7 +101,6 @@ const GetStarted: React.FC<GetStartedProps> = ({ isOpen, onClose }) => {
             setCurrentStep(GetStartedStep.LOG_IN);
         }
     }, [isWalletConnected, totalBalanceValue]);
-    console.log(isOpen);
 
     return (
         <ReactModal isOpen={isOpen} shouldCloseOnOverlayClick={false} style={defaultStyle}>
@@ -112,7 +111,7 @@ const GetStarted: React.FC<GetStartedProps> = ({ isOpen, onClose }) => {
                 <Title>{t('get-started.title')}</Title>
                 <ProgressDisplayWrapper>
                     {steps.map((step, index) => {
-                        return <ProgressBar key={`progress-${index}`} selected={step < currentStep} />;
+                        return <ProgressBar key={`progress-${index}`} selected={step <= currentStep} />;
                     })}
                 </ProgressDisplayWrapper>
                 {steps.map((step, index) => {
@@ -125,6 +124,7 @@ const GetStarted: React.FC<GetStartedProps> = ({ isOpen, onClose }) => {
                                 currentStep={currentStep}
                                 setCurrentStep={setCurrentStep}
                                 hasFunds={totalBalanceValue > 0}
+                                onClose={onClose}
                             />
                         </React.Fragment>
                     );

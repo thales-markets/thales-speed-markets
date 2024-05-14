@@ -49,9 +49,10 @@ type StepProps = {
     currentStep: GetStartedStep;
     setCurrentStep: (step: GetStartedStep) => void;
     hasFunds: boolean;
+    onClose: () => void;
 };
 
-const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurrentStep, hasFunds }) => {
+const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurrentStep, hasFunds, onClose }) => {
     const networkId = useChainId();
     const dispatch = useDispatch();
     const { isConnected: isWalletConnected, address: walletAddress } = useAccount();
@@ -106,13 +107,13 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
                     return isWalletConnected;
 
                 case GetStartedStep.DEPOSIT:
-                    return hasFunds;
+                    return currentStep > stepType && hasFunds;
 
                 case GetStartedStep.TRADE:
                     return false;
             }
         }
-    }, [isWalletConnected, stepType, hasFunds]);
+    }, [isWalletConnected, stepType, hasFunds, currentStep]);
 
     const onStepActionClickHandler = () => {
         if (isDisabled) {
@@ -130,7 +131,8 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
             case GetStartedStep.DEPOSIT:
                 break;
             case GetStartedStep.TRADE:
-                navigateTo(buildHref(ROUTES.Home));
+                navigateTo(buildHref(ROUTES.Markets.Home));
+                onClose();
                 break;
         }
     };
@@ -138,10 +140,10 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
     const changeCurrentStep = () => (isDisabled ? null : setCurrentStep(stepType));
 
     const handleCopy = () => {
-        const id = toast.loading(t('deposit.copying-address'));
+        const id = toast.loading(t('user-info.copying-address'));
         try {
             navigator.clipboard.writeText(isBiconomy ? biconomyConnector.address : (walletAddress as string));
-            toast.update(id, getInfoToastOptions(t('deposit.copied'), ''));
+            toast.update(id, getInfoToastOptions(t('user-info.copied'), ''));
         } catch (e) {
             toast.update(id, getErrorToastOptions('Error', ''));
         }
@@ -172,27 +174,37 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
                     <StepTitle completed={!isActive && showStepIcon}>{stepTitle}</StepTitle>
                     <StepDescription completed={!isActive && showStepIcon}>{stepDescription}</StepDescription>
                     {stepType === GetStartedStep.DEPOSIT && (
-                        <DepositContainer>
+                        <DepositContainer isActive={isActive}>
                             <GradientContainer>
                                 <AddressContainer>
                                     <Address>
-                                        {' '}
                                         {isBiconomy ? biconomyConnector.address : (walletAddress as string)}
                                     </Address>
-                                    <CopyText onClick={handleCopy}>COPY</CopyText>
+                                    <CopyText
+                                        onClick={() => {
+                                            if (isActive) handleCopy();
+                                        }}
+                                    >
+                                        {t('get-started.steps.action.copy')}
+                                    </CopyText>
                                     <QRIcon
                                         onClick={() => {
                                             setShowQRModal(!showQRModal);
                                         }}
                                         className="social-icon icon--qr-code"
                                     />
-                                    <CopyIcon onClick={handleCopy} className="network-icon network-icon--copy" />
+                                    <CopyIcon
+                                        onClick={() => {
+                                            if (isActive) handleCopy();
+                                        }}
+                                        className="network-icon network-icon--copy"
+                                    />
                                 </AddressContainer>
                             </GradientContainer>
                             <Separator />
                             <OnramperDiv
                                 onClick={() => {
-                                    setShowOnramper(true);
+                                    if (isActive) setShowOnramper(true);
                                 }}
                             >
                                 <OnramperDiv>
@@ -201,8 +213,8 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
                                     <OnramperIcons className={`social-icon icon--applepay`} />
                                     <OnramperIcons className={`social-icon icon--googlepay`} />
                                 </OnramperDiv>
-                                <Button width="100%" fontSize="14px">
-                                    Buy Crypto
+                                <Button disabled={!isActive} width="100%" fontSize="14px">
+                                    {t('get-started.steps.action.buy-crypto')}
                                 </Button>
                             </OnramperDiv>
                         </DepositContainer>
@@ -385,10 +397,11 @@ const OnramperIcons = styled.i`
     }
 `;
 
-const DepositContainer = styled.div`
+const DepositContainer = styled.div<{ isActive: boolean }>`
     display: flex;
     flex-direction: column;
     margin-top: 10px;
+    opacity: ${(props) => (props.isActive ? 1 : 0.7)};
 `;
 
 const CopyIcon = styled.i`
