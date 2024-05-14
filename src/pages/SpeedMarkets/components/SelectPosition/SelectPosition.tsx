@@ -1,25 +1,27 @@
 import { Positions } from 'enums/market';
+import queryString from 'query-string';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlexDivColumnCentered, FlexDivSpaceBetween } from 'styles/common';
 import { formatPercentage } from 'thales-utils';
 import { AmmChainedSpeedMarketsLimits } from 'types/market';
+import { history } from 'utils/routes';
 import {
     ChainedPositions,
     ClearAll,
-    Container,
+    Header,
+    HeaderSubText,
+    HeaderText,
     Icon,
     IconWrong,
-    PlusIcon,
-    PositionsSymbol,
+    PlusMinusIcon,
+    PositionContainer,
     PositionWrapper,
     PositionWrapperChained,
     PositionsContainer,
+    PositionsSymbol,
     PositionsWrapper,
     Skew,
-    Header,
-    HeaderText,
-    HeaderSubText,
 } from './styled-components';
 
 export type SelectedPosition = Positions.UP | Positions.DOWN | undefined;
@@ -46,6 +48,16 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
     const isClearAllDisabled =
         selected.length === ammChainedSpeedMarketsLimits?.minChainedMarkets && selected.every((p) => p === undefined);
 
+    const onPlusMinusIconHandle = (isChained: boolean) => {
+        setIsChained(isChained);
+        history.push({
+            pathname: location.pathname,
+            search: queryString.stringify({
+                isChained: isChained,
+            }),
+        });
+    };
+
     return (
         <div>
             <Header>
@@ -67,7 +79,7 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
 
                 <HeaderSubText> {t('speed-markets.steps.choose-direction-sub')}</HeaderSubText>
             </Header>
-            <Container>
+            <PositionContainer>
                 {selected.length === 1 ? (
                     // Single
                     <>
@@ -99,17 +111,20 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
                                 </Skew>
                             )}
                         </PositionWrapper>
-                        <PlusIcon className="network-icon network-icon--plus" onClick={() => setIsChained(true)} />
+                        <PlusMinusIcon
+                            className="network-icon network-icon--plus"
+                            onClick={() => onPlusMinusIconHandle(true)}
+                        />
                     </>
                 ) : (
                     // Chained
                     <FlexDivColumnCentered>
                         <FlexDivSpaceBetween>
-                            <PlusIcon
+                            <PlusMinusIcon
                                 className="network-icon network-icon--minus"
                                 onClick={() => {
                                     if (selected.length === 2) {
-                                        setIsChained(false);
+                                        onPlusMinusIconHandle(false);
                                     } else {
                                         onChainedChange(selected.slice(0, selected.length - 1));
                                     }
@@ -165,7 +180,7 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
                                 })}
                             </ChainedPositions>
                             {selected.length !== 6 && (
-                                <PlusIcon
+                                <PlusMinusIcon
                                     className="network-icon network-icon--plus"
                                     onClick={() => {
                                         onChainedChange([...selected, undefined]);
@@ -175,7 +190,7 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
                         </FlexDivSpaceBetween>
                     </FlexDivColumnCentered>
                 )}
-            </Container>
+            </PositionContainer>
         </div>
     );
 };

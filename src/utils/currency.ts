@@ -35,7 +35,7 @@ export const isStableCurrency = (currencyKey: Coins) => {
     return STABLE_COINS.includes(currencyKey);
 };
 
-export const getMinBalanceThreshold = (coin: Coins) => (isStableCurrency(coin) ? 1 : 0);
+export const getMinBalanceThreshold = (coin: Coins): number => (isStableCurrency(coin) ? 1 : 0);
 
 export const getPositiveCollateralIndexByBalance = (
     balancesObject: CollateralsBalance,

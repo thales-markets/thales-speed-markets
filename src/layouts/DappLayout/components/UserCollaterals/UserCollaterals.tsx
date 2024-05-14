@@ -1,6 +1,6 @@
 import OutsideClickHandler from 'components/OutsideClick';
 import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipleCollateralBalanceQuery';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getSelectedCollateralIndex, getIsBiconomy, setSelectedCollateralIndex } from 'redux/modules/wallet';
@@ -56,7 +56,8 @@ const UserCollaterals: React.FC = () => {
     );
 
     const currentCollateral = getCollateral(networkId, userSelectedCollateralIndex);
-    const currentCollateralBalance = collateralsWithBalance.find((col) => col.name === currentCollateral)?.balance || 0;
+    const currentCollateralBalance: number =
+        collateralsWithBalance.find((col) => col.name === currentCollateral)?.balance || 0;
     const currentCollateralWithBalance = { name: currentCollateral, balance: currentCollateralBalance };
 
     const defaultCollateral =
@@ -73,10 +74,15 @@ const UserCollaterals: React.FC = () => {
                 : currentCollateralWithBalance
             : currentCollateralWithBalance;
 
+    const [prevCollateral, setPrevCollateral] = useState<Coins | null>(null);
     const [collateral, setCollateral] = useState(defaultCollateral);
 
+    const isMounted = useRef(false);
+    // auto select collateral which is above threshold
     useEffect(() => {
+        // check collateral balance only on first render or when balance is changed for the same collateral
         if (
+            (!isMounted.current || prevCollateral === collateral.name) &&
             isMultiCollateralSupported &&
             multipleCollateralBalances?.data &&
             currentCollateralBalance <= getMinBalanceThreshold(currentCollateral)
@@ -93,6 +99,8 @@ const UserCollaterals: React.FC = () => {
                 setCollateral(positiveCollateral);
                 dispatch(setSelectedCollateralIndex(getCollateralIndexForNetwork(networkId, positiveCollateral.name)));
             }
+        } else {
+            isMounted.current = true;
         }
     }, [
         multipleCollateralBalances.data,
@@ -102,6 +110,8 @@ const UserCollaterals: React.FC = () => {
         collateralsWithBalance,
         currentCollateral,
         currentCollateralBalance,
+        prevCollateral,
+        collateral.name,
     ]);
 
     useEffect(() => {
@@ -114,11 +124,17 @@ const UserCollaterals: React.FC = () => {
         const selectedCollateral =
             collateralsWithBalance.find((el) => el.name === getCollateral(networkId, userSelectedCollateralIndex)) ||
             collateralsWithBalance[0];
-        setCollateral(selectedCollateral);
+
+        setCollateral((prevCol) => {
+            if (prevCol.name !== selectedCollateral.name) {
+                setPrevCollateral(prevCol.name);
+            }
+            return selectedCollateral;
+        });
     }, [userSelectedCollateralIndex, networkId, collateralsWithBalance]);
 
-    const onCollateralClickHandler = (coinType: Coins) => {
-        dispatch(setSelectedCollateralIndex(getCollateralIndexForNetwork(networkId, coinType)));
+    const onCollateralClickHandler = (coin: Coins) => {
+        dispatch(setSelectedCollateralIndex(getCollateralIndexForNetwork(networkId, coin)));
         setIsDropdownOpen(false);
     };
 

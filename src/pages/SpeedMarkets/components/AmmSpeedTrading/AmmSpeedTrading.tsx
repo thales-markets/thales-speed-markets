@@ -370,11 +370,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         setSkewImpact(skewImpact);
     }, [skewImpact, setSkewImpact]);
 
-    // Reset inputs
-    useEffect(() => {
-        setPaidAmount('');
-    }, [networkId, isConnected]);
-
     // Input field validations
     useEffect(() => {
         let messageKey = '';
@@ -627,6 +622,8 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 toast.update(id, getSuccessToastOptions(t(`common.buy.confirmation-message`), id));
                 resetData();
                 setPaidAmount('');
+                setSubmittedStrikePrice(0);
+                setIsSubmitting(false);
 
                 await delay(secondsToMilliseconds(12)); // wait some time for creator to pick up pending markets
 
@@ -651,14 +648,16 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 console.log('Transaction status', txReceipt.status);
                 await delay(800);
                 toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
+                setSubmittedStrikePrice(0);
+                setIsSubmitting(false);
             }
         } catch (e) {
             console.log(e);
             await delay(800);
             toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
+            setSubmittedStrikePrice(0);
+            setIsSubmitting(false);
         }
-        setSubmittedStrikePrice(0);
-        setIsSubmitting(false);
     };
 
     const handleMint = async () => {
@@ -819,7 +818,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                     {isMobile && getTradingDetails()}
                     <QuoteContainer>
                         <QuoteLabel>{t('speed-markets.profit')}</QuoteLabel>
-                        <QuoteText>{truncToDecimals(potentialProfit)}x</QuoteText>
+                        <QuoteText>{potentialProfit ? `${truncToDecimals(potentialProfit)}x` : '-'}</QuoteText>
                     </QuoteContainer>
                     {getSubmitButton()}
                 </ColumnSpaceBetween>

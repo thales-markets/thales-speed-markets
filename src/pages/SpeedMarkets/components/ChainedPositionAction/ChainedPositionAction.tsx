@@ -47,6 +47,8 @@ import {
 
 import { SupportedNetwork } from 'types/network';
 import { ViemContract } from 'types/viem';
+import { executeBiconomyTransaction } from 'utils/biconomy';
+import biconomyConnector from 'utils/biconomyWallet';
 import chainedSpeedMarketsAMMContract from 'utils/contracts/chainedSpeedMarketsAMMContract';
 import erc20Contract from 'utils/contracts/collateralContract';
 import multipleCollateral from 'utils/contracts/multipleCollateralContract';
@@ -55,8 +57,6 @@ import { delay } from 'utils/timer';
 import { Client, getContract } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
-import biconomyConnector from 'utils/biconomyWallet';
-import { executeBiconomyTransaction } from 'utils/biconomy';
 
 type ChainedPositionActionProps = {
     position: ChainedSpeedMarket;
@@ -358,8 +358,8 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 disabled={isSubmitting || (isOverview && !position.canResolve)}
                 additionalStyles={additionalButtonStyle}
                 backgroundColor={!isOverview ? theme.button.textColor.quaternary : undefined}
-                borderColor={theme.button.textColor.quaternary}
-                textColor={theme.button.textColor.secondary}
+                borderColor={!isOverview ? theme.button.textColor.quaternary : undefined}
+                textColor={!isOverview ? theme.button.textColor.secondary : undefined}
                 onClick={() =>
                     hasAllowance || isDefaultCollateral || isOverview ? handleResolve() : setOpenApprovalModal(true)
                 }
@@ -454,7 +454,6 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                                 margin: '0 0 0 7px',
                                 color: theme.button.textColor.quaternary,
                             }}
-                            isDropDownAbove={isMobile && !isProfileAction}
                         />
                     </CollateralSelectorContainer>
                 )}

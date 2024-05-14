@@ -19,7 +19,6 @@ type CollateralSelectorProps = {
     exchangeRates?: Rates | null;
     dropDownWidth?: string;
     additionalStyles?: CSSProperties;
-    isDropDownAbove?: boolean;
 };
 
 const CollateralSelector: React.FC<CollateralSelectorProps> = ({
@@ -32,7 +31,6 @@ const CollateralSelector: React.FC<CollateralSelectorProps> = ({
     exchangeRates,
     dropDownWidth,
     additionalStyles,
-    isDropDownAbove,
 }) => {
     const dispatch = useDispatch();
 
@@ -58,11 +56,7 @@ const CollateralSelector: React.FC<CollateralSelectorProps> = ({
     disabled = disabled || collateralArray.length === 1;
 
     return (
-        <Container
-            isDropDownAbove={isDropDownAbove}
-            margin={additionalStyles?.margin?.toString()}
-            position={additionalStyles?.position}
-        >
+        <Container margin={additionalStyles?.margin?.toString()} position={additionalStyles?.position}>
             <OutsideClickHandler onOutsideClick={() => setOpen(false)}>
                 <SelectedCollateral disabled={!!disabled} onClick={() => !disabled && setOpen(!open)}>
                     <TextCollateralWrapper>
@@ -118,11 +112,7 @@ const CollateralSelector: React.FC<CollateralSelectorProps> = ({
                           </DetailedDropdown>
                       )
                     : open && (
-                          <Dropdown
-                              isDropDownAbove={isDropDownAbove}
-                              width={dropDownWidth}
-                              onClick={() => setOpen(!open)}
-                          >
+                          <Dropdown width={dropDownWidth} onClick={() => setOpen(!open)}>
                               {collateralArray.map((collateral, index) => {
                                   return (
                                       <CollateralOption
@@ -143,8 +133,8 @@ const CollateralSelector: React.FC<CollateralSelectorProps> = ({
     );
 };
 
-const Container = styled(FlexDivStart)<{ isDropDownAbove?: boolean; margin?: string; position?: string }>`
-    ${(props) => (props.isDropDownAbove ? 'position: relative;' : props.position ? `position: ${props.position};` : '')}
+const Container = styled(FlexDivStart)<{ margin?: string; position?: string }>`
+    position: relative;
     margin: ${(props) => (props.margin ? props.margin : '0 7px')};
     align-items: center;
 `;
@@ -183,9 +173,9 @@ const SelectedCollateral = styled(FlexDivRowCentered)<{ disabled: boolean }>`
     cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
 `;
 
-const Dropdown = styled(FlexDivColumnCentered)<{ isDropDownAbove?: boolean; width?: string }>`
+const Dropdown = styled(FlexDivColumnCentered)<{ width?: string }>`
     position: absolute;
-    ${(props) => (props.isDropDownAbove ? 'bottom: 24px;' : '')}
+    top: 12px;
     margin-top: 8px;
     margin-left: -10px;
     width: ${(props) => (props.width ? props.width : '71px')};

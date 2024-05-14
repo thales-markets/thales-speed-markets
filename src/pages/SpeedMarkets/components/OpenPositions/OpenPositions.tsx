@@ -13,24 +13,27 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
+import { getIsBiconomy } from 'redux/modules/wallet';
 import styled, { useTheme } from 'styled-components';
 import { FlexDivCentered, FlexDivRow, FlexDivRowCentered } from 'styles/common';
 import { formatCurrencyWithSign } from 'thales-utils';
 import { ChainedSpeedMarket, UserOpenPositions } from 'types/market';
 import { RootState, ThemeInterface } from 'types/ui';
+import biconomyConnector from 'utils/biconomyWallet';
 import { getDefaultCollateral } from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
 import { resolveAllChainedMarkets, resolveAllSpeedPositions } from 'utils/speedAmm';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 import OpenPosition from '../OpenPosition';
-import { getIsBiconomy } from 'redux/modules/wallet';
-import biconomyConnector from 'utils/biconomyWallet';
 
 type OpenPositionsProps = {
     isChained?: boolean;
     maxPriceDelayForResolvingSec?: number;
     currentPrices?: { [key: string]: number };
 };
+
+const VISIBLE_SPEED_MARKETS_ROWS = 10;
+const VISIBLE_CHAINED_MARKETS_ROWS = 4;
 
 const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayForResolvingSec, currentPrices }) => {
     const { t } = useTranslation();
@@ -229,7 +232,9 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
                                   <ChainedPosition
                                       position={position}
                                       maxPriceDelayForResolvingSec={maxPriceDelayForResolvingSec}
-                                      isMultipleMarkets={userOpenChainedSpeedMarketsData.length > 1}
+                                      isMultipleMarkets={
+                                          userOpenChainedSpeedMarketsData.length > VISIBLE_CHAINED_MARKETS_ROWS
+                                      }
                                       setIsClaimable={(isClaimable) =>
                                           updateChainedClaimable(position.address, isClaimable)
                                       }
@@ -241,7 +246,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
                                       position={position}
                                       maxPriceDelayForResolvingSec={maxPriceDelayForResolvingSec}
                                       currentPrices={currentPrices}
-                                      isMultipleMarkets={positions.length > 3}
+                                      isMultipleMarkets={positions.length > VISIBLE_SPEED_MARKETS_ROWS}
                                       key={`position${position.market}${index}`}
                                   />
                               ))}

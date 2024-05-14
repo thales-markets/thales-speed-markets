@@ -239,7 +239,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
                             value: <MaturityDate maturityDateUnix={row.maturityDate} showFullCounter />,
                         },
                         {
-                            value: <MyPositionAction position={row} isProfileAction />,
+                            value: <MyPositionAction position={row} />,
                         },
                         {
                             value: !row.isChained && (

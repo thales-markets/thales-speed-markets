@@ -231,11 +231,11 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                                         </Chain>
                                     )}
                                     {side === Positions.UP ? (
-                                        <PositionsSymbol size={30} $isSelected>
+                                        <PositionsSymbol size={30}>
                                             <Icon size={16} className="icon icon--caret-up" />
                                         </PositionsSymbol>
                                     ) : (
-                                        <PositionsSymbol size={30} $isSelected>
+                                        <PositionsSymbol size={30}>
                                             <Icon size={16} className="icon icon--caret-down" />
                                         </PositionsSymbol>
                                     )}

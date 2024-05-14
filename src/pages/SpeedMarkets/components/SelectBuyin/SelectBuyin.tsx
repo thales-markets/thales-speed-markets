@@ -167,6 +167,12 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
         setBuyinAmount(value);
     }, [value]);
 
+    // Reset inputs
+    useEffect(() => {
+        setBuyinAmount(0);
+        onChange(0);
+    }, [networkId, isConnected, onChange]);
+
     const onMaxClick = () => {
         if (collateralBalance > 0) {
             const maxWalletAmount =

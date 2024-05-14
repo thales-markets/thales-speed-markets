@@ -54,14 +54,12 @@ const ONE_HUNDRED_AND_THREE_PERCENT = 1.03;
 
 type MyPositionActionProps = {
     position: UserPosition | UserOpenPositions;
-    isProfileAction?: boolean;
     maxPriceDelayForResolvingSec?: number;
     isMultipleContainerRows?: boolean;
 };
 
 const MyPositionAction: React.FC<MyPositionActionProps> = ({
     position,
-    isProfileAction,
     maxPriceDelayForResolvingSec,
     isMultipleContainerRows,
 }) => {
@@ -347,7 +345,6 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                                 color: theme.button.textColor.quaternary,
                                 position: !isMultipleContainerRows ? undefined : 'relative',
                             }}
-                            isDropDownAbove={isMobile && !isProfileAction}
                         />
                     </CollateralSelectorContainer>
                 )}

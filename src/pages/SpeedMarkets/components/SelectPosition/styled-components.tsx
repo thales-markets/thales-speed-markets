@@ -8,12 +8,12 @@ import {
     FlexDivStart,
 } from 'styles/common';
 
-export const Container = styled(FlexDivStart)`
+export const PositionContainer = styled(FlexDivStart)`
     gap: 10px;
     align-items: center;
 `;
 
-export const PlusIcon = styled.i`
+export const PlusMinusIcon = styled.i`
     font-size: 28px;
     color: ${(props) => props.theme.button.textColor.tertiary};
     cursor: pointer;

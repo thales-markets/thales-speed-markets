@@ -226,7 +226,7 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
                                     isProfileAction
                                 />
                             ) : (
-                                <MyPositionAction position={row} isProfileAction />
+                                <MyPositionAction position={row} />
                             ),
                         },
                         {
