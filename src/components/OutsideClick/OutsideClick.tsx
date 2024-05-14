@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react';
+import styled from 'styled-components';
 
 const OutsideClickHandler: React.FC<any & { onOutisdeClick: void }> = ({ children, onOutsideClick }) => {
     const wrapperRef = useRef(null);
@@ -18,7 +19,11 @@ const OutsideClickHandler: React.FC<any & { onOutisdeClick: void }> = ({ childre
         };
     }, [onOutsideClick]);
 
-    return <div ref={wrapperRef}>{children}</div>;
+    return <Wrapper ref={wrapperRef}>{children}</Wrapper>;
 };
+
+const Wrapper = styled.div`
+    display: contents;
+`;
 
 export default OutsideClickHandler;

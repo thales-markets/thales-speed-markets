@@ -8,12 +8,13 @@ import QRCodeModal from 'pages/AARelatedPages/Deposit/components/QRCodeModal';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactModal from 'react-modal';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 
-import { setWalletConnectModalVisibility } from 'redux/modules/wallet';
+import { getIsBiconomy, setWalletConnectModalVisibility } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDiv, FlexDivCentered, FlexDivColumn } from 'styles/common';
+import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
 import { getDefaultCollateral } from 'utils/currency';
 import { getNetworkNameByNetworkId } from 'utils/network';
@@ -53,7 +54,8 @@ type StepProps = {
 const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurrentStep, hasFunds }) => {
     const networkId = useChainId();
     const dispatch = useDispatch();
-    const { isConnected: isWalletConnected } = useAccount();
+    const { isConnected: isWalletConnected, address: walletAddress } = useAccount();
+    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
     const { t } = useTranslation();
     const [showQRModal, setShowQRModal] = useState<boolean>(false);
     const [showOnramper, setShowOnramper] = useState<boolean>(false);
@@ -138,7 +140,7 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
     const handleCopy = () => {
         const id = toast.loading(t('deposit.copying-address'));
         try {
-            navigator.clipboard.writeText(biconomyConnector.address);
+            navigator.clipboard.writeText(isBiconomy ? biconomyConnector.address : (walletAddress as string));
             toast.update(id, getInfoToastOptions(t('deposit.copied'), ''));
         } catch (e) {
             toast.update(id, getErrorToastOptions('Error', ''));
@@ -173,7 +175,10 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
                         <DepositContainer>
                             <GradientContainer>
                                 <AddressContainer>
-                                    <Address> {biconomyConnector.address}</Address>
+                                    <Address>
+                                        {' '}
+                                        {isBiconomy ? biconomyConnector.address : (walletAddress as string)}
+                                    </Address>
                                     <CopyText onClick={handleCopy}>COPY</CopyText>
                                     <QRIcon
                                         onClick={() => {

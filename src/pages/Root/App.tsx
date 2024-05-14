@@ -105,13 +105,14 @@ const App = () => {
             });
         }
         const onDisconnect = () => {
+            dispatch(setIsBiconomy(false));
             disconnect();
         };
         particleAuth.on(AuthCoreEvent.ParticleAuthDisconnect, onDisconnect);
         return () => {
             particleAuth.off(AuthCoreEvent.ParticleAuthDisconnect, onDisconnect);
         };
-    }, [connect, connectionStatus, disconnect, networkId]);
+    }, [connect, connectionStatus, disconnect, networkId, dispatch]);
 
     useEffect(() => {
         const handlePageResized = () => {
