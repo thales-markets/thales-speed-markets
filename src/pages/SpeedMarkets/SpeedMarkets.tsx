@@ -165,7 +165,6 @@ const SpeedMarkets: React.FC = () => {
                     <SelectTime
                         selectedDeltaSec={deltaTimeSec}
                         onDeltaChange={setDeltaTimeSec}
-                        onExactTimeChange={setStrikeTimeSec}
                         ammSpeedMarketsLimits={ammSpeedMarketsLimitsData}
                         isResetTriggered={isResetTriggered}
                         isChained={isChained}
@@ -189,7 +188,6 @@ const SpeedMarkets: React.FC = () => {
                     <SelectTime
                         selectedDeltaSec={deltaTimeSec}
                         onDeltaChange={setDeltaTimeSec}
-                        onExactTimeChange={setStrikeTimeSec}
                         ammSpeedMarketsLimits={ammSpeedMarketsLimitsData}
                         isResetTriggered={isResetTriggered}
                         isChained={isChained}

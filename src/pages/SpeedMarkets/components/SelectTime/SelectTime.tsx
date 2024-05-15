@@ -3,15 +3,12 @@ import NumericInput from 'components/fields/NumericInput/NumericInput';
 import {
     hoursToMinutes,
     hoursToSeconds,
-    millisecondsToSeconds,
     minutesToHours,
     minutesToSeconds,
     secondsToHours,
-    secondsToMilliseconds,
     secondsToMinutes,
 } from 'date-fns';
 import { ScreenSizeBreakpoint } from 'enums/ui';
-import useInterval from 'hooks/useInterval';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -26,7 +23,6 @@ import { Header, HeaderText } from '../SelectPosition/styled-components';
 type SelectTimeProps = {
     selectedDeltaSec: number;
     onDeltaChange: React.Dispatch<number>;
-    onExactTimeChange: React.Dispatch<number>;
     ammSpeedMarketsLimits: AmmSpeedMarketsLimits | null;
     isResetTriggered: boolean;
     isChained: boolean;
@@ -39,7 +35,6 @@ const CHAINED_TIMEFRAMES_MINUTES = [2, 5, 10];
 const SelectTime: React.FC<SelectTimeProps> = ({
     selectedDeltaSec,
     onDeltaChange,
-    onExactTimeChange,
     ammSpeedMarketsLimits,
     isResetTriggered,
     isChained,
@@ -50,16 +45,9 @@ const SelectTime: React.FC<SelectTimeProps> = ({
     const { isConnected } = useAccount();
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
-    const [isDeltaSelected, setIsDeltaSelected] = useState(true); // false is when exact time is selected
     const [showCustomDeltaTime, setShowCustomDeltaTime] = useState(false);
     const [customDeltaTime, setCustomDeltaTime] = useState<string | number>('');
     const [isDeltaMinutesSelected, setIsDeltaMinutesSelected] = useState(true); // false is when hours is selected
-
-    const DEFAULT_HOURS = '12';
-    const DEFAULT_MINUTES = '00';
-    const [exactTimeHours, setExactTimeHours] = useState(DEFAULT_HOURS);
-    const [exactTimeMinutes, setExactTimeMinutes] = useState(DEFAULT_MINUTES);
-    const [isAM, setIsAM] = useState(true); // false is when it is PM
 
     const [errorMessage, setErrorMessage] = useState('');
 
@@ -94,93 +82,9 @@ const SelectTime: React.FC<SelectTimeProps> = ({
         return times;
     }, [ammSpeedMarketsLimits, deltaTimesMinutes]);
 
-    const isValidExactTime = useCallback(
-        (exactTime: Date | undefined) => {
-            if (!isDeltaSelected) {
-                if (
-                    exactTime &&
-                    ammSpeedMarketsLimits &&
-                    exactTime.getTime() - Date.now() <
-                        secondsToMilliseconds(ammSpeedMarketsLimits?.minimalTimeToMaturity)
-                ) {
-                    const minimalTimeHours = secondsToHours(ammSpeedMarketsLimits?.minimalTimeToMaturity || 0);
-                    setErrorMessage(
-                        t('speed-markets.errors.min-maturity-date', {
-                            minTime:
-                                minimalTimeHours === 0
-                                    ? secondsToMinutes(ammSpeedMarketsLimits?.minimalTimeToMaturity || 0)
-                                    : minimalTimeHours,
-                            timeUnit:
-                                minimalTimeHours === 0
-                                    ? t('common.time-remaining.minutes')
-                                    : minimalTimeHours === 1
-                                    ? t('common.time-remaining.hour')
-                                    : t('common.time-remaining.hours'),
-                        })
-                    );
-                    return false;
-                }
-
-                setErrorMessage('');
-                return true;
-            }
-        },
-        [ammSpeedMarketsLimits, isDeltaSelected, t]
-    );
-
-    const getExactTime = useCallback(() => {
-        if (!isDeltaSelected) {
-            const exactTime = new Date();
-            exactTime.setHours(
-                isAM
-                    ? Number(exactTimeHours) === 12
-                        ? 0
-                        : Number(exactTimeHours)
-                    : Number(exactTimeHours) === 12
-                    ? 12
-                    : Number(exactTimeHours) + 12
-            );
-            exactTime.setMinutes(Number(exactTimeMinutes));
-            exactTime.setSeconds(0);
-            exactTime.setMilliseconds(0);
-            if (exactTime.getTime() < Date.now()) {
-                // if in the past move it for one day
-                exactTime.setDate(exactTime.getDate() + 1);
-            }
-            return exactTime;
-        }
-    }, [isDeltaSelected, isAM, exactTimeHours, exactTimeMinutes]);
-
-    // Exact time handler
+    // Validations
     useEffect(() => {
-        if (!isDeltaSelected) {
-            const exactTime = getExactTime();
-
-            if (!isValidExactTime(exactTime)) {
-                return;
-            }
-
-            if (exactTime) {
-                const exactTimeSec = millisecondsToSeconds(exactTime.getTime());
-                onExactTimeChange(exactTimeSec);
-            }
-        }
-    }, [
-        ammSpeedMarketsLimits,
-        isDeltaSelected,
-        isAM,
-        exactTimeHours,
-        exactTimeMinutes,
-        getExactTime,
-        isValidExactTime,
-        onExactTimeChange,
-    ]);
-
-    useInterval(() => isValidExactTime(getExactTime()), secondsToMilliseconds(10));
-
-    // Validations for delta time
-    useEffect(() => {
-        if (isDeltaSelected && !isChained) {
+        if (!isChained) {
             if (ammSpeedMarketsLimits && customDeltaTime !== '') {
                 const customDeltaTimeSec = isDeltaMinutesSelected
                     ? minutesToSeconds(Number(customDeltaTime))
@@ -218,19 +122,13 @@ const SelectTime: React.FC<SelectTimeProps> = ({
 
             setErrorMessage('');
         }
-    }, [ammSpeedMarketsLimits, customDeltaTime, isDeltaMinutesSelected, t, isDeltaSelected, isChained]);
+    }, [ammSpeedMarketsLimits, customDeltaTime, isDeltaMinutesSelected, t, isChained]);
 
     const resetData = useCallback(() => {
-        setIsDeltaSelected(true);
         setIsDeltaMinutesSelected(!!deltaTimesMinutes.length);
         setCustomDeltaTime('');
         onDeltaChange(0);
-
-        setIsAM(true);
-        setExactTimeHours(DEFAULT_HOURS);
-        setExactTimeMinutes(DEFAULT_MINUTES);
-        onExactTimeChange(0);
-    }, [onDeltaChange, onExactTimeChange, deltaTimesMinutes]);
+    }, [onDeltaChange, deltaTimesMinutes]);
 
     // Reset inputs
     useEffect(() => {
@@ -244,17 +142,14 @@ const SelectTime: React.FC<SelectTimeProps> = ({
     }, [isChained, resetData]);
 
     const onDeltaTimeClickHandler = (deltaHours: number, deltaMinutes: number) => {
-        setIsDeltaSelected(true);
         setCustomDeltaTime(deltaHours ? deltaHours : deltaMinutes);
         setIsDeltaMinutesSelected(deltaHours ? false : true);
         onDeltaChange(deltaHours ? hoursToSeconds(deltaHours) : minutesToSeconds(deltaMinutes));
-        onExactTimeChange(0);
     };
 
     const onDeltaTimeInputChange = (value: number | string) => {
         setCustomDeltaTime(value);
         onDeltaChange(isDeltaMinutesSelected ? minutesToSeconds(Number(value)) : hoursToSeconds(Number(value)));
-        onExactTimeChange(0);
     };
 
     const onMinutesButtonClikHandler = () => {
@@ -287,7 +182,7 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                         {deltaTimesMinutes.map((deltaMinutes, index) => (
                             <Time
                                 key={'minutes' + index}
-                                $isSelected={isDeltaSelected && selectedDeltaSec === minutesToSeconds(deltaMinutes)}
+                                $isSelected={selectedDeltaSec === minutesToSeconds(deltaMinutes)}
                                 onClick={() => onDeltaTimeClickHandler(0, deltaMinutes)}
                             >{`${deltaMinutes}m`}</Time>
                         ))}
@@ -299,14 +194,14 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                             {deltaTimesMinutes.map((deltaMinutes, index) => (
                                 <Time
                                     key={'minutes' + index}
-                                    $isSelected={isDeltaSelected && selectedDeltaSec === minutesToSeconds(deltaMinutes)}
+                                    $isSelected={selectedDeltaSec === minutesToSeconds(deltaMinutes)}
                                     onClick={() => onDeltaTimeClickHandler(0, deltaMinutes)}
                                 >{`${deltaMinutes}m`}</Time>
                             ))}
                             {deltaTimesHours.map((deltaHours, index) => (
                                 <Time
                                     key={'hours' + index}
-                                    $isSelected={isDeltaSelected && selectedDeltaSec === hoursToSeconds(deltaHours)}
+                                    $isSelected={selectedDeltaSec === hoursToSeconds(deltaHours)}
                                     onClick={() => onDeltaTimeClickHandler(deltaHours, 0)}
                                 >{`${deltaHours}h`}</Time>
                             ))}

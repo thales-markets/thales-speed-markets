@@ -247,7 +247,6 @@
             "max-buyin": "The maximum buy-in is {{maxAmount}}",
             "min-time": "The minimum time is {{minTime}} {{timeUnit}}",
             "max-time": "The maximum time is {{maxTime}} {{timeUnit}}",
-            "min-maturity-date": "The time has to be at least {{minTime}} {{timeUnit}} in the future",
             "out-of-liquidity-direction": "Out of liquidity for direction",
             "insufficient-balance-fee": "Not enough {{currencyKey}} in wallet for {{fee}} fee",
             "insufficient-balance-wallet": "Get {{currencyKey}} below"
