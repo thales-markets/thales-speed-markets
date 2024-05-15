@@ -16,6 +16,7 @@ import OutsideClick from 'components/OutsideClick';
 import { useSelector } from 'react-redux';
 import { getIsBiconomy } from 'redux/modules/wallet';
 import { RootState } from 'types/ui';
+import { LINKS } from 'constants/links';
 
 type UserInfoProps = {
     setUserInfoOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -91,8 +92,10 @@ const UserInfo: React.FC<UserInfoProps> = ({ setUserInfoOpen, setOpenWithdraw })
                             </SPAAnchor>
                         </FlexStartCentered>
                         <FlexStartCentered>
-                            <Icon className="network-icon network-icon--docs" />
-                            <Label>{t('user-info.docs')}</Label>
+                            <SPAAnchor href={LINKS.Docs}>
+                                <Icon className="network-icon network-icon--docs" />
+                                <Label>{t('user-info.docs')}</Label>
+                            </SPAAnchor>
                         </FlexStartCentered>
                     </FlexColumn>
                     <FlexColumn>
