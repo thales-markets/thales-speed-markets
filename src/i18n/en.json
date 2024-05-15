@@ -408,7 +408,8 @@
     "deposit": {
         "deposit-crypto": "deposit crypto",
         "select-token": "Select token",
-        "send": "Make sure you are depositing {{ network }} {{ token }} to the address above!",
+        "send": "Make sure you double check your withdrawal address and that it supports {{ token }} on {{ network }}!",
+
         "buy-with": "or",
         "description": "Don't have crypto wallet? No worries, you can buy any of above mentioned cryptocurrencies with your credit card.",
         "address-input-label": "Your personal {{ token }} deposit address on {{ network }}",
