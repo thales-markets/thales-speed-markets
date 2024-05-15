@@ -17,6 +17,7 @@ type NumericInputProps = {
     onMaxButton?: any;
     inputPadding?: string;
     margin?: string;
+    width?: string;
 };
 
 const INVALID_CHARS = ['-', '+', 'e'];
@@ -35,6 +36,7 @@ const NumericInput: React.FC<NumericInputProps> = ({
     onMaxButton,
     inputPadding,
     margin,
+    width,
 }) => {
     const { t } = useTranslation();
 
@@ -53,7 +55,7 @@ const NumericInput: React.FC<NumericInputProps> = ({
     };
 
     return (
-        <FieldContainer margin={margin}>
+        <FieldContainer width={width} margin={margin}>
             {label && <FieldLabel>{label}</FieldLabel>}
             <StyledInput
                 value={value}
@@ -108,6 +110,7 @@ const RightContainer = styled(FlexDivCentered)`
     position: absolute;
     right: 0;
     bottom: 10px;
+    height: 20px;
 `;
 
 const CurrencyLabel = styled.label<{ $hasSeparator?: boolean }>`

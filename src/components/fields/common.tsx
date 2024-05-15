@@ -6,6 +6,7 @@ export const FieldContainer = styled(FlexDivColumn)<{ width?: string; margin?: s
     position: relative;
     ${(props) => (props.width ? `width: ${props.width};` : '')};
     margin: ${(props) => props.margin || '0 0 10px 0'};
+    width: ${(props) => props.width || 'auto'};
     ${(props) => (props.zIndex ? `z-index: ${props.zIndex};` : '')}
 `;
 

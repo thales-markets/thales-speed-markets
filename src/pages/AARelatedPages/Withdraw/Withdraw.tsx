@@ -1,24 +1,17 @@
 import Button from 'components/Button';
 import NumericInput from 'components/fields/NumericInput';
 import TextInput from 'components/fields/TextInput';
-import BalanceDetails from 'pages/AARelatedPages/Deposit/components/BalanceDetails';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
-import styled from 'styled-components';
-import { FlexDiv } from 'styles/common';
 import { RootState } from 'types/ui';
 import { getNetworkNameByNetworkId } from 'utils/network';
 import queryString from 'query-string';
 import {
-    BalanceSection,
     FormContainer,
     InputContainer,
     InputLabel,
-    Link,
     PrimaryHeading,
-    SectionLabel,
-    TutorialLinksContainer,
     WarningContainer,
     WarningIcon,
     Wrapper,
@@ -33,13 +26,46 @@ import biconomyConnector from 'utils/biconomyWallet';
 import { isAddress } from 'viem';
 import { COLLATERALS } from 'constants/currency';
 import CollateralDropdown from '../Deposit/components/CollateralDropdown';
+import ReactModal from 'react-modal';
+import OutsideClick from 'components/OutsideClick';
+import styled from 'styled-components';
+import { FlexDiv } from 'styles/common';
+
+ReactModal.setAppElement('#root');
+
+const defaultStyle = {
+    content: {
+        top: '50%',
+        left: '50%',
+        right: 'auto',
+        bottom: 'auto',
+        padding: '2px',
+        background: 'linear-gradient(90deg, #a764b7 0%, #169cd2 100%)',
+        width: '720px',
+        borderRadius: '15px',
+        marginRight: '-50%',
+        transform: 'translate(-50%, -50%)',
+        overflow: 'none',
+        height: 'auto',
+        border: 'none',
+    },
+    overlay: {
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        zIndex: 200,
+    },
+};
 
 type FormValidation = {
     walletAddress: boolean;
     amount: boolean;
 };
 
-const Withdraw: React.FC = () => {
+type DepositProps = {
+    isOpen: boolean;
+    onClose: () => void;
+};
+
+const Withdraw: React.FC<DepositProps> = ({ isOpen, onClose }) => {
     const { t } = useTranslation();
     const networkId = useChainId();
     const walletAddress = biconomyConnector.address;
@@ -100,82 +126,76 @@ const Withdraw: React.FC = () => {
     };
 
     return (
-        <>
-            <Wrapper>
-                <FormContainer>
-                    <PrimaryHeading>{t('withdraw.heading-withdraw')}</PrimaryHeading>
-
-                    <div>
-                        <InputLabel>{t('deposit.select-token')}</InputLabel>
-                        <CollateralDropdown
-                            onChangeCollateral={handleChangeCollateral}
-                            collateralArray={COLLATERALS[networkId]}
-                            selectedItem={selectedToken}
-                        />
-                    </div>
-
-                    <div>
-                        <InputLabel marginTop="20px">
-                            {t('withdraw.address-input-label', {
-                                token: selectedToken,
-                                network: getNetworkNameByNetworkId(networkId),
-                            })}
-                        </InputLabel>
-                        <InputContainer>
-                            <TextInput
-                                value={withdrawalWalletAddress}
-                                onChange={(el: { target: { value: React.SetStateAction<string> } }) =>
-                                    setWithdrawalWalletAddress(el.target.value)
-                                }
-                                placeholder={t('withdraw.paste-address')}
-                                width="100%"
+        <ReactModal isOpen={isOpen} shouldCloseOnOverlayClick={true} style={defaultStyle}>
+            <OutsideClick onOutsideClick={onClose}>
+                <Wrapper>
+                    <FormContainer>
+                        <PrimaryHeading>{t('withdraw.heading-withdraw')}</PrimaryHeading>
+                        <CloseIconContainer>
+                            <CloseIcon onClick={onClose} />
+                        </CloseIconContainer>
+                        <div>
+                            <InputLabel>{t('deposit.select-token')}</InputLabel>
+                            <CollateralDropdown
+                                onChangeCollateral={handleChangeCollateral}
+                                collateralArray={COLLATERALS[networkId]}
+                                selectedItem={selectedToken}
                             />
-                        </InputContainer>
-                    </div>
-                    <div>
-                        <InputLabel marginTop="10px">{t('withdraw.amount')}</InputLabel>
-                        <InputContainer>
-                            <NumericInput
-                                value={amount}
-                                onChange={(el) => setAmount(Number(el.target.value))}
-                                placeholder={t('withdraw.paste-address')}
-                                onMaxButton={() => setAmount(paymentTokenBalance)}
-                                currencyLabel={getCollaterals(networkId)[selectedToken]}
-                                showValidation={!validation.amount && amount > 0}
-                                validationMessage={t('withdraw.validation.amount')}
-                            />
-                        </InputContainer>
-                        <WarningContainer>
-                            <WarningIcon className={'icon icon--warning'} />
-                            {t('deposit.send', {
-                                token: getCollaterals(networkId)[selectedToken],
-                                network: getNetworkNameByNetworkId(networkId),
-                            })}
-                        </WarningContainer>
-                    </div>
+                        </div>
 
-                    <ButtonContainer>
+                        <div>
+                            <InputLabel>
+                                {t('withdraw.address-input-label', {
+                                    token: selectedToken,
+                                    network: getNetworkNameByNetworkId(networkId),
+                                })}
+                            </InputLabel>
+                            <InputContainer>
+                                <TextInput
+                                    value={withdrawalWalletAddress}
+                                    onChange={(el: { target: { value: React.SetStateAction<string> } }) =>
+                                        setWithdrawalWalletAddress(el.target.value)
+                                    }
+                                    placeholder={t('withdraw.paste-address')}
+                                    width="100%"
+                                    margin="0"
+                                />
+                            </InputContainer>
+                        </div>
+                        <div>
+                            <InputLabel>{t('withdraw.amount')}</InputLabel>
+                            <InputContainer>
+                                <NumericInput
+                                    value={amount}
+                                    width="100%"
+                                    onChange={(el) => setAmount(Number(el.target.value))}
+                                    placeholder={t('withdraw.paste-address')}
+                                    onMaxButton={() => setAmount(paymentTokenBalance)}
+                                    currencyLabel={getCollaterals(networkId)[selectedToken]}
+                                    showValidation={!validation.amount && amount > 0}
+                                    validationMessage={t('withdraw.validation.amount')}
+                                />
+                            </InputContainer>
+                            <WarningContainer>
+                                <WarningIcon className={'icon icon--warning'} />
+                                {t('deposit.send', {
+                                    token: getCollaterals(networkId)[selectedToken],
+                                    network: getNetworkNameByNetworkId(networkId),
+                                })}
+                            </WarningContainer>
+                        </div>
                         <Button
                             disabled={!validation.amount || !validation.walletAddress}
                             fontSize={'22px'}
                             width="220px"
+                            additionalStyles={{ alignSelf: 'center' }}
                             onClick={() => setWithdrawalConfirmationModalVisibility(true)}
                         >
                             {t('withdraw.button-label-withdraw')}
                         </Button>
-                    </ButtonContainer>
-                </FormContainer>
-                <BalanceSection>
-                    <BalanceDetails />
-                    <TutorialLinksContainer>
-                        <SectionLabel>{'Tutorials'}</SectionLabel>
-                        <Link href={'#'}>{'Coinbase'}</Link>
-                        <Link href={'#'}>{'Coinbase'}</Link>
-                        <Link href={'#'}>{'Coinbase'}</Link>
-                        <Link href={'#'}>{'Coinbase'}</Link>
-                    </TutorialLinksContainer>
-                </BalanceSection>
-            </Wrapper>
+                    </FormContainer>
+                </Wrapper>
+            </OutsideClick>
             {showWithdrawalConfirmationModal && (
                 <WithdrawalConfirmationModal
                     amount={amount}
@@ -185,15 +205,29 @@ const Withdraw: React.FC = () => {
                     onClose={() => setWithdrawalConfirmationModalVisibility(false)}
                 />
             )}
-        </>
+        </ReactModal>
     );
 };
 
-const ButtonContainer = styled(FlexDiv)`
-    width: 100%;
-    padding: 40px 0px;
-    align-items: center;
-    justify-content: center;
+const CloseIconContainer = styled(FlexDiv)`
+    position: absolute;
+    top: 20px;
+    right: 20px;
+`;
+
+const CloseIcon = styled.i`
+    font-size: 16px;
+    margin-top: 1px;
+    cursor: pointer;
+
+    &:before {
+        font-family: Icons !important;
+        content: '\\0042';
+        color: ${(props) => props.theme.textColor.quinary};
+    }
+    @media (max-width: 575px) {
+        padding: 15px;
+    }
 `;
 
 export default Withdraw;

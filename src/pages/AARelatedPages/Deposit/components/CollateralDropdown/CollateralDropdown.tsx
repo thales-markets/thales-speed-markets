@@ -60,7 +60,7 @@ const Container = styled.div`
     justify-content: flex-start;
     padding: 7px;
     border-radius: 8px;
-    border: 2px solid ${(props) => props.theme.background.secondary};
+    border: 2px solid ${(props) => props.theme.borderColor.quaternary};
     color: ${(props) => props.theme.textColor.primary};
     font-family: ${(props) => props.theme.fontFamily.tertiary};
     position: relative;
@@ -97,7 +97,7 @@ const Icon = styled.i`
 const Arrow = styled.i`
     font-size: 10px;
     text-transform: none;
-    color: ${(props) => props.theme.background.quinary};
+    color: ${(props) => props.theme.textColor.primary};
     position: absolute;
     right: 10px;
 `;

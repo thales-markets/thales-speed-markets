@@ -19,6 +19,7 @@ import { getWalletConnectModalVisibility, setWalletConnectModalVisibility } from
 import Deposit from 'pages/AARelatedPages/Deposit';
 import ConnectWalletModal from 'components/ConnectWalletModal';
 import UserInfo from '../components/UserInfo';
+import Withdraw from 'pages/AARelatedPages/Withdraw';
 
 const DappHeader: React.FC = () => {
     const { t } = useTranslation();
@@ -31,7 +32,8 @@ const DappHeader: React.FC = () => {
     const [openReferralModal, setOpenReferralModal] = useState(false);
     const [openGetStarted, setOpenGetStarted] = useState(false);
     const [openDeposit, setOpenDeposit] = useState(false);
-    const [userInfoOpen, setUserInfoOpen] = useState(false);
+    const [openUserInfo, setOpenUserInfo] = useState(false);
+    const [openWithdraw, setOpenWithdraw] = useState(false);
 
     return (
         <Container $maxWidth={getMaxWidth()}>
@@ -76,18 +78,19 @@ const DappHeader: React.FC = () => {
                     <>
                         <UserWallet />
                         <HeaderIcons
-                            onClick={() => setUserInfoOpen(!userInfoOpen)}
+                            onClick={() => setOpenUserInfo(!openUserInfo)}
                             className={`network-icon network-icon--burger`}
                         />
                     </>
                 )}
 
                 {!isMobile && <Notifications />}
-                {userInfoOpen && <UserInfo setUserInfoOpen={setUserInfoOpen} />}
+                {openUserInfo && <UserInfo setUserInfoOpen={setOpenUserInfo} setOpenWithdraw={setOpenWithdraw} />}
             </RightContainer>
             {openReferralModal && <ReferralModal onClose={() => setOpenReferralModal(false)} />}
             {openGetStarted && <GetStarted isOpen={openGetStarted} onClose={() => setOpenGetStarted(false)} />}
             {openDeposit && <Deposit isOpen={openDeposit} onClose={() => setOpenDeposit(false)} />}
+            {openWithdraw && <Withdraw isOpen={openWithdraw} onClose={() => setOpenWithdraw(false)} />}
 
             <ConnectWalletModal
                 isOpen={connectWalletModalVisibility}
