@@ -111,7 +111,6 @@ const RightContainer = styled(FlexDivCentered)<{ hasLabel?: boolean }>`
     right: 0;
     top: ${(props) => (props.hasLabel ? 'calc(50% + 10px)' : '50%')}; // 10px half of label height and margin
     bottom: 50%;
-    height: 20px;
 `;
 
 const CurrencyLabel = styled.label<{ $hasSeparator?: boolean }>`
