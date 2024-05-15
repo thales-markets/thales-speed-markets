@@ -1,31 +1,37 @@
 import CollateralSelector from 'components/CollateralSelector';
 import NumericInput from 'components/fields/NumericInput';
 import { USD_SIGN } from 'constants/currency';
-import { STABLECOIN_CONVERSION_BUFFER_PERCENTAGE } from 'constants/market';
 import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import { t } from 'i18next';
 import useExchangeRatesQuery, { Rates } from 'queries/rates/useExchangeRatesQuery';
 import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipleCollateralBalanceQuery';
 import useStableBalanceQuery from 'queries/walletBalances/useStableBalanceQuery';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivCentered, FlexDivRow } from 'styles/common';
-import { roundNumberToDecimals, truncToDecimals } from 'thales-utils';
+import { NetworkId, ceilNumberToDecimals, truncToDecimals } from 'thales-utils';
 import { AmmChainedSpeedMarketsLimits, AmmSpeedMarketsLimits } from 'types/market';
 import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
-import { getCoinBalance, getCollateral, getCollaterals, getDefaultCollateral, isStableCurrency } from 'utils/currency';
+import {
+    convertCollateralToStable,
+    convertFromStableToCollateral,
+    getCoinBalance,
+    getCollateral,
+    getCollaterals,
+    getDefaultCollateral,
+    isStableCurrency,
+} from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
 import { useAccount, useChainId, useClient } from 'wagmi';
 import { SelectedPosition } from '../SelectPosition/SelectPosition';
 import { Header, HeaderText } from '../SelectPosition/styled-components';
 
 type SelectBuyinProps = {
-    value: number;
     onChange: React.Dispatch<number>;
     isChained: boolean;
     chainedPositions: SelectedPosition[];
@@ -37,7 +43,6 @@ type SelectBuyinProps = {
 const roundMaxBuyin = (maxBuyin: number) => Math.floor(maxBuyin / 10) * 10;
 
 const SelectBuyin: React.FC<SelectBuyinProps> = ({
-    value,
     onChange,
     isChained,
     chainedPositions,
@@ -45,15 +50,16 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
     ammChainedSpeedMarketsLimits,
     currencyKey,
 }) => {
-    const [buyinAmount, setBuyinAmount] = useState(0);
-
-    const selectedCollateralIndex = useSelector((rootState: RootState) => getSelectedCollateralIndex(rootState));
-    const isBiconomy = useSelector((rootState: RootState) => getIsBiconomy(rootState));
-    const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const { address: walletAddress, isConnected } = useAccount();
     const networkId = useChainId();
+    const { address: walletAddress, isConnected } = useAccount();
     const client = useClient();
+    const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
+    const isBiconomy = useSelector((rootState: RootState) => getIsBiconomy(rootState));
     const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
+    const selectedCollateralIndex = useSelector((rootState: RootState) => getSelectedCollateralIndex(rootState));
+
+    const [buyinAmount, setBuyinAmount] = useState(0);
+    const [errorMessageKey, setErrorMessageKey] = useState('');
 
     const defaultCollateral = useMemo(() => getDefaultCollateral(networkId), [networkId]);
     const selectedCollateral = useMemo(() => getCollateral(networkId, selectedCollateralIndex), [
@@ -115,11 +121,30 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
         [chainedPositions.length, ammChainedSpeedMarketsLimits]
     );
 
-    const buyinAmounts = useMemo(() => {
-        const chainedQuote = isChained ? roundNumberToDecimals(payoutMultiplier ** chainedPositions.length) : 0;
+    const chainedQuote = useMemo(
+        () => (isChained ? ceilNumberToDecimals(payoutMultiplier ** chainedPositions.length) : 0),
+        [isChained, chainedPositions.length, payoutMultiplier]
+    );
 
-        const first =
-            (isChained ? ammChainedSpeedMarketsLimits?.minBuyinAmount : ammSpeedMarketsLimits?.minBuyinAmount) || 0;
+    const minBuyinAmount = useMemo(
+        () => (isChained ? ammChainedSpeedMarketsLimits?.minBuyinAmount : ammSpeedMarketsLimits?.minBuyinAmount) || 0,
+        [isChained, ammChainedSpeedMarketsLimits?.minBuyinAmount, ammSpeedMarketsLimits?.minBuyinAmount]
+    );
+    const maxBuyinAmount = useMemo(
+        () =>
+            (isChained
+                ? Math.floor((ammChainedSpeedMarketsLimits?.maxProfitPerIndividualMarket || 0) / chainedQuote)
+                : ammSpeedMarketsLimits?.maxBuyinAmount) || 0,
+        [
+            isChained,
+            ammChainedSpeedMarketsLimits?.maxProfitPerIndividualMarket,
+            ammSpeedMarketsLimits?.maxBuyinAmount,
+            chainedQuote,
+        ]
+    );
+
+    const buyinAmounts = useMemo(() => {
+        const first = minBuyinAmount;
         const fifth = isChained
             ? roundMaxBuyin((ammChainedSpeedMarketsLimits?.maxProfitPerIndividualMarket || 0) / chainedQuote)
             : ammSpeedMarketsLimits?.maxBuyinAmount || 0;
@@ -155,17 +180,66 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
         return [first, second, third, fourth, fifth];
     }, [
         isChained,
-        ammSpeedMarketsLimits?.minBuyinAmount,
+        chainedQuote,
+        minBuyinAmount,
         ammSpeedMarketsLimits?.maxBuyinAmount,
-        ammChainedSpeedMarketsLimits?.minBuyinAmount,
         ammChainedSpeedMarketsLimits?.maxProfitPerIndividualMarket,
-        payoutMultiplier,
-        chainedPositions.length,
     ]);
 
+    const convertToStable = useCallback(
+        (value: number) => {
+            const rate = exchangeRates?.[selectedCollateral] || 0;
+            return convertCollateralToStable(selectedCollateral, value, rate);
+        },
+        [selectedCollateral, exchangeRates]
+    );
+    const convertFromStable = useCallback(
+        (value: number) => {
+            const rate = exchangeRates?.[selectedCollateral] || 0;
+            const useRateBuffer = value === minBuyinAmount;
+            return convertFromStableToCollateral(selectedCollateral, value, rate, useRateBuffer);
+        },
+        [selectedCollateral, exchangeRates, minBuyinAmount]
+    );
+
+    // Input field validations
     useEffect(() => {
-        setBuyinAmount(value);
-    }, [value]);
+        let messageKey = '';
+
+        if (buyinAmount > 0 && ((isConnected && buyinAmount > collateralBalance) || collateralBalance === 0)) {
+            messageKey =
+                networkId === NetworkId.BlastSepolia
+                    ? 'speed-markets.errors.insufficient-balance-wallet'
+                    : 'common.errors.insufficient-balance-wallet';
+        }
+        if (buyinAmount > 0) {
+            const convertedTotalPaidAmount = isStableCurrency(selectedCollateral)
+                ? buyinAmount
+                : convertToStable(buyinAmount);
+
+            if (convertedTotalPaidAmount < minBuyinAmount) {
+                messageKey = 'speed-markets.errors.min-buyin';
+            } else if (convertedTotalPaidAmount > maxBuyinAmount) {
+                messageKey = 'speed-markets.errors.max-buyin';
+            }
+        }
+
+        if (messageKey) {
+            onChange(0);
+            setErrorMessageKey(messageKey);
+        }
+        setErrorMessageKey(messageKey);
+    }, [
+        minBuyinAmount,
+        maxBuyinAmount,
+        buyinAmount,
+        collateralBalance,
+        isConnected,
+        selectedCollateral,
+        convertToStable,
+        networkId,
+        onChange,
+    ]);
 
     // Reset inputs
     useEffect(() => {
@@ -175,12 +249,9 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
 
     const onMaxClick = () => {
         if (collateralBalance > 0) {
-            const maxWalletAmount =
-                selectedCollateral === defaultCollateral
-                    ? Number(truncToDecimals(collateralBalance))
-                    : isStableCurrency(selectedCollateral)
-                    ? Number(truncToDecimals(collateralBalance / (1 + STABLECOIN_CONVERSION_BUFFER_PERCENTAGE)))
-                    : Number(truncToDecimals(collateralBalance, 18));
+            const maxWalletAmount = isStableCurrency(selectedCollateral)
+                ? Number(truncToDecimals(collateralBalance))
+                : Number(truncToDecimals(collateralBalance, 18));
 
             let maxLiquidity, maxLiquidityPerDirection: number;
             if (isChained) {
@@ -223,7 +294,7 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
                     return (
                         <Amount
                             key={index}
-                            $isSelected={buyinAmount === amount || (value > 0 && value === amount)}
+                            $isSelected={buyinAmount === amount}
                             onClick={() => {
                                 onChange(amount);
                                 setBuyinAmount(amount);
@@ -242,6 +313,12 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
                     onChange(Number(value));
                     setBuyinAmount(Number(value));
                 }}
+                showValidation={!!errorMessageKey}
+                validationMessage={t(errorMessageKey, {
+                    currencyKey: selectedCollateral,
+                    minAmount: convertFromStable(minBuyinAmount),
+                    maxAmount: convertFromStable(maxBuyinAmount),
+                })}
                 onMaxButton={onMaxClick}
                 currencyComponent={
                     isMultiCollateralSupported ? (

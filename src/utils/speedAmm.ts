@@ -30,7 +30,6 @@ export const getTransactionForSpeedAMM = async (
     creatorContractWithSigner: any,
     asset: string,
     deltaTimeSec: number,
-    strikeTimeSec: number,
     sides: number[],
     buyInAmount: bigint,
     strikePrice: bigint,
@@ -57,9 +56,9 @@ export const getTransactionForSpeedAMM = async (
                         strikePrice,
                         strikePriceSlippage,
                         sides,
-                        collateralAddress ? collateralAddress : ZERO_ADDRESS,
+                        collateralAddress || ZERO_ADDRESS,
                         buyInAmount,
-                        referral ? referral : ZERO_ADDRESS,
+                        referral || ZERO_ADDRESS,
                     ],
                 ]
             );
@@ -71,9 +70,9 @@ export const getTransactionForSpeedAMM = async (
                     strikePrice,
                     strikePriceSlippage,
                     sides,
-                    collateralAddress ? collateralAddress : ZERO_ADDRESS,
+                    collateralAddress || ZERO_ADDRESS,
                     buyInAmount,
-                    referral ? referral : ZERO_ADDRESS,
+                    referral || ZERO_ADDRESS,
                 ],
             ]);
         }
@@ -87,14 +86,14 @@ export const getTransactionForSpeedAMM = async (
                 [
                     [
                         asset,
-                        strikeTimeSec,
+                        0,
                         deltaTimeSec,
                         strikePrice,
                         strikePriceSlippage,
                         sides[0],
-                        collateralAddress ? collateralAddress : ZERO_ADDRESS,
+                        collateralAddress || ZERO_ADDRESS,
                         buyInAmount,
-                        referral ? referral : ZERO_ADDRESS,
+                        referral || ZERO_ADDRESS,
                         skewImpact,
                     ],
                 ]
@@ -103,14 +102,14 @@ export const getTransactionForSpeedAMM = async (
             txHash = await creatorContractWithSigner.write.addPendingSpeedMarket([
                 [
                     asset,
-                    strikeTimeSec,
+                    0,
                     deltaTimeSec,
                     strikePrice,
                     strikePriceSlippage,
                     sides[0],
-                    collateralAddress ? collateralAddress : ZERO_ADDRESS,
+                    collateralAddress || ZERO_ADDRESS,
                     buyInAmount,
-                    referral ? referral : ZERO_ADDRESS,
+                    referral || ZERO_ADDRESS,
                     skewImpact,
                 ],
             ]);

@@ -29,7 +29,7 @@ export const Input = styled.input<{ fontSize?: string; width?: string; height?: 
     border-radius: 8px;
     outline: 0;
     background: ${(props) => props.theme.input.background.primary};
-    color: ${(props) => props.theme.input.textColor.primary};
+    color: ${(props) => props.theme.input.textColor.secondary};
     font-style: normal;
     font-weight: normal;
     font-size: ${(props) => props.fontSize || '15px'};
@@ -45,7 +45,7 @@ export const Input = styled.input<{ fontSize?: string; width?: string; height?: 
         background: ${(props) => props.theme.input.background.selection.primary};
     }
     &:focus {
-        color: ${(props) => props.theme.input.textColor.primary};
+        color: ${(props) => props.theme.input.textColor.secondary};
         border: 2px solid ${(props) => props.theme.input.borderColor.focus.primary};
         box-sizing: border-box;
     }

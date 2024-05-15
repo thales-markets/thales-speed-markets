@@ -46,7 +46,7 @@ const SelectTime: React.FC<SelectTimeProps> = ({
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const [showCustomDeltaTime, setShowCustomDeltaTime] = useState(false);
-    const [customDeltaTime, setCustomDeltaTime] = useState<string | number>('');
+    const [customDeltaTime, setCustomDeltaTime] = useState(0);
     const [isDeltaMinutesSelected, setIsDeltaMinutesSelected] = useState(true); // false is when hours is selected
 
     const [errorMessage, setErrorMessage] = useState('');
@@ -85,12 +85,13 @@ const SelectTime: React.FC<SelectTimeProps> = ({
     // Validations
     useEffect(() => {
         if (!isChained) {
-            if (ammSpeedMarketsLimits && customDeltaTime !== '') {
+            if (ammSpeedMarketsLimits && customDeltaTime) {
                 const customDeltaTimeSec = isDeltaMinutesSelected
-                    ? minutesToSeconds(Number(customDeltaTime))
-                    : hoursToSeconds(Number(customDeltaTime));
+                    ? minutesToSeconds(customDeltaTime)
+                    : hoursToSeconds(customDeltaTime);
 
                 if (customDeltaTimeSec < ammSpeedMarketsLimits.minimalTimeToMaturity) {
+                    onDeltaChange(0);
                     const minimalTimeHours = secondsToHours(ammSpeedMarketsLimits?.minimalTimeToMaturity || 0);
                     setErrorMessage(
                         t('speed-markets.errors.min-time', {
@@ -106,6 +107,7 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                     );
                     return;
                 } else if (customDeltaTimeSec > ammSpeedMarketsLimits.maximalTimeToMaturity) {
+                    onDeltaChange(0);
                     setErrorMessage(
                         t('speed-markets.errors.max-time', {
                             maxTime: isDeltaMinutesSelected
@@ -122,11 +124,11 @@ const SelectTime: React.FC<SelectTimeProps> = ({
 
             setErrorMessage('');
         }
-    }, [ammSpeedMarketsLimits, customDeltaTime, isDeltaMinutesSelected, t, isChained]);
+    }, [ammSpeedMarketsLimits, customDeltaTime, isDeltaMinutesSelected, t, isChained, onDeltaChange]);
 
     const resetData = useCallback(() => {
         setIsDeltaMinutesSelected(!!deltaTimesMinutes.length);
-        setCustomDeltaTime('');
+        setCustomDeltaTime(0);
         onDeltaChange(0);
     }, [onDeltaChange, deltaTimesMinutes]);
 
@@ -147,7 +149,7 @@ const SelectTime: React.FC<SelectTimeProps> = ({
         onDeltaChange(deltaHours ? hoursToSeconds(deltaHours) : minutesToSeconds(deltaMinutes));
     };
 
-    const onDeltaTimeInputChange = (value: number | string) => {
+    const onDeltaTimeInputChange = (value: number) => {
         setCustomDeltaTime(value);
         onDeltaChange(isDeltaMinutesSelected ? minutesToSeconds(Number(value)) : hoursToSeconds(Number(value)));
     };
@@ -155,14 +157,14 @@ const SelectTime: React.FC<SelectTimeProps> = ({
     const onMinutesButtonClikHandler = () => {
         if (!isDeltaMinutesSelected) {
             setIsDeltaMinutesSelected(true);
-            onDeltaChange(minutesToSeconds(Number(customDeltaTime)));
+            onDeltaChange(minutesToSeconds(customDeltaTime));
         }
     };
 
     const onHoursButtonClikHandler = () => {
         if (isDeltaMinutesSelected) {
             setIsDeltaMinutesSelected(false);
-            onDeltaChange(hoursToSeconds(Number(customDeltaTime)));
+            onDeltaChange(hoursToSeconds(customDeltaTime));
         }
     };
 
@@ -214,11 +216,11 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                             <Row>
                                 <InputWrapper>
                                     <NumericInput
-                                        value={customDeltaTime}
+                                        value={customDeltaTime || ''}
                                         placeholder={
                                             isDeltaMinutesSelected ? t('common.enter-minutes') : t('common.enter-hours')
                                         }
-                                        onChange={(_, value) => onDeltaTimeInputChange(value)}
+                                        onChange={(_, value) => onDeltaTimeInputChange(Number(value))}
                                         showValidation={!!errorMessage}
                                         validationMessage={errorMessage}
                                         margin="0"

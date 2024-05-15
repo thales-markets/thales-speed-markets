@@ -55,7 +55,6 @@ const SpeedMarkets: React.FC = () => {
     const [positionType, setPositionType] = useState<SelectedPosition>(undefined);
     const [chainedPositions, setChainedPositions] = useState<SelectedPosition[]>([undefined, undefined]);
     const [deltaTimeSec, setDeltaTimeSec] = useState(0);
-    const [strikeTimeSec, setStrikeTimeSec] = useState(0);
     const [selectedStableBuyinAmount, setSelectedStableBuyinAmount] = useState(0);
     const [isResetTriggered, setIsResetTriggered] = useState(false);
     const [skew, setSkew] = useState({ [Positions.UP]: 0, [Positions.DOWN]: 0 });
@@ -130,7 +129,6 @@ const SpeedMarkets: React.FC = () => {
             setChainedPositions(Array(ammChainedSpeedMarketsLimitsData.minChainedMarkets).fill(undefined));
         }
         setDeltaTimeSec(0);
-        setStrikeTimeSec(0);
         setSelectedStableBuyinAmount(0);
     }, [ammChainedSpeedMarketsLimitsData?.minChainedMarkets]);
 
@@ -195,7 +193,6 @@ const SpeedMarkets: React.FC = () => {
                 )}
                 {isBuyinStep && (
                     <SelectBuyin
-                        value={selectedStableBuyinAmount}
                         onChange={setSelectedStableBuyinAmount}
                         isChained={isChained}
                         chainedPositions={chainedPositions}
@@ -270,7 +267,6 @@ const SpeedMarkets: React.FC = () => {
                         currencyKey={currencyKey}
                         positionType={positionType}
                         chainedPositions={chainedPositions}
-                        strikeTimeSec={strikeTimeSec}
                         deltaTimeSec={deltaTimeSec}
                         selectedStableBuyinAmount={selectedStableBuyinAmount}
                         setSelectedStableBuyinAmount={setSelectedStableBuyinAmount}

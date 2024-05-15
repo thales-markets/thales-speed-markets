@@ -248,7 +248,6 @@
             "min-time": "The minimum time is {{minTime}} {{timeUnit}}",
             "max-time": "The maximum time is {{maxTime}} {{timeUnit}}",
             "out-of-liquidity-direction": "Out of liquidity for direction",
-            "insufficient-balance-fee": "Not enough {{currencyKey}} in wallet for {{fee}} fee",
             "insufficient-balance-wallet": "Get {{currencyKey}} below"
         },
         "user-positions": {

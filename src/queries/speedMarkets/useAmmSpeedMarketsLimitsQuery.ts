@@ -67,6 +67,7 @@ const useAmmSpeedMarketsLimitsQuery = (
                     ]),
                 ]);
 
+                // TODO: can be from 0.x up to 1.x
                 ammSpeedMarketsLimits.minBuyinAmount = Math.ceil(
                     coinFormatter(ammParams.minBuyinAmount, queryConfig.networkId)
                 );

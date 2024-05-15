@@ -13,8 +13,8 @@ import { formatCurrencyWithKey, formatCurrencyWithSign, formatShortDateWithTime 
 import { MarketInfo } from 'types/market';
 import { RootState } from 'types/ui';
 import { getDefaultCollateral } from 'utils/currency';
-import { ColumnSpaceBetween, Text, TextLabel, TextValue } from './styled-components';
 import { useChainId } from 'wagmi';
+import { ColumnSpaceBetween, Text, TextLabel, TextValue } from './styled-components';
 
 type SpeedMarketsTrade = {
     address: string;
@@ -25,7 +25,6 @@ type SpeedMarketsTrade = {
 
 type TradingDetailsSentenceProps = {
     currencyKey: string;
-    maturityDate: number;
     market: MarketInfo | SpeedMarketsTrade;
     isFetchingQuote: boolean;
     profit: number | string;
@@ -36,7 +35,6 @@ type TradingDetailsSentenceProps = {
 
 const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
     currencyKey,
-    maturityDate,
     market,
     isFetchingQuote,
     profit,
@@ -60,12 +58,7 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
     // Refresh datetime on every minute change
     useInterval(() => {
         if (deltaTimeSec) {
-            const currentMinute = new Date().getMinutes();
-            const maturityMinute = new Date(maturityDate).getMinutes() - secondsToMinutes(deltaTimeSec);
-
-            if (currentMinute !== maturityMinute) {
-                setDateFromDelta(Date.now() + secondsToMilliseconds(deltaTimeSec));
-            }
+            setDateFromDelta(Date.now() + secondsToMilliseconds(deltaTimeSec));
         }
     }, secondsToMilliseconds(5));
 
@@ -99,8 +92,6 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
 
     const timeFormatted = deltaTimeSec
         ? `${deltaTimeFormatted} ${fullDateFromDeltaTimeFormatted}`
-        : maturityDate
-        ? formatShortDateWithTime(maturityDate)
         : `( ${t('speed-markets.amm-trading.choose-time')} )`;
 
     const getChainedPositions = () =>
