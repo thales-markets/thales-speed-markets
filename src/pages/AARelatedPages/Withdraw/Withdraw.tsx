@@ -146,7 +146,7 @@ const Withdraw: React.FC<DepositProps> = ({ isOpen, onClose }) => {
                         <div>
                             <InputLabel>
                                 {t('withdraw.address-input-label', {
-                                    token: selectedToken,
+                                    token: getCollaterals(networkId)[selectedToken],
                                     network: getNetworkNameByNetworkId(networkId),
                                 })}
                             </InputLabel>

@@ -75,7 +75,6 @@ export const WarningContainer = styled(FlexDiv)`
     padding: 12px 8px;
     align-items: center;
     font-weight: 400;
-    text-transform: capitalize;
     font-size: 18px;
     border-radius: 5px;
     margin-top: 4px;
@@ -88,6 +87,7 @@ export const WarningIcon = styled.i`
     padding-right: 12px;
     padding-left: 5px;
     color: ${(props) => props.theme.background.primary};
+    text-transform: uppercase;
 `;
 
 export const SectionLabel = styled.p`
