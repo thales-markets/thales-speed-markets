@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { FlexDivColumn } from 'styles/common';
 
 export const Text = styled.span`
-    font-family: ${(props) => props.theme.fontFamily.tertiary};
+    font-family: ${(props) => props.theme.fontFamily.primary};
     font-weight: 400;
     font-size: 18px;
     line-height: 130%;

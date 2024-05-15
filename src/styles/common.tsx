@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+export const PAGE_MAX_WIDTH = '1150px';
+
 export const FlexDiv = styled.div`
     display: flex;
     outline: none !important;

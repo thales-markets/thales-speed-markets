@@ -329,7 +329,7 @@ const AddressContainer = styled.div`
 `;
 
 const Address = styled.span`
-    font-family: ${(props) => props.theme.fontFamily.tertiary};
+    font-family: ${(props) => props.theme.fontFamily.primary};
     font-size: 14px;
     font-style: normal;
     font-weight: 800;

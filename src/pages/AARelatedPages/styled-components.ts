@@ -67,24 +67,11 @@ export const InputContainer = styled(FlexDiv)`
     width: 100%;
 `;
 
-export const CollateralContainer = styled.div`
-    position: relative;
-    width: 100%;
-    margin-left: auto;
-    border-radius: 8px;
-    border: 2px solid ${(props) => props.theme.background.secondary};
-    padding: 8px 0;
-    max-height: 40px;
-    align-items: center;
-    background: ${(props) => props.theme.input.background.primary};
-    cursor: pointer;
-`;
-
 export const WarningContainer = styled(FlexDiv)`
     width: 100%;
     background-color: ${(props) => props.theme.background.quinary};
     color: ${(props) => props.theme.background.primary};
-    font-family: ${(props) => props.theme.fontFamily.tertiary};
+    font-family: ${(props) => props.theme.fontFamily.primary};
     padding: 5px;
     align-items: center;
     font-weight: 400;

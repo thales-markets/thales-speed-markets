@@ -1,24 +1,23 @@
 import Button from 'components/Button';
-import ROUTES from 'constants/routes';
+import ConnectWalletModal from 'components/ConnectWalletModal';
+import NetworkSwitch from 'components/NetworkSwitch';
 import { ScreenSizeBreakpoint } from 'enums/ui';
+import Deposit from 'pages/AARelatedPages/Deposit';
+import GetStarted from 'pages/AARelatedPages/GetStarted';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
-import styled from 'styled-components';
-import { RootState } from 'types/ui';
 import { getIsMobile } from 'redux/modules/ui';
-import { FlexDivRow, FlexDivRowCentered } from 'styles/common';
+import { getWalletConnectModalVisibility, setWalletConnectModalVisibility } from 'redux/modules/wallet';
+import styled from 'styled-components';
+import { FlexDivRow, FlexDivRowCentered, PAGE_MAX_WIDTH } from 'styles/common';
+import { RootState } from 'types/ui';
+import { useAccount } from 'wagmi';
 import Logo from '../components/Logo';
 import Notifications from '../components/Notifications';
 import ReferralModal from '../components/ReferralModal';
-import UserWallet from '../components/UserWallet';
-import NetworkSwitch from 'components/NetworkSwitch';
-import { useAccount } from 'wagmi';
-import GetStarted from 'pages/AARelatedPages/GetStarted';
-import { getWalletConnectModalVisibility, setWalletConnectModalVisibility } from 'redux/modules/wallet';
-import Deposit from 'pages/AARelatedPages/Deposit';
-import ConnectWalletModal from 'components/ConnectWalletModal';
 import UserInfo from '../components/UserInfo';
+import UserWallet from '../components/UserWallet';
 
 const DappHeader: React.FC = () => {
     const { t } = useTranslation();
@@ -34,7 +33,7 @@ const DappHeader: React.FC = () => {
     const [userInfoOpen, setUserInfoOpen] = useState(false);
 
     return (
-        <Container $maxWidth={getMaxWidth()}>
+        <Container>
             <LeftContainer>
                 <FlexDivRow>
                     {isMobile && <Icon className="sidebar-icon icon--nav-menu" onClick={sidebarMenuClickHandler} />}
@@ -118,19 +117,9 @@ const sidebarMenuClickHandler = () => {
     }
 };
 
-const getMaxWidth = () => {
-    if (location.pathname === ROUTES.Markets.Profile) {
-        return '974px';
-    }
-    if ([ROUTES.Markets.SpeedMarkets, ROUTES.Home].includes(location.pathname)) {
-        return '1080px';
-    }
-    return '1440px';
-};
-
-const Container = styled(FlexDivRowCentered)<{ $maxWidth: string }>`
+const Container = styled(FlexDivRowCentered)`
     width: 100%;
-    max-width: ${(props) => props.$maxWidth};
+    max-width: ${PAGE_MAX_WIDTH};
     margin-left: auto;
     margin-right: auto;
     max-height: 40px;

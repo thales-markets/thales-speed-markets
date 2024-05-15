@@ -22,12 +22,13 @@ import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { getIsAppReady } from 'redux/modules/app';
 import styled from 'styled-components';
-import { BoldText } from 'styles/common';
+import { BoldText, PAGE_MAX_WIDTH } from 'styles/common';
 import { roundNumberToDecimals } from 'thales-utils';
 import { RootState } from 'types/ui';
 import { getSupportedNetworksByRoute } from 'utils/network';
 import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAssetsAsObject } from 'utils/pyth';
 import { buildHref } from 'utils/routes';
+import { useAccount, useChainId, useClient } from 'wagmi';
 import AmmSpeedTrading from './components/AmmSpeedTrading';
 import ClosedPositions from './components/ClosedPositions';
 import SelectAsset from './components/SelectAsset';
@@ -35,8 +36,6 @@ import SelectBuyin from './components/SelectBuyin';
 import SelectPosition from './components/SelectPosition';
 import { SelectedPosition } from './components/SelectPosition/SelectPosition';
 import SelectTime from './components/SelectTime';
-import { useChainId, useClient } from 'wagmi';
-import { useAccount } from 'wagmi';
 
 const SpeedMarkets: React.FC = () => {
     const { t } = useTranslation();
@@ -319,7 +318,7 @@ const getTimeStampForDelta = (seconds: number) => {
 
 const Container = styled.div`
     width: 100%;
-    max-width: 1080px;
+    max-width: ${PAGE_MAX_WIDTH};
     min-height: 799px;
 `;
 
@@ -327,7 +326,7 @@ const HeaderImage = styled.div`
     height: 120px;
     background-image: url(${banner});
     background-position: center;
-    border: 2px solid ${(props) => props.theme.borderColor.secondary};
+    border: 1px solid ${(props) => props.theme.borderColor.secondary};
     border-radius: 11px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         display: none;
@@ -351,7 +350,7 @@ const ContentWrapper = styled.div`
 const LeftSide = styled.div`
     height: 100%;
     width: 100%;
-    max-width: 640px;
+    max-width: 780px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         max-width: initial;
     }

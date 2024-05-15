@@ -16,23 +16,7 @@ export const SUPPORTED_NETWORKS: Record<SupportedNetwork, string> = {
     [NetworkId.BlastSepolia]: 'BLAST-SEPOLIA',
 };
 
-const SUPPORTED_NETWORKS_NAMES: Record<SupportedNetwork, string> = {
-    [NetworkId.OptimismMainnet]: 'OPTIMISM MAINNET',
-    [NetworkId.PolygonMainnet]: 'POLYGON',
-    [NetworkId.OptimismSepolia]: 'OPTIMISM SEPOLIA',
-    [NetworkId.Arbitrum]: 'ARBITRUM ONE',
-    [NetworkId.Base]: 'BASE',
-    [NetworkId.ZkSync]: 'ZKSYNC',
-    [NetworkId.ZkSyncSepolia]: 'ZKSYNC SEPOLIA',
-    [NetworkId.BlastSepolia]: 'BLAST SEPOLIA',
-};
-
 export const TEST_NETWORKS = [NetworkId.OptimismSepolia, NetworkId.ZkSyncSepolia, NetworkId.BlastSepolia];
-
-export const DEFAULT_NETWORK: { name: string; networkId: SupportedNetwork } = {
-    name: SUPPORTED_NETWORKS_NAMES[NetworkId.OptimismMainnet],
-    networkId: NetworkId.OptimismMainnet,
-};
 
 export const SUPPORTED_NETWORKS_PARAMS: Record<number, NetworkParams> = {
     [NetworkId.OptimismMainnet]: {

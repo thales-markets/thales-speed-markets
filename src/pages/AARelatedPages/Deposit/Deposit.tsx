@@ -301,7 +301,7 @@ const CopyButton = styled(FlexDiv)`
     justify-content: center;
     color: ${(props) => props.theme.button.textColor.primary};
     background-color: ${(props) => props.theme.button.background.primary};
-    font-family: ${(props) => props.theme.fontFamily.tertiary};
+    font-family: ${(props) => props.theme.fontFamily.primary};
 `;
 
 export default Deposit;

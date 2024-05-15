@@ -24,7 +24,7 @@ export const Header = styled(FlexDivColumn)`
 `;
 
 export const HeaderText = styled.span`
-    font-family: ${(props) => props.theme.fontFamily.tertiary};
+    font-family: ${(props) => props.theme.fontFamily.primary};
     font-size: 14px;
     font-style: normal;
     font-weight: 700;
@@ -40,14 +40,8 @@ export const HeaderSubText = styled(HeaderText)`
     text-transform: none;
 `;
 
-export const Roi = styled.span`
-    color: ${(props) => props.theme.textColor.primary};
-    font-size: 18px;
-    font-weight: 600;
-    line-height: 20px;
-`;
 export const ClearAll = styled(FlexDivCentered)<{ isDisabled?: boolean }>`
-    font-family: ${(props) => props.theme.fontFamily.tertiary};
+    font-family: ${(props) => props.theme.fontFamily.primary};
     color: ${(props) => props.theme.warning.textColor.primary};
 
     font-size: 12px;
@@ -89,7 +83,7 @@ export const PositionWrapper = styled(FlexDivCentered)<{ $isSelected?: boolean }
     align-items: center;
     justify-content: start;
     gap: 15px;
-    font-family: ${(props) => props.theme.fontFamily.tertiary};
+    font-family: ${(props) => props.theme.fontFamily.primary};
     font-size: 18px;
     font-style: normal;
     font-weight: 800;
@@ -150,42 +144,6 @@ export const AssetIcon = styled(Icon)`
     }
 `;
 
-const Label = styled.span`
-    font-size: 18px;
-    font-weight: 700;
-    line-height: 100%;
-    text-transform: capitalize;
-`;
-
-export const LabelUp = styled(Label)<{ $isSelected?: boolean; isColumn?: boolean }>`
-    color: ${(props) =>
-        props.$isSelected === undefined
-            ? props.theme.textColor.primary
-            : props.$isSelected
-            ? props.theme.positionColor.up
-            : props.theme.borderColor.primary};
-    ${(props) => (props.isColumn ? 'margin-bottom: 2px;' : 'margin-right: 7px;')}
-`;
-
-export const LabelDown = styled(Label)<{ $isSelected?: boolean; $isColumn?: boolean }>`
-    color: ${(props) =>
-        props.$isSelected === undefined
-            ? props.theme.textColor.primary
-            : props.$isSelected
-            ? props.theme.positionColor.down
-            : props.theme.borderColor.primary};
-    ${(props) => (props.$isColumn ? 'margin-top: 2px;' : 'margin-left: 7px;')}
-`;
-
-export const Separator = styled.div`
-    position: relative;
-    background: ${(props) => props.theme.borderColor.primary};
-    width: 3px;
-    height: 36px;
-    border-radius: 6px;
-    margin: 0 14px;
-`;
-
 export const Skew = styled.div<{ $isDiscount?: boolean }>`
     display: none; // TODO: remove
     position: absolute;
@@ -202,20 +160,4 @@ export const Skew = styled.div<{ $isDiscount?: boolean }>`
     font-weight: 700;
     white-space: nowrap;
 }
-`;
-
-export const TooltipWrapper = styled.div`
-    position: absolute;
-    bottom: -22px;
-    right: -7px;
-`;
-
-export const Chain = styled(FlexDivCentered)<{ isSelectedUp?: boolean }>`
-    width: 16px;
-    color: ${(props) =>
-        props.isSelectedUp === undefined
-            ? props.theme.textColor.primary
-            : props.isSelectedUp
-            ? props.theme.positionColor.up
-            : props.theme.positionColor.down};
 `;

@@ -106,7 +106,7 @@ const DescriptionWrapper = styled(FlexDivRow)`
 `;
 
 const Description = styled.p`
-    font-family: ${(props) => props.theme.fontFamily.tertiary};
+    font-family: ${(props) => props.theme.fontFamily.primary};
     font-size: 13px;
     line-height: 100%;
     font-weight: 400;

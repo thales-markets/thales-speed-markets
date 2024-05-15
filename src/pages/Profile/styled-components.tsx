@@ -1,10 +1,10 @@
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import styled from 'styled-components';
-import { FlexDivCentered, FlexDivColumn, FlexDivRow } from 'styles/common';
+import { FlexDivCentered, FlexDivColumn, FlexDivRow, PAGE_MAX_WIDTH } from 'styles/common';
 
 export const Container = styled(FlexDivColumn)`
     width: 100%;
-    max-width: 974px;
+    max-width: ${PAGE_MAX_WIDTH};
 `;
 
 export const Header = styled(FlexDivRow)`

@@ -2,9 +2,8 @@ import { Colors } from '../common';
 
 export default {
     fontFamily: {
-        primary: "'Fira Sans' !important",
+        primary: "'Karla' !important",
         secondary: "'Montserrat' !important",
-        tertiary: "'Karla' !important",
     },
     background: {
         primary: Colors.BLACK,
@@ -145,8 +144,8 @@ export default {
         },
     },
     positionColor: {
-        up: Colors.PURPLE,
-        down: Colors.PURPLE,
+        up: Colors.GREEN,
+        down: Colors.RED,
     },
     toastMessages: {
         success: {

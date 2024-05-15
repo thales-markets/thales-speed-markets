@@ -13,12 +13,13 @@ type ButtonProps = {
     borderColor?: string;
     borderRadius?: string;
     borderWidth?: string;
-    onClick?: () => void;
+    fontFamily?: string;
     fontSize?: string;
     fontWeight?: number;
     disabled?: boolean;
     additionalStyles?: CSSProperties;
     children?: any;
+    onClick?: () => void;
 };
 
 const Button: React.FC<ButtonProps> = ({
@@ -26,18 +27,19 @@ const Button: React.FC<ButtonProps> = ({
     minWidth,
     height,
     padding,
+    margin,
     textColor,
     backgroundColor,
     borderColor,
     borderRadius,
     borderWidth,
-    margin,
-    onClick,
     disabled,
     additionalStyles,
+    fontFamily,
     fontSize,
     fontWeight,
     children,
+    onClick,
 }) => {
     return (
         <Container
@@ -60,11 +62,12 @@ const Button: React.FC<ButtonProps> = ({
                 $backgroundColor={backgroundColor}
                 $borderRadius={borderRadius}
                 $borderWidth={borderWidth}
-                onClick={onClick}
                 disabled={disabled}
+                $fontFamily={fontFamily}
                 $fontSize={fontSize}
                 $fontWeight={fontWeight}
                 style={additionalStyles}
+                onClick={onClick}
             >
                 {children}
             </ButtonWrapper>
@@ -111,10 +114,11 @@ const ButtonWrapper = styled.button<{
     minWidth?: string;
     height?: string;
     padding?: string;
+    $backgroundColor?: string;
+    $textColor?: string;
     $borderRadius?: string;
     $borderWidth?: string;
-    $textColor?: string;
-    $backgroundColor?: string;
+    $fontFamily?: string;
     $fontSize?: string;
     $fontWeight?: number;
     disabled?: boolean;
@@ -137,7 +141,7 @@ const ButtonWrapper = styled.button<{
     border-width: 0;
     font-weight: ${(props) => props.$fontWeight || '700'};
     font-size: ${(props) => props.$fontSize || '18px'};
-    font-family: ${(props) => props.theme.fontFamily.secondary};
+    font-family: ${(props) => props.$fontFamily || props.theme.fontFamily.primary};
     line-height: 100%;
     cursor: pointer;
     color: ${(props) => props.$textColor || props.theme.button.textColor.primary};

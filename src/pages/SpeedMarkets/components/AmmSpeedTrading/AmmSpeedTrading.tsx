@@ -370,7 +370,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         setSkewImpact(skewImpact);
     }, [skewImpact, setSkewImpact]);
 
-    // Input field validations
+    // Input field validations TODO: move to SelectBuyin
     useEffect(() => {
         let messageKey = '';
 
@@ -870,7 +870,7 @@ const Container = styled(FlexDivRow)`
 
 const TradingDetailsContainer = styled(FlexDivRowCentered)`
     position: relative;
-    width: 640px;
+    width: 780px;
     height: 100%;
     background: ${(props) => props.theme.background.primary};
     border-radius: 8px;
@@ -924,7 +924,7 @@ const QuoteContainer = styled.div`
 `;
 
 const QuoteLabel = styled.span`
-    font-family: ${(props) => props.theme.fontFamily.tertiary};
+    font-family: ${(props) => props.theme.fontFamily.primary};
     font-size: 18px;
     font-style: normal;
     font-weight: 800;
@@ -933,7 +933,7 @@ const QuoteLabel = styled.span`
 `;
 
 const QuoteText = styled.span`
-    font-family: ${(props) => props.theme.fontFamily.tertiary};
+    font-family: ${(props) => props.theme.fontFamily.primary};
     font-size: 30px;
     font-style: normal;
     font-weight: 800;

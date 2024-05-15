@@ -62,7 +62,7 @@ const Container = styled.div`
     border-radius: 8px;
     border: 2px solid ${(props) => props.theme.background.secondary};
     color: ${(props) => props.theme.textColor.primary};
-    font-family: ${(props) => props.theme.fontFamily.tertiary};
+    font-family: ${(props) => props.theme.fontFamily.primary};
     position: relative;
     max-height: 40px;
     cursor: pointer;
@@ -104,7 +104,7 @@ const Arrow = styled.i`
 
 const CollateralName = styled.span`
     cursor: pointer;
-    font-family: ${(props) => props.theme.fontFamily.tertiary};
+    font-family: ${(props) => props.theme.fontFamily.primary};
 `;
 
 export default CollateralDropdown;
