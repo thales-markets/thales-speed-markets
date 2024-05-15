@@ -2,7 +2,6 @@ import { ChartContext } from 'constants/chart';
 import { ISeriesApi } from 'lightweight-charts';
 import { useContext, useEffect, useState } from 'react';
 import { useTheme } from 'styled-components';
-import { Colors } from 'styles/common';
 import { ThemeInterface } from 'types/ui';
 import { timeToLocal } from 'utils/formatters/date';
 
@@ -13,13 +12,14 @@ export const CandlestickComponent: React.FC<{ data: any; asset: string }> = ({ d
 
     useEffect(() => {
         const series = chart?.addCandlestickSeries({
-            upColor: Colors.GREEN,
-            downColor: Colors.RED,
+            upColor: theme.chart.candleUp,
+            downColor: theme.chart.candleDown,
             wickVisible: true,
-            wickUpColor: Colors.GREEN,
-            wickDownColor: Colors.RED,
-            priceLineColor: theme.background.quaternary,
+            wickUpColor: theme.chart.candleUp,
+            wickDownColor: theme.chart.candleDown,
+            priceLineColor: theme.chart.priceLine,
             priceLineWidth: 1,
+            borderColor: 'transparent',
             lastValueVisible: true,
         });
         setSeries(series);

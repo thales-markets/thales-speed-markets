@@ -30,7 +30,6 @@ type LightweightChartProps = {
     position: Positions | undefined;
     selectedPrice?: number;
     selectedDate?: number;
-    selectedRightPrice?: number;
     explicitCurrentPrice?: number;
     prevExplicitPrice?: number;
     chainedRisk?: Risk;
@@ -53,7 +52,6 @@ const SPEED_DEFAULT_TOGGLE_BUTTON_INDEX = 0;
 const LightweightChart: React.FC<LightweightChartProps> = ({
     asset,
     selectedPrice,
-    selectedRightPrice,
     position,
     selectedDate,
     explicitCurrentPrice,
@@ -214,7 +212,6 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
                         position={position}
                         asset={asset}
                         selectedPrice={selectedPrice}
-                        selectedRightPrice={selectedRightPrice}
                         selectedDate={selectedDate}
                     />
                 )}

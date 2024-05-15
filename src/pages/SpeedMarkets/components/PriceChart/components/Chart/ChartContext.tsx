@@ -19,7 +19,6 @@ type ChartProps = {
     position: Positions | undefined;
     asset: string;
     selectedPrice?: number;
-    selectedRightPrice?: number;
     selectedDate?: number;
     resolution?: string;
 };
@@ -33,7 +32,6 @@ export const ChartComponent: React.FC<ChartProps> = ({
     position,
     asset,
     selectedPrice,
-    selectedRightPrice,
     selectedDate,
     resolution,
 }) => {
@@ -46,7 +44,8 @@ export const ChartComponent: React.FC<ChartProps> = ({
         const chart = createChart(chartContainerRef.current ?? '', {
             layout: {
                 background: { type: ColorType.Solid, color: theme.background.primary },
-                textColor: theme.textColor.secondary,
+                textColor: theme.chart.labels,
+                fontFamily: theme.fontFamily.primary,
             },
             height: 285,
             grid: {
@@ -60,10 +59,10 @@ export const ChartComponent: React.FC<ChartProps> = ({
                 },
             },
             timeScale: {
-                rightOffset: 1,
+                rightOffset: 3,
                 timeVisible: true,
                 fixLeftEdge: true,
-                barSpacing: 7.5,
+                barSpacing: 10,
             },
         });
         setChart(chart);
@@ -88,7 +87,6 @@ export const ChartComponent: React.FC<ChartProps> = ({
                             data={data}
                             position={position}
                             selectedPrice={selectedPrice}
-                            selectedRightPrice={selectedRightPrice}
                             selectedDate={selectedDate}
                         />
 

@@ -7,8 +7,8 @@ import { useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsBiconomy } from 'redux/modules/wallet';
-import { Colors } from 'styles/common';
-import { RootState } from 'types/ui';
+import { useTheme } from 'styled-components';
+import { RootState, ThemeInterface } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
 import { timeToLocal } from 'utils/formatters/date';
 import { useAccount, useChainId, useClient } from 'wagmi';
@@ -18,6 +18,7 @@ export const UserPositionAreaSeries: React.FC<{
     candlestickData: any;
 }> = ({ asset, candlestickData }) => {
     const chart = useContext(ChartContext);
+    const theme: ThemeInterface = useTheme();
     const [series, setSeries] = useState<ISeriesApi<'Area'> | undefined>();
     const networkId = useChainId();
     const client = useClient();
@@ -204,10 +205,10 @@ export const UserPositionAreaSeries: React.FC<{
                         size: 0.1,
                         color:
                             value.shape === 'square'
-                                ? Colors.PURPLE // TODO: move to theme
+                                ? theme.chart.multiPositions
                                 : value.position.side === Positions.UP
-                                ? Colors.GREEN
-                                : Colors.RED,
+                                ? theme.chart.candleUp
+                                : theme.chart.candleDown,
                         shape: value.shape,
                         text: value.shape === 'square' ? 'Multi positions' : value.position.side,
                     };
@@ -218,7 +219,7 @@ export const UserPositionAreaSeries: React.FC<{
             series?.setMarkers([]);
             series?.setData([]);
         }
-    }, [userData, series]);
+    }, [userData, series, theme]);
 
     return <></>;
 };

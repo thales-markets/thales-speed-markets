@@ -195,4 +195,21 @@ export default {
         resolved: Colors.YELLOW_DARK,
         text: Colors.GRAY_BLUE,
     },
+    chart: {
+        candleUp: Colors.GREEN,
+        candleDown: Colors.RED,
+        labels: Colors.GRAY_BLUE,
+        priceLine: Colors.BLUE_SKY,
+        multiPositions: Colors.PURPLE,
+        area: {
+            up: {
+                start: Colors.GREEN_DARK_START,
+                end: Colors.GREEN_DARK_END,
+            },
+            down: {
+                start: Colors.RED_START,
+                end: Colors.RED_END,
+            },
+        },
+    },
 };

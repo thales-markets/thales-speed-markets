@@ -244,7 +244,6 @@ const SpeedMarkets: React.FC = () => {
                                 }
                                 selectedDate={getTimeStampForDelta(deltaTimeSec)}
                                 deltaTimeSec={deltaTimeSec}
-                                selectedRightPrice={undefined}
                                 explicitCurrentPrice={currentPrices[currencyKey]}
                                 prevExplicitPrice={prevPrice.current}
                                 chainedRisk={isChained ? ammChainedSpeedMarketsLimitsData?.risk : undefined}

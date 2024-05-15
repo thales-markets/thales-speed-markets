@@ -58,7 +58,7 @@ export const Colors = {
 
     WHITE: '#FFFFFF',
 
-    GREEN: '#03DAC5',
+    GREEN: '#00DA3C',
     GREEN_LIGHT: '#B0FFE7',
     GREEN_DARK: '#1D976C',
     GREEN_DARK_START: 'rgb(76, 211, 163, 0.4)',
@@ -75,11 +75,11 @@ export const Colors = {
     BLUE_DARK: '#1043B4',
     BLUE_MIDNIGHT: '#052040',
     BLUE_MIDNIGHT_LIGHT: '#1b314f',
-    BLUE_SKY: '#91bced',
+    BLUE_SKY: '#5FB9C6',
     BLUE_DEEP_SKY: '#169CD2',
     BLUE_DEEP_SKY_2: '#1D7DC0',
 
-    RED: '#DE496D',
+    RED: '#EC0000',
     RED_LIGHT: '#E29587',
     RED_DARK: '#D66D75',
     RED_START: 'rgb(109, 18, 40, 0.4)',
