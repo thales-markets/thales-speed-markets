@@ -21,10 +21,10 @@ export const Wrapper = styled(FlexDiv)`
 export const FormContainer = styled(FlexDiv)`
     flex-direction: column;
     align-items: stretch;
-    justify-content: space-between;
+    justify-content: flex-start;
+    gap: 18px;
     height: 100%;
     width: 100%;
-    height: 527px;
     @media (max-width: 600px) {
         width: 100%;
     }
@@ -46,8 +46,8 @@ export const PrimaryHeading = styled.h1`
     font-weight: 800;
     text-transform: uppercase;
     line-height: 20px;
-    margin-bottom: 21px;
     color: ${(props) => props.theme.textColor.primary};
+    text-align: center;
 `;
 
 export const InputLabel = styled.p<{ marginTop?: string }>`
@@ -72,13 +72,13 @@ export const WarningContainer = styled(FlexDiv)`
     background-color: ${(props) => props.theme.background.quinary};
     color: ${(props) => props.theme.background.primary};
     font-family: ${(props) => props.theme.fontFamily.primary};
-    padding: 5px;
+    padding: 12px 8px;
     align-items: center;
     font-weight: 400;
     text-transform: capitalize;
     font-size: 18px;
     border-radius: 5px;
-    margin-top: 12px;
+    margin-top: 4px;
     @media (max-width: 600px) {
         font-size: 12px;
     }

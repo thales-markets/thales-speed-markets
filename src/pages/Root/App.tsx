@@ -35,7 +35,6 @@ import {
     particleAuth,
     SocialAuthType,
 } from '@particle-network/auth-core';
-import Withdraw from 'pages/AARelatedPages/Withdraw';
 
 const App = () => {
     const dispatch = useDispatch();
@@ -171,14 +170,6 @@ const App = () => {
                             </Suspense>
                         </Route>
                     )}
-
-                    <Route exact path={ROUTES.Withdraw}>
-                        <Suspense fallback={<Loader />}>
-                            <DappLayout>
-                                <Withdraw />
-                            </DappLayout>
-                        </Suspense>
-                    </Route>
 
                     {getSupportedNetworksByRoute(ROUTES.Home).includes(networkId) && (
                         <Route exact path={ROUTES.Home}>
