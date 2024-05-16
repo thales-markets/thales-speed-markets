@@ -76,6 +76,7 @@ const DappHeader: React.FC = () => {
                 {isConnected && (
                     <>
                         <UserWallet />
+                        {!isMobile && <Notifications />}
                         <HeaderIcons
                             onClick={() => setOpenUserInfo(!openUserInfo)}
                             className={`network-icon network-icon--burger`}
@@ -83,7 +84,6 @@ const DappHeader: React.FC = () => {
                     </>
                 )}
 
-                {!isMobile && <Notifications />}
                 {openUserInfo && <UserInfo setUserInfoOpen={setOpenUserInfo} setOpenWithdraw={setOpenWithdraw} />}
             </RightContainer>
             {openReferralModal && <ReferralModal onClose={() => setOpenReferralModal(false)} />}
