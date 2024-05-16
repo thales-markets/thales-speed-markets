@@ -86,7 +86,7 @@ export const wagmiConfig = createConfig({
             http(RPC_LIST.INFURA[NetworkId.Arbitrum]),
             http(),
         ]),
-        [base.id]: fallback([http(RPC_LIST.ANKR[NetworkId.Base]), http()]),
+        [base.id]: fallback([http(RPC_LIST.CHAINNODE[NetworkId.Base]), http(RPC_LIST.ANKR[NetworkId.Base]), http()]),
         [polygon.id]: fallback([
             http(RPC_LIST.CHAINNODE[NetworkId.PolygonMainnet]),
             http(RPC_LIST.INFURA[NetworkId.PolygonMainnet]),
