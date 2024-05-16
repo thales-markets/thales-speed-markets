@@ -1,9 +1,8 @@
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import ReactTooltip from 'rc-tooltip';
-import React, { CSSProperties } from 'react';
-import styled, { useTheme } from 'styled-components';
+import React from 'react';
+import styled from 'styled-components';
 import 'styles/tooltip.css';
-import { ThemeInterface } from 'types/ui';
 
 type TooltipProps = {
     overlay: any;
@@ -11,20 +10,34 @@ type TooltipProps = {
 };
 
 const Tooltip: React.FC<TooltipProps> = ({ overlay, children }) => {
-    const theme: ThemeInterface = useTheme();
-
-    const toolipInnerStyle: CSSProperties = {
-        background: theme.background.primary,
-        color: theme.textColor.primary,
-        fontWeight: 700,
-    };
-
     return (
-        <ReactTooltip overlay={overlay} overlayInnerStyle={toolipInnerStyle} placement="top">
+        <ReactTooltip
+            overlay={
+                <Container>
+                    <Content>{overlay}</Content>
+                </Container>
+            }
+            placement="top"
+        >
             {children ? (children as any) : <InfoIcon />}
         </ReactTooltip>
     );
 };
+
+const Container = styled.div`
+    background: ${(props) => props.theme.borderColor.tertiary};
+    border-width: 1px;
+    border-radius: 2px;
+    padding: 1px;
+`;
+
+const Content = styled.div`
+    background: ${(props) => props.theme.background.primary};
+    border-radius: 2px;
+    color: ${(props) => props.theme.textColor.primary};
+    font-weight: 700;
+    padding: 10px;
+`;
 
 const InfoIcon = styled.i`
     position: relative;

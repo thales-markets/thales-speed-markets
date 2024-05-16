@@ -83,7 +83,6 @@
     padding: 0 3px 0 5px;
 }
 .rc-tooltip-inner {
-    padding: 10px 10px;
     font-weight: 400;
     font-size: 13px;
     line-height: 15px;
@@ -105,7 +104,7 @@
 .rc-tooltip-placement-top .rc-tooltip-arrow,
 .rc-tooltip-placement-topLeft .rc-tooltip-arrow,
 .rc-tooltip-placement-topRight .rc-tooltip-arrow {
-    bottom: 0px;
+    bottom: 1px;
     margin-left: -5px;
     border-width: 5px 5px 0;
 }
