@@ -21,8 +21,8 @@ const Toggle: React.FC<ToggleProps> = ({ options, onChange, selectedIndex }) => 
             {options.map(({ label, resolution }, index) => (
                 <Button
                     key={resolution}
-                    width="40px"
-                    height="31px"
+                    width="50px"
+                    height="30px"
                     textColor={
                         index === selectedIndex ? theme.button.textColor.secondary : theme.button.textColor.tertiary
                     }
@@ -50,7 +50,7 @@ const Wrapper = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 12px;
 `;
 
 export default Toggle;

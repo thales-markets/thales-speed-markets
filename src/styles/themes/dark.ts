@@ -178,17 +178,11 @@ export default {
         candleUp: Colors.GREEN,
         candleDown: Colors.RED,
         labels: Colors.GRAY_BLUE,
-        priceLine: Colors.BLUE_SKY,
+        priceLine: Colors.PURPLE,
         multiPositions: Colors.PURPLE,
         area: {
-            up: {
-                start: Colors.GREEN_DARK_START,
-                end: Colors.GREEN_DARK_END,
-            },
-            down: {
-                start: Colors.RED_START,
-                end: Colors.RED_END,
-            },
+            start: Colors.PURPLE_START,
+            end: Colors.PURPLE_END,
         },
     },
 };

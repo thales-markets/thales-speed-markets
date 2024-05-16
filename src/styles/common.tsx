@@ -57,26 +57,21 @@ export const Colors = {
 
     WHITE: '#FFFFFF',
 
-    GREEN: '#00DA3C',
-    GREEN_LIGHT: '#00C149',
+    GREEN: '#8AF6A8',
+    GREEN_LIGHT: '#7DDD97',
     GREEN_DARK: '#00994B',
-    GREEN_DARKER: '#00754D',
-    GREEN_DARK_START: 'rgb(76, 211, 163, 0.4)',
-    GREEN_DARK_END: 'rgb(76, 211, 163, 0)',
+    GREEN_DARKER: '#00A069',
 
     BLACK: '#000000',
 
     BLUE: '#169CD2',
     BLUE_LIGHT: '#06B2E3',
     BLUE_DARK: '#00EEE8',
-    BLUE_SKY: '#5FB9C6',
     BLUE_DEEP_SKY: '#1D7DC0',
 
     RED: '#EC0000',
     RED_LIGHT: '#C40000',
     RED_DARK: '#FF5E3A',
-    RED_START: 'rgb(109, 18, 40, 0.4)',
-    RED_END: 'rgb(222, 73, 109, 0)',
 
     ORANGE: '#E27A93',
     ORANGE_DARK: '#FF8800',
@@ -84,6 +79,8 @@ export const Colors = {
     YELLOW_DARK: '#9b8327',
 
     PURPLE: '#C294F5',
+    PURPLE_START: '#C294F566',
+    PURPLE_END: '#C294F500',
     PURPLE_DARK: '#A764B7',
     PURPLE_DARK_2: '#681483',
 };

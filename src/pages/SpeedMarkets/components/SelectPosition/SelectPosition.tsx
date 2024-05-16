@@ -44,7 +44,7 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
     skew,
 }) => {
     const { t } = useTranslation();
-    const discount = skew[Positions.UP] > 0 ? skew[Positions.UP] / 2 : skew[Positions.DOWN] / 2;
+    const discount = { [Positions.UP]: skew[Positions.DOWN] / 2, [Positions.DOWN]: skew[Positions.UP] / 2 };
     const isClearAllDisabled =
         selected.length === ammChainedSpeedMarketsLimits?.minChainedMarkets && selected.every((p) => p === undefined);
 
@@ -90,12 +90,7 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
                             <Icon className="icon icon--caret-up" />
                             {Positions.UP}
 
-                            {discount > 0 && (
-                                <Skew $isDiscount={skew[Positions.UP] > 0 ? false : discount > 0 ? true : undefined}>
-                                    {skew[Positions.UP] > 0 ? '-' : discount > 0 ? '+' : ''}
-                                    {formatPercentage(skew[Positions.UP] || discount)}
-                                </Skew>
-                            )}
+                            {discount[Positions.UP] > 0 && <Skew>+{formatPercentage(discount[Positions.UP])}</Skew>}
                         </PositionWrapper>
 
                         <PositionWrapper
@@ -104,12 +99,8 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
                         >
                             <Icon className="icon icon--caret-down" />
                             {Positions.DOWN}
-                            {discount > 0 && (
-                                <Skew $isDiscount={skew[Positions.DOWN] > 0 ? false : discount > 0 ? true : undefined}>
-                                    {skew[Positions.DOWN] > 0 ? '-' : discount > 0 ? '+' : ''}
-                                    {formatPercentage(skew[Positions.DOWN] || discount)}
-                                </Skew>
-                            )}
+
+                            {discount[Positions.DOWN] > 0 && <Skew>+{formatPercentage(discount[Positions.DOWN])}</Skew>}
                         </PositionWrapper>
                         <PlusMinusIcon
                             className="network-icon network-icon--plus"
