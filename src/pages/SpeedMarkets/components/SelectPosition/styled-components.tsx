@@ -144,18 +144,12 @@ export const AssetIcon = styled(Icon)`
     }
 `;
 
-export const Skew = styled.div<{ $isDiscount?: boolean }>`
-    display: none; // TODO: remove
+export const Skew = styled.div`
     position: absolute;
     top: -10px;
+    right: 0;
     background-color: ${(props) => props.theme.background.primary};
-    left: 0;
-    color: ${(props) =>
-        props.$isDiscount === undefined
-            ? props.theme.textColor.secondary
-            : props.$isDiscount
-            ? props.theme.textColor.quaternary
-            : props.theme.textColor.tertiary};
+    color: ${(props) => props.theme.textColor.quaternary};
     font-size: 13px;
     font-weight: 700;
     white-space: nowrap;

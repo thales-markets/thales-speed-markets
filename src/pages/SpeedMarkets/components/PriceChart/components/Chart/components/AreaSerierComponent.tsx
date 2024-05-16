@@ -98,8 +98,8 @@ export const AreaSeriesComponent: React.FC<{
                 ]);
                 if (position === Positions.UP || position === Positions.DOWN) {
                     series.applyOptions({
-                        topColor: position === Positions.UP ? theme.chart.area.up.end : theme.chart.area.down.start,
-                        bottomColor: position === Positions.UP ? theme.chart.area.up.start : theme.chart.area.down.end,
+                        topColor: position === Positions.UP ? theme.chart.area.end : theme.chart.area.start,
+                        bottomColor: position === Positions.UP ? theme.chart.area.start : theme.chart.area.end,
                         invertFilledArea: position === Positions.UP,
                     });
                 }

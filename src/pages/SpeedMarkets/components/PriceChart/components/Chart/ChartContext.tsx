@@ -96,8 +96,8 @@ export const ChartComponent: React.FC<ChartProps> = ({
             </Chart>
             <ResetButton>
                 <Button
-                    width="40px"
-                    height="31px"
+                    width="50px"
+                    height="30px"
                     textColor={theme.button.textColor.tertiary}
                     backgroundColor={theme.button.background.primary}
                     borderColor={theme.button.borderColor.secondary}
