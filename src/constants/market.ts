@@ -27,6 +27,9 @@ export const SPEED_MARKETS_OVERVIEW_SECTIONS = {
 export const ALTCOIN_CONVERSION_BUFFER_PERCENTAGE = 0.01; // 1%
 export const ALLOWANCE_BUFFER_PERCENTAGE = 1.01; // +1%
 
+export const MIN_BUYIN_COLLATERAL_CONVERSION_BUFFER_PERCENTAGE = 0.4; // 40%
+export const MAX_BUYIN_COLLATERAL_CONVERSION_BUFFER_PERCENTAGE = 0.05; // 5%
+
 const TODAY = new Date();
 // show history for 90 days in the past
 export const MIN_MATURITY = Math.round(

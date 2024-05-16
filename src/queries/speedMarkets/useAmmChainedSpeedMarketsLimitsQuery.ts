@@ -1,4 +1,5 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query';
+import { MIN_BUYIN_COLLATERAL_CONVERSION_BUFFER_PERCENTAGE } from 'constants/market';
 import { ZERO_ADDRESS } from 'constants/network';
 import QUERY_KEYS from 'constants/queryKeys';
 import { bigNumberFormatter, coinFormatter } from 'thales-utils';
@@ -50,9 +51,9 @@ const useChainedAmmSpeedMarketsLimitsQuery = (
                     ammChainedSpeedMarketsLimits.minChainedMarkets = Number(chainedAmmParams.minChainedMarkets);
                     ammChainedSpeedMarketsLimits.maxChainedMarkets = Number(chainedAmmParams.maxChainedMarkets);
 
-                    ammChainedSpeedMarketsLimits.minBuyinAmount = Math.ceil(
-                        coinFormatter(chainedAmmParams.minBuyinAmount, queryConfig.networkId)
-                    );
+                    ammChainedSpeedMarketsLimits.minBuyinAmount =
+                        coinFormatter(chainedAmmParams.minBuyinAmount, queryConfig.networkId) /
+                        (1 - MIN_BUYIN_COLLATERAL_CONVERSION_BUFFER_PERCENTAGE);
                     ammChainedSpeedMarketsLimits.maxBuyinAmount = coinFormatter(
                         chainedAmmParams.maxBuyinAmount,
                         queryConfig.networkId
