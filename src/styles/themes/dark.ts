@@ -39,13 +39,13 @@ export default {
             quaternary: Colors.ORANGE,
         },
         borderColor: {
-            primary: `linear-gradient(90deg, ${Colors.PURPLE_DARK} 0%, ${Colors.BLUE_DEEP_SKY} 100%)`,
+            primary: `linear-gradient(90deg, ${Colors.PURPLE_DARK} 0%, ${Colors.BLUE} 100%)`,
             secondary: Colors.PURPLE,
             tertiary: Colors.WHITE,
         },
         shadowColor: {
             primary: Colors.PURPLE_DARK,
-            secondary: Colors.BLUE_DEEP_SKY,
+            secondary: Colors.BLUE,
         },
     },
     input: {
@@ -94,7 +94,7 @@ export default {
             tertiary: Colors.PURPLE,
         },
         textColor: {
-            primary: `linear-gradient(180deg, ${Colors.PURPLE_DARK_2} 0%, ${Colors.BLUE_DEEP_SKY_2} 100%)`,
+            primary: `linear-gradient(180deg, ${Colors.PURPLE_DARK_2} 0%, ${Colors.BLUE_DEEP_SKY} 100%)`,
             secondary: Colors.BLACK,
             tertiary: Colors.PURPLE,
         },
@@ -123,18 +123,6 @@ export default {
             primary: Colors.ORANGE,
         },
     },
-    info: {
-        background: {
-            primary: Colors.GRAY_DARK,
-        },
-        textColor: {
-            primary: Colors.BLUE,
-            secondary: Colors.BLUE_DARK,
-        },
-        borderColor: {
-            primary: Colors.BLUE,
-        },
-    },
     table: {
         textColor: {
             primary: Colors.WHITE,
@@ -151,8 +139,9 @@ export default {
         success: {
             background: {
                 primary: Colors.GREEN,
-                secondary: Colors.GREEN_LIGHT,
+                secondary: Colors.GREEN_DARKER,
                 tertiary: Colors.GREEN_DARK,
+                quaternary: Colors.GREEN_LIGHT,
             },
             textColor: {
                 primary: Colors.BLACK,
@@ -160,19 +149,9 @@ export default {
         },
         info: {
             background: {
-                primary: Colors.BLUE_DARK,
-                secondary: Colors.BLUE_LIGHT,
-                tertiary: Colors.BLUE,
-            },
-            textColor: {
-                primary: Colors.BLACK,
-            },
-        },
-        warning: {
-            background: {
-                primary: Colors.ORANGE,
-                secondary: Colors.ORANGE_LIGHT,
-                tertiary: Colors.ORANGE_DARK,
+                primary: Colors.BLUE,
+                secondary: Colors.BLUE_DARK,
+                tertiary: Colors.BLUE_LIGHT,
             },
             textColor: {
                 primary: Colors.BLACK,
@@ -181,8 +160,8 @@ export default {
         error: {
             background: {
                 primary: Colors.RED,
-                secondary: Colors.RED_LIGHT,
-                tertiary: Colors.RED_DARK,
+                secondary: Colors.RED_DARK,
+                tertiary: Colors.RED_LIGHT,
             },
             textColor: {
                 primary: Colors.BLACK,

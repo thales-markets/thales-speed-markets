@@ -49,7 +49,6 @@ export const ExtraBoldText = styled.span`
     font-weight: 800;
 `;
 
-// TODO: Update color names
 export const Colors = {
     GRAY: '#2b3139',
     GRAY_LIGHT: '#848E9C',
@@ -59,37 +58,29 @@ export const Colors = {
     WHITE: '#FFFFFF',
 
     GREEN: '#00DA3C',
-    GREEN_LIGHT: '#B0FFE7',
-    GREEN_DARK: '#1D976C',
+    GREEN_LIGHT: '#00C149',
+    GREEN_DARK: '#00994B',
+    GREEN_DARKER: '#00754D',
     GREEN_DARK_START: 'rgb(76, 211, 163, 0.4)',
     GREEN_DARK_END: 'rgb(76, 211, 163, 0)',
 
-    GREEN_IN_START: 'rgb(76, 211, 163, 0.5)',
-    GREEN_IN_END: 'rgb(43, 49, 57, 0)',
-
     BLACK: '#000000',
-    BLACK_LIGHT: '#121212',
 
-    BLUE: '#5B86E5',
-    BLUE_LIGHT: '#36D1DC',
-    BLUE_DARK: '#1043B4',
-    BLUE_MIDNIGHT: '#052040',
-    BLUE_MIDNIGHT_LIGHT: '#1b314f',
+    BLUE: '#169CD2',
+    BLUE_LIGHT: '#06B2E3',
+    BLUE_DARK: '#00EEE8',
     BLUE_SKY: '#5FB9C6',
-    BLUE_DEEP_SKY: '#169CD2',
-    BLUE_DEEP_SKY_2: '#1D7DC0',
+    BLUE_DEEP_SKY: '#1D7DC0',
 
     RED: '#EC0000',
-    RED_LIGHT: '#E29587',
-    RED_DARK: '#D66D75',
+    RED_LIGHT: '#C40000',
+    RED_DARK: '#FF5E3A',
     RED_START: 'rgb(109, 18, 40, 0.4)',
     RED_END: 'rgb(222, 73, 109, 0)',
 
     ORANGE: '#E27A93',
-    ORANGE_LIGHT: '#FFB866',
     ORANGE_DARK: '#FF8800',
 
-    YELLOW: '#FFCC00',
     YELLOW_DARK: '#9b8327',
 
     PURPLE: '#C294F5',
