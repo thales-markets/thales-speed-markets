@@ -10,8 +10,7 @@ export const Wrapper = styled(FlexDiv)`
     width: 100%;
     background-color: ${(props) => props.theme.background.primary};
     border-radius: 15px;
-    padding: 25px;
-
+    padding: 25px 40px 10px;
     @media (max-width: 600px) {
         margin-top: 20px;
         flex-wrap: wrap-reverse;

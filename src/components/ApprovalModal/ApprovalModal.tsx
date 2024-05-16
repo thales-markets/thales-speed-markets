@@ -64,6 +64,7 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({ defaultAmount, tokenSymbo
             title={t('common.enable-wallet-access.approve', { currencyKey: tokenSymbol })}
             onClose={onClose}
             shouldCloseOnOverlayClick={false}
+            width="auto"
         >
             <Container>
                 <CheckboxContainer>
