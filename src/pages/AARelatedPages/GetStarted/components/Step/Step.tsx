@@ -331,7 +331,6 @@ const AddressContainer = styled.div`
 const Address = styled.span`
     font-family: ${(props) => props.theme.fontFamily.primary};
     font-size: 14px;
-    font-style: normal;
     font-weight: 800;
     line-height: normal;
     letter-spacing: -0.28px;
@@ -350,7 +349,6 @@ const QRIcon = styled.i`
 const CopyText = styled.span`
     font-family: ${(props) => props.theme.fontFamily.secondary};
     font-size: 14px;
-    font-style: normal;
     font-weight: 800;
     line-height: 100%; /* 14px */
     text-transform: uppercase;
@@ -368,9 +366,8 @@ const Separator = styled.div`
         content: 'or';
         font-family: ${(props) => props.theme.fontFamily.secondary};
         font-size: 14px;
-        font-style: normal;
         font-weight: 800;
-        line-height: 12px; /* 85.714% */
+        line-height: 12px;
         letter-spacing: -0.5px;
         color: ${(props) => props.theme.textColor.primary};
         background: ${(props) => props.theme.background.primary};

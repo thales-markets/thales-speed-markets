@@ -199,7 +199,6 @@ const FlexContainer = styled(AlignedFlex)<{
 `;
 
 const Label = styled.span`
-    font-style: normal;
     font-weight: 700;
     font-size: 13px;
     line-height: 100%;

@@ -53,7 +53,6 @@ export const PrimaryHeading = styled.h1`
 export const InputLabel = styled.p<{ marginTop?: string }>`
     font-family: ${(props) => props.theme.fontFamily.primary};
     font-size: 14px;
-    font-style: normal;
     font-weight: 400;
     line-height: normal;
     margin-top: ${(props) => (props.marginTop ? props.marginTop : '')};

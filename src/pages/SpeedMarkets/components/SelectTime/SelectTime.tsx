@@ -311,7 +311,6 @@ const Time = styled(FlexDivCentered)<{ $isSelected: boolean }>`
     border-radius: 8px;
     font-family: ${(props) => props.theme.fontFamily.primary};
     font-size: 13px;
-    font-style: normal;
     font-weight: 800;
     line-height: 100%;
     ${(props) => (props.$isSelected ? '' : `border: 2px solid ${props.theme.button.borderColor.secondary};`)}

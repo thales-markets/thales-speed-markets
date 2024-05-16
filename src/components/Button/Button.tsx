@@ -141,7 +141,7 @@ const ButtonWrapper = styled.button<{
     border-width: 0;
     font-weight: ${(props) => props.$fontWeight || '700'};
     font-size: ${(props) => props.$fontSize || '18px'};
-    font-family: ${(props) => props.$fontFamily || props.theme.fontFamily.primary};
+    font-family: ${(props) => props.$fontFamily || props.theme.fontFamily.secondary};
     line-height: 100%;
     cursor: pointer;
     color: ${(props) => props.$textColor || props.theme.button.textColor.primary};

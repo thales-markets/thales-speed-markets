@@ -140,7 +140,6 @@ const Container = styled(FlexDivStart)<{ margin?: string; position?: string }>`
 `;
 
 const Text = styled.span<{ fontWeight?: string }>`
-    font-style: normal;
     font-weight: ${(props) => (props.fontWeight ? props.fontWeight : '600')};
     font-size: 13px;
     line-height: 20px;

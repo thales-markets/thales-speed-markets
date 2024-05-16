@@ -49,9 +49,8 @@ const Text = styled.span`
     font-family: 'Nunito';
     color: ${(props) => props.theme.textColor.primary};
     font-size: 28px;
-    font-style: normal;
     font-weight: 700;
-    line-height: 100%; /* 28px */
+    line-height: 100%;
     text-transform: capitalize;
 `;
 
@@ -63,9 +62,8 @@ const CheckIcon = styled.i`
 const FooterText = styled.span`
     color: ${(props) => props.theme.textColor.primary};
     font-size: 14px;
-    font-style: normal;
     font-weight: 500;
-    line-height: 100%; /* 14px */
+    line-height: 100%;
     text-transform: capitalize;
 `;
 

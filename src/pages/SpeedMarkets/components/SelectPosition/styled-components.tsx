@@ -26,7 +26,6 @@ export const Header = styled(FlexDivColumn)`
 export const HeaderText = styled.span`
     font-family: ${(props) => props.theme.fontFamily.primary};
     font-size: 14px;
-    font-style: normal;
     font-weight: 700;
     line-height: 18px;
     text-transform: uppercase;
@@ -43,9 +42,7 @@ export const HeaderSubText = styled(HeaderText)`
 export const ClearAll = styled(FlexDivCentered)<{ isDisabled?: boolean }>`
     font-family: ${(props) => props.theme.fontFamily.primary};
     color: ${(props) => props.theme.warning.textColor.primary};
-
     font-size: 12px;
-    font-style: normal;
     font-weight: 700;
     line-height: 150%;
     cursor: ${(props) => (props.isDisabled ? 'default' : 'pointer')};
@@ -85,7 +82,6 @@ export const PositionWrapper = styled(FlexDivCentered)<{ $isSelected?: boolean }
     gap: 15px;
     font-family: ${(props) => props.theme.fontFamily.primary};
     font-size: 18px;
-    font-style: normal;
     font-weight: 800;
     line-height: 100%; /* 18px */
     text-transform: uppercase;

@@ -30,7 +30,6 @@ export const Input = styled.input<{ fontSize?: string; width?: string; height?: 
     outline: 0;
     background: ${(props) => props.theme.input.background.primary};
     color: ${(props) => props.theme.input.textColor.secondary};
-    font-style: normal;
     font-weight: normal;
     font-size: ${(props) => props.fontSize || '15px'};
     line-height: 18px;

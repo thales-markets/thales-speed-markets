@@ -139,7 +139,6 @@ export const CellTitle = styled.div<{ fontSize?: number }>`
 
 export const CellValue = styled.div<{ fontSize?: number }>`
     white-space: pre;
-    font-style: normal;
     font-weight: bold;
     font-size: ${(props) => props.fontSize || '12'}px;
     text-transform: uppercase;

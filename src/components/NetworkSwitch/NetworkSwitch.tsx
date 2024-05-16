@@ -83,7 +83,6 @@ const NetworkIconWrapper = styled.div<{ isConnected: boolean }>`
 const NetworkText = styled.span`
     position: relative;
     font-family: ${(props) => props.theme.fontFamily.secondary};
-    font-style: normal;
     font-weight: 700;
     font-size: 13px;
     line-height: 13px;

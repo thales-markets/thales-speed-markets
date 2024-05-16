@@ -149,7 +149,6 @@ const TextLabel = styled.span`
     font-family: ${(props) => props.theme.fontFamily.primary};
     color: ${(props) => props.theme.textColor.quinary};
     font-size: 14px;
-    font-style: normal;
     font-weight: 700;
     line-height: normal;
 `;
@@ -175,7 +174,6 @@ const Label = styled.span`
     font-family: ${(props) => props.theme.fontFamily.primary};
     color: ${(props) => props.theme.textColor.primary};
     font-size: 14px;
-    font-style: normal;
     font-weight: 800;
     line-height: 300%;
 `;

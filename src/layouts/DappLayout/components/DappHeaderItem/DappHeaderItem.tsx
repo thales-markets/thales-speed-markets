@@ -102,7 +102,6 @@ const MenuItem = styled.li<{ margin?: string }>`
 const Text = styled.span<{ $marginLeft?: string }>`
     z-index: 0;
     position: relative;
-    font-style: normal;
     font-weight: 600;
     font-size: 16px;
     line-height: 32px;

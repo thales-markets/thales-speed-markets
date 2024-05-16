@@ -366,7 +366,7 @@ const Info = styled.span`
     font-size: 18px;
     font-weight: 300;
     line-height: 20px;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.quinary};
 `;
 
 const OverviewLinkWrapper = styled.div`

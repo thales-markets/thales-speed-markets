@@ -110,7 +110,6 @@ const TextContainer = styled(FlexDivCentered)`
 `;
 
 const Text = styled.span`
-    font-style: normal;
     font-size: 15px;
     line-height: 18px;
     text-transform: uppercase;

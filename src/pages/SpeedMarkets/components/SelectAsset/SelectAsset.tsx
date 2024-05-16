@@ -92,9 +92,8 @@ const AssetIcon = styled.i<{ $isSelected: boolean }>`
 const AssetName = styled.p`
     font-family: ${(props) => props.theme.fontFamily.primary};
     font-size: 18px;
-    font-style: normal;
     font-weight: 800;
-    line-height: 100%; /* 18px */
+    line-height: 100%;
     text-transform: uppercase;
 `;
 

@@ -78,7 +78,6 @@ const Icon = styled.i<{ $isUp?: boolean }>`
 `;
 
 const Price = styled.span<{ $isUp?: boolean }>`
-    font-style: normal;
     font-weight: 700;
     font-size: 22px;
     line-height: 100%;

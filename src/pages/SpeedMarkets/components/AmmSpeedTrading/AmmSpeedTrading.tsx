@@ -609,14 +609,14 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     const getSubmitButton = () => {
         if (!isConnected) {
             return (
-                <Button height="40px" onClick={() => dispatch(setWalletConnectModalVisibility({ visibility: true }))}>
+                <Button onClick={() => dispatch(setWalletConnectModalVisibility({ visibility: true }))}>
                     {t('common.wallet.connect-your-wallet')}
                 </Button>
             );
         }
         if (isMintAvailable) {
             return (
-                <Button height="40px" onClick={handleMint}>
+                <Button onClick={handleMint}>
                     {isSubmitting ? t('common.mint.progress-label') : t('common.mint.label')}
                     <CollateralText>&nbsp;{selectedCollateral}</CollateralText>
                     {isSubmitting ? '...' : ''}
@@ -625,7 +625,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         }
         if (!isPositionSelected) {
             return (
-                <Button height="40px" disabled={true}>
+                <Button disabled={true}>
                     {isChained
                         ? t('speed-markets.chained.errors.choose-directions')
                         : t('speed-markets.amm-trading.choose-direction')}
@@ -633,32 +633,16 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             );
         }
         if (!deltaTimeSec) {
-            return (
-                <Button height="40px" disabled={true}>
-                    {t('speed-markets.amm-trading.choose-time')}
-                </Button>
-            );
+            return <Button disabled={true}>{t('speed-markets.amm-trading.choose-time')}</Button>;
         }
         if (!isPaidAmountEntered) {
-            return (
-                <Button height="40px" disabled={true}>
-                    {t('common.enter-amount')}
-                </Button>
-            );
+            return <Button disabled={true}>{t('common.enter-amount')}</Button>;
         }
         if (outOfLiquidityPerDirection) {
-            return (
-                <Button height="40px" disabled={true}>
-                    {t('speed-markets.errors.out-of-liquidity-direction')}
-                </Button>
-            );
+            return <Button disabled={true}>{t('speed-markets.errors.out-of-liquidity-direction')}</Button>;
         }
         if (outOfLiquidity) {
-            return (
-                <Button height="40px" disabled={true}>
-                    {t('common.errors.out-of-liquidity')}
-                </Button>
-            );
+            return <Button disabled={true}>{t('common.errors.out-of-liquidity')}</Button>;
         }
         if (!hasAllowance) {
             if (isBiconomy) {
@@ -669,7 +653,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 );
             } else {
                 return (
-                    <Button height="40px" disabled={isAllowing} onClick={() => setOpenApprovalModal(true)}>
+                    <Button disabled={isAllowing} onClick={() => setOpenApprovalModal(true)}>
                         {isAllowing
                             ? t('common.enable-wallet-access.approve-progress')
                             : t('common.enable-wallet-access.approve')}
@@ -833,7 +817,6 @@ const QuoteContainer = styled.div`
 const QuoteLabel = styled.span`
     font-family: ${(props) => props.theme.fontFamily.primary};
     font-size: 18px;
-    font-style: normal;
     font-weight: 800;
     line-height: 100%;
     text-transform: capitalize;
@@ -842,9 +825,8 @@ const QuoteLabel = styled.span`
 const QuoteText = styled.span`
     font-family: ${(props) => props.theme.fontFamily.primary};
     font-size: 30px;
-    font-style: normal;
     font-weight: 800;
-    line-height: 100%; /* 13px */
+    line-height: 100%;
     text-transform: capitalize;
 `;
 
