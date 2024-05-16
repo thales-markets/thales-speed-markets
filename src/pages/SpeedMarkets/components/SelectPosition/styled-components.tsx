@@ -20,7 +20,7 @@ export const PlusMinusIcon = styled.i`
 `;
 
 export const Header = styled(FlexDivColumn)`
-    margin-bottom: 6px;
+    margin-bottom: 12px;
 `;
 
 export const HeaderText = styled.span`
@@ -140,14 +140,16 @@ export const AssetIcon = styled(Icon)`
     }
 `;
 
-export const Skew = styled.div`
+export const Skew = styled.div<{ $isSelected: boolean }>`
     position: absolute;
     top: -10px;
-    right: 0;
+    right: 5px;
+    padding: 0 8px;
     background-color: ${(props) => props.theme.background.primary};
+    ${(props) => (props.$isSelected ? `border: 1px solid ${props.theme.borderColor.quaternary};` : '')}
+    ${(props) => (props.$isSelected ? `border-radius: 8px;` : '')}
     color: ${(props) => props.theme.textColor.quaternary};
     font-size: 13px;
     font-weight: 700;
     white-space: nowrap;
-}
 `;

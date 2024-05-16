@@ -1,15 +1,16 @@
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import ReactTooltip from 'rc-tooltip';
-import React from 'react';
+import React, { CSSProperties } from 'react';
 import styled from 'styled-components';
 import 'styles/tooltip.css';
 
 type TooltipProps = {
     overlay: any;
     children?: React.ReactNode;
+    customIconStyling?: CSSProperties;
 };
 
-const Tooltip: React.FC<TooltipProps> = ({ overlay, children }) => {
+const Tooltip: React.FC<TooltipProps> = ({ overlay, children, customIconStyling }) => {
     return (
         <ReactTooltip
             overlay={
@@ -19,7 +20,7 @@ const Tooltip: React.FC<TooltipProps> = ({ overlay, children }) => {
             }
             placement="top"
         >
-            {children ? (children as any) : <InfoIcon />}
+            {children ? (children as any) : <InfoIcon style={customIconStyling} />}
         </ReactTooltip>
     );
 };
@@ -48,7 +49,7 @@ const InfoIcon = styled.i`
     cursor: pointer;
     margin-top: 1px;
     margin-left: 4px;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.icon.background.primary};
     &:before {
         font-family: Icons !important;
         content: '\\20AC';

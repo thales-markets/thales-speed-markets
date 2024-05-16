@@ -353,7 +353,7 @@ const RightSide = styled.div`
     height: 100%;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 17px;
     max-width: 340px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         max-width: initial;

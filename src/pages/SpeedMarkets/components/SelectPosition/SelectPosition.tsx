@@ -1,7 +1,8 @@
+import Tooltip from 'components/Tooltip';
 import { Positions } from 'enums/market';
 import queryString from 'query-string';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { FlexDivColumnCentered, FlexDivSpaceBetween } from 'styles/common';
 import { formatPercentage } from 'thales-utils';
 import { AmmChainedSpeedMarketsLimits } from 'types/market';
@@ -23,6 +24,8 @@ import {
     PositionsWrapper,
     Skew,
 } from './styled-components';
+import { ThemeInterface } from 'types/ui';
+import { useTheme } from 'styled-components';
 
 export type SelectedPosition = Positions.UP | Positions.DOWN | undefined;
 
@@ -44,6 +47,8 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
     skew,
 }) => {
     const { t } = useTranslation();
+    const theme: ThemeInterface = useTheme();
+
     const discount = { [Positions.UP]: skew[Positions.DOWN] / 2, [Positions.DOWN]: skew[Positions.UP] / 2 };
     const isClearAllDisabled =
         selected.length === ammChainedSpeedMarketsLimits?.minChainedMarkets && selected.every((p) => p === undefined);
@@ -57,6 +62,28 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
             }),
         });
     };
+
+    const getSkewTooltip = () => (
+        <Tooltip
+            overlay={
+                <Trans
+                    i18nKey="speed-markets.tooltips.skew-info"
+                    components={{
+                        br: <br />,
+                    }}
+                    values={{
+                        skewDirection: skew[Positions.UP] > 0 ? Positions.UP : Positions.DOWN,
+                        skewPerc: formatPercentage(skew[Positions.UP] > 0 ? skew[Positions.UP] : skew[Positions.DOWN]),
+                        discountDirection: skew[Positions.DOWN] > 0 ? Positions.UP : Positions.DOWN,
+                        discountPerc: formatPercentage(
+                            discount[skew[Positions.DOWN] > 0 ? Positions.UP : Positions.DOWN]
+                        ),
+                    }}
+                />
+            }
+            customIconStyling={{ fontSize: '11px', color: theme.textColor.quaternary }}
+        />
+    );
 
     return (
         <div>
@@ -84,23 +111,33 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
                     // Single
                     <>
                         <PositionWrapper
-                            $isSelected={selected[0] !== undefined ? selected[0] === Positions.UP : undefined}
+                            $isSelected={selected[0] === Positions.UP}
                             onClick={() => onChange(selected[0] === Positions.UP ? undefined : Positions.UP)}
                         >
                             <Icon className="icon icon--caret-up" />
                             {Positions.UP}
 
-                            {discount[Positions.UP] > 0 && <Skew>+{formatPercentage(discount[Positions.UP])}</Skew>}
+                            {discount[Positions.UP] > 0 && (
+                                <Skew $isSelected={selected[0] === Positions.UP}>
+                                    +{formatPercentage(discount[Positions.UP])}
+                                    {getSkewTooltip()}
+                                </Skew>
+                            )}
                         </PositionWrapper>
 
                         <PositionWrapper
                             onClick={() => onChange(selected[0] === Positions.DOWN ? undefined : Positions.DOWN)}
-                            $isSelected={selected[0] !== undefined ? selected[0] === Positions.DOWN : undefined}
+                            $isSelected={selected[0] === Positions.DOWN}
                         >
                             <Icon className="icon icon--caret-down" />
                             {Positions.DOWN}
 
-                            {discount[Positions.DOWN] > 0 && <Skew>+{formatPercentage(discount[Positions.DOWN])}</Skew>}
+                            {discount[Positions.DOWN] > 0 && (
+                                <Skew $isSelected={selected[0] === Positions.DOWN}>
+                                    +{formatPercentage(discount[Positions.DOWN])}
+                                    {getSkewTooltip()}
+                                </Skew>
+                            )}
                         </PositionWrapper>
                         <PlusMinusIcon
                             className="network-icon network-icon--plus"
