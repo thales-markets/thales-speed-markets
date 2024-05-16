@@ -2,7 +2,6 @@ import Button from 'components/Button';
 import ConnectWalletModal from 'components/ConnectWalletModal';
 import NetworkSwitch from 'components/NetworkSwitch';
 import { ScreenSizeBreakpoint } from 'enums/ui';
-import Deposit from 'pages/AARelatedPages/Deposit';
 import GetStarted from 'pages/AARelatedPages/GetStarted';
 import Withdraw from 'pages/AARelatedPages/Withdraw';
 import React, { useState } from 'react';
@@ -30,7 +29,6 @@ const DappHeader: React.FC = () => {
 
     const [openReferralModal, setOpenReferralModal] = useState(false);
     const [openGetStarted, setOpenGetStarted] = useState(false);
-    const [openDeposit, setOpenDeposit] = useState(false);
     const [openUserInfo, setOpenUserInfo] = useState(false);
     const [openWithdraw, setOpenWithdraw] = useState(false);
 
@@ -88,7 +86,6 @@ const DappHeader: React.FC = () => {
             </RightContainer>
             {openReferralModal && <ReferralModal onClose={() => setOpenReferralModal(false)} />}
             {openGetStarted && <GetStarted isOpen={openGetStarted} onClose={() => setOpenGetStarted(false)} />}
-            {openDeposit && <Deposit isOpen={openDeposit} onClose={() => setOpenDeposit(false)} />}
             {openWithdraw && <Withdraw isOpen={openWithdraw} onClose={() => setOpenWithdraw(false)} />}
 
             <ConnectWalletModal

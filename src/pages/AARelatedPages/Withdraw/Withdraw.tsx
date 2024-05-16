@@ -7,53 +7,27 @@ import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipl
 import queryString from 'query-string';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ReactModal from 'react-modal';
+
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsBiconomy } from 'redux/modules/wallet';
-import styled, { useTheme } from 'styled-components';
-import { FlexDiv } from 'styles/common';
-import { RootState, ThemeInterface } from 'types/ui';
+import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
 import { getCollaterals } from 'utils/currency';
 import { getNetworkNameByNetworkId } from 'utils/network';
 import { isAddress } from 'viem';
 import { useAccount, useChainId, useClient } from 'wagmi';
-import CollateralDropdown from '../Deposit/components/CollateralDropdown';
+import CollateralDropdown from './components/CollateralDropdown';
 import {
     FormContainer,
     InputContainer,
     InputLabel,
-    PrimaryHeading,
     WarningContainer,
     WarningIcon,
     Wrapper,
 } from '../styled-components';
 import WithdrawalConfirmationModal from './components/WithdrawalConfirmationModal';
-
-ReactModal.setAppElement('#root');
-
-const getDefaultStyle = (theme: ThemeInterface) => ({
-    content: {
-        top: '50%',
-        left: '50%',
-        right: 'auto',
-        bottom: 'auto',
-        padding: '2px',
-        background: theme.borderColor.tertiary,
-        width: '720px',
-        borderRadius: '15px',
-        marginRight: '-50%',
-        transform: 'translate(-50%, -50%)',
-        overflow: 'none',
-        height: 'auto',
-        border: 'none',
-    },
-    overlay: {
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        zIndex: 200,
-    },
-});
+import Modal from 'components/Modal';
 
 type FormValidation = {
     walletAddress: boolean;
@@ -67,8 +41,6 @@ type DepositProps = {
 
 const Withdraw: React.FC<DepositProps> = ({ isOpen, onClose }) => {
     const { t } = useTranslation();
-    const theme: ThemeInterface = useTheme();
-
     const networkId = useChainId();
     const walletAddress = biconomyConnector.address;
     const { isConnected: isWalletConnected } = useAccount();
@@ -128,14 +100,15 @@ const Withdraw: React.FC<DepositProps> = ({ isOpen, onClose }) => {
     };
 
     return (
-        <ReactModal isOpen={isOpen} shouldCloseOnOverlayClick={true} style={getDefaultStyle(theme)}>
+        <Modal
+            title={t('withdraw.heading-withdraw')}
+            onClose={onClose}
+            isOpen={isOpen}
+            shouldCloseOnOverlayClick={true}
+        >
             <OutsideClick onOutsideClick={onClose}>
                 <Wrapper>
                     <FormContainer>
-                        <PrimaryHeading>{t('withdraw.heading-withdraw')}</PrimaryHeading>
-                        <CloseIconContainer>
-                            <CloseIcon onClick={onClose} />
-                        </CloseIconContainer>
                         <div>
                             <InputLabel>{t('deposit.select-token')}</InputLabel>
                             <CollateralDropdown
@@ -207,29 +180,8 @@ const Withdraw: React.FC<DepositProps> = ({ isOpen, onClose }) => {
                     onClose={() => setWithdrawalConfirmationModalVisibility(false)}
                 />
             )}
-        </ReactModal>
+        </Modal>
     );
 };
-
-const CloseIconContainer = styled(FlexDiv)`
-    position: absolute;
-    top: 20px;
-    right: 20px;
-`;
-
-const CloseIcon = styled.i`
-    font-size: 16px;
-    margin-top: 1px;
-    cursor: pointer;
-
-    &:before {
-        font-family: Icons !important;
-        content: '\\0042';
-        color: ${(props) => props.theme.textColor.quinary};
-    }
-    @media (max-width: 575px) {
-        padding: 15px;
-    }
-`;
 
 export default Withdraw;

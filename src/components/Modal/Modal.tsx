@@ -1,50 +1,59 @@
 import React from 'react';
 import ReactModal from 'react-modal';
 import styled from 'styled-components';
-import { FlexDiv, FlexDivRow } from 'styles/common';
-
-type ModalProps = {
-    title: string;
-    shouldCloseOnOverlayClick?: boolean;
-    onClose: () => void;
-    children?: React.ReactNode;
-};
+import { useTheme } from 'styled-components';
+import { FlexDiv } from 'styles/common';
+import { ThemeInterface } from 'types/ui';
 
 ReactModal.setAppElement('#root');
 
-const defaultCustomStyles = {
+type ModalProps = {
+    title: string;
+    isOpen?: boolean;
+    shouldCloseOnOverlayClick?: boolean;
+    onClose: () => void;
+    children?: React.ReactNode;
+    width?: string;
+};
+
+const getDefaultStyle = (theme: ThemeInterface, width?: string) => ({
     content: {
         top: '50%',
         left: '50%',
         right: 'auto',
         bottom: 'auto',
+        padding: '2px',
+        background: theme.borderColor.tertiary,
+        width: width ?? '720px',
+        borderRadius: '15px',
         marginRight: '-50%',
         transform: 'translate(-50%, -50%)',
-        padding: '0px',
-        background: 'transparent',
-        border: 'none',
         overflow: 'none',
+        height: 'auto',
+        border: 'none',
     },
     overlay: {
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        zIndex: 20000,
+        zIndex: 200,
         backdropFilter: 'blur(10px)',
     },
-};
+});
 
-const Modal: React.FC<ModalProps> = ({ title, onClose, children, shouldCloseOnOverlayClick }) => {
+const Modal: React.FC<ModalProps> = ({ title, onClose, children, shouldCloseOnOverlayClick, isOpen, width }) => {
+    const theme: ThemeInterface = useTheme();
+
     return (
         <ReactModal
-            isOpen
+            isOpen={isOpen ?? true}
             onRequestClose={onClose}
             shouldCloseOnOverlayClick={shouldCloseOnOverlayClick}
-            style={defaultCustomStyles}
+            style={getDefaultStyle(theme, width)}
         >
             <Container>
-                <Header>
-                    <Title>{title}</Title>
-                    <FlexDivRow>{<CloseIcon className="icon icon--x-sign" onClick={onClose} />}</FlexDivRow>
-                </Header>
+                <PrimaryHeading>{title}</PrimaryHeading>
+                <CloseIconContainer>
+                    <CloseIcon onClick={onClose} />
+                </CloseIconContainer>
                 {children}
             </Container>
         </ReactModal>
@@ -52,32 +61,42 @@ const Modal: React.FC<ModalProps> = ({ title, onClose, children, shouldCloseOnOv
 };
 
 const Container = styled.div`
-    border: 2px solid ${(props) => props.theme.borderColor.secondary};
+    border-radius: 15px;
     background: ${(props) => props.theme.background.primary};
     padding: 20px;
-    border-radius: 8px;
     max-height: 100vh;
     height: fit-content;
 `;
 
-const Header = styled(FlexDivRow)`
-    margin-bottom: 20px;
-`;
-
-const Title = styled(FlexDiv)`
-    font-weight: bold;
-    font-size: 18px;
-    line-height: 110%;
-    color: ${(props) => props.theme.textColor.secondary};
+const PrimaryHeading = styled.h1`
+    padding-top: 10px;
+    font-size: 20px;
+    font-weight: 800;
+    text-transform: uppercase;
+    line-height: 20px;
+    color: ${(props) => props.theme.textColor.primary};
     text-align: center;
 `;
 
+const CloseIconContainer = styled(FlexDiv)`
+    position: absolute;
+    top: 20px;
+    right: 20px;
+`;
+
 const CloseIcon = styled.i`
-    font-family: Icons !important;
     font-size: 16px;
-    line-height: 16px;
+    margin-top: 1px;
     cursor: pointer;
-    color: ${(props) => props.theme.textColor.secondary};
+
+    &:before {
+        font-family: Icons !important;
+        content: '\\0042';
+        color: ${(props) => props.theme.textColor.quinary};
+    }
+    @media (max-width: 575px) {
+        padding: 15px;
+    }
 `;
 
 export default Modal;

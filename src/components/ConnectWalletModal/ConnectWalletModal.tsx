@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import ReactModal from 'react-modal';
 import styled from 'styled-components';
-import { FlexDiv, FlexDivCentered, FlexDivRow } from 'styles/common';
+import { FlexDivCentered, FlexDivRow } from 'styles/common';
 
 import disclaimer from 'assets/docs/thales-protocol-disclaimer.pdf';
 import termsOfUse from 'assets/docs/thales-terms-of-use.pdf';
@@ -11,37 +11,13 @@ import { useConnectModal } from '@rainbow-me/rainbowkit';
 import SimpleLoader from 'components/SimpleLoader';
 import Checkbox from 'components/fields/Checkbox';
 import { SUPPORTED_PARTICAL_CONNECTORS } from 'constants/wallet';
-import { useSelector } from 'react-redux';
-import { getIsMobile } from 'redux/modules/ui';
-import { RootState, ThemeInterface } from 'types/ui';
+
 import { Connector, useConnect } from 'wagmi';
 import { getClassNameForParticalLogin, getSpecificConnectorFromConnectorsArray } from 'utils/particleWallet/utils';
 import Button from 'components/Button';
-import { useTheme } from 'styled-components';
+import Modal from 'components/Modal';
 
 ReactModal.setAppElement('#root');
-
-const getDefaultStyle = (theme: ThemeInterface) => ({
-    content: {
-        top: '50%',
-        left: '50%',
-        right: 'auto',
-        bottom: 'auto',
-        padding: '2px',
-        background: theme.borderColor.tertiary,
-        width: '720px',
-        borderRadius: '15px',
-        marginRight: '-50%',
-        transform: 'translate(-50%, -50%)',
-        overflow: 'none',
-        height: 'auto',
-        border: 'none',
-    },
-    overlay: {
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        zIndex: 201,
-    },
-});
 
 type ConnectWalletModalProps = {
     isOpen: boolean;
@@ -50,21 +26,10 @@ type ConnectWalletModalProps = {
 
 const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({ isOpen, onClose }) => {
     const { t } = useTranslation();
-    const theme: ThemeInterface = useTheme();
 
     const { connectors, isPending, connect } = useConnect();
-    const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const { openConnectModal } = useConnectModal();
     const [termsAccepted, setTerms] = useState(false);
-
-    useEffect(() => {
-        if (isMobile) {
-            const defaultStyle = getDefaultStyle(theme);
-            defaultStyle.content.width = '100%';
-            defaultStyle.content.padding = '20px 5px';
-            defaultStyle.content.height = '100%';
-        }
-    }, [isMobile, theme]);
 
     const handleConnect = (connector: Connector) => {
         try {
@@ -75,21 +40,15 @@ const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({ isOpen, onClose
     };
 
     return (
-        <ReactModal
+        <Modal
             isOpen={isOpen}
-            onRequestClose={onClose}
+            onClose={onClose}
             shouldCloseOnOverlayClick={true}
-            style={getDefaultStyle(theme)}
+            title={t('common.wallet.connect-wallet-modal-title')}
         >
             <Container>
-                <CloseIconContainer>
-                    <CloseIcon onClick={onClose} />
-                </CloseIconContainer>
                 {!isPending && (
                     <>
-                        <HeaderContainer>
-                            <Header>{t('common.wallet.connect-wallet-modal-title')}</Header>
-                        </HeaderContainer>
                         <ButtonsContainer disabled={!termsAccepted}>
                             <SocialLoginWrapper>
                                 <SocialButtonsWrapper>
@@ -209,44 +168,14 @@ const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({ isOpen, onClose
                     </LoaderContainer>
                 )}
             </Container>
-        </ReactModal>
+        </Modal>
     );
 };
-
-const HeaderContainer = styled(FlexDivCentered)`
-    flex-direction: column;
-    margin-bottom: 40px;
-`;
-
-const CloseIconContainer = styled(FlexDiv)`
-    justify-content: flex-end;
-`;
 
 const Container = styled.div`
     background-color: ${(props) => props.theme.background.primary};
     border-radius: 15px;
-    padding: 25px;
-`;
-
-const CloseIcon = styled.i`
-    font-size: 16px;
-    margin-top: 1px;
-    cursor: pointer;
-    &:before {
-        font-family: Icons !important;
-        content: '\\0042';
-        color: ${(props) => props.theme.textColor.primary};
-    }
-    @media (max-width: 575px) {
-        padding: 15px;
-    }
-`;
-
-const Header = styled.h2`
-    color: ${(props) => props.theme.textColor.primary};
-    font-size: 22px;
-    font-weight: 900;
-    text-transform: uppercase;
+    padding: 40px 90px;
 `;
 
 const Link = styled.a`
@@ -267,7 +196,6 @@ const FooterText = styled(SecondaryText)`
 `;
 
 const FooterContainer = styled(FlexDivCentered)<{ disabled: boolean }>`
-    margin: 0px 90px;
     margin-top: 28px;
     padding-top: 20px;
 
@@ -280,11 +208,7 @@ const FooterContainer = styled(FlexDivCentered)<{ disabled: boolean }>`
 `;
 const WalletIconsWrapper = styled(FlexDivCentered)`
     justify-content: center;
-    padding: 0px 90px;
     align-items: center;
-    @media (max-width: 575px) {
-        padding: 0px 40px;
-    }
 `;
 
 const WalletIcon = styled.i`
@@ -309,12 +233,8 @@ const ButtonsContainer = styled.div<{ disabled: boolean }>`
 
 const SocialLoginWrapper = styled(FlexDivCentered)`
     position: relative;
-    padding: 0px 90px;
     flex-direction: column;
     gap: 10px;
-    @media (max-width: 575px) {
-        padding: 0px 40px;
-    }
 `;
 
 const ConnectWithLabel = styled(SecondaryText)`
