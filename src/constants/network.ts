@@ -113,12 +113,6 @@ export const RPC_LIST = {
         [NetworkId.Arbitrum]: 'https://arbitrum-one.chainnodes.org/' + import.meta.env.VITE_APP_CHAINNODE_PROJECT_ID,
         [NetworkId.PolygonMainnet]:
             'https://polygon-mainnet.chainnodes.org/' + import.meta.env.VITE_APP_CHAINNODE_PROJECT_ID,
-        [NetworkId.ZkSyncSepolia]: 'TODO',
-        [NetworkId.ZkSync]: 'TODO',
-        [NetworkId.OptimismGoerli]: 'TODO',
-        [NetworkId.OptimismSepolia]: 'TODO',
-        [NetworkId.BlastSepolia]: 'TODO',
-        [NetworkId.Base]: 'TODO',
     },
     ANKR: {
         [NetworkId.OptimismMainnet]: 'https://rpc.ankr.com/optimism/' + import.meta.env.VITE_APP_ANKR_PROJECT_ID,
