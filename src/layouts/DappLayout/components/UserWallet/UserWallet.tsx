@@ -8,7 +8,6 @@ import { useAccount } from 'wagmi';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'types/ui';
 import { getIsBiconomy, setWalletConnectModalVisibility } from 'redux/modules/wallet';
-
 import { getUserInfo } from '@particle-network/auth-core';
 
 const TRUNCATE_ADDRESS_NUMBER_OF_CHARS = 5;
@@ -45,7 +44,7 @@ const UserWallet: React.FC = () => {
                     {isConnected ? (
                         walletText ||
                         truncateAddress(
-                            (isBiconomy ? getUserInfo()?.google_email : walletAddress) as string,
+                            (isBiconomy ? getUserInfo()?.name : walletAddress) as string,
                             TRUNCATE_ADDRESS_NUMBER_OF_CHARS,
                             TRUNCATE_ADDRESS_NUMBER_OF_CHARS
                         )

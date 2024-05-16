@@ -57,9 +57,12 @@ export const executeBiconomyTransactionWithConfirmation = async (
 
         const {
             receipt: { transactionHash },
+            success,
         } = await wait();
 
-        return transactionHash;
+        if (success === 'false') {
+            throw new Error('tx failed');
+        } else return transactionHash;
     }
 };
 
@@ -111,18 +114,16 @@ export const executeBiconomyTransaction = async (
                 success,
             } = await wait();
 
-            console.log('success: ', success);
-
             if (success === 'false') {
-                console.log('remove');
                 window.localStorage.removeItem(LOCAL_STORAGE_KEYS.SESSION_P_KEY[networkId]);
                 window.localStorage.removeItem(LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId]);
+                throw new Error('tx failed');
+            } else {
+                console.log('TX was succesful: ', success);
+                console.log('Transaction receipt', transactionHash);
+
+                return transactionHash;
             }
-
-            console.log('TX was succesful: ', success);
-            console.log('Transaction receipt', transactionHash);
-
-            return transactionHash;
         } else {
             try {
                 console.log('try with session');
@@ -163,12 +164,12 @@ export const executeBiconomyTransaction = async (
                 if (success === 'false') {
                     console.log('failed');
                     throw new Error('tx failed');
+                } else {
+                    console.log('TX was succesful: ', success);
+                    console.log('Transaction receipt', transactionHash);
+
+                    return transactionHash;
                 }
-
-                console.log('TX was succesful: ', success);
-                console.log('Transaction receipt', transactionHash);
-
-                return transactionHash;
             } catch {
                 console.log('try without session after');
                 biconomyConnector.wallet.setActiveValidationModule(biconomyConnector.wallet.defaultValidationModule);
@@ -193,12 +194,13 @@ export const executeBiconomyTransaction = async (
                     console.log('remove');
                     window.localStorage.removeItem(LOCAL_STORAGE_KEYS.SESSION_P_KEY[networkId]);
                     window.localStorage.removeItem(LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId]);
+                    throw new Error('tx failed');
+                } else {
+                    console.log('TX was succesful: ', success);
+                    console.log('Transaction receipt', transactionHash);
+
+                    return transactionHash;
                 }
-
-                console.log('TX was succesful: ', success);
-                console.log('Transaction receipt', transactionHash);
-
-                return transactionHash;
             }
         }
     }

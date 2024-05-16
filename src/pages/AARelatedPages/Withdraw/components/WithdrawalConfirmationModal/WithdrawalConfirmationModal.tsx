@@ -61,7 +61,6 @@ const WithdrawalConfirmationModal: React.FC<WithdrawalConfirmationModalProps> = 
                 );
                 toast.update(id, getSuccessToastOptions(t('withdraw.toast-messages.success'), ''));
             }
-            toast.update(id, getErrorToastOptions(t('withdraw.toast-messages.error'), ''));
         } catch (e) {
             console.log('Error ', e);
             toast.update(id, getErrorToastOptions(t('withdraw.toast-messages.error'), ''));

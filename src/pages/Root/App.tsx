@@ -28,13 +28,8 @@ import biconomyConnector from 'utils/biconomyWallet';
 import { setIsBiconomy } from 'redux/modules/wallet';
 import { particleWagmiWallet } from 'utils/particleWallet/particleWagmiWallet';
 import { useConnect as useParticleConnect } from '@particle-network/auth-core-modal';
-import {
-    AuthCoreEvent,
-    getLatestAuthType,
-    isSocialAuthType,
-    particleAuth,
-    SocialAuthType,
-} from '@particle-network/auth-core';
+import { AuthCoreEvent, getLatestAuthType, particleAuth, SocialAuthType } from '@particle-network/auth-core';
+import { isSocialLogin } from 'utils/particleWallet/utils';
 
 const App = () => {
     const dispatch = useDispatch();
@@ -71,7 +66,7 @@ const App = () => {
             });
         }
 
-        if (walletClient && isSocialAuthType(getLatestAuthType())) {
+        if (walletClient && isSocialLogin(getLatestAuthType())) {
             const bundlerUrl = `https://bundler.biconomy.io/api/v2/${networkId}/${
                 import.meta.env.VITE_APP_BICONOMY_BUNDLE_KEY
             }`;
@@ -94,7 +89,7 @@ const App = () => {
     }, [dispatch, switchChain, networkId, disconnect, walletClient]);
 
     useEffect(() => {
-        if (connectionStatus === 'connected' && isSocialAuthType(getLatestAuthType())) {
+        if (connectionStatus === 'connected' && isSocialLogin(getLatestAuthType())) {
             connect({
                 connector: particleWagmiWallet({
                     socialType: getLatestAuthType() as SocialAuthType,

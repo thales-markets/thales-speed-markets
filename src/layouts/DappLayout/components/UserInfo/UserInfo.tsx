@@ -68,10 +68,12 @@ const UserInfo: React.FC<UserInfoProps> = ({ setUserInfoOpen, setOpenWithdraw })
                             <TextLabel>{t('user-info.eoa')} </TextLabel>
                             <Value>{address?.toLowerCase()}</Value>
                         </FlexDivColumn>
-                        <SessionWrapper>
-                            <TextLabel>{t('user-info.session-valid')} </TextLabel>
-                            <Value>{formatShortDateWithFullTime(Number(validUntil) * 1000)}</Value>
-                        </SessionWrapper>
+                        {isBiconomy && (
+                            <SessionWrapper>
+                                <TextLabel>{t('user-info.session-valid')} </TextLabel>
+                                <Value>{formatShortDateWithFullTime(Number(validUntil) * 1000)}</Value>
+                            </SessionWrapper>
+                        )}
                     </FlexColumn>
                     <FlexColumn>
                         {isBiconomy && (
