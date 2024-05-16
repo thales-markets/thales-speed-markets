@@ -1,19 +1,27 @@
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import ReactTooltip from 'rc-tooltip';
 import React, { CSSProperties } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import 'styles/tooltip.css';
+import { ThemeInterface } from 'types/ui';
 
 type TooltipProps = {
     overlay: any;
-    customIconStyling?: CSSProperties;
     children?: React.ReactNode;
 };
 
-const Tooltip: React.FC<TooltipProps> = ({ overlay, customIconStyling, children }) => {
+const Tooltip: React.FC<TooltipProps> = ({ overlay, children }) => {
+    const theme: ThemeInterface = useTheme();
+
+    const toolipInnerStyle: CSSProperties = {
+        background: theme.background.primary,
+        color: theme.textColor.primary,
+        fontWeight: 700,
+    };
+
     return (
-        <ReactTooltip overlay={overlay} placement="top">
-            {children ? (children as any) : <InfoIcon style={customIconStyling} />}
+        <ReactTooltip overlay={overlay} overlayInnerStyle={toolipInnerStyle} placement="top">
+            {children ? (children as any) : <InfoIcon />}
         </ReactTooltip>
     );
 };

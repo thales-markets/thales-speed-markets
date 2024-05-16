@@ -22,7 +22,7 @@ export default {
     borderColor: {
         primary: Colors.GRAY,
         secondary: Colors.GRAY_LIGHT,
-        tertiary: '',
+        tertiary: `linear-gradient(90deg, ${Colors.PURPLE_DARK} 0%, ${Colors.BLUE} 100%)`,
         quaternary: Colors.PURPLE,
     },
     button: {

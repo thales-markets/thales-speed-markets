@@ -673,7 +673,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
     const getTradingDetails = () => {
         return (
-            <GradientContainer width={640}>
+            <GradientContainer width={780}>
                 <TradingDetailsContainer>
                     <TradingDetailsSentence
                         currencyKey={currencyKey}
@@ -761,7 +761,6 @@ const Container = styled(FlexDivRow)`
 
 const TradingDetailsContainer = styled(FlexDivRowCentered)`
     position: relative;
-    width: 780px;
     height: 100%;
     background: ${(props) => props.theme.background.primary};
     border-radius: 8px;

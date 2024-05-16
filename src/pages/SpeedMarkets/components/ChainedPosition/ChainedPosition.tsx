@@ -258,10 +258,7 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                                         </Text>
                                     ) : position.isOpen && maturedStrikeTimes[index] ? (
                                         <Text fontSize={16}>
-                                            <Tooltip
-                                                customIconStyling={{ marginLeft: '0', fontSize: '16px' }}
-                                                overlay={t('speed-markets.tooltips.final-price-missing')}
-                                            />
+                                            <Tooltip overlay={t('speed-markets.tooltips.final-price-missing')} />
                                         </Text>
                                     ) : (
                                         <Dash />
