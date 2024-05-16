@@ -19,7 +19,6 @@ import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import { DEFAULT_SESSION_KEY_MANAGER_MODULE, createSessionKeyManagerModule } from '@biconomy/account';
 
 import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
-import { RPC_LIST } from 'constants/network';
 import erc20Contract from './contracts/collateralContract';
 import chainedSpeedMarketsAMMContract from './contracts/chainedSpeedMarketsAMMContract';
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
@@ -57,9 +56,12 @@ export const executeBiconomyTransactionWithConfirmation = async (
 
         const {
             receipt: { transactionHash },
+            success,
         } = await wait();
 
-        return transactionHash;
+        if (success === 'false') {
+            throw new Error('tx failed');
+        } else return transactionHash;
     }
 };
 
@@ -111,18 +113,16 @@ export const executeBiconomyTransaction = async (
                 success,
             } = await wait();
 
-            console.log('success: ', success);
-
             if (success === 'false') {
-                console.log('remove');
                 window.localStorage.removeItem(LOCAL_STORAGE_KEYS.SESSION_P_KEY[networkId]);
                 window.localStorage.removeItem(LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId]);
+                throw new Error('tx failed');
+            } else {
+                console.log('TX was succesful: ', success);
+                console.log('Transaction receipt', transactionHash);
+
+                return transactionHash;
             }
-
-            console.log('TX was succesful: ', success);
-            console.log('Transaction receipt', transactionHash);
-
-            return transactionHash;
         } else {
             try {
                 console.log('try with session');
@@ -135,13 +135,10 @@ export const executeBiconomyTransaction = async (
                 biconomyConnector.wallet.setActiveValidationModule(sessionModule);
 
                 const sessionAccount = privateKeyToAccount(sessionKeyPrivKey as any);
-
-                const transport = RPC_LIST.CHAINNODE[networkId];
-
                 const sessionSigner = createWalletClient({
                     account: sessionAccount,
                     chain: networkId as any,
-                    transport: http(transport),
+                    transport: http(biconomyConnector.wallet.rpcProvider.transport.url),
                 });
 
                 const { wait } = await biconomyConnector.wallet.sendTransaction(transaction, {
@@ -163,12 +160,12 @@ export const executeBiconomyTransaction = async (
                 if (success === 'false') {
                     console.log('failed');
                     throw new Error('tx failed');
+                } else {
+                    console.log('TX was succesful: ', success);
+                    console.log('Transaction receipt', transactionHash);
+
+                    return transactionHash;
                 }
-
-                console.log('TX was succesful: ', success);
-                console.log('Transaction receipt', transactionHash);
-
-                return transactionHash;
             } catch {
                 console.log('try without session after');
                 biconomyConnector.wallet.setActiveValidationModule(biconomyConnector.wallet.defaultValidationModule);
@@ -193,12 +190,13 @@ export const executeBiconomyTransaction = async (
                     console.log('remove');
                     window.localStorage.removeItem(LOCAL_STORAGE_KEYS.SESSION_P_KEY[networkId]);
                     window.localStorage.removeItem(LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId]);
+                    throw new Error('tx failed');
+                } else {
+                    console.log('TX was succesful: ', success);
+                    console.log('Transaction receipt', transactionHash);
+
+                    return transactionHash;
                 }
-
-                console.log('TX was succesful: ', success);
-                console.log('Transaction receipt', transactionHash);
-
-                return transactionHash;
             }
         }
     }

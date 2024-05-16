@@ -3,6 +3,7 @@ import { SupportedNetwork } from 'types/network';
 import { ParticalTypes } from 'types/wallet';
 import { getNetworkNameByNetworkId } from 'utils/network';
 import { Connector } from 'wagmi';
+import { isSocialAuthType } from '@particle-network/auth-core';
 
 export const getClassNameForParticalLogin = (socialId: ParticalTypes) => {
     const label = PARTICAL_LOGINS_CLASSNAMES.find((item) => item.socialId == socialId)?.className;
@@ -26,3 +27,5 @@ export const getSpecificConnectorFromConnectorsArray = (
     }
     return connectors.find((connector: any) => connector.id == name);
 };
+
+export const isSocialLogin = (authType: any) => isSocialAuthType(authType) || (authType as any) === 'twitterv1';
