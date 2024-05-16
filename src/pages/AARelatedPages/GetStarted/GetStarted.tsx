@@ -2,7 +2,7 @@ import useExchangeRatesQuery, { Rates } from 'queries/rates/useExchangeRatesQuer
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { FlexDiv, FlexDivColumn, FlexDivStart } from 'styles/common';
 import Step from './components/Step';
 import { useTranslation } from 'react-i18next';
@@ -10,21 +10,21 @@ import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipl
 import { getCollaterals } from 'utils/currency';
 import { useAccount, useChainId, useClient } from 'wagmi';
 import { getIsBiconomy } from 'redux/modules/wallet';
-import { RootState } from 'types/ui';
+import { RootState, ThemeInterface } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
 import { GetStartedStep } from 'enums/wizard';
 import ReactModal from 'react-modal';
 
 ReactModal.setAppElement('#root');
 
-const defaultStyle = {
+const getDefaultStyle = (theme: ThemeInterface) => ({
     content: {
         top: '50%',
         left: '50%',
         right: 'auto',
         bottom: 'auto',
         padding: '2px',
-        background: 'linear-gradient(90deg, #a764b7 0%, #169cd2 100%)',
+        background: theme.borderColor.tertiary,
         width: '720px',
         borderRadius: '15px',
         marginRight: '-50%',
@@ -37,7 +37,7 @@ const defaultStyle = {
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
         zIndex: 200,
     },
-};
+});
 
 type GetStartedProps = {
     isOpen: boolean;
@@ -46,6 +46,8 @@ type GetStartedProps = {
 
 const GetStarted: React.FC<GetStartedProps> = ({ isOpen, onClose }) => {
     const { t } = useTranslation();
+    const theme: ThemeInterface = useTheme();
+
     const networkId = useChainId();
     const { address: walletAddress, isConnected: isWalletConnected } = useAccount();
     const client = useClient();
@@ -103,7 +105,7 @@ const GetStarted: React.FC<GetStartedProps> = ({ isOpen, onClose }) => {
     }, [isWalletConnected, totalBalanceValue]);
 
     return (
-        <ReactModal isOpen={isOpen} shouldCloseOnOverlayClick={false} style={defaultStyle}>
+        <ReactModal isOpen={isOpen} shouldCloseOnOverlayClick={false} style={getDefaultStyle(theme)}>
             <Container>
                 <CloseIconContainer>
                     <CloseIcon onClick={onClose} />

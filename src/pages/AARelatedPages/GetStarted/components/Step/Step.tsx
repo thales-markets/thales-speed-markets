@@ -12,9 +12,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 
 import { getIsBiconomy, setWalletConnectModalVisibility } from 'redux/modules/wallet';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { FlexDiv, FlexDivCentered, FlexDivColumn } from 'styles/common';
-import { RootState } from 'types/ui';
+import { RootState, ThemeInterface } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
 import { getDefaultCollateral } from 'utils/currency';
 import { getNetworkNameByNetworkId } from 'utils/network';
@@ -24,7 +24,7 @@ import { useAccount, useChainId } from 'wagmi';
 
 ReactModal.setAppElement('#root');
 
-const defaultStyle = {
+const getDefaultStyle = (theme: ThemeInterface) => ({
     content: {
         top: '50%',
         left: '50%',
@@ -32,7 +32,7 @@ const defaultStyle = {
         bottom: 'auto',
         padding: 2,
         paddingBottom: 0,
-        background: 'linear-gradient(90deg, #a764b7 0%, #169cd2 100%)',
+        background: theme.borderColor.tertiary,
         transform: 'translate(-50%, -50%)',
         overflow: 'none',
         border: 'none',
@@ -41,7 +41,7 @@ const defaultStyle = {
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
         zIndex: 200,
     },
-};
+});
 
 type StepProps = {
     stepNumber: number;
@@ -53,6 +53,8 @@ type StepProps = {
 };
 
 const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurrentStep, hasFunds, onClose }) => {
+    const theme: ThemeInterface = useTheme();
+
     const networkId = useChainId();
     const dispatch = useDispatch();
     const { isConnected: isWalletConnected, address: walletAddress } = useAccount();
@@ -230,7 +232,7 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
                 />
             )}
             {showOnramper && (
-                <ReactModal isOpen={showOnramper} shouldCloseOnOverlayClick={true} style={defaultStyle}>
+                <ReactModal isOpen={showOnramper} shouldCloseOnOverlayClick={true} style={getDefaultStyle(theme)}>
                     <OutsideClick onOutsideClick={() => setShowOnramper(false)}>
                         <div style={{ background: 'black', marginBottom: '2px' }}>
                             <iframe

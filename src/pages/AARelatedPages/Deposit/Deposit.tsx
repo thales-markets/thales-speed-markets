@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsAppReady } from 'redux/modules/app';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { FlexDiv } from 'styles/common';
 import { getNetworkNameByNetworkId } from 'utils/network';
 import {
@@ -25,7 +25,7 @@ import { getIsMobile } from 'redux/modules/ui';
 import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipleCollateralBalanceQuery';
 import queryString from 'query-string';
 import Modal from 'components/Modal';
-import { RootState } from 'types/ui';
+import { RootState, ThemeInterface } from 'types/ui';
 import { getIsBiconomy } from 'redux/modules/wallet';
 import { useAccount, useChainId, useClient } from 'wagmi';
 import biconomyConnector from 'utils/biconomyWallet';
@@ -40,14 +40,14 @@ import OutsideClick from 'components/OutsideClick';
 
 ReactModal.setAppElement('#root');
 
-const defaultStyle = {
+const getDefaultStyle = (theme: ThemeInterface) => ({
     content: {
         top: '50%',
         left: '50%',
         right: 'auto',
         bottom: 'auto',
         padding: '2px',
-        background: 'linear-gradient(90deg, #a764b7 0%, #169cd2 100%)',
+        background: theme.borderColor.tertiary,
         width: '720px',
         borderRadius: '15px',
         marginRight: '-50%',
@@ -60,7 +60,7 @@ const defaultStyle = {
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
         zIndex: 200,
     },
-};
+});
 
 type DepositProps = {
     isOpen: boolean;
@@ -69,6 +69,8 @@ type DepositProps = {
 
 const Deposit: React.FC<DepositProps> = ({ isOpen, onClose }) => {
     const { t } = useTranslation();
+    const theme: ThemeInterface = useTheme();
+
     const networkId = useChainId();
     const walletAddress = biconomyConnector.address;
     const { isConnected: isWalletConnected } = useAccount();
@@ -160,7 +162,7 @@ const Deposit: React.FC<DepositProps> = ({ isOpen, onClose }) => {
     }, [walletAddress, networkId, apiKey, isBiconomy]);
 
     return (
-        <ReactModal isOpen={isOpen} shouldCloseOnOverlayClick={true} style={defaultStyle}>
+        <ReactModal isOpen={isOpen} shouldCloseOnOverlayClick={true} style={getDefaultStyle(theme)}>
             <OutsideClick onOutsideClick={onClose}>
                 {isMobile && <PrimaryHeading>{t('deposit.deposit-crypto')}</PrimaryHeading>}
                 <Wrapper>

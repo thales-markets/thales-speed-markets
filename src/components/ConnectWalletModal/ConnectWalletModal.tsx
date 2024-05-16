@@ -13,21 +13,22 @@ import Checkbox from 'components/fields/Checkbox';
 import { SUPPORTED_PARTICAL_CONNECTORS } from 'constants/wallet';
 import { useSelector } from 'react-redux';
 import { getIsMobile } from 'redux/modules/ui';
-import { RootState } from 'types/ui';
+import { RootState, ThemeInterface } from 'types/ui';
 import { Connector, useConnect } from 'wagmi';
 import { getClassNameForParticalLogin, getSpecificConnectorFromConnectorsArray } from 'utils/particleWallet/utils';
 import Button from 'components/Button';
+import { useTheme } from 'styled-components';
 
 ReactModal.setAppElement('#root');
 
-const defaultStyle = {
+const getDefaultStyle = (theme: ThemeInterface) => ({
     content: {
         top: '50%',
         left: '50%',
         right: 'auto',
         bottom: 'auto',
         padding: '2px',
-        background: 'linear-gradient(90deg, #a764b7 0%, #169cd2 100%)',
+        background: theme.borderColor.tertiary,
         width: '720px',
         borderRadius: '15px',
         marginRight: '-50%',
@@ -40,7 +41,7 @@ const defaultStyle = {
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
         zIndex: 201,
     },
-};
+});
 
 type ConnectWalletModalProps = {
     isOpen: boolean;
@@ -49,6 +50,8 @@ type ConnectWalletModalProps = {
 
 const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({ isOpen, onClose }) => {
     const { t } = useTranslation();
+    const theme: ThemeInterface = useTheme();
+
     const { connectors, isPending, connect } = useConnect();
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const { openConnectModal } = useConnectModal();
@@ -56,11 +59,12 @@ const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({ isOpen, onClose
 
     useEffect(() => {
         if (isMobile) {
+            const defaultStyle = getDefaultStyle(theme);
             defaultStyle.content.width = '100%';
             defaultStyle.content.padding = '20px 5px';
             defaultStyle.content.height = '100%';
         }
-    }, [isMobile]);
+    }, [isMobile, theme]);
 
     const handleConnect = (connector: Connector) => {
         try {
@@ -71,7 +75,12 @@ const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({ isOpen, onClose
     };
 
     return (
-        <ReactModal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={defaultStyle}>
+        <ReactModal
+            isOpen={isOpen}
+            onRequestClose={onClose}
+            shouldCloseOnOverlayClick={true}
+            style={getDefaultStyle(theme)}
+        >
             <Container>
                 <CloseIconContainer>
                     <CloseIcon onClick={onClose} />

@@ -1,12 +1,25 @@
 import Button from 'components/Button';
+import OutsideClick from 'components/OutsideClick';
 import NumericInput from 'components/fields/NumericInput';
 import TextInput from 'components/fields/TextInput';
+import { COLLATERALS } from 'constants/currency';
+import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipleCollateralBalanceQuery';
+import queryString from 'query-string';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import ReactModal from 'react-modal';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
-import { RootState } from 'types/ui';
+import { getIsBiconomy } from 'redux/modules/wallet';
+import styled, { useTheme } from 'styled-components';
+import { FlexDiv } from 'styles/common';
+import { RootState, ThemeInterface } from 'types/ui';
+import biconomyConnector from 'utils/biconomyWallet';
+import { getCollaterals } from 'utils/currency';
 import { getNetworkNameByNetworkId } from 'utils/network';
-import queryString from 'query-string';
+import { isAddress } from 'viem';
+import { useAccount, useChainId, useClient } from 'wagmi';
+import CollateralDropdown from '../Deposit/components/CollateralDropdown';
 import {
     FormContainer,
     InputContainer,
@@ -17,30 +30,17 @@ import {
     Wrapper,
 } from '../styled-components';
 import WithdrawalConfirmationModal from './components/WithdrawalConfirmationModal';
-import { useTranslation } from 'react-i18next';
-import { getCollaterals } from 'utils/currency';
-import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipleCollateralBalanceQuery';
-import { useAccount, useChainId, useClient } from 'wagmi';
-import { getIsBiconomy } from 'redux/modules/wallet';
-import biconomyConnector from 'utils/biconomyWallet';
-import { isAddress } from 'viem';
-import { COLLATERALS } from 'constants/currency';
-import CollateralDropdown from '../Deposit/components/CollateralDropdown';
-import ReactModal from 'react-modal';
-import OutsideClick from 'components/OutsideClick';
-import styled from 'styled-components';
-import { FlexDiv } from 'styles/common';
 
 ReactModal.setAppElement('#root');
 
-const defaultStyle = {
+const getDefaultStyle = (theme: ThemeInterface) => ({
     content: {
         top: '50%',
         left: '50%',
         right: 'auto',
         bottom: 'auto',
         padding: '2px',
-        background: 'linear-gradient(90deg, #a764b7 0%, #169cd2 100%)',
+        background: theme.borderColor.tertiary,
         width: '720px',
         borderRadius: '15px',
         marginRight: '-50%',
@@ -53,7 +53,7 @@ const defaultStyle = {
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
         zIndex: 200,
     },
-};
+});
 
 type FormValidation = {
     walletAddress: boolean;
@@ -67,6 +67,8 @@ type DepositProps = {
 
 const Withdraw: React.FC<DepositProps> = ({ isOpen, onClose }) => {
     const { t } = useTranslation();
+    const theme: ThemeInterface = useTheme();
+
     const networkId = useChainId();
     const walletAddress = biconomyConnector.address;
     const { isConnected: isWalletConnected } = useAccount();
@@ -126,7 +128,7 @@ const Withdraw: React.FC<DepositProps> = ({ isOpen, onClose }) => {
     };
 
     return (
-        <ReactModal isOpen={isOpen} shouldCloseOnOverlayClick={true} style={defaultStyle}>
+        <ReactModal isOpen={isOpen} shouldCloseOnOverlayClick={true} style={getDefaultStyle(theme)}>
             <OutsideClick onOutsideClick={onClose}>
                 <Wrapper>
                     <FormContainer>
