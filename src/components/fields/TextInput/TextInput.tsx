@@ -35,6 +35,9 @@ const StyledInput = styled(Input)<{ padding?: string; readOnly: boolean }>`
     &:focus {
         ${(props) => (props.readOnly ? `border: 2px solid ${props.theme.input.borderColor.primary};` : '')}
     }
+    &::placeholder {
+        opacity: 0.5;
+    }
 `;
 
 export default TextInput;
