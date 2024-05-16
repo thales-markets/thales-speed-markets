@@ -92,10 +92,6 @@ export const RPC_LIST = {
         [NetworkId.Arbitrum]: `https://arbitrum-one.chainnodes.org/${CHAINNODE_PROJECT_ID}`,
         [NetworkId.PolygonMainnet]: `https://polygon-mainnet.chainnodes.org/${CHAINNODE_PROJECT_ID}`,
         [NetworkId.Base]: `https://base-mainnet.chainnodes.org/${CHAINNODE_PROJECT_ID}`,
-        [NetworkId.ZkSync]: 'TODO',
-        [NetworkId.ZkSyncSepolia]: 'TODO',
-        [NetworkId.BlastSepolia]: 'TODO',
-        [NetworkId.OptimismSepolia]: 'TODO',
     },
     ANKR: {
         [NetworkId.OptimismMainnet]: `https://rpc.ankr.com/optimism/${ANKR_PROJECT_ID}`,

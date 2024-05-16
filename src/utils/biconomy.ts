@@ -19,7 +19,6 @@ import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import { DEFAULT_SESSION_KEY_MANAGER_MODULE, createSessionKeyManagerModule } from '@biconomy/account';
 
 import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
-import { RPC_LIST } from 'constants/network';
 import erc20Contract from './contracts/collateralContract';
 import chainedSpeedMarketsAMMContract from './contracts/chainedSpeedMarketsAMMContract';
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
@@ -136,13 +135,10 @@ export const executeBiconomyTransaction = async (
                 biconomyConnector.wallet.setActiveValidationModule(sessionModule);
 
                 const sessionAccount = privateKeyToAccount(sessionKeyPrivKey as any);
-
-                const transport = RPC_LIST.CHAINNODE[networkId];
-
                 const sessionSigner = createWalletClient({
                     account: sessionAccount,
                     chain: networkId as any,
-                    transport: http(transport),
+                    transport: http(biconomyConnector.wallet.rpcProvider.transport.url),
                 });
 
                 const { wait } = await biconomyConnector.wallet.sendTransaction(transaction, {
