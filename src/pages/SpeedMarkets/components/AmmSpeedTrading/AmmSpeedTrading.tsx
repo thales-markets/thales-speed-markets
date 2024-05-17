@@ -788,7 +788,7 @@ const ColumnSpaceBetween = styled(FlexDivColumn)`
 
 const ShareIcon = styled.i<{ disabled: boolean }>`
     position: absolute;
-    top: 12px;
+    bottom: 12px;
     right: 12px;
     font-size: 18px;
     color: ${(props) => props.theme.textColor.primary};
@@ -813,7 +813,6 @@ const QuoteContainer = styled.div`
 `;
 
 const QuoteLabel = styled.span`
-    font-family: ${(props) => props.theme.fontFamily.primary};
     font-size: 18px;
     font-weight: 800;
     line-height: 100%;
@@ -821,7 +820,6 @@ const QuoteLabel = styled.span`
 `;
 
 const QuoteText = styled.span`
-    font-family: ${(props) => props.theme.fontFamily.primary};
     font-size: 30px;
     font-weight: 800;
     line-height: 100%;

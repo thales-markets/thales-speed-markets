@@ -146,7 +146,6 @@ const FlexStartCentered = styled(FlexDivStart)`
 `;
 
 const TextLabel = styled.span`
-    font-family: ${(props) => props.theme.fontFamily.primary};
     color: ${(props) => props.theme.textColor.quinary};
     font-size: 14px;
     font-weight: 700;
@@ -171,7 +170,6 @@ const CopyIcon = styled.i`
     margin-left: 4px;
 `;
 const Label = styled.span`
-    font-family: ${(props) => props.theme.fontFamily.primary};
     color: ${(props) => props.theme.textColor.primary};
     font-size: 14px;
     font-weight: 800;

@@ -129,7 +129,6 @@ const CurrencyLabel = styled.label<{ $hasSeparator?: boolean }>`
 `;
 
 const MaxButton = styled.button`
-    font-family: ${(props) => props.theme.fontFamily.primary};
     background: ${(props) => props.theme.button.borderColor.secondary};
     border-radius: 17px;
     border: none;

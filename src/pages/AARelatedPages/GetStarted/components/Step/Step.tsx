@@ -315,7 +315,6 @@ const AddressContainer = styled.div`
 `;
 
 const Address = styled.span`
-    font-family: ${(props) => props.theme.fontFamily.primary};
     font-size: 14px;
     font-weight: 800;
     line-height: normal;

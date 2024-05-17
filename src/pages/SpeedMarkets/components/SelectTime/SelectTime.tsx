@@ -211,7 +211,11 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                                 >{`${deltaHours}h`}</Time>
                             ))}
                             <PlusMinusIcon
-                                className="network-icon network-icon--plus"
+                                className={
+                                    showCustomDeltaTime
+                                        ? 'network-icon network-icon--minus'
+                                        : 'network-icon network-icon--plus'
+                                }
                                 onClick={onCustomTimeClickHandler}
                             />
                         </SingleRow>
@@ -317,7 +321,6 @@ const Time = styled(FlexDivCentered)<{ $isChained: boolean; $isSelected: boolean
     width: ${(props) => (props.$isChained ? '60px' : '67px')};
     height: 40px;
     border-radius: 8px;
-    font-family: ${(props) => props.theme.fontFamily.primary};
     font-size: 13px;
     font-weight: 800;
     line-height: 100%;

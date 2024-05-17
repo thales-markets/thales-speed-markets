@@ -234,7 +234,7 @@
         "amm-trading": {
             "asset-price": "If {{asset}} price is",
             "choose-direction": "choose direction",
-            "choose-time": "choose time",
+            "choose-time": "choose duration",
             "pick-price": "pick a price",
             "based-amount": "based on amount",
             "you-win": "you win",

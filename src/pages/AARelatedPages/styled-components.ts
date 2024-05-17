@@ -50,7 +50,6 @@ export const PrimaryHeading = styled.h1`
 `;
 
 export const InputLabel = styled.p<{ marginTop?: string }>`
-    font-family: ${(props) => props.theme.fontFamily.primary};
     font-size: 14px;
     font-weight: 400;
     line-height: normal;
@@ -69,7 +68,6 @@ export const WarningContainer = styled(FlexDiv)`
     width: 100%;
     background-color: ${(props) => props.theme.background.quinary};
     color: ${(props) => props.theme.background.primary};
-    font-family: ${(props) => props.theme.fontFamily.primary};
     padding: 12px 8px;
     align-items: center;
     font-weight: 400;

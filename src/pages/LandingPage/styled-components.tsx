@@ -285,7 +285,6 @@ export const Title = styled.h1`
 `;
 
 export const TitleDesc = styled.p`
-    font-family: ${(props) => props.theme.fontFamily.primary};
     font-size: 18px;
     line-height: 110%;
     font-weight: 400;
@@ -413,7 +412,6 @@ export const ContentTextTitle = styled.h2`
     }
 `;
 export const ContentTextDesc = styled.p`
-    font-family: ${(props) => props.theme.fontFamily.primary};
     font-size: 16px;
     line-height: 100%;
     font-weight: 400;
@@ -453,7 +451,6 @@ export const CoinsImg = styled.img`
 `;
 
 export const LogoText = styled.span`
-    font-family: ${(props) => props.theme.fontFamily.primary};
     font-size: 18px;
     line-height: 150%;
     font-weight: 600;

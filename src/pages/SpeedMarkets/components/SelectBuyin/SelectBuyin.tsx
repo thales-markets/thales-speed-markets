@@ -354,7 +354,6 @@ const Amount = styled(FlexDivCentered)<{ $isSelected: boolean }>`
     width: 60px;
     height: 40px;
     border-radius: 8px;
-    font-family: ${(props) => props.theme.fontFamily.primary};
     font-size: 13px;
     font-weight: 800;
     line-height: 100%;

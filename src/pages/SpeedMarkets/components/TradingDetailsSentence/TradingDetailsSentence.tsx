@@ -7,14 +7,13 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsMobile } from 'redux/modules/ui';
-import styled from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
 import { formatCurrencyWithKey, formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
 import { MarketInfo } from 'types/market';
 import { RootState } from 'types/ui';
 import { getDefaultCollateral } from 'utils/currency';
 import { useChainId } from 'wagmi';
-import { ColumnSpaceBetween, Text, TextLabel, TextValue } from './styled-components';
+import { Cotainer, PositionText, SentanceTextValue, Text, TextLabel } from './styled-components';
 
 type SpeedMarketsTrade = {
     address: string;
@@ -84,10 +83,10 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
                       : t('common.time-remaining.hours')
                   : t('common.time-remaining.minutes')
           }`
-        : `... ${t('common.time-remaining.minutes')}`;
+        : `( ${t('speed-markets.amm-trading.choose-time')} ) ${t('common.time-remaining.minutes')}`;
 
     const fullDateFromDeltaTimeFormatted = deltaTimeSec
-        ? `(${isChained ? t('common.starting') + ' ' : ''}${formatShortDateWithTime(dateFromDelta)})`
+        ? `(${formatShortDateWithTime(dateFromDelta)})`
         : `( ${t('speed-markets.amm-trading.choose-time')} )`;
 
     const timeFormatted = deltaTimeSec
@@ -104,7 +103,8 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
     const isAllChainedMarketsSelected = chainedPositions.every((pos) => pos !== undefined);
 
     return (
-        <ColumnSpaceBetween>
+        <Cotainer>
+            {/* First line */}
             <FlexDivCentered>
                 <Text>
                     <TextLabel>
@@ -117,7 +117,7 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
                             {`(${t('speed-markets.chained.starting-from')} ${formatCurrencyWithSign(
                                 USD_SIGN,
                                 (market as MarketInfo).strikePrice
-                            )}),`}
+                            )})`}
                         </SentanceTextValue>
                     )}
                     {market.address ? (
@@ -153,6 +153,7 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
                     </SentanceTextValue>
                 </FlexDivCentered>
             )}
+            {/* Second line */}
             <FlexDivCentered>
                 <Text>
                     <TextLabel>
@@ -162,9 +163,6 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
                         <>
                             <SentanceTextValue $lowercase>{deltaTimeFormatted}</SentanceTextValue>
                             <TextLabel>{` ${t('speed-markets.chained.between-rounds')}`}</TextLabel>
-                            {!isMobile && (
-                                <SentanceTextValue $lowercase>{fullDateFromDeltaTimeFormatted}</SentanceTextValue>
-                            )}
                         </>
                     ) : (
                         <SentanceTextValue $lowercase>{timeFormatted}</SentanceTextValue>
@@ -176,6 +174,7 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
                     <SentanceTextValue $lowercase>{fullDateFromDeltaTimeFormatted}</SentanceTextValue>
                 </FlexDivCentered>
             )}
+            {/* Third line */}
             <FlexDivCentered>
                 <Text>
                     <TextLabel>{t('speed-markets.amm-trading.you-win')}</TextLabel>
@@ -190,17 +189,8 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
                     )}
                 </Text>
             </FlexDivCentered>
-        </ColumnSpaceBetween>
+        </Cotainer>
     );
 };
-
-const SentanceTextValue = styled(TextValue)`
-    padding-left: 5px;
-`;
-
-const PositionText = styled(TextValue)<{ $isUp: boolean }>`
-    color: ${(props) => (props.$isUp ? props.theme.positionColor.up : props.theme.positionColor.down)};
-    text-transform: uppercase;
-`;
 
 export default TradingDetailsSentence;

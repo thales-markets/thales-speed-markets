@@ -17,7 +17,6 @@ export const Header = styled(FlexDivColumn)`
 `;
 
 export const HeaderText = styled.span`
-    font-family: ${(props) => props.theme.fontFamily.primary};
     font-size: 14px;
     font-weight: 700;
     line-height: 18px;
@@ -33,8 +32,7 @@ export const HeaderSubText = styled(HeaderText)`
 `;
 
 export const ClearAll = styled(FlexDivCentered)<{ isDisabled?: boolean }>`
-    font-family: ${(props) => props.theme.fontFamily.primary};
-    color: ${(props) => props.theme.warning.textColor.primary};
+    color: ${(props) => props.theme.textColor.tertiary};
     font-size: 12px;
     font-weight: 700;
     line-height: 150%;
@@ -45,8 +43,8 @@ export const ClearAll = styled(FlexDivCentered)<{ isDisabled?: boolean }>`
 export const IconWrong = styled(FlexDivCentered)`
     width: 16px;
     height: 16px;
-    color: ${(props) => props.theme.warning.textColor.primary};
-    border: 2px solid ${(props) => props.theme.warning.textColor.primary};
+    color: ${(props) => props.theme.textColor.tertiary};
+    border: 2px solid ${(props) => props.theme.textColor.tertiary};
 
     font-weight: 300;
     border-radius: 50%;
@@ -73,10 +71,9 @@ export const PositionWrapper = styled(FlexDivCentered)<{ $isSelected?: boolean }
     align-items: center;
     justify-content: start;
     gap: 15px;
-    font-family: ${(props) => props.theme.fontFamily.primary};
     font-size: 18px;
     font-weight: 800;
-    line-height: 100%; /* 18px */
+    line-height: 100%;
     text-transform: uppercase;
     padding-left: 15px;
     width: 145px;
