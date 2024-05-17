@@ -1,6 +1,5 @@
 import ApprovalModal from 'components/ApprovalModal';
 import Button from 'components/Button';
-import { GradientContainer } from 'components/Common/GradientBorder';
 import {
     getDefaultToastContent,
     getErrorToastOptions,
@@ -28,7 +27,7 @@ import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
 import { getIsBiconomy, getSelectedCollateralIndex, setWalletConnectModalVisibility } from 'redux/modules/wallet';
 import styled from 'styled-components';
-import { FlexDivCentered, FlexDivColumn, FlexDivRow, FlexDivRowCentered } from 'styles/common';
+import { FlexDivCentered, FlexDivColumn, FlexDivRow, FlexDivRowCentered, GradientContainer } from 'styles/common';
 import {
     COLLATERAL_DECIMALS,
     NetworkId,

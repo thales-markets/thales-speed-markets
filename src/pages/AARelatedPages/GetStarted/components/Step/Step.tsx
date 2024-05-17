@@ -1,5 +1,4 @@
 import Button from 'components/Button';
-import { GradientContainer } from 'components/Common/GradientBorder';
 import Modal from 'components/Modal';
 import OutsideClick from 'components/OutsideClick';
 import { getErrorToastOptions, getInfoToastOptions } from 'components/ToastMessage/ToastMessage';
@@ -11,10 +10,9 @@ import { useTranslation } from 'react-i18next';
 import ReactModal from 'react-modal';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-
 import { getIsBiconomy, setWalletConnectModalVisibility } from 'redux/modules/wallet';
 import styled from 'styled-components';
-import { FlexDiv, FlexDivCentered, FlexDivColumn } from 'styles/common';
+import { FlexDiv, FlexDivCentered, FlexDivColumn, GradientContainer } from 'styles/common';
 import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
 import { getDefaultCollateral } from 'utils/currency';

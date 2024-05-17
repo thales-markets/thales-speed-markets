@@ -269,7 +269,7 @@ const PythIconWrap = styled.div`
     i {
         font-size: 40px;
         line-height: 10px;
-        color: ${(props) => props.theme.textColor.primary};
+        color: ${(props) => props.theme.textColor.quinary};
     }
 `;
 
