@@ -146,7 +146,7 @@ const Text = styled.span<{ fontWeight?: string }>`
 `;
 
 const TextCollateral = styled(Text)<{ color?: string }>`
-    color: ${(props) => (props.color ? props.color : props.theme.dropDown.textColor.secondary)};
+    color: ${(props) => (props.color ? props.color : props.theme.dropDown.textColor.primary)};
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -180,17 +180,19 @@ const Dropdown = styled(FlexDivColumnCentered)<{ width?: string }>`
     width: ${(props) => (props.width ? props.width : '71px')};
     padding: 5px 3px;
     border-radius: 8px;
-    background: ${(props) => props.theme.dropDown.background.secondary};
+    border: 2px solid ${(props) => props.theme.dropDown.background.secondary};
+    background: ${(props) => props.theme.dropDown.background.primary};
     z-index: 100;
 `;
 
 const DetailedDropdown = styled(FlexDivColumnCentered)<{ width?: string }>`
     position: absolute;
-    top: 30px;
-    right: 0px;
+    top: 34px;
+    right: -9px;
     width: ${(props) => (props.width ? props.width : '340px')};
     padding: 5px 3px;
     border-radius: 8px;
+    border: 2px solid ${(props) => props.theme.dropDown.background.secondary};
     background: ${(props) => props.theme.dropDown.background.primary};
     z-index: 100;
 `;
@@ -202,16 +204,9 @@ const CollateralOption = styled.div`
     border-radius: 8px;
     cursor: pointer;
     &:hover {
-        background: ${(props) => props.theme.dropDown.background.secondary};
-    }
-`;
-
-const DetailedCollateralOption = styled(FlexDivSpaceBetween)`
-    padding: 5px 24px;
-    border-radius: 8px;
-    cursor: pointer;
-    &:hover {
-        background: ${(props) => props.theme.dropDown.background.secondary};
+        ${TextCollateral} {
+            color: ${(props) => props.theme.dropDown.textColor.secondary};
+        }
     }
 `;
 
@@ -219,9 +214,20 @@ const Icon = styled.i`
     font-size: 25px;
     line-height: 100%;
     margin-right: 10px;
-    background: ${(props) => props.theme.icon.background.primary};
-    color: ${(props) => props.theme.icon.textColor.secondary};
+    background: ${(props) => props.theme.dropDown.background.primary};
+    color: ${(props) => props.theme.dropDown.textColor.primary};
     border-radius: 50%;
+`;
+
+const DetailedCollateralOption = styled(FlexDivSpaceBetween)`
+    padding: 5px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    &:hover {
+        ${Icon}, ${TextCollateral} {
+            color: ${(props) => props.theme.dropDown.textColor.secondary};
+        }
+    }
 `;
 
 export default CollateralSelector;

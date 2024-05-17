@@ -9,7 +9,6 @@ import { FlexDivRow } from 'styles/common';
 import { Coins, formatCurrencyWithKey } from 'thales-utils';
 import { RootState } from 'types/ui';
 import {
-    getAssetIcon,
     getCoinBalance,
     getCollateral,
     getCollateralIndexForNetwork,
@@ -138,11 +137,6 @@ const UserCollaterals: React.FC = () => {
         setIsDropdownOpen(false);
     };
 
-    const assetIcon = (type: string) => {
-        const AssetIconElement = getAssetIcon(type as Coins);
-        return <AssetIconElement style={AssetIconStyle} />;
-    };
-
     return (
         <Container>
             <OutsideClickHandler onOutsideClick={() => isDropdownOpen && setIsDropdownOpen(false)}>
@@ -170,7 +164,9 @@ const UserCollaterals: React.FC = () => {
                                     $clickable={isConnected}
                                     onClick={() => onCollateralClickHandler(coin.name)}
                                 >
-                                    {assetIcon(coin.name)}
+                                    <AssetIcon
+                                        className={`currency-icon currency-icon--${collateral.name.toLowerCase()}`}
+                                    />
 
                                     <BalanceText>{formatCurrencyWithKey(coin.name, coin.balance)}</BalanceText>
                                 </BalanceWrapper>
@@ -214,8 +210,9 @@ const Dropdown = styled.div`
     position: absolute;
     top: 30px;
     right: 0;
-    background-color: ${(props) => props.theme.background.secondary};
     border-radius: 8px;
+    border: 2px solid ${(props) => props.theme.dropDown.background.secondary};
+    background: ${(props) => props.theme.dropDown.background.primary};
     width: 150px;
     padding: 5px;
     text-align: center;
@@ -225,6 +222,20 @@ const Dropdown = styled.div`
         min-width: 124px;
         width: 100%;
     }
+`;
+
+const Icon = styled.i`
+    font-size: 10px;
+    color: ${(props) => props.theme.textColor.quinary};
+`;
+
+const AssetIcon = styled.i`
+    font-size: 25px;
+    line-height: 100%;
+    margin-right: 10px;
+    background: ${(props) => props.theme.dropDown.background.primary};
+    color: ${(props) => props.theme.dropDown.textColor.primary};
+    border-radius: 50%;
 `;
 
 const BalanceWrapper = styled.div<{ $clickable: boolean }>`
@@ -237,6 +248,9 @@ const BalanceWrapper = styled.div<{ $clickable: boolean }>`
     border-radius: 8px;
     &:hover {
         background: ${(props) => props.theme.background.primary};
+        ${AssetIcon} {
+            color: ${(props) => props.theme.dropDown.textColor.secondary};
+        }
     }
 `;
 
@@ -245,13 +259,6 @@ const BalanceText = styled.span`
     font-family: ${(props) => props.theme.fontFamily.secondary};
     font-weight: 700;
     font-size: 12px;
-`;
-
-const AssetIconStyle = { width: '16px', height: '16px', marginRight: '5px' };
-
-const Icon = styled.i`
-    font-size: 10px;
-    color: ${(props) => props.theme.textColor.quinary};
 `;
 
 export default UserCollaterals;

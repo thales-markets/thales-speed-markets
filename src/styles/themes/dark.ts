@@ -73,12 +73,12 @@ export default {
     },
     dropDown: {
         background: {
-            primary: Colors.PURPLE,
-            secondary: Colors.WHITE,
+            primary: Colors.BLACK,
+            secondary: Colors.PURPLE,
         },
         textColor: {
             primary: Colors.WHITE,
-            secondary: Colors.BLACK,
+            secondary: Colors.PURPLE,
         },
     },
     link: {
@@ -116,11 +116,11 @@ export default {
             secondary: Colors.GRAY,
         },
         textColor: {
-            primary: Colors.ORANGE,
+            primary: Colors.WHITE,
             secondary: Colors.ORANGE_DARK,
         },
         borderColor: {
-            primary: Colors.ORANGE,
+            primary: Colors.PURPLE,
         },
     },
     table: {
