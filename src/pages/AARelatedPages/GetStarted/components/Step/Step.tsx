@@ -193,7 +193,7 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
                                     <OnramperIcons className={`social-icon icon--applepay`} />
                                     <OnramperIcons className={`social-icon icon--googlepay`} />
                                 </OnramperDiv>
-                                <Button disabled={!isActive} width="100%" fontSize="14px">
+                                <Button disabled={!isActive} width="100%" fontSize="18px">
                                     {t('get-started.steps.action.buy-crypto')}
                                 </Button>
                             </OnramperDiv>
