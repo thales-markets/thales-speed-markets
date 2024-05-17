@@ -21,10 +21,10 @@ import { Trans, useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { getIsAppReady } from 'redux/modules/app';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { BoldText, PAGE_MAX_WIDTH } from 'styles/common';
 import { roundNumberToDecimals } from 'thales-utils';
-import { RootState } from 'types/ui';
+import { RootState, ThemeInterface } from 'types/ui';
 import { getSupportedNetworksByRoute } from 'utils/network';
 import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAssetsAsObject } from 'utils/pyth';
 import { buildHref } from 'utils/routes';
@@ -40,6 +40,7 @@ import SelectTime from './components/SelectTime';
 const SpeedMarkets: React.FC = () => {
     const { t } = useTranslation();
     const location = useLocation();
+    const theme: ThemeInterface = useTheme();
 
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const networkId = useChainId();
@@ -178,7 +179,7 @@ const SpeedMarkets: React.FC = () => {
                         selected={isChained ? chainedPositions : [positionType]}
                         onChange={setPositionType}
                         onChainedChange={setChainedPositions}
-                        ammChainedSpeedMarketsLimits={ammChainedSpeedMarketsLimitsData}
+                        resetData={resetData}
                         skew={skew}
                     />
                 )}
@@ -193,6 +194,7 @@ const SpeedMarkets: React.FC = () => {
                 )}
                 {isBuyinStep && (
                     <SelectBuyin
+                        selectedStableBuyinAmount={selectedStableBuyinAmount}
                         onChange={setSelectedStableBuyinAmount}
                         isChained={isChained}
                         chainedPositions={chainedPositions}
@@ -234,7 +236,10 @@ const SpeedMarkets: React.FC = () => {
                                             : '...',
                                     }}
                                 />
-                                <Tooltip overlay={t('speed-markets.tooltips.buyin-fees')} />
+                                <Tooltip
+                                    overlay={t('speed-markets.tooltips.buyin-fees')}
+                                    customIconStyling={{ color: theme.textColor.quinary }}
+                                />
                             </Info>
                             <LightweightChart
                                 position={isChained ? undefined : positionType}

@@ -14,7 +14,7 @@ import styled from 'styled-components';
 import { FlexDiv, FlexDivRowCentered, FlexDivSpaceBetween } from 'styles/common';
 import { formatCurrencyWithSign } from 'thales-utils';
 import { Risk, RiskPerAsset, RiskPerAssetAndPosition } from 'types/market';
-import { RootState } from 'types/ui';
+import { RootState, ThemeInterface } from 'types/ui';
 
 import SimpleLoader from 'components/SimpleLoader';
 import { hoursToSeconds, minutesToSeconds, subDays } from 'date-fns';
@@ -22,6 +22,7 @@ import { ChartComponent } from './components/Chart/ChartContext';
 import CurrentPrice from './components/CurrentPrice';
 import Toggle from './components/DateToggle';
 import { useChainId, useClient } from 'wagmi';
+import { useTheme } from 'styled-components';
 
 const now = new Date();
 
@@ -62,6 +63,7 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
     risksPerAssetAndDirection,
 }) => {
     const { t } = useTranslation();
+    const theme: ThemeInterface = useTheme();
 
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const networkId = useChainId();
@@ -167,20 +169,27 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
         ? formatCurrencyWithSign(USD_SIGN, riskPerDirectionDown.max - riskPerDirectionDown.current)
         : 0;
 
+    const isPriceUp = (explicitCurrentPrice || 0) > (prevExplicitPrice || 0);
+
     return (
         <Wrapper>
             <FlexDivSpaceBetween>
                 <FlexDivRowCentered>
-                    <CurrentPrice
-                        asset={asset}
-                        currentPrice={currentPrice}
-                        isPriceUp={(explicitCurrentPrice || 0) > (prevExplicitPrice || 0)}
+                    <CurrentPrice asset={asset} currentPrice={currentPrice} isPriceUp={isPriceUp} />
+                    <TooltipInfo
+                        overlay={t('speed-markets.tooltips.current-price')}
+                        customIconStyling={{
+                            color: isPriceUp ? theme.positionColor.up : theme.positionColor.down,
+                            marginLeft: '6px',
+                        }}
                     />
-                    <TooltipInfo overlay={t('speed-markets.tooltips.current-price')} />
                 </FlexDivRowCentered>
                 {!!liquidity && (
                     <FlexDiv>
-                        <Value>{`${t('common.liquidity')} ${liquidity}`}</Value>
+                        <span>
+                            <Label>{t('common.liquidity')}</Label>
+                            <Value margin="0 0 0 4px">{liquidity}</Value>
+                        </span>
                         <TooltipInfo
                             overlay={
                                 <Trans
@@ -198,6 +207,7 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
                                     }}
                                 />
                             }
+                            customIconStyling={{ color: theme.textColor.quaternary }}
                         />
                     </FlexDiv>
                 )}
@@ -246,7 +256,7 @@ const ChartContainer = styled.div`
     margin-top: 15px;
 `;
 
-const Value = styled.span<{ margin?: string }>`
+const Label = styled.span<{ margin?: string }>`
     font-weight: 400;
     font-size: 18px;
     line-height: 100%;
@@ -258,6 +268,10 @@ const Value = styled.span<{ margin?: string }>`
     @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         font-size: 16px;
     }
+`;
+
+const Value = styled(Label)`
+    color: ${(props) => props.theme.textColor.quaternary};
 `;
 
 const PythIconWrap = styled.div`

@@ -1,15 +1,8 @@
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import styled from 'styled-components';
-import {
-    FlexDivCentered,
-    FlexDivColumn,
-    FlexDivColumnCentered,
-    FlexDivSpaceBetween,
-    FlexDivStart,
-} from 'styles/common';
+import { FlexDivCentered, FlexDivColumn, FlexDivColumnCentered, FlexDivSpaceBetween, FlexDivRow } from 'styles/common';
 
-export const PositionContainer = styled(FlexDivStart)`
-    gap: 10px;
+export const PositionContainer = styled(FlexDivRow)`
     align-items: center;
 `;
 
@@ -89,7 +82,7 @@ export const PositionWrapper = styled(FlexDivCentered)<{ $isSelected?: boolean }
     width: 145px;
     height: 40px;
     border-radius: 8px;
-    ${(props) => (props.$isSelected ? '' : `border: 2px solid ${props.theme.button.borderColor.secondary};`)}
+    border: 2px solid ${(props) => props.theme.button.borderColor.secondary};
     background: ${(props) =>
         props.$isSelected ? props.theme.button.background.secondary : props.theme.button.background.primary};
     color: ${(props) =>
@@ -146,8 +139,9 @@ export const Skew = styled.div<{ $isSelected: boolean }>`
     right: 5px;
     padding: 0 8px;
     background-color: ${(props) => props.theme.background.primary};
-    ${(props) => (props.$isSelected ? `border: 1px solid ${props.theme.borderColor.quaternary};` : '')}
-    ${(props) => (props.$isSelected ? `border-radius: 8px;` : '')}
+    border: 1px solid
+        ${(props) => (props.$isSelected ? props.theme.borderColor.quaternary : props.theme.background.primary)};
+    border-radius: 8px;
     color: ${(props) => props.theme.textColor.quaternary};
     font-size: 13px;
     font-weight: 700;

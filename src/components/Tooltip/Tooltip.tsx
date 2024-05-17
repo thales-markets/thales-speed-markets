@@ -42,7 +42,7 @@ const Content = styled.div`
 
 const InfoIcon = styled.i`
     position: relative;
-    font-size: 15px;
+    font-size: 16px;
     line-height: 100%;
     vertical-align: middle;
     font-weight: normal;
@@ -52,7 +52,7 @@ const InfoIcon = styled.i`
     color: ${(props) => props.theme.icon.background.primary};
     &:before {
         font-family: Icons !important;
-        content: '\\20AC';
+        content: '\\0046';
     }
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         font-size: 15px;

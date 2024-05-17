@@ -139,12 +139,14 @@ const ButtonWrapper = styled.button<{
             : `calc(${DEFAULT_MIN_HEIGHT} - 2 * ${DEFAULT_BORDER_WIDTH})`};
     border-radius: ${(props) => props.$borderRadius || DEFAULT_BORDER_RADIUS};
     border-width: 0;
-    font-weight: ${(props) => props.$fontWeight || '700'};
+    font-weight: ${(props) => props.$fontWeight || '800'};
     font-size: ${(props) => props.$fontSize || '18px'};
     font-family: ${(props) => props.$fontFamily || props.theme.fontFamily.secondary};
     line-height: 100%;
     cursor: pointer;
-    color: ${(props) => props.$textColor || props.theme.button.textColor.primary};
+    color: ${(props) =>
+        props.$textColor ||
+        (props.disabled ? props.theme.button.textColor.tertiary : props.theme.button.textColor.primary)};
     background-color: ${(props) => props.$backgroundColor || props.theme.button.background.primary};
     outline: none;
     &:disabled {

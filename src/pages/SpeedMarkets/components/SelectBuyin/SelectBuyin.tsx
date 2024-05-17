@@ -32,6 +32,7 @@ import { SelectedPosition } from '../SelectPosition/SelectPosition';
 import { Header, HeaderText } from '../SelectPosition/styled-components';
 
 type SelectBuyinProps = {
+    selectedStableBuyinAmount: number;
     onChange: React.Dispatch<number>;
     isChained: boolean;
     chainedPositions: SelectedPosition[];
@@ -43,6 +44,7 @@ type SelectBuyinProps = {
 const roundMaxBuyin = (maxBuyin: number) => Math.floor(maxBuyin / 10) * 10;
 
 const SelectBuyin: React.FC<SelectBuyinProps> = ({
+    selectedStableBuyinAmount,
     onChange,
     isChained,
     chainedPositions,
@@ -58,7 +60,7 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
     const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
     const selectedCollateralIndex = useSelector((rootState: RootState) => getSelectedCollateralIndex(rootState));
 
-    const [buyinAmount, setBuyinAmount] = useState(0);
+    const [buyinAmount, setBuyinAmount] = useState(selectedStableBuyinAmount);
     const [errorMessageKey, setErrorMessageKey] = useState('');
 
     const defaultCollateral = useMemo(() => getDefaultCollateral(networkId), [networkId]);
@@ -240,6 +242,11 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
         networkId,
         onChange,
     ]);
+
+    // Reset inputs
+    useEffect(() => {
+        setBuyinAmount(selectedStableBuyinAmount);
+    }, [selectedStableBuyinAmount]);
 
     // Reset inputs
     useEffect(() => {

@@ -3,9 +3,10 @@ import { Positions } from 'enums/market';
 import queryString from 'query-string';
 import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
+import { useTheme } from 'styled-components';
 import { FlexDivColumnCentered, FlexDivSpaceBetween } from 'styles/common';
 import { formatPercentage } from 'thales-utils';
-import { AmmChainedSpeedMarketsLimits } from 'types/market';
+import { ThemeInterface } from 'types/ui';
 import { history } from 'utils/routes';
 import {
     ChainedPositions,
@@ -24,8 +25,6 @@ import {
     PositionsWrapper,
     Skew,
 } from './styled-components';
-import { ThemeInterface } from 'types/ui';
-import { useTheme } from 'styled-components';
 
 export type SelectedPosition = Positions.UP | Positions.DOWN | undefined;
 
@@ -34,7 +33,7 @@ type SelectPositionProps = {
     onChange: React.Dispatch<SelectedPosition>;
     onChainedChange: React.Dispatch<SelectedPosition[]>;
     setIsChained: React.Dispatch<React.SetStateAction<boolean>>;
-    ammChainedSpeedMarketsLimits: AmmChainedSpeedMarketsLimits | null;
+    resetData: React.Dispatch<void>;
     skew: { [Positions.UP]: number; [Positions.DOWN]: number };
 };
 
@@ -43,15 +42,13 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
     onChange,
     onChainedChange,
     setIsChained,
-    ammChainedSpeedMarketsLimits,
+    resetData,
     skew,
 }) => {
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 
     const discount = { [Positions.UP]: skew[Positions.DOWN] / 2, [Positions.DOWN]: skew[Positions.UP] / 2 };
-    const isClearAllDisabled =
-        selected.length === ammChainedSpeedMarketsLimits?.minChainedMarkets && selected.every((p) => p === undefined);
 
     const onPlusMinusIconHandle = (isChained: boolean) => {
         setIsChained(isChained);
@@ -90,13 +87,12 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
             <Header>
                 <FlexDivSpaceBetween>
                     <HeaderText> {t('speed-markets.steps.choose-direction')}</HeaderText>
-                    {selected.length > 2 && (
+                    {selected.length > 1 && (
                         <ClearAll
-                            isDisabled={isClearAllDisabled}
-                            onClick={() =>
-                                !isClearAllDisabled &&
-                                onChainedChange(Array(ammChainedSpeedMarketsLimits?.minChainedMarkets).fill(undefined))
-                            }
+                            onClick={() => {
+                                setIsChained(false);
+                                resetData();
+                            }}
                         >
                             {t('speed-markets.chained.clear-all')}
                             <IconWrong className="icon icon--wrong" />

@@ -18,7 +18,7 @@ import { FlexDivCentered, FlexDivColumnCentered, FlexDivRow, FlexDivStart } from
 import { AmmSpeedMarketsLimits } from 'types/market';
 import { RootState, ThemeInterface } from 'types/ui';
 import { useAccount } from 'wagmi';
-import { Header, HeaderText } from '../SelectPosition/styled-components';
+import { Header, HeaderText, PlusMinusIcon } from '../SelectPosition/styled-components';
 
 type SelectTimeProps = {
     selectedDeltaSec: number;
@@ -184,6 +184,7 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                         {deltaTimesMinutes.map((deltaMinutes, index) => (
                             <Time
                                 key={'minutes' + index}
+                                $isChained
                                 $isSelected={selectedDeltaSec === minutesToSeconds(deltaMinutes)}
                                 onClick={() => onDeltaTimeClickHandler(0, deltaMinutes)}
                             >{`${deltaMinutes}m`}</Time>
@@ -192,10 +193,11 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                 ) : (
                     // Single
                     <>
-                        <FlexDivRow>
+                        <SingleRow>
                             {deltaTimesMinutes.map((deltaMinutes, index) => (
                                 <Time
                                     key={'minutes' + index}
+                                    $isChained={false}
                                     $isSelected={selectedDeltaSec === minutesToSeconds(deltaMinutes)}
                                     onClick={() => onDeltaTimeClickHandler(0, deltaMinutes)}
                                 >{`${deltaMinutes}m`}</Time>
@@ -203,14 +205,16 @@ const SelectTime: React.FC<SelectTimeProps> = ({
                             {deltaTimesHours.map((deltaHours, index) => (
                                 <Time
                                     key={'hours' + index}
+                                    $isChained={false}
                                     $isSelected={selectedDeltaSec === hoursToSeconds(deltaHours)}
                                     onClick={() => onDeltaTimeClickHandler(deltaHours, 0)}
                                 >{`${deltaHours}h`}</Time>
                             ))}
-                            <Time $isSelected={showCustomDeltaTime} onClick={onCustomTimeClickHandler}>
-                                {'CUSTOM'}
-                            </Time>
-                        </FlexDivRow>
+                            <PlusMinusIcon
+                                className="network-icon network-icon--plus"
+                                onClick={onCustomTimeClickHandler}
+                            />
+                        </SingleRow>
 
                         {showCustomDeltaTime && (
                             <Row>
@@ -292,6 +296,10 @@ const Row = styled(FlexDivRow)`
     margin-top: 10px;
 `;
 
+const SingleRow = styled(FlexDivRow)`
+    align-items: center;
+`;
+
 const ChainedRow = styled(FlexDivStart)`
     gap: 10px;
 `;
@@ -305,8 +313,8 @@ const InputWrapper = styled.div`
     width: 100%;
 `;
 
-const Time = styled(FlexDivCentered)<{ $isSelected: boolean }>`
-    width: 60px;
+const Time = styled(FlexDivCentered)<{ $isChained: boolean; $isSelected: boolean }>`
+    width: ${(props) => (props.$isChained ? '60px' : '67px')};
     height: 40px;
     border-radius: 8px;
     font-family: ${(props) => props.theme.fontFamily.primary};
