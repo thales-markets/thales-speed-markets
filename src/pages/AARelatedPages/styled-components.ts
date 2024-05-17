@@ -55,7 +55,7 @@ export const InputLabel = styled.p<{ marginTop?: string }>`
     line-height: normal;
     margin-top: ${(props) => (props.marginTop ? props.marginTop : '')};
     margin-bottom: 5px;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.quinary};
 `;
 
 export const InputContainer = styled(FlexDiv)`
