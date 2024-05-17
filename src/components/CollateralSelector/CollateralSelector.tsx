@@ -147,6 +147,7 @@ const Text = styled.span<{ fontWeight?: string }>`
 
 const TextCollateral = styled(Text)<{ color?: string }>`
     color: ${(props) => (props.color ? props.color : props.theme.dropDown.textColor.primary)};
+    font-weight: 700;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;

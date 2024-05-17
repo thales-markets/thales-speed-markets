@@ -164,11 +164,9 @@ const UserCollaterals: React.FC = () => {
                                     $clickable={isConnected}
                                     onClick={() => onCollateralClickHandler(coin.name)}
                                 >
-                                    <AssetIcon
-                                        className={`currency-icon currency-icon--${collateral.name.toLowerCase()}`}
-                                    />
+                                    <AssetIcon className={`currency-icon currency-icon--${coin.name.toLowerCase()}`} />
 
-                                    <BalanceText>{formatCurrencyWithKey(coin.name, coin.balance)}</BalanceText>
+                                    <AssetName>{formatCurrencyWithKey(coin.name, coin.balance)}</AssetName>
                                 </BalanceWrapper>
                             ))}
                         </Dropdown>
@@ -238,6 +236,17 @@ const AssetIcon = styled.i`
     border-radius: 50%;
 `;
 
+const BalanceText = styled.span`
+    color: ${(props) => props.theme.textColor.quinary};
+    font-family: ${(props) => props.theme.fontFamily.secondary};
+    font-weight: 700;
+    font-size: 12px;
+`;
+
+const AssetName = styled(BalanceText)`
+    color: ${(props) => props.theme.textColor.primary};
+`;
+
 const BalanceWrapper = styled.div<{ $clickable: boolean }>`
     display: -webkit-flex;
     flex-direction: row;
@@ -248,17 +257,10 @@ const BalanceWrapper = styled.div<{ $clickable: boolean }>`
     border-radius: 8px;
     &:hover {
         background: ${(props) => props.theme.background.primary};
-        ${AssetIcon} {
+        ${AssetIcon}, ${AssetName} {
             color: ${(props) => props.theme.dropDown.textColor.secondary};
         }
     }
-`;
-
-const BalanceText = styled.span`
-    color: ${(props) => props.theme.textColor.quinary};
-    font-family: ${(props) => props.theme.fontFamily.secondary};
-    font-weight: 700;
-    font-size: 12px;
 `;
 
 export default UserCollaterals;
