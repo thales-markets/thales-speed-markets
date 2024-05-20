@@ -380,11 +380,12 @@
         }
     },
     "get-started": {
-        "title": "Get started on speedmarkets",
+        "title": "Get started on Speed Markets",
         "steps": {
             "action": {
+                "log-in": "Login",
                 "deposit": "Deposit now",
-                "trade": "Trade on speedmarkets",
+                "trade": "Trade on Speed Markets",
                 "deposit-crypto": "Deposit crypto",
                 "credit-card": "Credit card buy",
                 "buy-crypto": "FUND WITH CARD",
@@ -394,10 +395,10 @@
                 "sign-up": "Sign up",
                 "logged-in": "Logged in",
                 "deposit": "Deposit funds",
-                "trade": "Speedmarkets"
+                "trade": "Speed Markets"
             },
             "description": {
-                "sign-up": "Sign up to start using Speed Markets",
+                "sign-up": "Log In to Speed Markets via social login or via connecting your wallet.",
                 "logged-in": "You have successfully created your Speed Markets Smart Account on the blockchain and are logged in.",
                 "deposit": "Deposit funds in your Speed Markets smart account by sending USDT and/or USDC to the address below. If you don't have USDT or USDC, you can also directly deposit them via Credit Card using the FUND WITH CARD button.",
                 "trade": "You are all set! You have funds in your account and you can now start trading on Speed Markets!"
