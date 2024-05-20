@@ -30,9 +30,13 @@ import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAsse
 import { refetchActiveSpeedMarkets, refetchPythPrice } from 'utils/queryConnector';
 import { isUserWinner, resolveAllSpeedPositions } from 'utils/speedAmm';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
-import { getIsBiconomy } from 'redux/modules/wallet';
+import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
 import biconomyConnector from 'utils/biconomyWallet';
 import UnresolvedPosition from '../UnresolvedPosition';
+import { getIsMultiCollateralSupported } from 'utils/network';
+import { getCollateral } from 'utils/currency';
+import multipleCollateral from 'utils/contracts/multipleCollateralContract';
+import erc20Contract from 'utils/contracts/collateralContract';
 
 const UnresolvedPositions: React.FC = () => {
     const { t } = useTranslation();
@@ -50,6 +54,16 @@ const UnresolvedPositions: React.FC = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSubmittingSection, setIsSubmittingSection] = useState('');
     const [isLoadingEnabled, setIsLoadingEnabled] = useState(true);
+
+    const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
+    const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
+    const selectedCollateral = useMemo(() => getCollateral(networkId, selectedCollateralIndex), [
+        networkId,
+        selectedCollateralIndex,
+    ]);
+    const collateralAddress = isMultiCollateralSupported
+        ? multipleCollateral[selectedCollateral].addresses[networkId]
+        : erc20Contract.addresses[networkId];
 
     const ammSpeedMarketsLimitsQuery = useAmmSpeedMarketsLimitsQuery(
         { networkId, client },
@@ -159,7 +173,13 @@ const UnresolvedPositions: React.FC = () => {
 
     const handleResolveAll = async (positions: UserOpenPositions[], isAdmin: boolean) => {
         setIsSubmitting(true);
-        await resolveAllSpeedPositions(positions, isAdmin, { networkId, client: walletClient.data });
+        await resolveAllSpeedPositions(
+            positions,
+            isAdmin,
+            { networkId, client: walletClient.data },
+            isBiconomy,
+            collateralAddress
+        );
         setIsSubmitting(false);
         setIsSubmittingSection('');
     };

@@ -14,9 +14,10 @@ type ModalProps = {
     onClose: () => void;
     children?: React.ReactNode;
     width?: string;
+    zIndex?: number;
 };
 
-const getDefaultStyle = (theme: ThemeInterface, width?: string) => ({
+const getDefaultStyle = (theme: ThemeInterface, width?: string, zIndex?: number) => ({
     content: {
         top: '50%',
         left: '50%',
@@ -34,12 +35,20 @@ const getDefaultStyle = (theme: ThemeInterface, width?: string) => ({
     },
     overlay: {
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        zIndex: 200,
+        zIndex: zIndex ?? 200,
         backdropFilter: 'blur(10px)',
     },
 });
 
-const Modal: React.FC<ModalProps> = ({ title, onClose, children, shouldCloseOnOverlayClick, isOpen, width }) => {
+const Modal: React.FC<ModalProps> = ({
+    title,
+    onClose,
+    children,
+    shouldCloseOnOverlayClick,
+    isOpen,
+    width,
+    zIndex,
+}) => {
     const theme: ThemeInterface = useTheme();
 
     return (
@@ -47,7 +56,7 @@ const Modal: React.FC<ModalProps> = ({ title, onClose, children, shouldCloseOnOv
             isOpen={isOpen ?? true}
             onRequestClose={onClose}
             shouldCloseOnOverlayClick={shouldCloseOnOverlayClick}
-            style={getDefaultStyle(theme, width)}
+            style={getDefaultStyle(theme, width, zIndex)}
         >
             <Container>
                 <PrimaryHeading>{title}</PrimaryHeading>

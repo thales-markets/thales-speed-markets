@@ -153,7 +153,14 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
                 <StepDescriptionSection isActive={isActive} isDisabled={isDisabled} onClick={changeCurrentStep}>
                     <StepTitle completed={!isActive && showStepIcon}>{stepTitle}</StepTitle>
                     <StepDescription completed={!isActive && showStepIcon}>{stepDescription}</StepDescription>
-                    {stepType === GetStartedStep.DEPOSIT && (
+                    {stepType === GetStartedStep.LOG_IN && !isWalletConnected && (
+                        <ButtonWrapper>
+                            <Button disabled={!isActive} width="210px" fontSize="18px">
+                                {t('get-started.steps.action.log-in')}
+                            </Button>
+                        </ButtonWrapper>
+                    )}
+                    {stepType === GetStartedStep.DEPOSIT && isWalletConnected && (
                         <DepositContainer isActive={isActive}>
                             <GradientContainer>
                                 <AddressContainer>
@@ -257,7 +264,7 @@ const StepTitle = styled.span<{ completed?: boolean }>`
     font-size: 20px;
     line-height: 27px;
     color: ${(props) => (props.completed ? props.theme.background.quinary : '')};
-    margin-bottom: 10px;
+    margin-bottom: 4px;
 `;
 
 const StepDescription = styled.p<{ completed?: boolean }>`
@@ -391,6 +398,14 @@ const CopyIcon = styled.i`
     right: 60px;
     top: 6px;
     font-size: 22px;
+`;
+
+const ButtonWrapper = styled.div`
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 10px;
 `;
 
 export default Step;

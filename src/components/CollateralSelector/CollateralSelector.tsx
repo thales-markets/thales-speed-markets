@@ -60,6 +60,9 @@ const CollateralSelector: React.FC<CollateralSelectorProps> = ({
             <OutsideClickHandler onOutsideClick={() => setOpen(false)}>
                 <SelectedCollateral disabled={!!disabled} onClick={() => !disabled && setOpen(!open)}>
                     <TextCollateralWrapper>
+                        <AssetIcon
+                            className={`currency-icon currency-icon--${collateralArray[selectedItem].toLowerCase()}`}
+                        />
                         <SelectedTextCollateral color={additionalStyles?.color}>
                             {collateralArray[selectedItem]}
                         </SelectedTextCollateral>
@@ -157,6 +160,7 @@ const TextCollateral = styled(Text)<{ color?: string }>`
 
 const SelectedTextCollateral = styled(TextCollateral)`
     color: ${(props) => (props.color ? props.color : props.theme.dropDown.textColor.primary)};
+    margin-right: 4px;
 `;
 
 const TextCollateralWrapper = styled.div`
@@ -218,6 +222,11 @@ const Icon = styled.i`
     background: ${(props) => props.theme.dropDown.background.primary};
     color: ${(props) => props.theme.dropDown.textColor.primary};
     border-radius: 50%;
+`;
+
+const AssetIcon = styled(Icon)`
+    font-size: 20px;
+    margin-right: 4px;
 `;
 
 const DetailedCollateralOption = styled(FlexDivSpaceBetween)`

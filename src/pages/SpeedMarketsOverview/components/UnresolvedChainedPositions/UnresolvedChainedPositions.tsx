@@ -28,8 +28,12 @@ import { getPriceId } from 'utils/pyth';
 import { refetchActiveSpeedMarkets, refetchPythPrice } from 'utils/queryConnector';
 import { isUserWinner, resolveAllChainedMarkets } from 'utils/speedAmm';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
-import { getIsBiconomy } from 'redux/modules/wallet';
+import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
 import biconomyConnector from 'utils/biconomyWallet';
+import { getIsMultiCollateralSupported } from 'utils/network';
+import { getCollateral } from 'utils/currency';
+import multipleCollateral from 'utils/contracts/multipleCollateralContract';
+import erc20Contract from 'utils/contracts/collateralContract';
 
 const UnresolvedChainedPositions: React.FC = () => {
     const { t } = useTranslation();
@@ -45,6 +49,16 @@ const UnresolvedChainedPositions: React.FC = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSubmittingSection, setIsSubmittingSection] = useState('');
     const [isLoadingEnabled, setIsLoadingEnabled] = useState(true);
+
+    const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
+    const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
+    const selectedCollateral = useMemo(() => getCollateral(networkId, selectedCollateralIndex), [
+        networkId,
+        selectedCollateralIndex,
+    ]);
+    const collateralAddress = isMultiCollateralSupported
+        ? multipleCollateral[selectedCollateral].addresses[networkId]
+        : erc20Contract.addresses[networkId];
 
     const ammChainedSpeedMarketsLimitsQuery = useAmmChainedSpeedMarketsLimitsQuery(
         { networkId, client },
@@ -182,7 +196,13 @@ const UnresolvedChainedPositions: React.FC = () => {
 
     const handleResolveAll = async (positions: ChainedSpeedMarket[], isAdmin: boolean) => {
         setIsSubmitting(true);
-        await resolveAllChainedMarkets(positions, isAdmin, { networkId, client: walletClient.data });
+        await resolveAllChainedMarkets(
+            positions,
+            isAdmin,
+            { networkId, client: walletClient.data },
+            isBiconomy,
+            collateralAddress
+        );
         if (!mountedRef.current) return null;
         setIsSubmitting(false);
         setIsSubmittingSection('');
