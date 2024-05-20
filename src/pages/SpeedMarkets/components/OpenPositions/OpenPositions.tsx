@@ -13,18 +13,20 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
-import { getIsBiconomy } from 'redux/modules/wallet';
+import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
 import styled, { useTheme } from 'styled-components';
 import { FlexDivCentered, FlexDivRow, FlexDivRowCentered } from 'styles/common';
 import { formatCurrencyWithSign } from 'thales-utils';
 import { ChainedSpeedMarket, UserOpenPositions } from 'types/market';
 import { RootState, ThemeInterface } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
-import { getDefaultCollateral } from 'utils/currency';
+import { getCollateral, getDefaultCollateral } from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
 import { resolveAllChainedMarkets, resolveAllSpeedPositions } from 'utils/speedAmm';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 import OpenPosition from '../OpenPosition';
+import multipleCollateral from 'utils/contracts/multipleCollateralContract';
+import erc20Contract from 'utils/contracts/collateralContract';
 
 type OpenPositionsProps = {
     isChained?: boolean;
@@ -48,6 +50,14 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
+    const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
+    const selectedCollateral = useMemo(() => getCollateral(networkId, selectedCollateralIndex), [
+        networkId,
+        selectedCollateralIndex,
+    ]);
+    const collateralAddress = isMultiCollateralSupported
+        ? multipleCollateral[selectedCollateral].addresses[networkId]
+        : erc20Contract.addresses[networkId];
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     // For sorting purpose as claimable status is unknown until all chained positions is rendered
@@ -167,9 +177,21 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
     const handleSubmit = async () => {
         setIsSubmitting(true);
         if (isChained) {
-            await resolveAllChainedMarkets(claimableChainedPositions, false, { networkId, client: walletClient.data });
+            await resolveAllChainedMarkets(
+                claimableChainedPositions,
+                false,
+                { networkId, client: walletClient.data },
+                isBiconomy,
+                collateralAddress
+            );
         } else {
-            await resolveAllSpeedPositions(claimableSpeedPositions, false, { networkId, client: walletClient.data });
+            await resolveAllSpeedPositions(
+                claimableSpeedPositions,
+                false,
+                { networkId, client: walletClient.data },
+                isBiconomy,
+                collateralAddress
+            );
         }
         setIsSubmitting(false);
     };

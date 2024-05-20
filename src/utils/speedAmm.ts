@@ -175,7 +175,8 @@ export const resolveAllSpeedPositions = async (
     positions: UserOpenPositions[],
     isAdmin: boolean,
     queryConfig: QueryConfig,
-    isBiconomy?: boolean
+    isBiconomy?: boolean,
+    collateralAddress?: string
 ) => {
     if (!positions.length) {
         return;
@@ -234,18 +235,18 @@ export const resolveAllSpeedPositions = async (
     if (marketsToResolve.length > 0) {
         try {
             let txHash;
-            if (isBiconomy) {
+            if (isBiconomy && collateralAddress) {
                 txHash = isAdmin
                     ? await executeBiconomyTransaction(
                           queryConfig.networkId,
-                          '0x7F5c764cBc14f9669B88837ca1490cCa17c31607', // TODO:
+                          collateralAddress,
                           speedMarketsAMMContractWithSigner,
                           'resolveMarketManuallyBatch',
                           [marketsToResolve, manualFinalPrices]
                       )
                     : await executeBiconomyTransaction(
                           queryConfig.networkId,
-                          '0x7F5c764cBc14f9669B88837ca1490cCa17c31607', // TODO:
+                          collateralAddress,
                           speedMarketsAMMContractWithSigner,
                           'resolveMarketsBatch',
                           [marketsToResolve, priceUpdateDataArray]
@@ -283,7 +284,8 @@ export const resolveAllChainedMarkets = async (
     positions: ChainedSpeedMarket[],
     isAdmin: boolean,
     queryConfig: QueryConfig,
-    isBiconomy?: boolean
+    isBiconomy?: boolean,
+    collateralAddress?: string
 ) => {
     if (!positions.length) {
         return;
@@ -361,18 +363,18 @@ export const resolveAllChainedMarkets = async (
     if (marketsToResolve.length > 0) {
         try {
             let txHash;
-            if (isBiconomy) {
+            if (isBiconomy && collateralAddress) {
                 txHash = isAdmin
                     ? await executeBiconomyTransaction(
                           queryConfig.networkId,
-                          '0x7F5c764cBc14f9669B88837ca1490cCa17c31607', // TODO:
+                          collateralAddress,
                           chainedSpeedMarketsAMMContractWithSigner,
                           'resolveMarketManuallyBatch',
                           [marketsToResolve, manualFinalPrices]
                       )
                     : await executeBiconomyTransaction(
                           queryConfig.networkId,
-                          '0x7F5c764cBc14f9669B88837ca1490cCa17c31607', // TODO:
+                          collateralAddress,
                           chainedSpeedMarketsAMMContractWithSigner,
                           'resolveMarketsBatch',
                           [marketsToResolve, priceUpdateDataArray]

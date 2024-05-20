@@ -11,12 +11,12 @@ import {
 import { CONNECTION_TIMEOUT_MS, PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
 import { differenceInSeconds, millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
 import { ScreenSizeBreakpoint } from 'enums/ui';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsMobile } from 'redux/modules/ui';
-import { getIsBiconomy } from 'redux/modules/wallet';
+import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
 import styled, { CSSProperties } from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
 import { UserOpenPositions } from 'types/market';
@@ -25,7 +25,11 @@ import { RootState } from 'types/ui';
 import { ViemContract } from 'types/viem';
 import { executeBiconomyTransaction } from 'utils/biconomy';
 import { getContarctAbi } from 'utils/contracts/abi';
+import erc20Contract from 'utils/contracts/collateralContract';
+import multipleCollateral from 'utils/contracts/multipleCollateralContract';
 import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
+import { getCollateral } from 'utils/currency';
+import { getIsMultiCollateralSupported } from 'utils/network';
 import { getPriceId, getPriceServiceEndpoint, priceParser } from 'utils/pyth';
 import { refetchActiveSpeedMarkets } from 'utils/queryConnector';
 import { delay } from 'utils/timer';
@@ -54,6 +58,16 @@ const OverviewPositionAction: React.FC<OverviewPositionActionProps> = ({
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
 
+    const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
+    const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
+    const selectedCollateral = useMemo(() => getCollateral(networkId, selectedCollateralIndex), [
+        networkId,
+        selectedCollateralIndex,
+    ]);
+    const collateralAddress = isMultiCollateralSupported
+        ? multipleCollateral[selectedCollateral].addresses[networkId]
+        : erc20Contract.addresses[networkId];
+
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
@@ -79,7 +93,7 @@ const OverviewPositionAction: React.FC<OverviewPositionActionProps> = ({
                 if (isBiconomy) {
                     hash = await executeBiconomyTransaction(
                         networkId,
-                        '0x7F5c764cBc14f9669B88837ca1490cCa17c31607', // TODO:
+                        collateralAddress,
                         speedMarketsAMMContractWithSigner,
                         'resolveMarketManually',
                         [position.market, Number(priceParser(position.finalPrice || 0))]
@@ -120,7 +134,7 @@ const OverviewPositionAction: React.FC<OverviewPositionActionProps> = ({
                 if (isBiconomy) {
                     hash = await executeBiconomyTransaction(
                         networkId,
-                        '0x7F5c764cBc14f9669B88837ca1490cCa17c31607', // TODO:
+                        collateralAddress,
                         speedMarketsAMMContractWithSigner,
                         'resolveMarket',
                         [position.market, priceUpdateData]
