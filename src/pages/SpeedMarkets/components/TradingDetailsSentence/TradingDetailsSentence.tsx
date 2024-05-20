@@ -26,8 +26,8 @@ type TradingDetailsSentenceProps = {
     currencyKey: string;
     market: MarketInfo | SpeedMarketsTrade;
     isFetchingQuote: boolean;
-    profit: number | string;
-    paidAmount: number | string;
+    profit: number;
+    paidAmount: number;
     deltaTimeSec?: number;
     hasCollateralConversion?: boolean;
 };
@@ -63,7 +63,7 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
 
     const potentialWinFormatted = isFetchingQuote
         ? '...'
-        : `${formatCurrencyWithKey(getDefaultCollateral(networkId), Number(profit) * Number(paidAmount))}`;
+        : `${formatCurrencyWithKey(getDefaultCollateral(networkId), profit * paidAmount)}`;
 
     const positionTypeFormatted =
         market.positionType === Positions.UP
@@ -180,11 +180,11 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
                     <TextLabel>{t('speed-markets.amm-trading.you-win')}</TextLabel>
                     {hasCollateralConversion && <TextLabel>{` ${t('speed-markets.amm-trading.at-least')}`}</TextLabel>}
                     <SentanceTextValue $isProfit>
-                        {Number(profit) > 0 && Number(paidAmount) > 0
+                        {profit > 0 && paidAmount > 0
                             ? potentialWinFormatted
                             : '( ' + t('speed-markets.amm-trading.based-amount') + ' )'}
                     </SentanceTextValue>
-                    {hasCollateralConversion && Number(profit) > 0 && Number(paidAmount) > 0 && (
+                    {hasCollateralConversion && profit > 0 && paidAmount > 0 && (
                         <Tooltip overlay={t('speed-markets.tooltips.payout-conversion')} />
                     )}
                 </Text>

@@ -49,7 +49,7 @@ const InfoIcon = styled.i`
     cursor: pointer;
     margin-top: 1px;
     margin-left: 4px;
-    color: ${(props) => props.theme.icon.background.primary};
+    color: ${(props) => props.theme.icon.background.tertiary};
     &:before {
         font-family: Icons !important;
         content: '\\0046';

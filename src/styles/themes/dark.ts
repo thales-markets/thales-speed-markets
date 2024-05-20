@@ -116,11 +116,11 @@ export default {
             secondary: Colors.GRAY,
         },
         textColor: {
-            primary: Colors.WHITE,
+            primary: Colors.ORANGE,
             secondary: Colors.ORANGE_DARK,
         },
         borderColor: {
-            primary: Colors.PURPLE,
+            primary: Colors.ORANGE,
         },
     },
     table: {
