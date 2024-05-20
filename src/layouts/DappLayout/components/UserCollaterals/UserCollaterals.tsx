@@ -215,7 +215,6 @@ const Dropdown = styled.div`
     padding: 5px;
     text-align: center;
     z-index: 101;
-    gap: 5px;
     @media (max-width: 500px) {
         min-width: 124px;
         width: 100%;
