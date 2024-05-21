@@ -69,7 +69,7 @@ const DappHeader: React.FC = () => {
                         {t('common.wallet.connect-your-wallet')}
                     </Button>
                 )}
-                {isMobile && (
+                {isMobile && isConnected && (
                     <Button
                         width="140px"
                         height="30px"
