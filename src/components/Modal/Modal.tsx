@@ -104,7 +104,7 @@ const CloseIcon = styled.i`
 
     &:before {
         font-family: Icons !important;
-        content: '\\0042';
+        content: '\\0076';
         color: ${(props) => props.theme.textColor.quinary};
     }
 `;

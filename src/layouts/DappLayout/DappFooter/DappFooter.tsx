@@ -1,4 +1,5 @@
 import { LINKS } from 'constants/links';
+import { ScreenSizeBreakpoint } from 'enums/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -43,10 +44,10 @@ const DappFooter: React.FC = () => {
                     </TextLink>
                 </Item>
                 <Item>
-                    <a target="_blank" rel="noreferrer" href={LINKS.Docs}>
+                    <a target="_blank" rel="noreferrer" href={LINKS.ThalesIo.Docs}>
                         <FooterIcon className="icon-home icon-home--documentation" />
                     </a>
-                    <TextLink target="_blank" rel="noreferrer" href={LINKS.Docs}>
+                    <TextLink target="_blank" rel="noreferrer" href={LINKS.ThalesIo.Docs}>
                         {t('common.footer.docs')}
                     </TextLink>
                 </Item>
@@ -66,6 +67,11 @@ const Container = styled.div`
     gap: 20px;
     padding-top: 75px;
     margin: auto auto 25px auto;
+    z-index: 1;
+
+    @media screen and (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
+        padding-top: 50px;
+    }
 `;
 
 const Items = styled(FlexDivRow)`

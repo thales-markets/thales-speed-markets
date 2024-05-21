@@ -1,6 +1,6 @@
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import styled from 'styled-components';
-import { FlexDivCentered, FlexDivColumn, FlexDivEnd, FlexDivStart } from 'styles/common';
+import { FlexDivCentered, FlexDivColumn, FlexDivEnd, FlexDivSpaceBetween, FlexDivStart } from 'styles/common';
 
 export const Container = styled.div`
     position: relative;
@@ -10,18 +10,21 @@ export const Container = styled.div`
 
 export const ZeusImgWrapper = styled.div`
     position: absolute;
+    top: 20px;
     right: 0;
     width: 695px;
     height: 695px;
     overflow: clip;
     @media screen and (max-width: ${ScreenSizeBreakpoint.MEDIUM}px) {
         width: 500px;
+        top: 60px;
     }
     @media screen and (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         width: 380px;
     }
-    @media screen and (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+    @media screen and (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         width: 300px;
+        top: 70px;
     }
 `;
 
@@ -38,8 +41,8 @@ export const ZeusImg = styled.img`
 
 export const BlueTriangleImg = styled.img`
     position: absolute;
-    top: -50px;
-    right: 486px;
+    top: 5px;
+    right: 320px;
     width: 400px;
     height: 400px;
     transform: rotate(180deg);
@@ -213,6 +216,7 @@ export const BigRocketImg = styled.img`
     object-fit: cover;
     object-position: 15% 12%;
     z-index: 1;
+
     @media screen and (max-width: ${ScreenSizeBreakpoint.LARGE}px) {
         left: 0;
         width: 200px;
@@ -221,37 +225,116 @@ export const BigRocketImg = styled.img`
 
 export const Header = styled(FlexDivColumn)`
     position: relative;
-    margin: 94px 94px 0;
-    gap: 45px;
+    margin: 20px 94px 0;
+    gap: 172px;
     z-index: 1;
-    @media screen and (max-width: ${ScreenSizeBreakpoint.MEDIUM}px) {
-        margin: 44px 44px 0;
-    }
-    @media screen and (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        margin: 24px 24px 0;
-    }
+
     @media screen and (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
-        margin: 20px 20px 0;
+        margin: 50px 20px 0;
     }
 `;
 
+export const HeaderRow = styled(FlexDivStart)`
+    align-items: center;
+`;
+
 export const SpeedLogo = styled.i`
-    font-size: 350px;
-    line-height: 127px;
-    margin-left: -15px;
-    margin-bottom: -23px;
+    font-size: 170px;
+    line-height: 64px;
+    margin-left: -8px;
+    margin-bottom: -12px;
+
+    @media screen and (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
+        font-size: 130px;
+        margin-top: -8px;
+        margin-left: -6px;
+        margin-bottom: -16px;
+    }
+`;
+
+export const HeaderLinks = styled(FlexDivSpaceBetween)`
+    width: 44%;
+    color: ${(props) => props.theme.textColor.primary};
+    margin-left: 5%;
+    gap: 20px;
+
     @media screen and (max-width: ${ScreenSizeBreakpoint.MEDIUM}px) {
-        font-size: 300px;
+        margin-left: 2%;
+        gap: 10px;
     }
     @media screen and (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        font-size: 250px;
+        display: none;
+    }
+`;
+
+export const HeaderText = styled.span`
+    font-family: ${(props) => props.theme.fontFamily.secondary};
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 100%;
+    text-align: center;
+    text-transform: uppercase;
+
+    @media screen and (max-width: ${ScreenSizeBreakpoint.MEDIUM}px) {
+        font-size: 14px;
+    }
+`;
+
+export const DappButton = styled(FlexDivCentered)`
+    width: 170px;
+    height: 40px;
+    margin-left: auto;
+    border-radius: 60px;
+    background: ${(props) => props.theme.button.background.tertiary};
+    color: ${(props) => props.theme.button.textColor.secondary};
+
+    @media screen and (max-width: ${ScreenSizeBreakpoint.MEDIUM}px) {
+        width: 140px;
+    }
+    @media screen and (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        display: none;
+    }
+`;
+
+export const MobileDappButtonWrapper = styled.div`
+    padding: 100px 0;
+`;
+
+export const MobileDappButton = styled(DappButton)`
+    display: flex;
+    margin: 0 auto;
+`;
+
+export const MobileBurgerMenu = styled.div`
+    position: relative;
+    width: 100%;
+    z-index: 0;
+`;
+
+export const MobileBurger = styled.i`
+    display: none;
+
+    @media screen and (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        display: flex;
+        margin-left: auto;
+        font-size: 32px;
     }
     @media screen and (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
-        font-size: 170px;
-        margin-top: -32px;
-        margin-bottom: 60px;
-        margin-left: -8px;
+        font-size: 30px;
     }
+`;
+
+export const MenuHeaderLinks = styled(FlexDivColumn)`
+    gap: 64px;
+    margin-top: 100px;
+    margin-left: 58px;
+`;
+
+export const CloseIcon = styled.i`
+    position: absolute;
+    top: 50px;
+    right: 20px;
+    font-size: 20px;
 `;
 
 export const ThalesLogo = styled.i`
@@ -260,6 +343,13 @@ export const ThalesLogo = styled.i`
     margin-top: -58px;
     margin-bottom: -84px;
     z-index: -1;
+
+    @media screen and (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
+        font-size: 120px;
+        line-height: 100%;
+        margin-top: -38px;
+        margin-bottom: -52px;
+    }
 `;
 
 export const TitleWrapper = styled(FlexDivColumn)`
@@ -295,6 +385,9 @@ export const ButtonContainer = styled(FlexDivCentered)<{ isBottom?: boolean }>`
     margin: ${(props) => (props.isBottom ? '232px 0px 88px' : '73px 0 70px 0')};
     @media screen and (max-width: ${ScreenSizeBreakpoint.LARGE}px) {
         margin: ${(props) => (props.isBottom ? '132px 0px 88px' : '73px 0 70px 0')};
+    }
+    @media screen and (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
+        ${(props) => (props.isBottom ? 'margin: 60px 0px;' : '')}
     }
 `;
 
@@ -448,6 +541,11 @@ export const CoinsImg = styled.img`
         top: -108px;
         left: -150px;
     }
+    @media screen and (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        width: 108px;
+        top: -44px;
+        left: -58px;
+    }
 `;
 
 export const LogoText = styled.span`
@@ -455,12 +553,24 @@ export const LogoText = styled.span`
     line-height: 150%;
     font-weight: 600;
     color: ${(props) => props.theme.textColor.primary};
+
+    @media screen and (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
+        font-size: 13px;
+    }
 `;
 
 export const Link = styled.a`
     font-weight: 800;
     color: ${(props) => props.theme.link.textColor.secondary};
+    text-align: center;
     &:hover {
         text-decoration: underline;
+    }
+
+    @media screen and (max-width: ${ScreenSizeBreakpoint.MEDIUM}px) {
+        width: min-content;
+    }
+    @media screen and (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        width: max-content;
     }
 `;

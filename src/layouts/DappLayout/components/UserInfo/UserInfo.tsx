@@ -94,7 +94,7 @@ const UserInfo: React.FC<UserInfoProps> = ({ setUserInfoOpen, setOpenWithdraw })
                             </SPAAnchor>
                         </FlexStartCentered>
                         <FlexStartCentered>
-                            <SPAAnchor href={LINKS.Docs}>
+                            <SPAAnchor href={LINKS.ThalesIo.Docs}>
                                 <Icon className="network-icon network-icon--docs" />
                                 <Label>{t('user-info.docs')}</Label>
                             </SPAAnchor>
