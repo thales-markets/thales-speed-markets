@@ -17,6 +17,7 @@ import { useSelector } from 'react-redux';
 import { getIsBiconomy } from 'redux/modules/wallet';
 import { RootState } from 'types/ui';
 import { LINKS } from 'constants/links';
+import { ScreenSizeBreakpoint } from 'enums/ui';
 
 type UserInfoProps = {
     setUserInfoOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -127,6 +128,9 @@ const Container = styled.div`
     padding: 14px;
     background: ${(props) => props.theme.background.primary};
     z-index: 1000;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        top: 48px;
+    }
 `;
 
 const FlexColumn = styled(FlexDivColumn)`
