@@ -4,9 +4,11 @@ import { SupportedNetwork } from 'types/network';
 import { ViemContract } from 'types/viem';
 import {
     concat,
+    createPublicClient,
     createWalletClient,
     encodeFunctionData,
     erc20Abi,
+    getContract,
     http,
     maxUint256,
     pad,
@@ -22,6 +24,7 @@ import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
 import erc20Contract from './contracts/collateralContract';
 import chainedSpeedMarketsAMMContract from './contracts/chainedSpeedMarketsAMMContract';
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
+import { checkAllowance } from './network';
 
 export const executeBiconomyTransactionWithConfirmation = async (
     collateral: string,
@@ -30,10 +33,6 @@ export const executeBiconomyTransactionWithConfirmation = async (
     data?: ReadonlyArray<any>,
     value?: any
 ): Promise<any | undefined> => {
-    console.log('collateral: ', collateral);
-    console.log('methodName: ', methodName);
-    console.log('contract: ', contract);
-    console.log('data: ', data);
     if (biconomyConnector.wallet && contract) {
         const encodedCall = encodeFunctionData({
             abi: contract.abi,
@@ -74,7 +73,6 @@ export const executeBiconomyTransaction = async (
     value?: any
 ): Promise<any | undefined> => {
     if (biconomyConnector.wallet && contract) {
-        console.log(value);
         const encodedCall = encodeFunctionData({
             abi: contract.abi,
             functionName: methodName,
@@ -84,63 +82,51 @@ export const executeBiconomyTransaction = async (
         const transaction = {
             to: contract.address,
             data: encodedCall,
+            value,
         };
 
-        const sessionKeyPrivKey = window.localStorage.getItem(LOCAL_STORAGE_KEYS.SESSION_P_KEY[networkId]);
         const validUntil = window.localStorage.getItem(LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId]);
-
         const dateUntilValid = new Date(Number(validUntil) * 1000);
         const nowDate = new Date();
 
-        if (!validUntil || Number(nowDate) > Number(dateUntilValid)) {
-            console.log('try without session');
-            biconomyConnector.wallet.setActiveValidationModule(biconomyConnector.wallet.defaultValidationModule);
-            const transactionArray = await getCreateSessionTxs(
-                biconomyConnector.wallet.biconomySmartAccountConfig.chainId,
-                collateral
-            );
-            transactionArray.push(transaction);
+        const createSessionAndExecuteTxs = async () => {
+            if (biconomyConnector.wallet) {
+                biconomyConnector.wallet.setActiveValidationModule(biconomyConnector.wallet.defaultValidationModule);
+                const transactionArray = await getCreateSessionTxs(
+                    biconomyConnector.wallet.biconomySmartAccountConfig.chainId,
+                    collateral
+                );
+                transactionArray.push(transaction);
 
-            const { wait } = await biconomyConnector.wallet.sendTransaction(transactionArray, {
-                paymasterServiceData: {
-                    mode: PaymasterMode.ERC20,
-                    preferredToken: collateral,
-                },
-            });
+                const { wait } = await biconomyConnector.wallet.sendTransaction(transactionArray, {
+                    paymasterServiceData: {
+                        mode: PaymasterMode.ERC20,
+                        preferredToken: collateral,
+                    },
+                });
 
-            const {
-                receipt: { transactionHash },
-                success,
-            } = await wait();
+                const {
+                    receipt: { transactionHash },
+                    success,
+                } = await wait();
 
-            if (success === 'false') {
-                window.localStorage.removeItem(LOCAL_STORAGE_KEYS.SESSION_P_KEY[networkId]);
-                window.localStorage.removeItem(LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId]);
-                throw new Error('tx failed');
-            } else {
-                console.log('TX was succesful: ', success);
-                console.log('Transaction receipt', transactionHash);
-
-                return transactionHash;
+                if (success === 'false') {
+                    window.localStorage.removeItem(LOCAL_STORAGE_KEYS.SESSION_P_KEY[networkId]);
+                    window.localStorage.removeItem(LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId]);
+                    throw new Error('tx failed');
+                } else {
+                    console.log('Transaction receipt', transactionHash);
+                    return transactionHash;
+                }
             }
+        };
+
+        if (!validUntil || Number(nowDate) > Number(dateUntilValid)) {
+            const txHash = await createSessionAndExecuteTxs();
+            return txHash;
         } else {
             try {
-                console.log('try with session');
-                // try executing via Session module, if its not passing then enable session and execute with signing
-                // generate sessionModule
-                const sessionModule = await createSessionKeyManagerModule({
-                    moduleAddress: DEFAULT_SESSION_KEY_MANAGER_MODULE,
-                    smartAccountAddress: biconomyConnector.address,
-                });
-                biconomyConnector.wallet.setActiveValidationModule(sessionModule);
-
-                const sessionAccount = privateKeyToAccount(sessionKeyPrivKey as any);
-                const sessionSigner = createWalletClient({
-                    account: sessionAccount,
-                    chain: networkId as any,
-                    transport: http(biconomyConnector.wallet.rpcProvider.transport.url),
-                });
-
+                const sessionSigner = await getSessionSigner(networkId);
                 const { wait } = await biconomyConnector.wallet.sendTransaction(transaction, {
                     paymasterServiceData: {
                         mode: PaymasterMode.ERC20,
@@ -158,45 +144,14 @@ export const executeBiconomyTransaction = async (
                 } = await wait();
 
                 if (success === 'false') {
-                    console.log('failed');
                     throw new Error('tx failed');
                 } else {
-                    console.log('TX was succesful: ', success);
                     console.log('Transaction receipt', transactionHash);
-
                     return transactionHash;
                 }
             } catch {
-                console.log('try without session after');
-                biconomyConnector.wallet.setActiveValidationModule(biconomyConnector.wallet.defaultValidationModule);
-                const transactionArray = await getCreateSessionTxs(
-                    biconomyConnector.wallet.biconomySmartAccountConfig.chainId,
-                    collateral
-                );
-                transactionArray.push(transaction);
-                const { wait } = await biconomyConnector.wallet.sendTransaction(transactionArray, {
-                    paymasterServiceData: {
-                        mode: PaymasterMode.ERC20,
-                        preferredToken: collateral,
-                    },
-                });
-
-                const {
-                    receipt: { transactionHash },
-                    success,
-                } = await wait();
-
-                if (success === 'false') {
-                    console.log('remove');
-                    window.localStorage.removeItem(LOCAL_STORAGE_KEYS.SESSION_P_KEY[networkId]);
-                    window.localStorage.removeItem(LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId]);
-                    throw new Error('tx failed');
-                } else {
-                    console.log('TX was succesful: ', success);
-                    console.log('Transaction receipt', transactionHash);
-
-                    return transactionHash;
-                }
+                const txHash = await createSessionAndExecuteTxs();
+                return txHash;
             }
         }
     }
@@ -254,38 +209,6 @@ const getCreateSessionTxs = async (networkId: SupportedNetwork, collateralAddres
 
         const transactionArray = [];
 
-        const encodedCall = encodeFunctionData({
-            abi: erc20Abi,
-            functionName: 'approve',
-            args: [speedMarketsAMMContract.addresses[networkId], maxUint256],
-        });
-
-        const encodedCallChained = encodeFunctionData({
-            abi: erc20Abi,
-            functionName: 'approve',
-            args: [chainedSpeedMarketsAMMContract.addresses[networkId], maxUint256],
-        });
-
-        const approvalTxSingle = {
-            to: collateralAddress,
-            data: encodedCall,
-        };
-
-        const approvalTxChained = {
-            to: collateralAddress,
-            data: encodedCallChained,
-        };
-
-        const approvalTxSingleClaim = {
-            to: erc20Contract.addresses[networkId],
-            data: encodedCall,
-        };
-
-        const approvalTxChainedClaim = {
-            to: erc20Contract.addresses[networkId],
-            data: encodedCallChained,
-        };
-
         // enableModule session manager module
         try {
             const enabled = await biconomyConnector.wallet.isModuleEnabled(DEFAULT_SESSION_KEY_MANAGER_MODULE);
@@ -310,13 +233,86 @@ const getCreateSessionTxs = async (networkId: SupportedNetwork, collateralAddres
             Math.floor(dateUntil.getTime() / 1000).toString()
         );
 
-        transactionArray.push(
-            ...[setSessiontrx, approvalTxSingle, approvalTxChained, approvalTxSingleClaim, approvalTxChainedClaim]
+        // get client to check allowance
+        const client = createPublicClient({
+            chain: networkId as any,
+            transport: http(biconomyConnector.wallet?.rpcProvider.transport.url),
+        });
+
+        const erc20Instance = getContract({
+            abi: erc20Contract.abi,
+            address: collateralAddress as `0x${string}`,
+            client: client,
+        });
+
+        const hasAllowance = await checkAllowance(
+            maxUint256,
+            erc20Instance,
+            biconomyConnector.address,
+            speedMarketsAMMContract.addresses[networkId]
         );
+        if (hasAllowance) {
+            transactionArray.push(setSessiontrx);
+        } else {
+            const encodedCall = encodeFunctionData({
+                abi: erc20Abi,
+                functionName: 'approve',
+                args: [speedMarketsAMMContract.addresses[networkId], maxUint256],
+            });
+
+            const encodedCallChained = encodeFunctionData({
+                abi: erc20Abi,
+                functionName: 'approve',
+                args: [chainedSpeedMarketsAMMContract.addresses[networkId], maxUint256],
+            });
+
+            const approvalTxSingle = {
+                to: collateralAddress,
+                data: encodedCall,
+            };
+
+            const approvalTxChained = {
+                to: collateralAddress,
+                data: encodedCallChained,
+            };
+
+            const approvalTxSingleClaim = {
+                to: erc20Contract.addresses[networkId],
+                data: encodedCall,
+            };
+
+            const approvalTxChainedClaim = {
+                to: erc20Contract.addresses[networkId],
+                data: encodedCallChained,
+            };
+
+            transactionArray.push(
+                ...[setSessiontrx, approvalTxSingle, approvalTxChained, approvalTxSingleClaim, approvalTxChainedClaim]
+            );
+        }
 
         return transactionArray;
     }
     return [];
+};
+
+const getSessionSigner = async (networkId: SupportedNetwork) => {
+    // try executing via Session module, if its not passing then enable session and execute with signing
+    // generate sessionModule
+    const sessionModule = await createSessionKeyManagerModule({
+        moduleAddress: DEFAULT_SESSION_KEY_MANAGER_MODULE,
+        smartAccountAddress: biconomyConnector.address,
+    });
+    biconomyConnector.wallet?.setActiveValidationModule(sessionModule);
+    const sessionKeyPrivKey = window.localStorage.getItem(LOCAL_STORAGE_KEYS.SESSION_P_KEY[networkId]);
+
+    const sessionAccount = privateKeyToAccount(sessionKeyPrivKey as any);
+    const sessionSigner = createWalletClient({
+        account: sessionAccount,
+        chain: networkId as any,
+        transport: http(biconomyConnector.wallet?.rpcProvider.transport.url),
+    });
+    return sessionSigner;
 };
 
 interface Rule {
