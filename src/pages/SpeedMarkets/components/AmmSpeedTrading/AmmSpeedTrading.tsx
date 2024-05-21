@@ -8,7 +8,12 @@ import {
 } from 'components/ToastMessage/ToastMessage';
 import { PLAUSIBLE, PLAUSIBLE_KEYS } from 'constants/analytics';
 import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
-import { ALLOWANCE_BUFFER_PERCENTAGE, POSITIONS_TO_SIDE_MAP, SPEED_MARKETS_QUOTE } from 'constants/market';
+import {
+    ALLOWANCE_BUFFER_PERCENTAGE,
+    DEFAULT_PRICE_SLIPPAGE_PERCENTAGE,
+    POSITIONS_TO_SIDE_MAP,
+    SPEED_MARKETS_QUOTE,
+} from 'constants/market';
 import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import { secondsToMilliseconds } from 'date-fns';
 import { Positions } from 'enums/market';
@@ -64,6 +69,7 @@ import { delay } from 'utils/timer';
 import { Client, getContract, parseUnits, stringToHex } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
+import PriceSlippage from '../PriceSlippage';
 import { SelectedPosition } from '../SelectPosition/SelectPosition';
 
 type AmmSpeedTradingProps = {
@@ -111,6 +117,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     const [paidAmount, setPaidAmount] = useState(selectedStableBuyinAmount);
     const [potentialProfit, setPotentialProfit] = useState(0);
     const [submittedStrikePrice, setSubmittedStrikePrice] = useState(0);
+    const [priceSlippage, setPriceSlippage] = useState(DEFAULT_PRICE_SLIPPAGE_PERCENTAGE);
     const [isAllowing, setIsAllowing] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [outOfLiquidity, setOutOfLiquidity] = useState(false);
@@ -493,7 +500,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             setSubmittedStrikePrice(pythPrice);
 
             const strikePrice = priceParser(pythPrice);
-            const strikePriceSlippage = parseUnits('0.02', 18); // TODO: add to UI custom slippage % (2%)
+            const strikePriceSlippage = parseUnits(priceSlippage.toString(), 18);
 
             const asset = stringToHex(currencyKey, { size: 32 });
 
@@ -674,6 +681,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         return (
             <GradientContainer width={780}>
                 <TradingDetailsContainer>
+                    {!isChained && <PriceSlippage slippage={priceSlippage} onChange={setPriceSlippage} />}
                     <TradingDetailsSentence
                         currencyKey={currencyKey}
                         deltaTimeSec={deltaTimeSec}
@@ -689,11 +697,13 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                         hasCollateralConversion={selectedCollateral !== defaultCollateral}
                     />
                     {!isChained && (
-                        <ShareIcon
-                            className="icon-home icon-home--twitter-x"
+                        <ShareWrapper
                             disabled={isButtonDisabled}
                             onClick={() => !isButtonDisabled && setOpenTwitterShareModal(true)}
-                        />
+                        >
+                            {t('common.flex-card.share')}
+                            <Icon className="icon-home icon-home--twitter-x" />
+                        </ShareWrapper>
                     )}
                 </TradingDetailsContainer>
             </GradientContainer>
@@ -786,14 +796,23 @@ const ColumnSpaceBetween = styled(FlexDivColumn)`
     height: 100%;
 `;
 
-const ShareIcon = styled.i<{ disabled: boolean }>`
+const ShareWrapper = styled.div<{ disabled: boolean }>`
     position: absolute;
     bottom: 12px;
     right: 12px;
-    font-size: 18px;
-    color: ${(props) => props.theme.textColor.primary};
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 18px;
+    color: ${(props) => props.theme.textColor.quinary};
     cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
     opacity: ${(props) => (props.disabled ? '0.5' : '1')};
+    text-transform: lowercase;
+`;
+
+const Icon = styled.i`
+    font-size: 14px;
+    color: ${(props) => props.theme.textColor.quinary};
+    margin-left: 5px;
 `;
 
 const CollateralText = styled.span`

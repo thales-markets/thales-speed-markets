@@ -1,7 +1,10 @@
 import React, { useRef, useEffect } from 'react';
 import styled from 'styled-components';
 
-const OutsideClickHandler: React.FC<any & { onOutisdeClick: void }> = ({ children, onOutsideClick }) => {
+const OutsideClickHandler: React.FC<{ children: React.ReactNode; onOutsideClick: React.Dispatch<void> }> = ({
+    children,
+    onOutsideClick,
+}) => {
     const wrapperRef = useRef(null);
 
     useEffect(() => {

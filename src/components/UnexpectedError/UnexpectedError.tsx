@@ -78,6 +78,7 @@ const Container = styled(FlexDivColumnCentered)<{ theme: ThemeInterface }>`
     height: 100%;
     background: ${(props) => props.theme.background.primary};
     color: ${(props) => props.theme.textColor.primary};
+    font-family: ${(props) => props.theme.fontFamily.primary};
 
     a {
         color: ${(props) => props.theme.link.textColor.primary};

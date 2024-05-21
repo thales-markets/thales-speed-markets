@@ -6,6 +6,7 @@ import { FieldContainer, FieldLabel, Input } from '../common';
 
 type NumericInputProps = {
     value: string | number;
+    min?: number;
     label?: string;
     placeholder?: string;
     disabled?: boolean;
@@ -18,6 +19,7 @@ type NumericInputProps = {
     inputPadding?: string;
     margin?: string;
     width?: string;
+    height?: string;
 };
 
 const INVALID_CHARS = ['-', '+', 'e'];
@@ -25,6 +27,7 @@ const DEFAULT_TOKEN_DECIMALS = 18;
 
 const NumericInput: React.FC<NumericInputProps> = ({
     value,
+    min,
     label,
     placeholder,
     disabled,
@@ -37,6 +40,7 @@ const NumericInput: React.FC<NumericInputProps> = ({
     inputPadding,
     margin,
     width,
+    height,
 }) => {
     const { t } = useTranslation();
 
@@ -49,6 +53,9 @@ const NumericInput: React.FC<NumericInputProps> = ({
             if (numberOfDecimals > DEFAULT_TOKEN_DECIMALS) {
                 trimmedValue = value.substring(0, value.length - 1);
             }
+        }
+        if (min && Number(value) < Number(min)) {
+            trimmedValue = min.toString();
         }
 
         onChange(e, trimmedValue.replace(/,/g, '.').replace(/[e+-]/gi, ''));
@@ -69,9 +76,11 @@ const NumericInput: React.FC<NumericInputProps> = ({
                         e.preventDefault();
                     }
                 }}
-                min="0"
+                min={min}
+                step={min}
                 title=""
                 padding={inputPadding}
+                height={height}
             />
             <RightContainer hasLabel={!!label}>
                 {onMaxButton && (

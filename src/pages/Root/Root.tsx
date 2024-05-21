@@ -25,7 +25,21 @@ interface RootProps {
 }
 
 const theme = getDefaultTheme();
-const customTheme = merge(darkTheme(), { colors: { modalBackground: ThemeMap[theme].background.primary } });
+const rainbowCustomTheme = merge(darkTheme(), {
+    colors: {
+        accentColor: ThemeMap[theme].textColor.quinary,
+        accentColorForeground: ThemeMap[theme].button.textColor.secondary,
+        modalBackground: ThemeMap[theme].background.primary,
+        modalBorder: ThemeMap[theme].borderColor.quaternary,
+        // profileAction: ThemeMap[theme].background.quinary,
+        profileForeground: ThemeMap[theme].background.primary,
+        closeButton: ThemeMap[theme].button.textColor.tertiary,
+        closeButtonBackground: ThemeMap[theme].button.background.primary,
+        actionButtonBorder: 'transparent',
+    },
+    radii: { menuButton: '8px' },
+});
+
 queryConnector.setQueryClient();
 
 const Root: React.FC<RootProps> = ({ store }) => {
@@ -47,7 +61,7 @@ const Root: React.FC<RootProps> = ({ store }) => {
                     >
                         <WagmiProvider config={wagmiConfig}>
                             <RainbowKitProvider
-                                theme={customTheme}
+                                theme={rainbowCustomTheme}
                                 appInfo={{
                                     appName: 'SpeedMarkets',
                                     disclaimer: WalletDisclaimer,

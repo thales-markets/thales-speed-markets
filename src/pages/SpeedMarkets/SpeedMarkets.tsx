@@ -21,10 +21,10 @@ import { Trans, useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { getIsAppReady } from 'redux/modules/app';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import { BoldText, PAGE_MAX_WIDTH } from 'styles/common';
 import { roundNumberToDecimals } from 'thales-utils';
-import { RootState, ThemeInterface } from 'types/ui';
+import { RootState } from 'types/ui';
 import { getSupportedNetworksByRoute } from 'utils/network';
 import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAssetsAsObject } from 'utils/pyth';
 import { buildHref } from 'utils/routes';
@@ -40,7 +40,6 @@ import SelectTime from './components/SelectTime';
 const SpeedMarkets: React.FC = () => {
     const { t } = useTranslation();
     const location = useLocation();
-    const theme: ThemeInterface = useTheme();
 
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const networkId = useChainId();
@@ -236,10 +235,7 @@ const SpeedMarkets: React.FC = () => {
                                             : '...',
                                     }}
                                 />
-                                <Tooltip
-                                    overlay={t('speed-markets.tooltips.buyin-fees')}
-                                    customIconStyling={{ color: theme.textColor.quinary }}
-                                />
+                                <Tooltip overlay={t('speed-markets.tooltips.buyin-fees')} />
                             </Info>
                             <LightweightChart
                                 position={isChained ? undefined : positionType}
@@ -324,7 +320,7 @@ const HeaderImage = styled.div`
     height: 120px;
     background-image: url(${banner});
     background-position: center;
-    border: 1px solid ${(props) => props.theme.borderColor.secondary};
+    border: 1px solid ${(props) => props.theme.borderColor.quinary};
     border-radius: 11px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         display: none;
