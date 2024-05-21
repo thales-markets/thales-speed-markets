@@ -30,8 +30,8 @@ export default {
         background: {
             primary: Colors.BLACK,
             secondary: Colors.PURPLE,
-            tertiary: Colors.WHITE,
-            quaternary: Colors.GRAY_LIGHT,
+            tertiary: Colors.BLUE,
+            quaternary: '',
         },
         textColor: {
             primary: Colors.WHITE,
@@ -42,11 +42,7 @@ export default {
         borderColor: {
             primary: `linear-gradient(90deg, ${Colors.PURPLE_DARK} 0%, ${Colors.BLUE} 100%)`,
             secondary: Colors.PURPLE,
-            tertiary: Colors.WHITE,
-        },
-        shadowColor: {
-            primary: Colors.PURPLE_DARK,
-            secondary: Colors.BLUE,
+            tertiary: '',
         },
     },
     input: {

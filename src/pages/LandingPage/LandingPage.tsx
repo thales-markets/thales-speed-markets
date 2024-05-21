@@ -5,9 +5,11 @@ import PurpleTriangle from 'assets/images/landing/purple-triangle.png';
 import Rocket from 'assets/images/landing/rocket.png';
 import Zeus from 'assets/images/landing/zeus-hero.webp';
 import SPAAnchor from 'components/SPAAnchor';
+import { LINKS } from 'constants/links';
 import ROUTES from 'constants/routes';
+import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { ExtraBoldText, FlexDivCentered, FlexDivColumn, FlexDivRow } from 'styles/common';
+import { ExtraBoldText, FlexDivCentered, FlexDivColumn } from 'styles/common';
 import {
     BigBlurImg,
     BigBlurImgWrapper,
@@ -22,6 +24,7 @@ import {
     ButtonWrapper,
     CacheBagContentIcon,
     ChainedContentIcon,
+    CloseIcon,
     CoinsImg,
     Container,
     Content,
@@ -31,11 +34,20 @@ import {
     ContentTextTitle,
     ContentTextWrapper,
     CryptoContentIcon,
+    DappButton,
     DetectiveContentIcon,
     Header,
+    HeaderLinks,
+    HeaderRow,
+    HeaderText,
     Link,
     LogoText,
     MediumBlurImg,
+    MenuHeaderLinks,
+    MobileBurger,
+    MobileBurgerMenu,
+    MobileDappButton,
+    MobileDappButtonWrapper,
     PurpleTriangleImg,
     PurpleTriangleImgWrapper,
     PythContentIcon,
@@ -54,12 +66,49 @@ import {
     ZeusImg,
     ZeusImgWrapper,
 } from './styled-components';
-import { LINKS } from 'constants/links';
 
 const LandingPage: React.FC = () => {
     const { t } = useTranslation();
 
-    return (
+    const [openBurgerMenu, setOpenBurgerMenu] = useState(false);
+
+    const getThalesLogo = () => (
+        <FlexDivColumn>
+            <a target="_blank" rel="noreferrer" href={LINKS.ThalesIo.Home}>
+                <FlexDivCentered>
+                    <LogoText>{t('landing.powered-by')}</LogoText>
+                </FlexDivCentered>
+                <FlexDivCentered>
+                    <ThalesLogo className="icon-home icon-home--thales" />
+                </FlexDivCentered>
+            </a>
+        </FlexDivColumn>
+    );
+
+    return openBurgerMenu ? (
+        <MobileBurgerMenu>
+            <CloseIcon className="icon icon--x-sign" onClick={() => setOpenBurgerMenu(false)} />
+            <MenuHeaderLinks>
+                <Link href={LINKS.ThalesIo.Docs} target="_blank" rel="noreferrer">
+                    <HeaderText>{t('landing.header.about')}</HeaderText>
+                </Link>
+                <Link href={LINKS.ThalesIo.Devs} target="_blank" rel="noreferrer">
+                    <HeaderText>{t('landing.header.devs')}</HeaderText>
+                </Link>
+                <Link href={LINKS.ThalesIo.Home} target="_blank" rel="noreferrer">
+                    <HeaderText>{t('landing.header.thales')}</HeaderText>
+                </Link>
+            </MenuHeaderLinks>
+            <MobileDappButtonWrapper>
+                <SPAAnchor href={ROUTES.Markets.Home}>
+                    <MobileDappButton>
+                        <HeaderText>{t('landing.header.dapp')}</HeaderText>
+                    </MobileDappButton>
+                </SPAAnchor>
+            </MobileDappButtonWrapper>
+            {getThalesLogo()}
+        </MobileBurgerMenu>
+    ) : (
         <Container>
             <BlueTriangleImg src={BlueTriangle} />
             <ZeusImgWrapper>
@@ -77,10 +126,31 @@ const LandingPage: React.FC = () => {
                     <BigRocketImg src={Rocket} />
                 </BigRocketImgWrapper>
             </BigRocketWrapper>
+
             <Header>
-                <FlexDivRow>
+                <HeaderRow>
                     <SpeedLogo className="icon-home icon-home--speed-full-logo" />
-                </FlexDivRow>
+                    <HeaderLinks>
+                        <Link href={LINKS.ThalesIo.Docs} target="_blank" rel="noreferrer">
+                            <HeaderText>{t('landing.header.about')}</HeaderText>
+                        </Link>
+                        <Link href={LINKS.ThalesIo.Devs} target="_blank" rel="noreferrer">
+                            <HeaderText>{t('landing.header.devs')}</HeaderText>
+                        </Link>
+                        <Link href={LINKS.ThalesIo.Home} target="_blank" rel="noreferrer">
+                            <HeaderText>{t('landing.header.thales')}</HeaderText>
+                        </Link>
+                    </HeaderLinks>
+                    <SPAAnchor href={ROUTES.Markets.Home}>
+                        <DappButton>
+                            <HeaderText>{t('landing.header.dapp')}</HeaderText>
+                        </DappButton>
+                    </SPAAnchor>
+                    <MobileBurger
+                        className="network-icon network-icon--burger"
+                        onClick={() => setOpenBurgerMenu(true)}
+                    />
+                </HeaderRow>
                 <TitleWrapper>
                     <Title>
                         <Trans
@@ -253,16 +323,7 @@ const LandingPage: React.FC = () => {
                 </ButtonWrapper>
             </ButtonContainer>
 
-            <FlexDivColumn>
-                <a target="_blank" rel="noreferrer" href={LINKS.ThalesIo}>
-                    <FlexDivCentered>
-                        <LogoText>{t('landing.powered-by')}</LogoText>
-                    </FlexDivCentered>
-                    <FlexDivCentered>
-                        <ThalesLogo className="icon-home icon-home--thales" />
-                    </FlexDivCentered>
-                </a>
-            </FlexDivColumn>
+            {getThalesLogo()}
         </Container>
     );
 };

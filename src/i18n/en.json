@@ -201,6 +201,7 @@
         }
     },
     "landing": {
+        "header": { "about": "About", "devs": "For developers", "thales": "Thales protocol", "dapp": "Open dapp" },
         "title": "Trade Faster,<br>Win Bigger<br>and Have Fun With Speed Markets!!",
         "title-desc": "<bold>Speed Markets</bold> allow users to purchase UP or DOWN positions around the current price of ETH and BTC.",
         "trade-now": "Trade now",
