@@ -679,7 +679,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
     const getTradingDetails = () => {
         return (
-            <GradientContainer width={780}>
+            <GradientContainer width={isMobile ? 0 : 780}>
                 <TradingDetailsContainer>
                     {!isChained && <PriceSlippage slippage={priceSlippage} onChange={setPriceSlippage} />}
                     <TradingDetailsSentence
@@ -717,11 +717,12 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             {!isMobile && getTradingDetails()}
             <FinalizeTrade>
                 <ColumnSpaceBetween ref={inputWrapperRef}>
-                    {isMobile && getTradingDetails()}
                     <QuoteContainer>
                         <QuoteLabel>{t('speed-markets.profit')}</QuoteLabel>
                         <QuoteText>{potentialProfit ? `${truncToDecimals(potentialProfit)}x` : '-'}</QuoteText>
                     </QuoteContainer>
+                    {isMobile && getTradingDetails()}
+
                     {getSubmitButton()}
                 </ColumnSpaceBetween>
             </FinalizeTrade>
@@ -777,7 +778,7 @@ const TradingDetailsContainer = styled(FlexDivRowCentered)`
 
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         width: 100%;
-        margin-bottom: 10px;
+        padding-bottom: 70px;
     }
 `;
 
@@ -792,8 +793,12 @@ const FinalizeTrade = styled(FlexDivCentered)`
 
 const ColumnSpaceBetween = styled(FlexDivColumn)`
     width: 100%;
-    justify-content: space-between;
     height: 100%;
+    justify-content: space-between;
+
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        gap: 10px;
+    }
 `;
 
 const ShareWrapper = styled.div<{ disabled: boolean }>`

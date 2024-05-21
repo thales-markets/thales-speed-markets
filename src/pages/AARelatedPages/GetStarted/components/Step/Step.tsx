@@ -3,6 +3,7 @@ import Modal from 'components/Modal';
 import OutsideClick from 'components/OutsideClick';
 import { getErrorToastOptions, getInfoToastOptions } from 'components/ToastMessage/ToastMessage';
 import ROUTES from 'constants/routes';
+import { ScreenSizeBreakpoint } from 'enums/ui';
 import { GetStartedStep } from 'enums/wizard';
 import QRCodeModal from 'pages/AARelatedPages/Withdraw/components/QRCodeModal';
 import React, { useMemo, useState } from 'react';
@@ -37,6 +38,7 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
     const dispatch = useDispatch();
     const { isConnected: isWalletConnected, address: walletAddress } = useAccount();
     const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
+
     const { t } = useTranslation();
     const [showQRModal, setShowQRModal] = useState<boolean>(false);
     const [showOnramper, setShowOnramper] = useState<boolean>(false);
@@ -189,7 +191,7 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
                                 </AddressContainer>
                             </GradientContainer>
                             <Separator />
-                            <OnramperDiv
+                            <OnRampWrapper
                                 onClick={() => {
                                     if (isActive) setShowOnramper(true);
                                 }}
@@ -203,7 +205,7 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
                                 <Button disabled={!isActive} width="100%" fontSize="18px">
                                     {t('get-started.steps.action.buy-crypto')}
                                 </Button>
-                            </OnramperDiv>
+                            </OnRampWrapper>
                         </DepositContainer>
                     )}
                 </StepDescriptionSection>
@@ -244,7 +246,6 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
 const Container = styled.div`
     display: flex;
     margin: 10px 0;
-
     gap: 10px;
     align-items: flex-start;
     @media (max-width: 600px) {
@@ -257,6 +258,7 @@ const StepNumberSection = styled(FlexDivCentered)``;
 const StepDescriptionSection = styled(FlexDivColumn)<{ isActive: boolean; isDisabled?: boolean }>`
     color: ${(props) => (props.isActive ? props.theme.textColor.primary : props.theme.textColor.secondary)};
     cursor: ${(props) => (props.isDisabled ? 'not-allowed' : 'pointer')};
+    overflow: hidden;
 `;
 
 const StepTitle = styled.span<{ completed?: boolean }>`
@@ -327,6 +329,10 @@ const Address = styled.span`
     line-height: normal;
     letter-spacing: -0.28px;
     text-transform: lowercase;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin-right: 60px;
 `;
 
 const QRIcon = styled.i`
@@ -378,11 +384,17 @@ const OnramperDiv = styled(FlexDiv)`
     cursor: pointer;
 `;
 
+const OnRampWrapper = styled(OnramperDiv)`
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        flex-direction: column;
+    }
+`;
+
 const OnramperIcons = styled.i`
     font-size: 70px;
     color: ${(props) => props.theme.textColor.primary};
-    @media (max-width: 500px) {
-        font-size: 45px;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        font-size: 60px;
     }
 `;
 

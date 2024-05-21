@@ -14,6 +14,7 @@ import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
 import { GetStartedStep } from 'enums/wizard';
 import Modal from 'components/Modal';
+import { ScreenSizeBreakpoint } from 'enums/ui';
 
 type GetStartedProps = {
     isOpen: boolean;
@@ -114,6 +115,9 @@ const Container = styled(FlexDivColumn)`
     border-radius: 15px;
     padding: 0 40px;
     position: relative;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        padding: 0;
+    }
 `;
 
 const ProgressDisplayWrapper = styled(FlexDiv)`

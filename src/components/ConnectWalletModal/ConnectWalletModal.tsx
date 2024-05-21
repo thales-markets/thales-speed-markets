@@ -16,6 +16,7 @@ import { Connector, useConnect } from 'wagmi';
 import { getClassNameForParticalLogin, getSpecificConnectorFromConnectorsArray } from 'utils/particleWallet/utils';
 import Button from 'components/Button';
 import Modal from 'components/Modal';
+import { ScreenSizeBreakpoint } from 'enums/ui';
 
 ReactModal.setAppElement('#root');
 
@@ -177,6 +178,9 @@ const Container = styled.div`
     background-color: ${(props) => props.theme.background.primary};
     border-radius: 15px;
     padding: 40px 90px;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        padding: 40px;
+    }
 `;
 
 const Link = styled.a`
@@ -200,7 +204,7 @@ const FooterContainer = styled(FlexDivCentered)<{ disabled: boolean }>`
     margin-top: 28px;
     padding-top: 20px;
 
-    @media (max-width: 575px) {
+    @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}) {
         margin: 0px 40px;
         margin-top: 28px;
     }

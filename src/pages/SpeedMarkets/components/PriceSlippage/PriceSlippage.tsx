@@ -6,6 +6,7 @@ import {
     DOUBLE_DEFAULT_PRICE_SLIPPAGE_PERCENTAGE,
     MIN_STRIKE_PRICE_SLIPPAGE_PERCENTAGE,
 } from 'constants/market';
+import { ScreenSizeBreakpoint } from 'enums/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -78,6 +79,12 @@ const Container = styled(FlexDivCentered)`
     border: 1px solid ${(props) => props.theme.borderColor.quaternary};
     border-radius: 8px;
     color: ${(props) => props.theme.textColor.quinary};
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        left: 12px;
+        bottom: 12px;
+        top: auto;
+        right: auto;
+    }
 `;
 
 const SlippageDetailsWrapper = styled.div`
@@ -88,6 +95,12 @@ const SlippageDetailsWrapper = styled.div`
     background: ${(props) => props.theme.borderColor.tertiary};
     border-radius: 8px;
     z-index: 2;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        left: -2px;
+        bottom: -2px;
+        top: auto;
+        right: auto;
+    }
 `;
 
 const SlippageDetails = styled(FlexDivColumn)`

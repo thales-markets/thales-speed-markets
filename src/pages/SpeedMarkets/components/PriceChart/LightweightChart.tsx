@@ -23,6 +23,7 @@ import CurrentPrice from './components/CurrentPrice';
 import Toggle from './components/DateToggle';
 import { useChainId, useClient } from 'wagmi';
 import { useTheme } from 'styled-components';
+import { getIsMobile } from 'redux/modules/ui';
 
 const now = new Date();
 
@@ -68,6 +69,8 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const networkId = useChainId();
     const client = useClient();
+
+    const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const [dateRange, setDateRange] = useState(SpeedMarketsToggleButtons[SPEED_DEFAULT_TOGGLE_BUTTON_INDEX]);
     const [selectedToggleIndex, setToggleIndex] = useState(SPEED_DEFAULT_TOGGLE_BUTTON_INDEX);
@@ -212,31 +215,35 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
                     </FlexDiv>
                 )}
             </FlexDivSpaceBetween>
-            <ChartContainer>
-                {pythQuery.isLoading ? (
-                    <SimpleLoader />
-                ) : (
-                    <ChartComponent
-                        resolution={dateRange.resolution}
-                        data={candleData}
-                        position={position}
-                        asset={asset}
-                        selectedPrice={selectedPrice}
-                        selectedDate={selectedDate}
-                    />
-                )}
-            </ChartContainer>
+            {!isMobile && (
+                <>
+                    <ChartContainer>
+                        {pythQuery.isLoading ? (
+                            <SimpleLoader />
+                        ) : (
+                            <ChartComponent
+                                resolution={dateRange.resolution}
+                                data={candleData}
+                                position={position}
+                                asset={asset}
+                                selectedPrice={selectedPrice}
+                                selectedDate={selectedDate}
+                            />
+                        )}
+                    </ChartContainer>
 
-            <Toggle
-                options={SpeedMarketsToggleButtons}
-                selectedIndex={selectedToggleIndex}
-                onChange={handleDateRangeChange}
-            />
-            <PythIconWrap>
-                <a target="_blank" rel="noreferrer" href={LINKS.Pyth.Benchmarks}>
-                    <i className="icon icon--pyth" />
-                </a>
-            </PythIconWrap>
+                    <Toggle
+                        options={SpeedMarketsToggleButtons}
+                        selectedIndex={selectedToggleIndex}
+                        onChange={handleDateRangeChange}
+                    />
+                    <PythIconWrap>
+                        <a target="_blank" rel="noreferrer" href={LINKS.Pyth.Benchmarks}>
+                            <i className="icon icon--pyth" />
+                        </a>
+                    </PythIconWrap>
+                </>
+            )}
         </Wrapper>
     );
 };
@@ -246,9 +253,6 @@ const Wrapper = styled.div`
     width: 100%;
     height: 100%;
     margin-top: 15px;
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        height: 352px;
-    }
 `;
 
 const ChartContainer = styled.div`

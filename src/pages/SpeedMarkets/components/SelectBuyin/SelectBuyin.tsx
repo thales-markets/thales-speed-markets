@@ -308,7 +308,7 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
                             }}
                         >
                             <DollarSign>{USD_SIGN}</DollarSign>
-                            {amount}
+                            {amount.toFixed(0)}
                         </Amount>
                     );
                 })}
@@ -348,6 +348,11 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
 
 const BuyinAmountsWrapper = styled(FlexDivRow)`
     margin-bottom: 10px;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        width: 100%;
+        justify-content: center;
+        gap: 14px;
+    }
 `;
 
 const Amount = styled(FlexDivCentered)<{ $isSelected: boolean }>`
@@ -364,7 +369,7 @@ const Amount = styled(FlexDivCentered)<{ $isSelected: boolean }>`
         props.$isSelected ? props.theme.button.textColor.secondary : props.theme.button.textColor.tertiary};
     cursor: pointer;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        width: 60px;
+        width: 100%;
     }
 `;
 

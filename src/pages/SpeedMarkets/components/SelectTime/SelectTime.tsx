@@ -8,7 +8,7 @@ import {
     secondsToHours,
     secondsToMinutes,
 } from 'date-fns';
-import { ScreenSizeBreakpoint } from 'enums/ui';
+
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -19,6 +19,7 @@ import { AmmSpeedMarketsLimits } from 'types/market';
 import { RootState, ThemeInterface } from 'types/ui';
 import { useAccount } from 'wagmi';
 import { Header, HeaderText, PlusMinusIcon } from '../SelectPosition/styled-components';
+import { ScreenSizeBreakpoint } from 'enums/ui';
 
 type SelectTimeProps = {
     selectedDeltaSec: number;
@@ -302,6 +303,11 @@ const Row = styled(FlexDivRow)`
 
 const SingleRow = styled(FlexDivRow)`
     align-items: center;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        width: 100%;
+        justify-content: center;
+        gap: 14px;
+    }
 `;
 
 const ChainedRow = styled(FlexDivStart)`
@@ -318,7 +324,8 @@ const InputWrapper = styled.div`
 `;
 
 const Time = styled(FlexDivCentered)<{ $isChained: boolean; $isSelected: boolean }>`
-    width: ${(props) => (props.$isChained ? '60px' : '67px')};
+    min-width: 60px;
+
     height: 40px;
     border-radius: 8px;
     font-size: 13px;
@@ -331,7 +338,7 @@ const Time = styled(FlexDivCentered)<{ $isChained: boolean; $isSelected: boolean
         props.$isSelected ? props.theme.button.textColor.secondary : props.theme.button.textColor.tertiary};
     cursor: pointer;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        width: 60px;
+        width: ${(props) => (props.$isChained ? '60px' : '100%')};
     }
 `;
 

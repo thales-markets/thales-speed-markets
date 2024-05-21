@@ -4,6 +4,11 @@ import { FlexDivCentered, FlexDivColumn, FlexDivColumnCentered, FlexDivSpaceBetw
 
 export const PositionContainer = styled(FlexDivRow)`
     align-items: center;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        width: 100%;
+        justify-content: center;
+        gap: 14px;
+    }
 `;
 
 export const PlusMinusIcon = styled.i`
@@ -76,7 +81,7 @@ export const PositionWrapper = styled(FlexDivCentered)<{ $isSelected?: boolean }
     line-height: 100%;
     text-transform: uppercase;
     padding-left: 15px;
-    width: 145px;
+    min-width: 145px;
     height: 40px;
     border-radius: 8px;
     border: 2px solid ${(props) => props.theme.button.borderColor.secondary};
@@ -85,6 +90,9 @@ export const PositionWrapper = styled(FlexDivCentered)<{ $isSelected?: boolean }
     color: ${(props) =>
         props.$isSelected ? props.theme.button.textColor.secondary : props.theme.button.textColor.tertiary};
     cursor: pointer;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        width: 100%;
+    }
 `;
 
 export const PositionWrapperChained = styled(FlexDivCentered)<{ $isSelected?: boolean }>`

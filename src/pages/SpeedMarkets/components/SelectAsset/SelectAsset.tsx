@@ -1,7 +1,7 @@
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { FlexDivCentered } from 'styles/common';
+import { FlexDivSpaceBetween } from 'styles/common';
 import { getSynthAsset } from 'utils/currency';
 
 type SelectAssetProps = {
@@ -44,8 +44,12 @@ const SelectAsset: React.FC<SelectAssetProps> = ({ selectedAsset, allAssets, onC
     );
 };
 
-const Container = styled(FlexDivCentered)`
+const Container = styled(FlexDivSpaceBetween)`
     gap: 10px;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        justify-content: center;
+        width: 100%;
+    }
 `;
 
 const Asset = styled.div<{ $isSelected: boolean }>`
@@ -53,7 +57,8 @@ const Asset = styled.div<{ $isSelected: boolean }>`
     align-items: center;
     justify-content: start;
     padding-left: 15px;
-    width: 165px;
+    min-width: 165px;
+    width: 100%;
     height: 40px;
     border-radius: 8px;
     ${(props) => (props.$isSelected ? '' : `border: 2px solid ${props.theme.button.borderColor.secondary};`)}
@@ -65,7 +70,6 @@ const Asset = styled.div<{ $isSelected: boolean }>`
     font-size: 18px;
     line-height: 90%;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        width: 160px;
         font-size: 16px;
     }
 `;

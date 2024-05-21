@@ -1,9 +1,11 @@
 import React from 'react';
 import ReactModal from 'react-modal';
+import { useSelector } from 'react-redux';
+import { getIsMobile } from 'redux/modules/ui';
 import styled from 'styled-components';
 import { useTheme } from 'styled-components';
 import { FlexDiv } from 'styles/common';
-import { ThemeInterface } from 'types/ui';
+import { RootState, ThemeInterface } from 'types/ui';
 
 ReactModal.setAppElement('#root');
 
@@ -26,6 +28,7 @@ const getDefaultStyle = (theme: ThemeInterface, width?: string, zIndex?: number)
         padding: '2px',
         background: theme.borderColor.tertiary,
         width: width ?? '720px',
+        maxWidth: '100%',
         borderRadius: '15px',
         marginRight: '-50%',
         transform: 'translate(-50%, -50%)',
@@ -50,13 +53,14 @@ const Modal: React.FC<ModalProps> = ({
     zIndex,
 }) => {
     const theme: ThemeInterface = useTheme();
+    const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     return (
         <ReactModal
             isOpen={isOpen ?? true}
             onRequestClose={onClose}
             shouldCloseOnOverlayClick={shouldCloseOnOverlayClick}
-            style={getDefaultStyle(theme, width, zIndex)}
+            style={getDefaultStyle(theme, isMobile ? 'auto' : width, zIndex)}
         >
             <Container>
                 <PrimaryHeading>{title}</PrimaryHeading>
@@ -102,9 +106,6 @@ const CloseIcon = styled.i`
         font-family: Icons !important;
         content: '\\0042';
         color: ${(props) => props.theme.textColor.quinary};
-    }
-    @media (max-width: 575px) {
-        padding: 15px;
     }
 `;
 

@@ -36,19 +36,19 @@ const DappHeader: React.FC = () => {
         <Container>
             <LeftContainer>
                 <FlexDivRow>
-                    {isMobile && <Icon className="sidebar-icon icon--nav-menu" onClick={sidebarMenuClickHandler} />}
                     <Logo />
-                    <Button
-                        width="140px"
-                        height="30px"
-                        margin="10px 0"
-                        fontSize="12px"
-                        onClick={() => setOpenGetStarted(true)}
-                    >
-                        {t('common.header.get-started')}
-                    </Button>
+                    {!isMobile && (
+                        <Button
+                            width="140px"
+                            height="30px"
+                            margin="10px 0"
+                            fontSize="12px"
+                            onClick={() => setOpenGetStarted(true)}
+                        >
+                            {t('common.header.get-started')}
+                        </Button>
+                    )}
                 </FlexDivRow>
-                {isMobile && <Notifications />}
             </LeftContainer>
             <RightContainer>
                 {!isConnected && (
@@ -69,12 +69,24 @@ const DappHeader: React.FC = () => {
                         {t('common.wallet.connect-your-wallet')}
                     </Button>
                 )}
+                {isMobile && (
+                    <Button
+                        width="140px"
+                        height="30px"
+                        margin="10px"
+                        fontSize="12px"
+                        onClick={() => setOpenGetStarted(true)}
+                    >
+                        {t('common.header.get-started')}
+                    </Button>
+                )}
 
                 <NetworkSwitch />
+
                 {isConnected && (
                     <>
-                        <UserWallet />
-                        {!isMobile && <Notifications />}
+                        {!isMobile && <UserWallet />}
+                        <Notifications />
                         <HeaderIcons
                             onClick={() => setOpenUserInfo(!openUserInfo)}
                             className={`network-icon network-icon--burger`}
@@ -102,21 +114,6 @@ const DappHeader: React.FC = () => {
     );
 };
 
-const sidebarMenuClickHandler = () => {
-    const root = document.getElementById('root');
-    const content = document.getElementById('main-content');
-    const sidebar = document.getElementById('sidebar');
-    if (root?.classList.contains('collapse')) {
-        sidebar?.classList.remove('collapse');
-        content?.classList.remove('collapse');
-        root?.classList.remove('collapse');
-    } else {
-        root?.classList.add('collapse');
-        content?.classList.add('collapse');
-        sidebar?.classList.add('collapse');
-    }
-};
-
 const Container = styled(FlexDivRowCentered)`
     width: 100%;
     max-width: ${PAGE_MAX_WIDTH};
@@ -125,7 +122,6 @@ const Container = styled(FlexDivRowCentered)`
     max-height: 40px;
     margin-bottom: 6px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        flex-direction: column;
     }
 `;
 
@@ -138,15 +134,12 @@ const LeftContainer = styled(FlexDivRowCentered)`
 
 const RightContainer = styled(FlexDivRowCentered)`
     position: relative;
-    @media (max-width: 500px) {
-        width: 100%;
-    }
     gap: 10px;
-`;
-
-const Icon = styled.i`
-    margin-right: 13px;
-    font-size: 26px;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        width: 100%;
+        justify-content: flex-end;
+        gap: 0;
+    }
 `;
 
 const HeaderIcons = styled.i`
