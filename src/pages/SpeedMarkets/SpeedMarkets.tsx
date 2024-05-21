@@ -320,7 +320,7 @@ const HeaderImage = styled.div`
     height: 120px;
     background-image: url(${banner});
     background-position: center;
-    border: 1px solid ${(props) => props.theme.borderColor.secondary};
+    border: 1px solid ${(props) => props.theme.borderColor.quinary};
     border-radius: 11px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         display: none;

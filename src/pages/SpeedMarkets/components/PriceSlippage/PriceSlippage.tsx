@@ -75,7 +75,7 @@ const Container = styled(FlexDivCentered)`
     max-width: 152px;
     height: 40px;
     padding: 5px;
-    border: 2px solid ${(props) => props.theme.borderColor.quaternary};
+    border: 1px solid ${(props) => props.theme.borderColor.quaternary};
     border-radius: 8px;
     color: ${(props) => props.theme.textColor.quinary};
 `;

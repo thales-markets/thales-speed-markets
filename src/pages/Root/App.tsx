@@ -212,7 +212,7 @@ const GlobalStyle = createGlobalStyle`
     }
     html {
         scroll-behavior: smooth;
-        scrollbar-color: ${(props) => props.theme.background.tertiary} transparent;
+        scrollbar-color: ${(props) => props.theme.background.quinary} transparent;
     }
     body {
         background: ${(props) => props.theme.background.primary};
