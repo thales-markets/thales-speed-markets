@@ -1,3 +1,4 @@
+import { ScreenSizeBreakpoint } from 'enums/ui';
 import React from 'react';
 import ReactModal from 'react-modal';
 import { useSelector } from 'react-redux';
@@ -19,21 +20,21 @@ type ModalProps = {
     zIndex?: number;
 };
 
-const getDefaultStyle = (theme: ThemeInterface, width?: string, zIndex?: number) => ({
+const getDefaultStyle = (theme: ThemeInterface, width?: string, zIndex?: number, isMobile?: boolean) => ({
     content: {
-        top: '50%',
-        left: '50%',
+        top: isMobile ? '0' : '50%',
+        left: isMobile ? '0' : '50%',
         right: 'auto',
         bottom: 'auto',
         padding: '2px',
-        background: theme.borderColor.tertiary,
-        width: width ?? '720px',
+        background: isMobile ? theme.background.primary : theme.borderColor.tertiary,
+        width: isMobile ? 'auto' : width ?? '720px',
         maxWidth: '100%',
-        borderRadius: '15px',
+        borderRadius: isMobile ? '0' : '15px',
         marginRight: '-50%',
-        transform: 'translate(-50%, -50%)',
+        transform: isMobile ? '' : 'translate(-50%, -50%)',
         overflow: 'none',
-        height: 'auto',
+        height: isMobile ? '100%' : 'auto',
         border: 'none',
     },
     overlay: {
@@ -60,7 +61,7 @@ const Modal: React.FC<ModalProps> = ({
             isOpen={isOpen ?? true}
             onRequestClose={onClose}
             shouldCloseOnOverlayClick={shouldCloseOnOverlayClick}
-            style={getDefaultStyle(theme, isMobile ? 'auto' : width, zIndex)}
+            style={getDefaultStyle(theme, width, zIndex, isMobile)}
         >
             <Container>
                 <PrimaryHeading>{title}</PrimaryHeading>
@@ -95,6 +96,10 @@ const CloseIconContainer = styled(FlexDiv)`
     position: absolute;
     top: 20px;
     right: 20px;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        top: 14px;
+        right: 14px;
+    }
 `;
 
 const CloseIcon = styled.i`
@@ -106,6 +111,9 @@ const CloseIcon = styled.i`
         font-family: Icons !important;
         content: '\\0076';
         color: ${(props) => props.theme.textColor.quinary};
+    }
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        font-size: 14px;
     }
 `;
 

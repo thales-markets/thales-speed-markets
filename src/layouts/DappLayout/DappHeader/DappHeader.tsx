@@ -56,6 +56,7 @@ const DappHeader: React.FC = () => {
                         width="140px"
                         height="30px"
                         fontSize="12px"
+                        margin={isMobile ? '10px' : '0px'}
                         fontWeight={800}
                         onClick={() =>
                             dispatch(

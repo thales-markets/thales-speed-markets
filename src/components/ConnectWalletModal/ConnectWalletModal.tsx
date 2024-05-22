@@ -179,7 +179,8 @@ const Container = styled.div`
     border-radius: 15px;
     padding: 40px 90px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        padding: 40px;
+        padding: 0;
+        padding-top: 30px;
     }
 `;
 
