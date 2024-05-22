@@ -8,6 +8,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { getIsMobile } from 'redux/modules/ui';
 import styled, { useTheme } from 'styled-components';
+import { PAGE_MAX_WIDTH } from 'styles/common';
 import { isAndroid, isMetamask } from 'thales-utils';
 import { RootState, ThemeInterface } from 'types/ui';
 import { isMobile } from 'utils/device';
@@ -101,14 +102,12 @@ const Wrapper = styled.div`
     justify-content: flex-start;
     align-items: center;
     width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 30px 20px 0px 92px;
+    margin: 30px auto 0 auto;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         padding: 10px 10px 0 10px;
         padding-bottom: 50px !important;
     }
-    max-width: 1440px;
+    max-width: ${PAGE_MAX_WIDTH};
     min-height: 100vh;
 `;
 

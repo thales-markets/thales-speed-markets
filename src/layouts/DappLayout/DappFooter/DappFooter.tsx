@@ -5,11 +5,11 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { FlexDivColumn, FlexDivRow } from 'styles/common';
 
-const DappFooter: React.FC = () => {
+const DappFooter: React.FC<{ isLandingPage?: boolean }> = ({ isLandingPage }) => {
     const { t } = useTranslation();
 
     return (
-        <Container>
+        <Container $isLandingPage={isLandingPage}>
             <Items>
                 <Item>
                     <a target="_blank" rel="noreferrer" href={LINKS.GitHub}>
@@ -59,11 +59,11 @@ const DappFooter: React.FC = () => {
     );
 };
 
-const Container = styled.div`
+const Container = styled.div<{ $isLandingPage?: boolean }>`
     display: flex;
     flex-direction: column;
     align-items: center;
-    max-width: 990px;
+    ${(props) => (props.$isLandingPage ? 'max-width: 950px;' : '')}
     gap: 20px;
     padding-top: 75px;
     margin: auto auto 25px auto;
@@ -107,9 +107,7 @@ const FooterIcon = styled.i`
     color: ${(props) => props.theme.textColor.primary};
 `;
 
-const DescriptionWrapper = styled(FlexDivRow)`
-    padding: 0 10px;
-`;
+const DescriptionWrapper = styled(FlexDivRow)``;
 
 const Description = styled.p`
     font-size: 13px;

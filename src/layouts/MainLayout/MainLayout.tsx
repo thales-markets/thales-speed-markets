@@ -48,7 +48,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             {isAppReady ? (
                 <>
                     {children}
-                    <DappFooter />
+                    <DappFooter isLandingPage />
                 </>
             ) : (
                 <Loader />
