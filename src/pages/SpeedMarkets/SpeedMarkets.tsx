@@ -3,7 +3,6 @@ import banner from 'assets/images/speed-markets-banner.png';
 import PageLinkBanner from 'components/PageLinkBanner';
 import SPAAnchor from 'components/SPAAnchor/SPAAnchor';
 import SimpleLoader from 'components/SimpleLoader';
-import Tooltip from 'components/Tooltip';
 import { LINKS } from 'constants/links';
 import { CONNECTION_TIMEOUT_MS, SUPPORTED_ASSETS } from 'constants/pyth';
 import ROUTES from 'constants/routes';
@@ -235,7 +234,6 @@ const SpeedMarkets: React.FC = () => {
                                             : '...',
                                     }}
                                 />
-                                <Tooltip overlay={t('speed-markets.tooltips.buyin-fees')} />
                             </Info>
                             <LightweightChart
                                 position={isChained ? undefined : positionType}
@@ -368,6 +366,7 @@ const Info = styled.span`
     font-weight: 300;
     line-height: 20px;
     color: ${(props) => props.theme.textColor.quinary};
+    min-height: 40px;
 `;
 
 const OverviewLinkWrapper = styled.div`

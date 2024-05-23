@@ -156,6 +156,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         networkId,
         selectedCollateralIndex,
     ]);
+    const isEth = selectedCollateral === CRYPTO_CURRENCY_MAP.ETH;
     const collateralAddress = isMultiCollateralSupported
         ? multipleCollateral[selectedCollateral].addresses[networkId]
         : erc20Contract.addresses[networkId];
@@ -377,9 +378,10 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         if (!collateralAddress) {
             return;
         }
+
         const erc20Instance = getContract({
             abi: erc20Contract.abi,
-            address: collateralAddress,
+            address: isEth ? multipleCollateral.WETH.addresses[networkId] : collateralAddress,
             client: client as Client,
         });
 
@@ -413,11 +415,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         };
 
         if (isConnected) {
-            if (selectedCollateral === CRYPTO_CURRENCY_MAP.ETH) {
-                setAllowance(true);
-            } else {
-                getAllowance();
-            }
+            getAllowance();
         }
     }, [
         collateralAddress,
@@ -437,9 +435,10 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
         const erc20Instance = getContract({
             abi: erc20Contract.abi,
-            address: collateralAddress,
+            address: isEth ? multipleCollateral.WETH.addresses[networkId] : collateralAddress,
             client: walletClient.data as Client,
         }) as ViemContract;
+
         const addressToApprove = isChained
             ? chainedSpeedMarketsAMMContract.addresses[networkId]
             : speedMarketsAMMContract.addresses[networkId];
