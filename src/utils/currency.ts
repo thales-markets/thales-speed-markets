@@ -1,19 +1,10 @@
-import {
-    COLLATERALS,
-    STABLE_COINS,
-    SYNTHS_MAP,
-    currencyKeyToAssetIconMap,
-    currencyKeyToNameMap,
-} from 'constants/currency';
+import { COLLATERALS, STABLE_COINS, SYNTHS_MAP, currencyKeyToNameMap } from 'constants/currency';
 import { COLLATERAL_DECIMALS, Coins } from 'thales-utils';
 import { CollateralsBalance } from 'types/collateral';
 import { SupportedNetwork } from 'types/network';
 
 // TODO: replace this with a more robust logic (like checking the asset field)
 const synthToAsset = (currencyKey: string) => currencyKey.replace(/^(i|s)/i, '');
-
-export const getAssetIcon = (currencyKey: string) =>
-    currencyKeyToAssetIconMap[currencyKey] || currencyKeyToAssetIconMap[`s${currencyKey}`];
 
 export const getSynthName = (currencyKey: string) =>
     currencyKeyToNameMap[currencyKey] || currencyKeyToNameMap[`s${currencyKey}`] || currencyKey;

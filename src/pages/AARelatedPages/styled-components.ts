@@ -29,26 +29,6 @@ export const FormContainer = styled(FlexDiv)`
     }
 `;
 
-export const BalanceSection = styled(FlexDiv)`
-    flex-direction: column;
-    width: 100%;
-    margin-top: 20px;
-    @media (max-width: 600px) {
-        padding: 0;
-        width: 100%;
-        max-width: 100%;
-    }
-`;
-
-export const PrimaryHeading = styled.h1`
-    font-size: 20px;
-    font-weight: 800;
-    text-transform: uppercase;
-    line-height: 20px;
-    color: ${(props) => props.theme.textColor.primary};
-    text-align: center;
-`;
-
 export const InputLabel = styled.p<{ marginTop?: string }>`
     font-size: 14px;
     font-weight: 400;
@@ -84,32 +64,4 @@ export const WarningIcon = styled.i`
     padding-left: 5px;
     color: ${(props) => props.theme.background.primary};
     text-transform: uppercase;
-`;
-
-export const SectionLabel = styled.p`
-    font-size: 13px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    margin-bottom: 24px;
-    color: ${(props) => props.theme.textColor.secondary};
-`;
-
-export const TutorialLinksContainer = styled(FlexDiv)`
-    flex-direction: column;
-    border-radius: 5px;
-    margin-bottom: 13px;
-
-    padding: 19px;
-    border: 1px ${(props) => props.theme.borderColor.primary} solid;
-`;
-
-export const Link = styled.a`
-    width: fit-content;
-    font-size: 12px;
-    font-weight: 700;
-    text-decoration: underline;
-    text-transform: capitalize;
-    padding-bottom: 15px;
-    color: ${(props) => props.theme.textColor.primary};
 `;
