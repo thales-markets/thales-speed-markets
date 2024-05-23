@@ -24,7 +24,6 @@ export const SPEED_MARKETS_OVERVIEW_SECTIONS = {
     openPositions: 'openPositions',
 };
 
-export const ALTCOIN_CONVERSION_BUFFER_PERCENTAGE = 0.01; // 1%
 export const ALLOWANCE_BUFFER_PERCENTAGE = 1.01; // +1% (101%)
 
 export const MIN_BUYIN_COLLATERAL_CONVERSION_BUFFER_PERCENTAGE = 0.4; // 40%

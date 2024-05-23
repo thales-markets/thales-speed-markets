@@ -153,11 +153,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
               )
             : 0;
 
-    const minBuyinAmount = useMemo(
-        () => (isChained ? ammChainedSpeedMarketsLimits?.minBuyinAmount : ammSpeedMarketsLimits?.minBuyinAmount) || 0,
-        [isChained, ammChainedSpeedMarketsLimits?.minBuyinAmount, ammSpeedMarketsLimits?.minBuyinAmount]
-    );
-
     const defaultCollateral = useMemo(() => getDefaultCollateral(networkId), [networkId]);
     const selectedCollateral = useMemo(() => getCollateral(networkId, selectedCollateralIndex), [
         networkId,
@@ -232,10 +227,9 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     const convertFromStable = useCallback(
         (value: number) => {
             const rate = exchangeRates?.[selectedCollateral] || 0;
-            const useRateBuffer = value === minBuyinAmount;
-            return convertFromStableToCollateral(selectedCollateral, value, rate, useRateBuffer);
+            return convertFromStableToCollateral(selectedCollateral, value, rate);
         },
-        [selectedCollateral, exchangeRates, minBuyinAmount]
+        [selectedCollateral, exchangeRates]
     );
 
     const skewImpact = useMemo(() => {
@@ -325,12 +319,12 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
     // Submit validations
     useEffect(() => {
-        const convertedStableBuyinAmount = enteredBuyinAmount || convertToStable(paidAmount);
-        if (convertedStableBuyinAmount > 0) {
+        const convertedStablePaidAmount = convertToStable(paidAmount);
+        if (convertedStablePaidAmount > 0) {
             if (isChained) {
                 if (ammChainedSpeedMarketsLimits?.risk) {
                     setOutOfLiquidity(
-                        ammChainedSpeedMarketsLimits?.risk.current + convertedStableBuyinAmount >
+                        ammChainedSpeedMarketsLimits?.risk.current + convertedStablePaidAmount >
                             ammChainedSpeedMarketsLimits?.risk.max
                     );
                     setOutOfLiquidityPerDirection(false);
@@ -341,7 +335,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 )[0];
                 if (riskPerAssetAndDirectionData) {
                     setOutOfLiquidityPerDirection(
-                        riskPerAssetAndDirectionData?.current + convertedStableBuyinAmount >
+                        riskPerAssetAndDirectionData?.current + convertedStablePaidAmount >
                             riskPerAssetAndDirectionData?.max
                     );
                 }
@@ -350,7 +344,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                     (data) => data.currency === currencyKey
                 )[0];
                 if (riskPerAssetData) {
-                    setOutOfLiquidity(riskPerAssetData?.current + convertedStableBuyinAmount > riskPerAssetData?.max);
+                    setOutOfLiquidity(riskPerAssetData?.current + convertedStablePaidAmount > riskPerAssetData?.max);
                 }
             }
         } else {
@@ -361,7 +355,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         ammSpeedMarketsLimits,
         ammChainedSpeedMarketsLimits?.risk,
         currencyKey,
-        enteredBuyinAmount,
         convertToStable,
         paidAmount,
         positionType,
@@ -501,6 +494,8 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             const chainedSides = chainedPositions.map((pos) => (pos !== undefined ? POSITIONS_TO_SIDE_MAP[pos] : -1));
             const singleSides = positionType !== undefined ? [POSITIONS_TO_SIDE_MAP[positionType]] : [];
             const sides = isChained ? chainedSides : singleSides;
+
+            // TODO: contract doesn't support ETH so convert it to WETH
 
             const buyInAmountParam = coinParser(
                 truncToDecimals(buyinAmount, COLLATERAL_DECIMALS[selectedCollateral]),
@@ -656,7 +651,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                         {isAllowing
                             ? t('common.enable-wallet-access.approve-progress')
                             : t('common.enable-wallet-access.approve')}
-                        <CollateralText>&nbsp;{selectedCollateral}</CollateralText>
+                        <CollateralText>&nbsp;{isEth ? CRYPTO_CURRENCY_MAP.WETH : selectedCollateral}</CollateralText>
                         {isAllowing ? '...' : ''}
                     </Button>
                 );
@@ -686,7 +681,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                         }}
                         isFetchingQuote={false}
                         profit={potentialProfit}
-                        paidAmount={enteredBuyinAmount || convertToStable(paidAmount)}
+                        paidAmount={convertToStable(paidAmount)}
                         hasCollateralConversion={selectedCollateral !== defaultCollateral}
                     />
                     {!isChained && (
@@ -739,7 +734,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                             ? ceilNumberToDecimals(paidAmount)
                             : ceilNumberToDecimals(paidAmount, COLLATERAL_DECIMALS[selectedCollateral]))
                     }
-                    tokenSymbol={selectedCollateral}
+                    tokenSymbol={isEth ? CRYPTO_CURRENCY_MAP.WETH : selectedCollateral}
                     isAllowing={isAllowing}
                     onSubmit={handleAllowance}
                     onClose={() => setOpenApprovalModal(false)}

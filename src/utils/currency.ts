@@ -5,7 +5,6 @@ import {
     currencyKeyToAssetIconMap,
     currencyKeyToNameMap,
 } from 'constants/currency';
-import { ALTCOIN_CONVERSION_BUFFER_PERCENTAGE } from 'constants/market';
 import { COLLATERAL_DECIMALS, Coins } from 'thales-utils';
 import { CollateralsBalance } from 'types/collateral';
 import { SupportedNetwork } from 'types/network';
@@ -60,23 +59,16 @@ export const getCoinBalance = (balancesQueryObject: any, currency: Coins) => {
     return 0;
 };
 
-export const convertCollateralToStable = (srcCollateral: Coins, amount: number, rate: number, useBuffer = true) => {
-    const rateBuffer = useBuffer ? 1 - ALTCOIN_CONVERSION_BUFFER_PERCENTAGE : 1;
-    return isStableCurrency(srcCollateral) ? amount : amount * rate * rateBuffer;
+export const convertCollateralToStable = (srcCollateral: Coins, amount: number, rate: number) => {
+    return isStableCurrency(srcCollateral) ? amount : amount * rate;
 };
 
-export const convertFromStableToCollateral = (
-    dstCollateral: Coins,
-    amount: number,
-    rate: number,
-    useBuffer: boolean
-) => {
+export const convertFromStableToCollateral = (dstCollateral: Coins, amount: number, rate: number) => {
     if (isStableCurrency(dstCollateral)) {
         return amount;
     } else {
-        const priceFeedBuffer = useBuffer ? 1 - ALTCOIN_CONVERSION_BUFFER_PERCENTAGE : 1;
         return rate
-            ? Math.ceil((amount / (rate * priceFeedBuffer)) * 10 ** COLLATERAL_DECIMALS[dstCollateral]) /
+            ? Math.ceil((amount / rate) * 10 ** COLLATERAL_DECIMALS[dstCollateral]) /
                   10 ** COLLATERAL_DECIMALS[dstCollateral]
             : 0;
     }

@@ -196,18 +196,16 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
     const convertToStable = useCallback(
         (value: number) => {
             const rate = exchangeRates?.[selectedCollateral] || 0;
-            const useRateBuffer = value !== minBuyinAmount;
-            return convertCollateralToStable(selectedCollateral, value, rate, useRateBuffer);
+            return convertCollateralToStable(selectedCollateral, value, rate);
         },
-        [selectedCollateral, exchangeRates, minBuyinAmount]
+        [selectedCollateral, exchangeRates]
     );
     const convertFromStable = useCallback(
         (value: number) => {
             const rate = exchangeRates?.[selectedCollateral] || 0;
-            const useRateBuffer = value === minBuyinAmount;
-            return convertFromStableToCollateral(selectedCollateral, value, rate, useRateBuffer);
+            return convertFromStableToCollateral(selectedCollateral, value, rate);
         },
-        [selectedCollateral, exchangeRates, minBuyinAmount]
+        [selectedCollateral, exchangeRates]
     );
 
     // Conversion when collateral is changed
@@ -221,7 +219,11 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
         } else if (isStableCurrency(selectedCollateral)) {
             setBuyinAmount(selectedStableBuyinAmount);
         }
-    }, [selectedCollateral, selectedStableBuyinAmount, convertFromStable, convertToStable]);
+    }, [selectedCollateral, selectedStableBuyinAmount, convertFromStable]);
+
+    useEffect(() => {
+        onChange(buyinAmount);
+    }, [buyinAmount, onChange]);
 
     // Input field validations
     useDebouncedEffect(() => {
@@ -264,8 +266,7 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
     useEffect(() => {
         setBuyinAmount(0);
         setSelectedStableBuyinAmount(0);
-        onChange(0);
-    }, [networkId, isConnected, onChange]);
+    }, [networkId, isConnected]);
 
     const onMaxClick = () => {
         const maxWalletAmount = isConnected
@@ -303,7 +304,6 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
 
         setSelectedStableBuyinAmount(isStableCurrency(selectedCollateral) ? maxPaidAmount : 0);
         setBuyinAmount(maxPaidAmount);
-        onChange(maxPaidAmount);
     };
 
     return (
@@ -320,7 +320,6 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
                             onClick={() => {
                                 setSelectedStableBuyinAmount(amount);
                                 setBuyinAmount(convertFromStable(amount));
-                                onChange(convertFromStable(amount));
                             }}
                         >
                             <DollarSign>{USD_SIGN}</DollarSign>
@@ -335,7 +334,6 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
                 onChange={(_, value) => {
                     setSelectedStableBuyinAmount(isStableCurrency(selectedCollateral) ? Number(value) : 0);
                     setBuyinAmount(Number(value));
-                    onChange(Number(value));
                 }}
                 showValidation={!!errorMessageKey}
                 validationMessage={t(errorMessageKey, {
