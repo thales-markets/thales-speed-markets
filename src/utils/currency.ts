@@ -60,8 +60,10 @@ export const getCoinBalance = (balancesQueryObject: any, currency: Coins) => {
     return 0;
 };
 
-export const convertCollateralToStable = (srcCollateral: Coins, amount: number, rate: number) =>
-    isStableCurrency(srcCollateral) ? amount : amount * rate * (1 - ALTCOIN_CONVERSION_BUFFER_PERCENTAGE);
+export const convertCollateralToStable = (srcCollateral: Coins, amount: number, rate: number, useBuffer = true) => {
+    const rateBuffer = useBuffer ? 1 - ALTCOIN_CONVERSION_BUFFER_PERCENTAGE : 1;
+    return isStableCurrency(srcCollateral) ? amount : amount * rate * rateBuffer;
+};
 
 export const convertFromStableToCollateral = (
     dstCollateral: Coins,

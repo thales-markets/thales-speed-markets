@@ -30,27 +30,30 @@ import { getIsMultiCollateralSupported } from 'utils/network';
 import { useAccount, useChainId, useClient } from 'wagmi';
 import { SelectedPosition } from '../SelectPosition/SelectPosition';
 import { Header, HeaderText } from '../SelectPosition/styled-components';
+import useDebouncedEffect from 'hooks/useDebouncedEffect';
 
 type SelectBuyinProps = {
-    selectedStableBuyinAmount: number;
+    buyinAmountParam: number;
     onChange: React.Dispatch<number>;
     isChained: boolean;
     chainedPositions: SelectedPosition[];
     ammSpeedMarketsLimits: AmmSpeedMarketsLimits | null;
     ammChainedSpeedMarketsLimits: AmmChainedSpeedMarketsLimits | null;
     currencyKey: string;
+    setHasError: React.Dispatch<boolean>;
 };
 
 const roundMaxBuyin = (maxBuyin: number) => Math.floor(maxBuyin / 10) * 10;
 
 const SelectBuyin: React.FC<SelectBuyinProps> = ({
-    selectedStableBuyinAmount,
+    buyinAmountParam,
     onChange,
     isChained,
     chainedPositions,
     ammSpeedMarketsLimits,
     ammChainedSpeedMarketsLimits,
     currencyKey,
+    setHasError,
 }) => {
     const networkId = useChainId();
     const { address: walletAddress, isConnected } = useAccount();
@@ -60,7 +63,8 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
     const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
     const selectedCollateralIndex = useSelector((rootState: RootState) => getSelectedCollateralIndex(rootState));
 
-    const [buyinAmount, setBuyinAmount] = useState(selectedStableBuyinAmount);
+    const [buyinAmount, setBuyinAmount] = useState(buyinAmountParam);
+    const [selectedStableBuyinAmount, setSelectedStableBuyinAmount] = useState(0);
     const [errorMessageKey, setErrorMessageKey] = useState('');
 
     const defaultCollateral = useMemo(() => getDefaultCollateral(networkId), [networkId]);
@@ -145,7 +149,8 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
         ]
     );
 
-    const buyinAmounts = useMemo(() => {
+    // only for generating buttons
+    const stableBuyinAmounts = useMemo(() => {
         const first = minBuyinAmount;
         const fifth = isChained
             ? roundMaxBuyin((ammChainedSpeedMarketsLimits?.maxProfitPerIndividualMarket || 0) / chainedQuote)
@@ -191,9 +196,10 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
     const convertToStable = useCallback(
         (value: number) => {
             const rate = exchangeRates?.[selectedCollateral] || 0;
-            return convertCollateralToStable(selectedCollateral, value, rate);
+            const useRateBuffer = value !== minBuyinAmount;
+            return convertCollateralToStable(selectedCollateral, value, rate, useRateBuffer);
         },
-        [selectedCollateral, exchangeRates]
+        [selectedCollateral, exchangeRates, minBuyinAmount]
     );
     const convertFromStable = useCallback(
         (value: number) => {
@@ -204,91 +210,100 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
         [selectedCollateral, exchangeRates, minBuyinAmount]
     );
 
-    // Input field validations
+    // Conversion when collateral is changed
     useEffect(() => {
-        let messageKey = '';
+        if (selectedStableBuyinAmount > 0) {
+            if (isStableCurrency(selectedCollateral)) {
+                setBuyinAmount(selectedStableBuyinAmount);
+            } else {
+                setBuyinAmount(convertFromStable(selectedStableBuyinAmount));
+            }
+        } else if (isStableCurrency(selectedCollateral)) {
+            setBuyinAmount(selectedStableBuyinAmount);
+        }
+    }, [selectedCollateral, selectedStableBuyinAmount, convertFromStable, convertToStable]);
+
+    // Input field validations
+    useDebouncedEffect(() => {
+        let errorMessageKey = '';
 
         if (buyinAmount > 0 && ((isConnected && buyinAmount > collateralBalance) || collateralBalance === 0)) {
-            messageKey =
+            errorMessageKey =
                 networkId === NetworkId.BlastSepolia
                     ? 'speed-markets.errors.insufficient-balance-wallet'
                     : 'common.errors.insufficient-balance-wallet';
         }
         if (buyinAmount > 0) {
-            const convertedTotalPaidAmount = isStableCurrency(selectedCollateral)
-                ? buyinAmount
-                : convertToStable(buyinAmount);
+            const convertedBuyinAmount = convertToStable(buyinAmount);
 
-            if (convertedTotalPaidAmount < minBuyinAmount) {
-                messageKey = 'speed-markets.errors.min-buyin';
-            } else if (convertedTotalPaidAmount > maxBuyinAmount) {
-                messageKey = 'speed-markets.errors.max-buyin';
+            if (convertedBuyinAmount < minBuyinAmount) {
+                errorMessageKey = 'speed-markets.errors.min-buyin';
+            } else if (convertedBuyinAmount > maxBuyinAmount) {
+                errorMessageKey = 'speed-markets.errors.max-buyin';
             }
         }
 
-        if (messageKey) {
-            onChange(0);
-            setErrorMessageKey(messageKey);
+        if (errorMessageKey) {
+            setHasError(true);
+        } else {
+            setHasError(false);
         }
-        setErrorMessageKey(messageKey);
+        setErrorMessageKey(errorMessageKey);
     }, [
         minBuyinAmount,
         maxBuyinAmount,
         buyinAmount,
         collateralBalance,
         isConnected,
-        selectedCollateral,
         convertToStable,
         networkId,
-        onChange,
+        setHasError,
     ]);
 
     // Reset inputs
     useEffect(() => {
-        setBuyinAmount(selectedStableBuyinAmount);
-    }, [selectedStableBuyinAmount]);
-
-    // Reset inputs
-    useEffect(() => {
         setBuyinAmount(0);
+        setSelectedStableBuyinAmount(0);
         onChange(0);
     }, [networkId, isConnected, onChange]);
 
     const onMaxClick = () => {
-        if (collateralBalance > 0) {
-            const maxWalletAmount = isStableCurrency(selectedCollateral)
+        const maxWalletAmount = isConnected
+            ? isStableCurrency(selectedCollateral)
                 ? Number(truncToDecimals(collateralBalance))
-                : Number(truncToDecimals(collateralBalance, 18));
+                : Number(truncToDecimals(collateralBalance, 18))
+            : Number.POSITIVE_INFINITY;
 
-            let maxLiquidity, maxLiquidityPerDirection: number;
-            if (isChained) {
-                maxLiquidity =
-                    ammChainedSpeedMarketsLimits !== undefined
-                        ? Number(ammChainedSpeedMarketsLimits?.risk.max) -
-                          Number(ammChainedSpeedMarketsLimits?.risk.current)
-                        : Infinity;
-                maxLiquidityPerDirection = Infinity;
-            } else {
-                const riskPerAsset = ammSpeedMarketsLimits?.risksPerAssetAndDirection.filter(
-                    (data) => data.currency === currencyKey
-                )[0];
-                maxLiquidity = riskPerAsset !== undefined ? riskPerAsset.max - riskPerAsset.current : Infinity;
+        let maxLiquidity, maxLiquidityPerDirection: number;
+        if (isChained) {
+            maxLiquidity =
+                ammChainedSpeedMarketsLimits !== undefined
+                    ? Number(ammChainedSpeedMarketsLimits?.risk.max) -
+                      Number(ammChainedSpeedMarketsLimits?.risk.current)
+                    : Infinity;
+            maxLiquidityPerDirection = Infinity;
+        } else {
+            const riskPerAsset = ammSpeedMarketsLimits?.risksPerAssetAndDirection.filter(
+                (data) => data.currency === currencyKey
+            )[0];
+            maxLiquidity = riskPerAsset !== undefined ? riskPerAsset.max - riskPerAsset.current : Infinity;
 
-                const riskPerAssetAndDirection = ammSpeedMarketsLimits?.risksPerAssetAndDirection.filter(
-                    (data) => data.currency === currencyKey && data.position === Positions.UP
-                )[0];
-                maxLiquidityPerDirection =
-                    riskPerAssetAndDirection !== undefined
-                        ? riskPerAssetAndDirection.max - riskPerAssetAndDirection.current
-                        : Infinity;
-            }
-
-            const maxPaidAmount = Math.floor(
-                Math.min(buyinAmounts[buyinAmounts.length - 1], maxWalletAmount, maxLiquidity, maxLiquidityPerDirection)
-            );
-            onChange(maxPaidAmount);
-            setBuyinAmount(maxPaidAmount);
+            const riskPerAssetAndDirection = ammSpeedMarketsLimits?.risksPerAssetAndDirection.filter(
+                (data) => data.currency === currencyKey && data.position === Positions.UP
+            )[0];
+            maxLiquidityPerDirection =
+                riskPerAssetAndDirection !== undefined
+                    ? riskPerAssetAndDirection.max - riskPerAssetAndDirection.current
+                    : Infinity;
         }
+
+        const maxLimitAmount = Math.min(maxBuyinAmount, maxLiquidity, maxLiquidityPerDirection);
+        const maxPaidAmount =
+            maxLimitAmount < convertToStable(maxWalletAmount) ? convertFromStable(maxLimitAmount) : maxWalletAmount;
+
+        setSelectedStableBuyinAmount(isStableCurrency(selectedCollateral) ? maxPaidAmount : 0);
+        setBuyinAmount(maxPaidAmount);
+        onChange(maxPaidAmount);
     };
 
     return (
@@ -297,14 +312,15 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
                 <HeaderText> {t('speed-markets.steps.enter-buyin')}</HeaderText>
             </Header>
             <BuyinAmountsWrapper>
-                {buyinAmounts.map((amount, index) => {
+                {stableBuyinAmounts.map((amount, index) => {
                     return (
                         <Amount
                             key={index}
-                            $isSelected={buyinAmount === amount}
+                            $isSelected={selectedStableBuyinAmount === amount}
                             onClick={() => {
-                                onChange(amount);
-                                setBuyinAmount(amount);
+                                setSelectedStableBuyinAmount(amount);
+                                setBuyinAmount(convertFromStable(amount));
+                                onChange(convertFromStable(amount));
                             }}
                         >
                             <DollarSign>{USD_SIGN}</DollarSign>
@@ -317,8 +333,9 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
                 value={buyinAmount || ''}
                 placeholder={t('common.enter-amount')}
                 onChange={(_, value) => {
-                    onChange(Number(value));
+                    setSelectedStableBuyinAmount(isStableCurrency(selectedCollateral) ? Number(value) : 0);
                     setBuyinAmount(Number(value));
+                    onChange(Number(value));
                 }}
                 showValidation={!!errorMessageKey}
                 validationMessage={t(errorMessageKey, {

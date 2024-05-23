@@ -78,13 +78,13 @@ type AmmSpeedTradingProps = {
     positionType: SelectedPosition;
     chainedPositions: SelectedPosition[];
     deltaTimeSec: number;
-    selectedStableBuyinAmount: number;
-    setSelectedStableBuyinAmount: React.Dispatch<number>;
+    enteredBuyinAmount: number;
     ammSpeedMarketsLimits: AmmSpeedMarketsLimits | null;
     ammChainedSpeedMarketsLimits: AmmChainedSpeedMarketsLimits | null;
     currentPrice: number;
     setSkewImpact: React.Dispatch<{ [Positions.UP]: number; [Positions.DOWN]: number }>;
     resetData: React.Dispatch<void>;
+    hasError: boolean;
 };
 
 const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
@@ -93,12 +93,13 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     positionType,
     chainedPositions,
     deltaTimeSec,
-    selectedStableBuyinAmount,
+    enteredBuyinAmount,
     ammSpeedMarketsLimits,
     ammChainedSpeedMarketsLimits,
     currentPrice,
     setSkewImpact,
     resetData,
+    hasError,
 }) => {
     const { t } = useTranslation();
     const dispatch = useDispatch();
@@ -114,7 +115,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const [buyinAmount, setBuyinAmount] = useState(0);
-    const [paidAmount, setPaidAmount] = useState(selectedStableBuyinAmount);
+    const [paidAmount, setPaidAmount] = useState(enteredBuyinAmount);
     const [potentialProfit, setPotentialProfit] = useState(0);
     const [submittedStrikePrice, setSubmittedStrikePrice] = useState(0);
     const [priceSlippage, setPriceSlippage] = useState(DEFAULT_PRICE_SLIPPAGE_PERCENTAGE);
@@ -135,7 +136,13 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     const isPaidAmountEntered = paidAmount > 0;
 
     const isButtonDisabled =
-        !isPositionSelected || !deltaTimeSec || !isPaidAmountEntered || isSubmitting || !hasAllowance || outOfLiquidity;
+        !isPositionSelected ||
+        !deltaTimeSec ||
+        !isPaidAmountEntered ||
+        isSubmitting ||
+        !hasAllowance ||
+        outOfLiquidity ||
+        hasError;
 
     const chainedQuote =
         isChained && ammChainedSpeedMarketsLimits
@@ -301,28 +308,15 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             // initial value
             setPotentialProfit(0);
         }
-    }, [
-        paidAmount,
-        totalFee,
-        selectedCollateral,
-        defaultCollateral,
-        selectedStableBuyinAmount,
-        isChained,
-        chainedQuote,
-    ]);
+    }, [paidAmount, totalFee, selectedCollateral, defaultCollateral, isChained, chainedQuote]);
 
-    // when buttons are used to populate amount
     useEffect(() => {
-        if (selectedStableBuyinAmount > 0) {
-            if (isStableCurrency(selectedCollateral)) {
-                setPaidAmount(selectedStableBuyinAmount);
-            } else {
-                setPaidAmount(convertFromStable(selectedStableBuyinAmount));
-            }
+        if (enteredBuyinAmount > 0) {
+            setPaidAmount(enteredBuyinAmount);
         } else {
             setPaidAmount(0);
         }
-    }, [selectedStableBuyinAmount, convertFromStable, selectedCollateral]);
+    }, [enteredBuyinAmount, convertFromStable, selectedCollateral]);
 
     // Update skew
     useDebouncedEffect(() => {
@@ -331,7 +325,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
     // Submit validations
     useEffect(() => {
-        const convertedStableBuyinAmount = selectedStableBuyinAmount || convertToStable(paidAmount);
+        const convertedStableBuyinAmount = enteredBuyinAmount || convertToStable(paidAmount);
         if (convertedStableBuyinAmount > 0) {
             if (isChained) {
                 if (ammChainedSpeedMarketsLimits?.risk) {
@@ -367,7 +361,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         ammSpeedMarketsLimits,
         ammChainedSpeedMarketsLimits?.risk,
         currencyKey,
-        selectedStableBuyinAmount,
+        enteredBuyinAmount,
         convertToStable,
         paidAmount,
         positionType,
@@ -692,7 +686,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                         }}
                         isFetchingQuote={false}
                         profit={potentialProfit}
-                        paidAmount={selectedStableBuyinAmount || convertToStable(paidAmount)}
+                        paidAmount={enteredBuyinAmount || convertToStable(paidAmount)}
                         hasCollateralConversion={selectedCollateral !== defaultCollateral}
                     />
                     {!isChained && (

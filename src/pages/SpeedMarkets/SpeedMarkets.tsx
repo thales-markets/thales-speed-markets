@@ -54,9 +54,10 @@ const SpeedMarkets: React.FC = () => {
     const [positionType, setPositionType] = useState<SelectedPosition>(undefined);
     const [chainedPositions, setChainedPositions] = useState<SelectedPosition[]>([undefined, undefined]);
     const [deltaTimeSec, setDeltaTimeSec] = useState(0);
-    const [selectedStableBuyinAmount, setSelectedStableBuyinAmount] = useState(0);
+    const [buyinAmount, setBuyinAmount] = useState(0);
     const [isResetTriggered, setIsResetTriggered] = useState(false);
     const [skew, setSkew] = useState({ [Positions.UP]: 0, [Positions.DOWN]: 0 });
+    const [hasError, setHasError] = useState(false);
 
     const ammSpeedMarketsLimitsQuery = useAmmSpeedMarketsLimitsQuery({ networkId, client }, undefined, {
         enabled: isAppReady,
@@ -128,7 +129,7 @@ const SpeedMarkets: React.FC = () => {
             setChainedPositions(Array(ammChainedSpeedMarketsLimitsData.minChainedMarkets).fill(undefined));
         }
         setDeltaTimeSec(0);
-        setSelectedStableBuyinAmount(0);
+        setBuyinAmount(0);
     }, [ammChainedSpeedMarketsLimitsData?.minChainedMarkets]);
 
     useEffect(() => {
@@ -148,7 +149,7 @@ const SpeedMarkets: React.FC = () => {
     }, [isResetTriggered]);
 
     useEffect(() => {
-        setSelectedStableBuyinAmount(0);
+        setBuyinAmount(0);
     }, [isChained]);
 
     const getStep = (stepNumber: number) => {
@@ -192,13 +193,14 @@ const SpeedMarkets: React.FC = () => {
                 )}
                 {isBuyinStep && (
                     <SelectBuyin
-                        selectedStableBuyinAmount={selectedStableBuyinAmount}
-                        onChange={setSelectedStableBuyinAmount}
+                        buyinAmountParam={buyinAmount}
+                        onChange={setBuyinAmount}
                         isChained={isChained}
                         chainedPositions={chainedPositions}
                         ammSpeedMarketsLimits={ammSpeedMarketsLimitsData}
                         ammChainedSpeedMarketsLimits={ammChainedSpeedMarketsLimitsData}
                         currencyKey={currencyKey}
+                        setHasError={setHasError}
                     />
                 )}
             </>
@@ -266,13 +268,13 @@ const SpeedMarkets: React.FC = () => {
                         positionType={positionType}
                         chainedPositions={chainedPositions}
                         deltaTimeSec={deltaTimeSec}
-                        selectedStableBuyinAmount={selectedStableBuyinAmount}
-                        setSelectedStableBuyinAmount={setSelectedStableBuyinAmount}
+                        enteredBuyinAmount={buyinAmount}
                         ammSpeedMarketsLimits={ammSpeedMarketsLimitsData}
                         ammChainedSpeedMarketsLimits={ammChainedSpeedMarketsLimitsData}
                         currentPrice={currentPrices[currencyKey]}
                         setSkewImpact={setSkew}
                         resetData={resetData}
+                        hasError={hasError}
                     />
                     <PageLinkBanner link={LINKS.Markets.Thales} />
                     {isConnected && (

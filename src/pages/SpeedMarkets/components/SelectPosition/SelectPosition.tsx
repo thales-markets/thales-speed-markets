@@ -60,6 +60,17 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
         });
     };
 
+    const onClearAllHandle = () => {
+        setIsChained(false);
+        resetData();
+        history.push({
+            pathname: location.pathname,
+            search: queryString.stringify({
+                isChained: false,
+            }),
+        });
+    };
+
     const getSkewTooltip = () => (
         <Tooltip
             overlay={
@@ -88,12 +99,7 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
                 <FlexDivSpaceBetween>
                     <HeaderText> {t('speed-markets.steps.choose-direction')}</HeaderText>
                     {selected.length > 1 && (
-                        <ClearAll
-                            onClick={() => {
-                                setIsChained(false);
-                                resetData();
-                            }}
-                        >
+                        <ClearAll onClick={onClearAllHandle}>
                             {t('speed-markets.chained.clear-all')}
                             <IconWrong className="icon icon--wrong" />
                         </ClearAll>
