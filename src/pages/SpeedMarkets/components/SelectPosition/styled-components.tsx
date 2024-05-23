@@ -7,7 +7,7 @@ export const PositionContainer = styled(FlexDivRow)`
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         width: 100%;
         justify-content: center;
-        gap: 14px;
+        gap: 10px;
     }
 `;
 
