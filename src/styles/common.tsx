@@ -72,8 +72,8 @@ export const Colors = {
     BLACK: '#000000',
 
     BLUE: '#169CD2',
-    BLUE_LIGHT: '#06B2E3',
-    BLUE_DARK: '#00EEE8',
+    BLUE_LIGHT: '#00EEE8',
+    BLUE_DARK: '#06B2E3',
     BLUE_DEEP_SKY: '#1D7DC0',
 
     RED: '#DE496D',

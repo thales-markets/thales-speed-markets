@@ -66,7 +66,7 @@ const CloseIcon = styled.i`
 
 export const toastBasicProperties = {
     position: 'top-right' as ToastPosition,
-    autoClose: secondsToMilliseconds(7),
+    autoClose: secondsToMilliseconds(700),
     hideProgressBar: false,
     closeOnClick: false,
     pauseOnHover: true,
