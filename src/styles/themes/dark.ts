@@ -67,6 +67,9 @@ export default {
                 primary: Colors.RED,
             },
         },
+        placeholderColor: {
+            primary: Colors.PURPLE_HALF,
+        },
     },
     dropDown: {
         background: {
@@ -147,8 +150,8 @@ export default {
         info: {
             background: {
                 primary: Colors.BLUE,
-                secondary: Colors.BLUE_DARK,
-                tertiary: Colors.BLUE_LIGHT,
+                secondary: Colors.BLUE_LIGHT,
+                tertiary: Colors.BLUE_DARK,
             },
             textColor: {
                 primary: Colors.BLACK,
@@ -157,8 +160,8 @@ export default {
         error: {
             background: {
                 primary: Colors.RED,
-                secondary: Colors.RED_DARK,
-                tertiary: Colors.RED_LIGHT,
+                secondary: Colors.RED_LIGHT,
+                tertiary: Colors.RED_DARK,
             },
             textColor: {
                 primary: Colors.BLACK,

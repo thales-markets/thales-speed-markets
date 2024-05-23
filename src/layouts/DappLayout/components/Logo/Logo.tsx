@@ -24,8 +24,8 @@ const Container = styled.div``;
 
 const LogoIcon = styled.i`
     font-size: 125px;
-    line-height: 50px;
-    margin-right: 10px;
+    line-height: 40px;
+    margin: 3px 10px -5px 0;
     @media screen and (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         font-size: 40px;
         line-height: 40px;

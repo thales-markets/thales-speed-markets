@@ -72,13 +72,13 @@ export const Colors = {
     BLACK: '#000000',
 
     BLUE: '#169CD2',
-    BLUE_LIGHT: '#06B2E3',
-    BLUE_DARK: '#00EEE8',
+    BLUE_LIGHT: '#00EEE8',
+    BLUE_DARK: '#06B2E3',
     BLUE_DEEP_SKY: '#1D7DC0',
 
-    RED: '#EC0000',
-    RED_LIGHT: '#C40000',
-    RED_DARK: '#FF5E3A',
+    RED: '#DE496D',
+    RED_LIGHT: '#EC91A7',
+    RED_DARK: '#EC0039',
 
     ORANGE: '#E27A93',
     ORANGE_DARK: '#FF8800',
@@ -86,8 +86,9 @@ export const Colors = {
     YELLOW_DARK: '#9b8327',
 
     PURPLE: '#C294F5',
-    PURPLE_START: '#C294F566',
-    PURPLE_END: '#C294F500',
+    PURPLE_HALF: '#C294f580', // 50%
+    PURPLE_START: '#C294F566', // 40%
+    PURPLE_END: '#C294F500', // 0%
     PURPLE_DARK: '#A764B7',
     PURPLE_DARK_2: '#681483',
 };

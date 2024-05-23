@@ -41,7 +41,7 @@ const DappHeader: React.FC = () => {
                         <Button
                             width="140px"
                             height="30px"
-                            margin="10px 0"
+                            margin="auto 0"
                             fontSize="12px"
                             onClick={() => setOpenGetStarted(true)}
                         >

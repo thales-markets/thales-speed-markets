@@ -182,7 +182,7 @@ export const RocketImg = styled.img<{ isVideo?: boolean }>`
 
 export const BigRocketWrapper = styled.div`
     position: absolute;
-    bottom: 1012px;
+    bottom: 986px;
     right: 0;
     z-index: -1;
     @media screen and (max-width: ${ScreenSizeBreakpoint.LARGE}px) {
