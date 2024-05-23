@@ -37,7 +37,7 @@ export const Input = styled.input<{ fontSize?: string; width?: string; height?: 
     overflow: hidden;
 
     &::placeholder {
-        color: ${(props) => props.theme.input.textColor.primary};
+        color: ${(props) => props.theme.input.placeholderColor.primary};
     }
     &::selection {
         color: ${(props) => props.theme.input.textColor.tertiary};

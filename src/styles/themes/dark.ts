@@ -67,6 +67,9 @@ export default {
                 primary: Colors.RED,
             },
         },
+        placeholderColor: {
+            primary: Colors.PURPLE_HALF,
+        },
     },
     dropDown: {
         background: {
