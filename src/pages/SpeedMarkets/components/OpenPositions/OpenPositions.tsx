@@ -40,7 +40,6 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 
-    console.log(currentPrices);
     const networkId = useChainId();
     const client = useClient();
     const walletClient = useWalletClient();

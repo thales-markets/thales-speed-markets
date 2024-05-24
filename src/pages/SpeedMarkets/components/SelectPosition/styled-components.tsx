@@ -138,7 +138,7 @@ export const AssetIcon = styled(Icon)`
     }
 `;
 
-export const Skew = styled.div<{ $isSelected: boolean }>`
+export const Bonus = styled.div<{ $isSelected: boolean }>`
     position: absolute;
     top: -10px;
     right: 5px;

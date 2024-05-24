@@ -55,6 +55,7 @@
         "liquidity": "Liquidity",
         "support-contact": "Please contact <anchor>Thales support</anchor>",
         "try-again": "Try again",
+        "bonus": "Bonus",
         "time-remaining": {
             "ended": "ended",
             "years": "years",
@@ -287,8 +288,8 @@
             "paid-conversion": "Amount in $ is estimated and can be slightly different due to conversion rate at execution time",
             "final-price-missing": "Oracle price snapshot for this market's timestamp is still being processed. Even if contract input is delayed by the Pyth oracles, the price snapshot will be true to the moment of market expiration",
             "fee-info": "{{firstPerc}} from {{firstTime}}min up to {{secondTime}}min<br>{{secondPerc}} from {{secondTime}}min up to {{thirdTime}}min<br>{{thirdPerc}} from {{thirdTime}}min up to {{fourthTime}}min<br>{{fourthPerc}} for above or equal {{fourthTime}}min<br>{{maxSkewImpact}} maximum skew impact",
-            "skew-info": "Reduced return for {{skewDirection}} is -{{skewPerc}}<br>Bonus return for {{discountDirection}} is +{{discountPerc}}",
-            "skew-slippage": "Skew slippage is maximum 1%"
+            "bonus-unknown": "This direction has a bonus on potential win. Exact value depends on selected Duration.",
+            "bonus-info": "Bonus return for {{bonusDirection}} is +{{bonusPerc}}"
         },
         "overview": {
             "title": "Overview",

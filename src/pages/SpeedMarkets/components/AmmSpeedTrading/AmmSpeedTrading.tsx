@@ -82,7 +82,10 @@ type AmmSpeedTradingProps = {
     ammSpeedMarketsLimits: AmmSpeedMarketsLimits | null;
     ammChainedSpeedMarketsLimits: AmmChainedSpeedMarketsLimits | null;
     currentPrice: number;
-    setSkewImpact: React.Dispatch<{ [Positions.UP]: number; [Positions.DOWN]: number }>;
+    setProfitAndSkewPerPosition: React.Dispatch<{
+        profit: { [Positions.UP]: number; [Positions.DOWN]: number };
+        skew: { [Positions.UP]: number; [Positions.DOWN]: number };
+    }>;
     resetData: React.Dispatch<void>;
     hasError: boolean;
 };
@@ -97,7 +100,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     ammSpeedMarketsLimits,
     ammChainedSpeedMarketsLimits,
     currentPrice,
-    setSkewImpact,
+    setProfitAndSkewPerPosition,
     resetData,
     hasError,
 }) => {
@@ -258,30 +261,48 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         return skewPerPosition;
     }, [ammSpeedMarketsLimits?.maxSkewImpact, ammSpeedMarketsLimits?.risksPerAssetAndDirection, currencyKey]);
 
-    const totalFee = useMemo(() => {
-        if (ammSpeedMarketsLimits) {
-            if (isChained) {
-                return ammSpeedMarketsLimits.safeBoxImpact;
-            } else if (deltaTimeSec) {
-                const lpFee = getFeeByTimeThreshold(
-                    deltaTimeSec,
-                    ammSpeedMarketsLimits?.timeThresholdsForFees,
-                    ammSpeedMarketsLimits?.lpFees,
-                    ammSpeedMarketsLimits?.defaultLPFee
-                );
-                const skew = positionType ? skewImpact[positionType] : 0;
-                const oppositePosition = positionType
-                    ? positionType === Positions.UP
-                        ? Positions.DOWN
-                        : Positions.UP
-                    : undefined;
-                const discount = oppositePosition ? skewImpact[oppositePosition] / 2 : 0;
+    const getTotalFee = useCallback(
+        (position: Positions | undefined) => {
+            if (ammSpeedMarketsLimits) {
+                if (isChained) {
+                    return ammSpeedMarketsLimits.safeBoxImpact;
+                } else if (deltaTimeSec) {
+                    const lpFee = getFeeByTimeThreshold(
+                        deltaTimeSec,
+                        ammSpeedMarketsLimits?.timeThresholdsForFees,
+                        ammSpeedMarketsLimits?.lpFees,
+                        ammSpeedMarketsLimits?.defaultLPFee
+                    );
+                    const skew = position ? skewImpact[position] : 0;
+                    const oppositePosition = position
+                        ? position === Positions.UP
+                            ? Positions.DOWN
+                            : Positions.UP
+                        : undefined;
+                    const discount = oppositePosition ? skewImpact[oppositePosition] / 2 : 0;
 
-                return ceilNumberToDecimals(lpFee + skew - discount + Number(ammSpeedMarketsLimits?.safeBoxImpact), 4);
+                    return ceilNumberToDecimals(
+                        lpFee + skew - discount + Number(ammSpeedMarketsLimits?.safeBoxImpact),
+                        4
+                    );
+                }
             }
-        }
-        return 0;
-    }, [isChained, ammSpeedMarketsLimits, deltaTimeSec, skewImpact, positionType]);
+            return 0;
+        },
+        [isChained, ammSpeedMarketsLimits, deltaTimeSec, skewImpact]
+    );
+
+    const totalFee = useMemo(() => getTotalFee(positionType), [positionType, getTotalFee]);
+
+    const profitPerPosition = useMemo(() => {
+        const totalFeeUp = getTotalFee(Positions.UP);
+        const totalFeeDown = getTotalFee(Positions.DOWN);
+
+        return {
+            [Positions.UP]: totalFeeUp ? SPEED_MARKETS_QUOTE / (1 + totalFeeUp) : 0,
+            [Positions.DOWN]: totalFeeDown ? SPEED_MARKETS_QUOTE / (1 + totalFeeDown) : 0,
+        };
+    }, [getTotalFee]);
 
     // Used for canceling asynchronous tasks
     const mountedRef = useRef(true);
@@ -314,10 +335,10 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         }
     }, [enteredBuyinAmount, convertFromStable, selectedCollateral]);
 
-    // Update skew
+    // Update profits and skew per each position
     useDebouncedEffect(() => {
-        setSkewImpact(skewImpact);
-    }, [skewImpact, setSkewImpact]);
+        setProfitAndSkewPerPosition({ profit: profitPerPosition, skew: skewImpact });
+    }, [profitPerPosition, skewImpact, setProfitAndSkewPerPosition]);
 
     // Submit validations
     useEffect(() => {
