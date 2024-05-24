@@ -24,9 +24,9 @@ import { getCollateral, getDefaultCollateral } from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
 import { resolveAllChainedMarkets, resolveAllSpeedPositions } from 'utils/speedAmm';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
-import OpenPosition from '../OpenPosition';
 import multipleCollateral from 'utils/contracts/multipleCollateralContract';
 import erc20Contract from 'utils/contracts/collateralContract';
+import TablePositions from './components/TablePositions';
 
 type OpenPositionsProps = {
     isChained?: boolean;
@@ -34,13 +34,13 @@ type OpenPositionsProps = {
     currentPrices?: { [key: string]: number };
 };
 
-const VISIBLE_SPEED_MARKETS_ROWS = 10;
 const VISIBLE_CHAINED_MARKETS_ROWS = 4;
 
 const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayForResolvingSec, currentPrices }) => {
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 
+    console.log(currentPrices);
     const networkId = useChainId();
     const client = useClient();
     const walletClient = useWalletClient();
@@ -249,29 +249,23 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
             ) : (
                 <>
                     <PositionsWrapper $noPositions={noPositions} $isChained={isChained}>
-                        {isChained && !noPositions
-                            ? sortedUserOpenChainedSpeedMarketsData.map((position, index) => (
-                                  <ChainedPosition
-                                      position={position}
-                                      maxPriceDelayForResolvingSec={maxPriceDelayForResolvingSec}
-                                      isMultipleMarkets={
-                                          userOpenChainedSpeedMarketsData.length > VISIBLE_CHAINED_MARKETS_ROWS
-                                      }
-                                      setIsClaimable={(isClaimable) =>
-                                          updateChainedClaimable(position.address, isClaimable)
-                                      }
-                                      key={`position${position.address}${index}`}
-                                  />
-                              ))
-                            : positions.map((position, index) => (
-                                  <OpenPosition
-                                      position={position}
-                                      maxPriceDelayForResolvingSec={maxPriceDelayForResolvingSec}
-                                      currentPrices={currentPrices}
-                                      isMultipleMarkets={positions.length > VISIBLE_SPEED_MARKETS_ROWS}
-                                      key={`position${position.market}${index}`}
-                                  />
-                              ))}
+                        {isChained && !noPositions ? (
+                            sortedUserOpenChainedSpeedMarketsData.map((position, index) => (
+                                <ChainedPosition
+                                    position={position}
+                                    maxPriceDelayForResolvingSec={maxPriceDelayForResolvingSec}
+                                    isMultipleMarkets={
+                                        userOpenChainedSpeedMarketsData.length > VISIBLE_CHAINED_MARKETS_ROWS
+                                    }
+                                    setIsClaimable={(isClaimable) =>
+                                        updateChainedClaimable(position.address, isClaimable)
+                                    }
+                                    key={`position${position.address}${index}`}
+                                />
+                            ))
+                        ) : (
+                            <TablePositions data={positions} currentPrices={currentPrices} />
+                        )}
                     </PositionsWrapper>
                     {noPositions && <NoPositionsText>{t('speed-markets.user-positions.no-positions')}</NoPositionsText>}
                 </>
@@ -313,9 +307,7 @@ const Wrapper = styled.div`
 const PositionsWrapper = styled.div<{ $noPositions?: boolean; $isChained?: boolean }>`
     display: flex;
     flex-direction: column;
-    gap: ${(props) => (props.$isChained ? '16' : '6')}px;
     overflow-y: auto;
-    max-height: ${(props) => (props.$isChained ? '624' : '560')}px;
     ${(props) => (props.$noPositions ? 'filter: blur(10px);' : '')}
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         flex-direction: row;
