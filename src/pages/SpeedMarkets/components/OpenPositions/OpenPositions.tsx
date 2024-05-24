@@ -307,7 +307,6 @@ const Wrapper = styled.div`
 const PositionsWrapper = styled.div<{ $noPositions?: boolean; $isChained?: boolean }>`
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
     ${(props) => (props.$noPositions ? 'filter: blur(10px);' : '')}
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         flex-direction: row;

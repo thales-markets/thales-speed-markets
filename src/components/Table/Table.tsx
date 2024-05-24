@@ -236,14 +236,12 @@ const ExpandableRowReact: React.FC<{
 const ReactTable = styled.div<{ height?: string }>`
     width: 100%;
     height: ${(props) => props.height || '100%'};
-    overflow-x: auto;
     position: relative;
     display: flex;
 `;
 
 const TableBody = styled.div`
     display: flex;
-    overflow: auto;
     flex-direction: column;
     width: 100%;
 `;
