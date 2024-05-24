@@ -92,6 +92,9 @@ const LandingPage: React.FC = () => {
                 <Link href={LINKS.ThalesIo.Docs} target="_blank" rel="noreferrer">
                     <HeaderText>{t('landing.header.about')}</HeaderText>
                 </Link>
+                <Link href={LINKS.Discord.SpeedMarkets} target="_blank" rel="noreferrer">
+                    <HeaderText>{t('landing.header.community')}</HeaderText>
+                </Link>
                 <Link href={LINKS.ThalesIo.Devs} target="_blank" rel="noreferrer">
                     <HeaderText>{t('landing.header.devs')}</HeaderText>
                 </Link>
@@ -133,6 +136,9 @@ const LandingPage: React.FC = () => {
                     <HeaderLinks>
                         <Link href={LINKS.ThalesIo.Docs} target="_blank" rel="noreferrer">
                             <HeaderText>{t('landing.header.about')}</HeaderText>
+                        </Link>
+                        <Link href={LINKS.Discord.SpeedMarkets} target="_blank" rel="noreferrer">
+                            <HeaderText>{t('landing.header.community')}</HeaderText>
                         </Link>
                         <Link href={LINKS.ThalesIo.Devs} target="_blank" rel="noreferrer">
                             <HeaderText>{t('landing.header.devs')}</HeaderText>

@@ -65,7 +65,7 @@ const Container = styled.div<{ $isLandingPage?: boolean }>`
     align-items: center;
     ${(props) => (props.$isLandingPage ? 'max-width: 950px;' : '')}
     gap: 20px;
-    padding-top: 75px;
+    padding: ${(props) => (props.$isLandingPage ? '75px 10px 0 10px' : '75px 0 0 0')};
     margin: auto auto 25px auto;
     z-index: 1;
 
