@@ -113,7 +113,7 @@ const Table: React.FC<TableProps> = ({
                                     ? { cursor: 'pointer', ...tableHeadCellStyles }
                                     : { ...tableHeadCellStyles }
                             }
-                            width={header.width}
+                            width={header.getSize()}
                             id={header.id}
                         >
                             <HeaderTitle cssProp={header.headTitleStyle}>
@@ -170,7 +170,7 @@ const Table: React.FC<TableProps> = ({
                                                     <TableCell
                                                         style={tableRowCellStyles}
                                                         key={cellIndex}
-                                                        width={cell.column.width}
+                                                        width={cell.column.getSize()}
                                                         id={cell.column.id}
                                                         onClick={
                                                             onTableCellClick
@@ -193,14 +193,16 @@ const Table: React.FC<TableProps> = ({
             <PaginationWrapper>
                 <SelectWrapper>
                     <Button
-                        height="30px"
+                        height="24px"
+                        fontSize="14px"
                         onClick={() => tableInstance.firstPage()}
                         disabled={!tableInstance.getCanPreviousPage()}
                     >
                         {'<<'}
                     </Button>
                     <Button
-                        height="30px"
+                        height="24px"
+                        fontSize="14px"
                         onClick={() => tableInstance.previousPage()}
                         disabled={!tableInstance.getCanPreviousPage()}
                     >
@@ -218,14 +220,16 @@ const Table: React.FC<TableProps> = ({
 
                 <SelectWrapper>
                     <Button
-                        height="30px"
+                        height="24px"
+                        fontSize="14px"
                         onClick={() => tableInstance.nextPage()}
                         disabled={!tableInstance.getCanNextPage()}
                     >
                         {'>'}
                     </Button>
                     <Button
-                        height="30px"
+                        height="24px"
+                        fontSize="14px"
                         onClick={() => tableInstance.lastPage()}
                         disabled={!tableInstance.getCanNextPage()}
                     >
@@ -305,6 +309,7 @@ const TableRowHead = styled(TableRow)`
 const TableCell = styled(FlexDivCentered)<{ width?: number | string; id: string }>`
     flex: 1;
     max-width: ${(props) => (props.width ? `${props.width}px` : 'initial')};
+    width: 100%;
     justify-content: center;
     &:first-child {
         padding-left: 18px;
