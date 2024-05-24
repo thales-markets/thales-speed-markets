@@ -160,7 +160,9 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     ]);
     const isEth = selectedCollateral === CRYPTO_CURRENCY_MAP.ETH;
     const collateralAddress = isMultiCollateralSupported
-        ? multipleCollateral[selectedCollateral].addresses[networkId]
+        ? isEth
+            ? multipleCollateral.WETH.addresses[networkId]
+            : multipleCollateral[selectedCollateral].addresses[networkId]
         : erc20Contract.addresses[networkId];
 
     const referral =
@@ -368,7 +370,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
         const erc20Instance = getContract({
             abi: erc20Contract.abi,
-            address: isEth ? multipleCollateral.WETH.addresses[networkId] : collateralAddress,
+            address: collateralAddress,
             client: client as Client,
         });
 
@@ -388,6 +390,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                     networkId,
                     selectedCollateral
                 );
+
                 const allowance: boolean = await checkAllowance(
                     parsedAmount,
                     erc20Instance,
@@ -422,7 +425,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
         const erc20Instance = getContract({
             abi: erc20Contract.abi,
-            address: isEth ? multipleCollateral.WETH.addresses[networkId] : collateralAddress,
+            address: collateralAddress,
             client: walletClient.data as Client,
         }) as ViemContract;
 
@@ -495,14 +498,30 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             const singleSides = positionType !== undefined ? [POSITIONS_TO_SIDE_MAP[positionType]] : [];
             const sides = isChained ? chainedSides : singleSides;
 
-            // TODO: contract doesn't support ETH so convert it to WETH
+            const collateralAddressParam = selectedCollateral !== defaultCollateral ? collateralAddress : '';
 
             const buyInAmountParam = coinParser(
                 truncToDecimals(buyinAmount, COLLATERAL_DECIMALS[selectedCollateral]),
                 networkId,
                 selectedCollateral
             );
+
             const skewImpactParam = positionType ? parseUnits(skewImpact[positionType].toString(), 18) : undefined;
+
+            // contract doesn't support ETH so convert it to WETH when ETH is selected
+            if (isEth) {
+                const wethContractWithSigner = getContract({
+                    abi: multipleCollateral.WETH.abi,
+                    address: multipleCollateral.WETH.addresses[networkId],
+                    client: walletClient.data as Client,
+                });
+                const hash = await wethContractWithSigner.write.deposit([], { value: buyInAmountParam });
+                const txReceipt = await waitForTransactionReceipt(client as Client, { hash });
+                if (txReceipt.status !== 'success') {
+                    console.log('Failed WETH deposit', txReceipt);
+                    throw txReceipt;
+                }
+            }
 
             const hash = await getTransactionForSpeedAMM(
                 speedMarketsAMMContractWithSigner,
@@ -512,15 +531,13 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 buyInAmountParam,
                 strikePrice,
                 strikePriceSlippage,
-                selectedCollateral !== defaultCollateral ? collateralAddress : '',
+                collateralAddressParam,
                 referral as string,
                 skewImpactParam as any,
                 isBiconomy
             );
 
-            const txReceipt = await waitForTransactionReceipt(client as Client, {
-                hash,
-            });
+            const txReceipt = await waitForTransactionReceipt(client as Client, { hash });
 
             if (txReceipt.status === 'success') {
                 toast.update(id, getSuccessToastOptions(t(`common.buy.confirmation-message`), id));
