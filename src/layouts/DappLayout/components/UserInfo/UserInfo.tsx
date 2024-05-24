@@ -43,78 +43,76 @@ const UserInfo: React.FC<UserInfoProps> = ({ setUserInfoOpen, setOpenWithdraw })
     };
 
     return (
-        <>
-            <OutsideClick onOutsideClick={() => setUserInfoOpen(false)}>
-                <Container>
-                    <FlexColumn>
-                        {isBiconomy && (
-                            <>
-                                <FlexDivRowCentered>
-                                    <FlexDivColumn>
-                                        <TextLabel>{getUserInfo()?.name} </TextLabel>
-                                        <Value>{getUserInfo()?.google_email}</Value>
-                                    </FlexDivColumn>
-                                </FlexDivRowCentered>
+        <OutsideClick onOutsideClick={() => setUserInfoOpen(false)}>
+            <Container>
+                <FlexColumn>
+                    {isBiconomy && (
+                        <>
+                            <FlexDivRowCentered>
                                 <FlexDivColumn>
-                                    <TextLabel>{t('user-info.smart-account')} </TextLabel>
-                                    <Value>
-                                        {biconomyConnector.address.toLowerCase()}
-                                        <CopyIcon onClick={handleCopy} className="network-icon network-icon--copy" />
-                                    </Value>
+                                    <TextLabel>{getUserInfo()?.name} </TextLabel>
+                                    <Value>{getUserInfo()?.google_email}</Value>
                                 </FlexDivColumn>
-                            </>
-                        )}
+                            </FlexDivRowCentered>
+                            <FlexDivColumn>
+                                <TextLabel>{t('user-info.smart-account')} </TextLabel>
+                                <Value>
+                                    {biconomyConnector.address.toLowerCase()}
+                                    <CopyIcon onClick={handleCopy} className="network-icon network-icon--copy" />
+                                </Value>
+                            </FlexDivColumn>
+                        </>
+                    )}
 
-                        <FlexDivColumn>
-                            <TextLabel>{t('user-info.eoa')} </TextLabel>
-                            <Value>{address?.toLowerCase()}</Value>
-                        </FlexDivColumn>
-                        {isBiconomy && (
-                            <SessionWrapper>
-                                <TextLabel>{t('user-info.session-valid')} </TextLabel>
-                                <Value>{formatShortDateWithFullTime(Number(validUntil) * 1000)}</Value>
-                            </SessionWrapper>
-                        )}
-                    </FlexColumn>
-                    <FlexColumn>
-                        {isBiconomy && (
-                            <FlexStartCentered
-                                onClick={() => {
-                                    setOpenWithdraw(true);
-                                    setUserInfoOpen(false);
-                                }}
-                            >
-                                <Icon className="network-icon network-icon--withdraw" />
-                                <Label>{t('user-info.withdraw')}</Label>
-                            </FlexStartCentered>
-                        )}
-                        <FlexStartCentered>
-                            <SPAAnchor onClick={() => setUserInfoOpen(false)} href={buildHref(ROUTES.Markets.Profile)}>
-                                <Icon className="network-icon network-icon--avatar" />
-                                <Label>{t('user-info.trading-profile')}</Label>
-                            </SPAAnchor>
-                        </FlexStartCentered>
-                        <FlexStartCentered>
-                            <SPAAnchor href={LINKS.ThalesIo.Docs}>
-                                <Icon className="network-icon network-icon--docs" />
-                                <Label>{t('user-info.docs')}</Label>
-                            </SPAAnchor>
-                        </FlexStartCentered>
-                    </FlexColumn>
-                    <FlexColumn>
+                    <FlexDivColumn>
+                        <TextLabel>{t('user-info.eoa')} </TextLabel>
+                        <Value>{address?.toLowerCase()}</Value>
+                    </FlexDivColumn>
+                    {isBiconomy && (
+                        <SessionWrapper>
+                            <TextLabel>{t('user-info.session-valid')} </TextLabel>
+                            <Value>{formatShortDateWithFullTime(Number(validUntil) * 1000)}</Value>
+                        </SessionWrapper>
+                    )}
+                </FlexColumn>
+                <FlexColumn>
+                    {isBiconomy && (
                         <FlexStartCentered
                             onClick={() => {
+                                setOpenWithdraw(true);
                                 setUserInfoOpen(false);
-                                disconnect();
                             }}
                         >
-                            <Icon className="network-icon network-icon--logout" />
-                            <Label>{t('user-info.logout')}</Label>
+                            <Icon className="network-icon network-icon--withdraw" />
+                            <Label>{t('user-info.withdraw')}</Label>
                         </FlexStartCentered>
-                    </FlexColumn>
-                </Container>
-            </OutsideClick>
-        </>
+                    )}
+                    <FlexStartCentered>
+                        <SPAAnchor onClick={() => setUserInfoOpen(false)} href={buildHref(ROUTES.Markets.Profile)}>
+                            <Icon className="network-icon network-icon--avatar" />
+                            <Label>{t('user-info.trading-profile')}</Label>
+                        </SPAAnchor>
+                    </FlexStartCentered>
+                    <FlexStartCentered>
+                        <SPAAnchor href={LINKS.ThalesIo.Docs}>
+                            <Icon className="network-icon network-icon--docs" />
+                            <Label>{t('user-info.docs')}</Label>
+                        </SPAAnchor>
+                    </FlexStartCentered>
+                </FlexColumn>
+                <FlexColumn>
+                    <FlexStartCentered
+                        onClick={() => {
+                            setUserInfoOpen(false);
+                            disconnect();
+                        }}
+                    >
+                        <Icon className="network-icon network-icon--logout" />
+                        <Label>{t('user-info.logout')}</Label>
+                    </FlexStartCentered>
+                </FlexColumn>
+            </Container>
+        </OutsideClick>
     );
 };
 

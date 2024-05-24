@@ -207,11 +207,11 @@ const Dropdown = styled.div`
     flex-direction: column;
     position: absolute;
     top: 30px;
-    right: 0;
+    right: -2px;
     border-radius: 8px;
     border: 2px solid ${(props) => props.theme.dropDown.background.secondary};
     background: ${(props) => props.theme.dropDown.background.primary};
-    width: 150px;
+    width: 180px;
     padding: 5px;
     text-align: center;
     z-index: 101;
