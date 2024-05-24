@@ -9,3 +9,9 @@ export enum TradingSteps {
     TIME = 3,
     BUYIN = 4,
 }
+
+export enum SortDirection {
+    NONE,
+    ASC,
+    DESC,
+}

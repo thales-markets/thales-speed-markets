@@ -58,11 +58,7 @@ type MyPositionActionProps = {
     isMultipleContainerRows?: boolean;
 };
 
-const MyPositionAction: React.FC<MyPositionActionProps> = ({
-    position,
-    maxPriceDelayForResolvingSec,
-    isMultipleContainerRows,
-}) => {
+const MyPositionAction: React.FC<MyPositionActionProps> = ({ position, maxPriceDelayForResolvingSec }) => {
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 
@@ -218,14 +214,16 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                           collateralAddress,
                           speedMarketsAMMContractWithSigner,
                           'resolveMarket',
-                          [position.market, priceUpdateData]
+                          [position.market, priceUpdateData],
+                          updateFee
                       )
                     : await executeBiconomyTransaction(
                           networkId,
                           collateralAddress,
                           speedMarketsAMMContractWithSigner,
                           'resolveMarketWithOfframp',
-                          [position.market, priceUpdateData, collateralAddress, isEth]
+                          [position.market, priceUpdateData, collateralAddress, isEth],
+                          updateFee
                       );
             } else {
                 hash = isDefaultCollateral
@@ -276,9 +274,6 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
             {...getDefaultButtonProps(isMobile)}
             disabled={isSubmitting}
             additionalStyles={additionalButtonStyle}
-            backgroundColor={theme.button.textColor.quaternary}
-            borderColor={theme.button.textColor.quaternary}
-            textColor={theme.button.textColor.secondary}
             onClick={() => (hasAllowance || isDefaultCollateral ? handleResolve() : setOpenApprovalModal(true))}
         >
             {hasAllowance || isDefaultCollateral
@@ -332,22 +327,15 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     return (
         <>
             <FlexDivCentered>
-                {getButton()}
                 {isMultiCollateralSupported && position.claimable && (
-                    <CollateralSelectorContainer>
-                        <InLabel color={theme.button.textColor.quaternary}>{t('common.in')}</InLabel>
-                        <CollateralSelector
-                            collateralArray={getCollaterals(networkId)}
-                            selectedItem={selectedCollateralIndex}
-                            onChangeCollateral={() => {}}
-                            disabled={isSubmitting || isAllowing}
-                            additionalStyles={{
-                                color: theme.button.textColor.quaternary,
-                                position: !isMultipleContainerRows ? undefined : 'relative',
-                            }}
-                        />
-                    </CollateralSelectorContainer>
+                    <CollateralSelector
+                        collateralArray={getCollaterals(networkId)}
+                        selectedItem={selectedCollateralIndex}
+                        onChangeCollateral={() => {}}
+                        disabled={isSubmitting || isAllowing}
+                    />
                 )}
+                {getButton()}
             </FlexDivCentered>
             {openApprovalModal && (
                 <ApprovalModal
