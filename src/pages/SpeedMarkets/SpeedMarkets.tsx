@@ -193,13 +193,13 @@ const SpeedMarkets: React.FC = () => {
                 )}
                 {isBuyinStep && (
                     <SelectBuyin
-                        buyinAmountParam={buyinAmount}
                         onChange={setBuyinAmount}
                         isChained={isChained}
                         chainedPositions={chainedPositions}
                         ammSpeedMarketsLimits={ammSpeedMarketsLimitsData}
                         ammChainedSpeedMarketsLimits={ammChainedSpeedMarketsLimitsData}
                         currencyKey={currencyKey}
+                        isResetTriggered={isResetTriggered}
                         setHasError={setHasError}
                     />
                 )}

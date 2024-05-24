@@ -33,26 +33,26 @@ import { Header, HeaderText } from '../SelectPosition/styled-components';
 import useDebouncedEffect from 'hooks/useDebouncedEffect';
 
 type SelectBuyinProps = {
-    buyinAmountParam: number;
     onChange: React.Dispatch<number>;
     isChained: boolean;
     chainedPositions: SelectedPosition[];
     ammSpeedMarketsLimits: AmmSpeedMarketsLimits | null;
     ammChainedSpeedMarketsLimits: AmmChainedSpeedMarketsLimits | null;
     currencyKey: string;
+    isResetTriggered: boolean;
     setHasError: React.Dispatch<boolean>;
 };
 
 const roundMaxBuyin = (maxBuyin: number) => Math.floor(maxBuyin / 10) * 10;
 
 const SelectBuyin: React.FC<SelectBuyinProps> = ({
-    buyinAmountParam,
     onChange,
     isChained,
     chainedPositions,
     ammSpeedMarketsLimits,
     ammChainedSpeedMarketsLimits,
     currencyKey,
+    isResetTriggered,
     setHasError,
 }) => {
     const networkId = useChainId();
@@ -63,7 +63,7 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
     const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
     const selectedCollateralIndex = useSelector((rootState: RootState) => getSelectedCollateralIndex(rootState));
 
-    const [buyinAmount, setBuyinAmount] = useState(buyinAmountParam);
+    const [buyinAmount, setBuyinAmount] = useState(0);
     const [selectedStableBuyinAmount, setSelectedStableBuyinAmount] = useState(0);
     const [errorMessageKey, setErrorMessageKey] = useState('');
 
@@ -267,6 +267,14 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
         setBuyinAmount(0);
         setSelectedStableBuyinAmount(0);
     }, [networkId, isConnected]);
+
+    // Reset inputs
+    useEffect(() => {
+        if (isResetTriggered) {
+            setBuyinAmount(0);
+            setSelectedStableBuyinAmount(0);
+        }
+    }, [isResetTriggered]);
 
     const onMaxClick = () => {
         const maxWalletAmount = isConnected

@@ -128,10 +128,10 @@ const SelectTime: React.FC<SelectTimeProps> = ({
     }, [ammSpeedMarketsLimits, customDeltaTime, isDeltaMinutesSelected, t, isChained, onDeltaChange]);
 
     const resetData = useCallback(() => {
-        setIsDeltaMinutesSelected(!!deltaTimesMinutes.length);
+        setIsDeltaMinutesSelected(true);
         setCustomDeltaTime(0);
         onDeltaChange(0);
-    }, [onDeltaChange, deltaTimesMinutes]);
+    }, [onDeltaChange]);
 
     // Reset inputs
     useEffect(() => {
