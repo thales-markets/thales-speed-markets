@@ -326,7 +326,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({ position, maxPriceD
 
     return (
         <>
-            <FlexDivCentered>
+            <Wrapper>
                 {isMultiCollateralSupported && position.claimable && (
                     <CollateralSelector
                         collateralArray={getCollaterals(networkId)}
@@ -336,7 +336,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({ position, maxPriceD
                     />
                 )}
                 {getButton()}
-            </FlexDivCentered>
+            </Wrapper>
             {openApprovalModal && (
                 <ApprovalModal
                     // add three percent to approval amount to take into account price changes
@@ -350,6 +350,10 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({ position, maxPriceD
         </>
     );
 };
+
+const Wrapper = styled(FlexDivCentered)`
+    white-space: pre;
+`;
 
 export const getDefaultButtonProps = (isMobile: boolean) => ({
     height: isMobile ? '24px' : '27px',

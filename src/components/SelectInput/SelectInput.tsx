@@ -10,11 +10,12 @@ type SelectInputProps = {
     options: Array<SelectOption>;
     handleChange: (value: number | undefined | null) => void;
     defaultValue?: number;
+    value?: SelectOption;
 };
 
-const SelectInput: React.FC<SelectInputProps> = ({ options, handleChange, defaultValue }) => {
+const SelectInput: React.FC<SelectInputProps> = ({ options, handleChange, defaultValue, value }) => {
     const theme: ThemeInterface = useTheme();
-    const defaultOption = options[defaultValue ? defaultValue : 0];
+    const defaultOption = value ?? options[defaultValue ? defaultValue : 0];
 
     const customStyled = {
         container: (base: CSSObjectWithLabel) => ({ ...base, width: '100%' }),
@@ -23,8 +24,8 @@ const SelectInput: React.FC<SelectInputProps> = ({ options, handleChange, defaul
             ...base,
             width: '100%',
             // color: props.selectProps.menuColor,
-            backgroundColor: theme.background.secondary,
-            border: `2px solid ${theme.borderColor.primary}`,
+            backgroundColor: theme.background.primary,
+            border: `2px solid ${theme.borderColor.quaternary}`,
             marginTop: 5,
             borderRadius: 8,
             overflow: 'auto',
@@ -43,9 +44,9 @@ const SelectInput: React.FC<SelectInputProps> = ({ options, handleChange, defaul
         }),
         control: (base: CSSObjectWithLabel, props: ControlProps<SelectOption, boolean, GroupBase<SelectOption>>) => ({
             ...base,
-            backgroundColor: theme.background.secondary,
-            borderColor: theme.borderColor.primary,
-            color: theme.textColor.secondary,
+            backgroundColor: theme.background.primary,
+            border: `2px solid ${theme.borderColor.quaternary}`,
+            color: theme.textColor.primary,
             borderRadius: '8px',
             // width: width,
             minHeight: 38,
@@ -74,10 +75,10 @@ const SelectInput: React.FC<SelectInputProps> = ({ options, handleChange, defaul
         dropdownIndicator: (base: CSSObjectWithLabel) => ({
             ...base,
 
-            color: theme.textColor.quaternary,
+            color: theme.textColor.quinary,
             [':hover']: {
                 ...base[':hover'],
-                color: theme.textColor.quaternary,
+                color: theme.textColor.quinary,
             },
         }),
     };
@@ -106,7 +107,7 @@ const DropdownIndicator: React.FC<any> = (props) => {
 const Icon = styled.i`
     font-size: 12px;
     line-height: 100%;
-    color: ${(props) => props.theme.textColor.quaternary};
+    color: ${(props) => props.theme.textColor.quinary};
 `;
 
 export default SelectInput;

@@ -14,36 +14,36 @@ const TablePositions: React.FC<{ data: UserOpenPositions[]; currentPrices?: { [k
 }) => {
     const columns = [
         {
-            Header: <Header>{t('speed-markets.user-positions.asset')}</Header>,
-            accessor: 'currencyKey',
-            Cell: (cellProps: any) => (
-                <AssetWrapper>
-                    <AssetIcon className={`currency-icon currency-icon--${cellProps.cell.value.toLowerCase()}`} />
-                    <AssetName>{cellProps.cell.value}</AssetName>
-                    <AssetName>{formatCurrencyWithSign(USD_SIGN, cellProps.row.original.strikePrice, 2)}</AssetName>
-                </AssetWrapper>
-            ),
-
-            sortable: false,
+            header: <Header>{t('speed-markets.user-positions.asset')}</Header>,
+            accessorKey: 'currencyKey',
+            cell: (cellProps: any) => {
+                return (
+                    <AssetWrapper first>
+                        <AssetIcon
+                            className={`currency-icon currency-icon--${cellProps.cell.getValue().toLowerCase()}`}
+                        />
+                        <AssetName>{cellProps.cell.value}</AssetName>
+                        <AssetName>{formatCurrencyWithSign(USD_SIGN, cellProps.row.original.strikePrice, 2)}</AssetName>
+                    </AssetWrapper>
+                );
+            },
         },
         {
-            Header: <Header>{t('speed-markets.user-positions.direction')}</Header>,
-            accessor: 'side',
-            Cell: (cellProps: any) => (
+            header: <Header>{t('speed-markets.user-positions.direction')}</Header>,
+            accessorKey: 'side',
+            cell: (cellProps: any) => (
                 <AssetWrapper>
-                    <DirectionIcon className={`icon icon--caret-${cellProps.cell.value.toLowerCase()}`} />
+                    <DirectionIcon className={`icon icon--caret-${cellProps.cell.getValue().toLowerCase()}`} />
                 </AssetWrapper>
             ),
-            width: 100,
-            sortable: false,
         },
         {
-            Header: <Header>{t('speed-markets.user-positions.price')}</Header>,
-            accessor: 'finalPrice',
-            Cell: (cellProps: any) => (
+            header: <Header>{t('speed-markets.user-positions.price')}</Header>,
+            accessorKey: 'finalPrice',
+            cell: (cellProps: any) => (
                 <AssetWrapper>
                     {cellProps.cell.value ? (
-                        <AssetName>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.value, 2)}</AssetName>
+                        <AssetName>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue(), 2)}</AssetName>
                     ) : (
                         <AssetName>
                             {currentPrices
@@ -53,56 +53,46 @@ const TablePositions: React.FC<{ data: UserOpenPositions[]; currentPrices?: { [k
                     )}
                 </AssetWrapper>
             ),
-            width: 150,
-            sortable: false,
         },
         {
-            Header: <Header>{t('speed-markets.user-positions.end-time')}</Header>,
-            accessor: 'maturityDate',
-            Cell: (cellProps: any) => (
+            header: <Header>{t('speed-markets.user-positions.end-time')}</Header>,
+            accessorKey: 'maturityDate',
+            cell: (cellProps: any) => (
                 <AssetWrapper>
-                    <AssetName>{formatShortDateWithFullTime(cellProps.cell.value)}</AssetName>
+                    <AssetName>{formatShortDateWithFullTime(cellProps.cell.getValue())}</AssetName>
                 </AssetWrapper>
             ),
-            width: 200,
-            sortable: false,
         },
         {
-            Header: <Header>{t('speed-markets.user-positions.paid')}</Header>,
-            accessor: 'paid',
-            Cell: (cellProps: any) => (
+            header: <Header>{t('speed-markets.user-positions.paid')}</Header>,
+            accessorKey: 'paid',
+            cell: (cellProps: any) => (
                 <AssetWrapper>
-                    <AssetName>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.value, 2)}</AssetName>
+                    <AssetName>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue(), 2)}</AssetName>
                 </AssetWrapper>
             ),
-            width: 100,
-            sortable: false,
         },
         {
-            Header: <Header>{t('speed-markets.user-positions.payout')}</Header>,
-            accessor: 'payout',
-            Cell: (cellProps: any) => (
+            header: <Header>{t('speed-markets.user-positions.payout')}</Header>,
+            accessorKey: 'payout',
+            cell: (cellProps: any) => (
                 <AssetWrapper>
-                    <AssetName>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.value, 2)}</AssetName>
+                    <AssetName>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue(), 2)}</AssetName>
                 </AssetWrapper>
             ),
-            width: 100,
-            sortable: false,
         },
         {
-            Header: <Header>{t('speed-markets.user-positions.status')}</Header>,
-            accessor: 'action',
-            Cell: (cellProps: any) => (
+            header: <Header>{t('speed-markets.user-positions.status')}</Header>,
+            accessorKey: 'action',
+            cell: (cellProps: any) => (
                 <AssetWrapper>
                     <MyPositionAction position={cellProps.row.original} />
                 </AssetWrapper>
             ),
-            width: 400,
-            sortable: false,
         },
     ];
 
-    return <Table data={data} columns={columns}></Table>;
+    return <Table data={data} columns={columns as any}></Table>;
 };
 
 const Header = styled.p`
@@ -112,11 +102,12 @@ const Header = styled.p`
     font-weight: 700;
 `;
 
-const AssetWrapper = styled.div`
+const AssetWrapper = styled.div<{ first?: boolean }>`
     display: flex;
-    justify-content: center;
+    justify-content: ${(props) => (props.first ? 'flex-start' : 'center')};
     align-items: center;
     gap: 4px;
+    width: 100%;
     padding: 14px 0 10px 0;
 `;
 
