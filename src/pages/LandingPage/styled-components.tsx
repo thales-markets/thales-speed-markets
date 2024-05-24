@@ -229,6 +229,9 @@ export const Header = styled(FlexDivColumn)`
     gap: 172px;
     z-index: 1;
 
+    @media screen and (max-width: ${ScreenSizeBreakpoint.MEDIUM}px) {
+        margin: 20px 50px 0;
+    }
     @media screen and (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         margin: 50px 20px 0;
     }
@@ -253,9 +256,9 @@ export const SpeedLogo = styled.i`
 `;
 
 export const HeaderLinks = styled(FlexDivSpaceBetween)`
-    width: 44%;
+    width: 50%;
     color: ${(props) => props.theme.textColor.primary};
-    margin-left: 5%;
+    margin-left: 4%;
     gap: 20px;
 
     @media screen and (max-width: ${ScreenSizeBreakpoint.MEDIUM}px) {
@@ -289,7 +292,7 @@ export const DappButton = styled(FlexDivCentered)`
     color: ${(props) => props.theme.button.textColor.secondary};
 
     @media screen and (max-width: ${ScreenSizeBreakpoint.MEDIUM}px) {
-        width: 140px;
+        width: 130px;
     }
     @media screen and (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         display: none;
@@ -325,7 +328,7 @@ export const MobileBurger = styled.i`
 `;
 
 export const MenuHeaderLinks = styled(FlexDivColumn)`
-    gap: 64px;
+    gap: 60px;
     margin-top: 100px;
     margin-left: 58px;
 `;

@@ -23,7 +23,7 @@ import {
     PositionsContainer,
     PositionsSymbol,
     PositionsWrapper,
-    Skew,
+    Bonus,
 } from './styled-components';
 
 export type SelectedPosition = Positions.UP | Positions.DOWN | undefined;
@@ -34,7 +34,10 @@ type SelectPositionProps = {
     onChainedChange: React.Dispatch<SelectedPosition[]>;
     setIsChained: React.Dispatch<React.SetStateAction<boolean>>;
     resetData: React.Dispatch<void>;
-    skew: { [Positions.UP]: number; [Positions.DOWN]: number };
+    profitAndSkewPerPosition: {
+        profit: { [Positions.UP]: number; [Positions.DOWN]: number };
+        skew: { [Positions.UP]: number; [Positions.DOWN]: number };
+    };
 };
 
 const SelectPosition: React.FC<SelectPositionProps> = ({
@@ -43,12 +46,29 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
     onChainedChange,
     setIsChained,
     resetData,
-    skew,
+    profitAndSkewPerPosition,
 }) => {
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 
-    const discount = { [Positions.UP]: skew[Positions.DOWN] / 2, [Positions.DOWN]: skew[Positions.UP] / 2 };
+    /*
+     * Calculate ROI bonus as:
+     * ROI on UP = 60%
+     * ROI on DOWN = 70%
+     * ROI Bonus = (70 - 60) / 60 = 16.67%
+     */
+    const profit = profitAndSkewPerPosition.profit;
+    const skew = profitAndSkewPerPosition.skew;
+    const bonusPercentage = {
+        [Positions.UP]:
+            profit[Positions.UP] > profit[Positions.DOWN]
+                ? (profit[Positions.UP] - profit[Positions.DOWN]) / (profit[Positions.DOWN] - 1)
+                : 0,
+        [Positions.DOWN]:
+            profit[Positions.DOWN] > profit[Positions.UP]
+                ? (profit[Positions.DOWN] - profit[Positions.UP]) / (profit[Positions.UP] - 1)
+                : 0,
+    };
 
     const onPlusMinusIconHandle = (isChained: boolean) => {
         setIsChained(isChained);
@@ -71,22 +91,17 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
         });
     };
 
-    const getSkewTooltip = () => (
+    const getBonusTooltip = (isBonusUnknown: boolean, direction: Positions, bonus: string) => (
         <Tooltip
             overlay={
                 <Trans
-                    i18nKey="speed-markets.tooltips.skew-info"
+                    i18nKey={
+                        isBonusUnknown ? 'speed-markets.tooltips.bonus-unknown' : 'speed-markets.tooltips.bonus-info'
+                    }
                     components={{
                         br: <br />,
                     }}
-                    values={{
-                        skewDirection: skew[Positions.UP] > 0 ? Positions.UP : Positions.DOWN,
-                        skewPerc: formatPercentage(skew[Positions.UP] > 0 ? skew[Positions.UP] : skew[Positions.DOWN]),
-                        discountDirection: skew[Positions.DOWN] > 0 ? Positions.UP : Positions.DOWN,
-                        discountPerc: formatPercentage(
-                            discount[skew[Positions.DOWN] > 0 ? Positions.UP : Positions.DOWN]
-                        ),
-                    }}
+                    values={{ bonusDirection: direction, bonusPerc: bonus }}
                 />
             }
             customIconStyling={{ fontSize: '11px', color: theme.textColor.quaternary }}
@@ -119,11 +134,17 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
                             <Icon className="icon icon--caret-up" />
                             {Positions.UP}
 
-                            {discount[Positions.UP] > 0 && (
-                                <Skew $isSelected={selected[0] === Positions.UP}>
-                                    +{formatPercentage(discount[Positions.UP])}
-                                    {getSkewTooltip()}
-                                </Skew>
+                            {(bonusPercentage[Positions.UP] || skew[Positions.UP] === 0) && (
+                                <Bonus $isSelected={selected[0] === Positions.UP}>
+                                    {bonusPercentage[Positions.UP]
+                                        ? `+${formatPercentage(bonusPercentage[Positions.UP])}`
+                                        : t('common.bonus')}
+                                    {getBonusTooltip(
+                                        bonusPercentage[Positions.UP] === 0,
+                                        Positions.UP,
+                                        formatPercentage(bonusPercentage[Positions.UP])
+                                    )}
+                                </Bonus>
                             )}
                         </PositionWrapper>
 
@@ -134,11 +155,17 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
                             <Icon className="icon icon--caret-down" />
                             {Positions.DOWN}
 
-                            {discount[Positions.DOWN] > 0 && (
-                                <Skew $isSelected={selected[0] === Positions.DOWN}>
-                                    +{formatPercentage(discount[Positions.DOWN])}
-                                    {getSkewTooltip()}
-                                </Skew>
+                            {(bonusPercentage[Positions.DOWN] || skew[Positions.DOWN] === 0) && (
+                                <Bonus $isSelected={selected[0] === Positions.DOWN}>
+                                    {bonusPercentage[Positions.DOWN]
+                                        ? `+${formatPercentage(bonusPercentage[Positions.DOWN])}`
+                                        : t('common.bonus')}
+                                    {getBonusTooltip(
+                                        bonusPercentage[Positions.DOWN] === 0,
+                                        Positions.DOWN,
+                                        formatPercentage(bonusPercentage[Positions.DOWN])
+                                    )}
+                                </Bonus>
                             )}
                         </PositionWrapper>
                         <PlusMinusIcon

@@ -56,7 +56,10 @@ const SpeedMarkets: React.FC = () => {
     const [deltaTimeSec, setDeltaTimeSec] = useState(0);
     const [buyinAmount, setBuyinAmount] = useState(0);
     const [isResetTriggered, setIsResetTriggered] = useState(false);
-    const [skew, setSkew] = useState({ [Positions.UP]: 0, [Positions.DOWN]: 0 });
+    const [profitAndSkewPerPosition, setProfitAndSkewPerPosition] = useState({
+        profit: { [Positions.UP]: 0, [Positions.DOWN]: 0 },
+        skew: { [Positions.UP]: 0, [Positions.DOWN]: 0 },
+    });
     const [hasError, setHasError] = useState(false);
 
     const ammSpeedMarketsLimitsQuery = useAmmSpeedMarketsLimitsQuery({ networkId, client }, undefined, {
@@ -179,7 +182,7 @@ const SpeedMarkets: React.FC = () => {
                         onChange={setPositionType}
                         onChainedChange={setChainedPositions}
                         resetData={resetData}
-                        skew={skew}
+                        profitAndSkewPerPosition={profitAndSkewPerPosition}
                     />
                 )}
                 {isTimeStep && !isChained && (
@@ -209,7 +212,7 @@ const SpeedMarkets: React.FC = () => {
 
     return (
         <>
-            {ammSpeedMarketsLimitsQuery.isLoading || ammChainedSpeedMarketsLimitsQuery.isLoading ? (
+            {!isAppReady || ammSpeedMarketsLimitsQuery.isLoading || ammChainedSpeedMarketsLimitsQuery.isLoading ? (
                 <SimpleLoader />
             ) : (
                 <Container>
@@ -272,7 +275,7 @@ const SpeedMarkets: React.FC = () => {
                         ammSpeedMarketsLimits={ammSpeedMarketsLimitsData}
                         ammChainedSpeedMarketsLimits={ammChainedSpeedMarketsLimitsData}
                         currentPrice={currentPrices[currencyKey]}
-                        setSkewImpact={setSkew}
+                        setProfitAndSkewPerPosition={setProfitAndSkewPerPosition}
                         resetData={resetData}
                         hasError={hasError}
                     />
