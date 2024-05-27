@@ -5,7 +5,6 @@ import { USD_SIGN } from 'constants/currency';
 import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import { CollateralSelectorContainer, InLabel } from 'pages/Profile/components/MyPositionAction/MyPositionAction';
-import ChainedPosition from 'pages/SpeedMarkets/components/ChainedPosition';
 import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
 import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveSpeedMarketsDataQuery';
 import React, { CSSProperties, useEffect, useMemo, useState } from 'react';
@@ -28,6 +27,7 @@ import { resolveAllChainedMarkets, resolveAllSpeedPositions } from 'utils/speedA
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 import CardPositions from '../CardPositions';
 import TablePositions from './components/TablePositions';
+import ChainedTablePositions from './components/ChainedPositions/ChainedTablePositions';
 
 type OpenPositionsProps = {
     isChained?: boolean;
@@ -35,9 +35,7 @@ type OpenPositionsProps = {
     currentPrices?: { [key: string]: number };
 };
 
-const VISIBLE_CHAINED_MARKETS_ROWS = 4;
-
-const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayForResolvingSec, currentPrices }) => {
+const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, currentPrices }) => {
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 
@@ -109,6 +107,8 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
             );
         }
     };
+
+    console.log(updateChainedClaimable);
 
     // For chained sorting purpose update claimable status when it is known
     useEffect(() => {
@@ -249,20 +249,11 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
             ) : (
                 <>
                     <PositionsWrapper $noPositions={noPositions} $isChained={isChained}>
-                        {isChained && !noPositions ? (
-                            sortedUserOpenChainedSpeedMarketsData.map((position, index) => (
-                                <ChainedPosition
-                                    position={position}
-                                    maxPriceDelayForResolvingSec={maxPriceDelayForResolvingSec}
-                                    isMultipleMarkets={
-                                        userOpenChainedSpeedMarketsData.length > VISIBLE_CHAINED_MARKETS_ROWS
-                                    }
-                                    setIsClaimable={(isClaimable) =>
-                                        updateChainedClaimable(position.address, isClaimable)
-                                    }
-                                    key={`position${position.address}${index}`}
-                                />
-                            ))
+                        {isChained ? (
+                            <ChainedTablePositions
+                                data={sortedUserOpenChainedSpeedMarketsData}
+                                currentPrices={currentPrices}
+                            />
                         ) : isMobile ? (
                             <CardPositions data={positions} />
                         ) : (
