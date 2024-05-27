@@ -72,6 +72,7 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
 
     const onPlusMinusIconHandle = (isChained: boolean) => {
         setIsChained(isChained);
+        resetData();
         history.push({
             pathname: location.pathname,
             search: queryString.stringify({
