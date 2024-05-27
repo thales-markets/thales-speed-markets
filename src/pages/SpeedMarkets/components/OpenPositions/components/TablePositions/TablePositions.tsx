@@ -71,6 +71,7 @@ const TablePositions: React.FC<{ data: UserOpenPositions[]; currentPrices?: { [k
                     <AssetName>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue(), 2)}</AssetName>
                 </AssetWrapper>
             ),
+            size: 120,
         },
         {
             header: <Header>{t('speed-markets.user-positions.payout')}</Header>,
@@ -80,6 +81,7 @@ const TablePositions: React.FC<{ data: UserOpenPositions[]; currentPrices?: { [k
                     <AssetName>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue(), 2)}</AssetName>
                 </AssetWrapper>
             ),
+            size: 100,
         },
         {
             header: <Header>{t('speed-markets.user-positions.status')}</Header>,
@@ -89,6 +91,7 @@ const TablePositions: React.FC<{ data: UserOpenPositions[]; currentPrices?: { [k
                     <MyPositionAction position={cellProps.row.original} />
                 </AssetWrapper>
             ),
+            size: 400,
         },
     ];
 
