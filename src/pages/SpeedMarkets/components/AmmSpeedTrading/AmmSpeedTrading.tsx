@@ -15,6 +15,7 @@ import {
     SPEED_MARKETS_QUOTE,
 } from 'constants/market';
 import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
+import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 import { secondsToMilliseconds } from 'date-fns';
 import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
@@ -39,6 +40,7 @@ import {
     bigNumberFormatter,
     ceilNumberToDecimals,
     coinParser,
+    localStore,
     truncToDecimals,
 } from 'thales-utils';
 import { AmmChainedSpeedMarketsLimits, AmmSpeedMarketsLimits } from 'types/market';
@@ -117,11 +119,13 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
+    const lsPriceSlippage: number | undefined = localStore.get(LOCAL_STORAGE_KEYS.PRICE_SLIPPAGE);
+
     const [buyinAmount, setBuyinAmount] = useState(0);
     const [paidAmount, setPaidAmount] = useState(enteredBuyinAmount);
     const [potentialProfit, setPotentialProfit] = useState(0);
     const [submittedStrikePrice, setSubmittedStrikePrice] = useState(0);
-    const [priceSlippage, setPriceSlippage] = useState(DEFAULT_PRICE_SLIPPAGE_PERCENTAGE);
+    const [priceSlippage, setPriceSlippage] = useState(lsPriceSlippage || DEFAULT_PRICE_SLIPPAGE_PERCENTAGE);
     const [isAllowing, setIsAllowing] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [outOfLiquidity, setOutOfLiquidity] = useState(false);
@@ -339,6 +343,11 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     useDebouncedEffect(() => {
         setProfitAndSkewPerPosition({ profit: profitPerPosition, skew: skewImpact });
     }, [profitPerPosition, skewImpact, setProfitAndSkewPerPosition]);
+
+    // Save price slippage to local storage
+    useEffect(() => {
+        localStore.set(LOCAL_STORAGE_KEYS.PRICE_SLIPPAGE, priceSlippage);
+    }, [priceSlippage]);
 
     // Submit validations
     useEffect(() => {

@@ -1,5 +1,6 @@
 export const LOCAL_STORAGE_KEYS = {
     UI_THEME: 'ui-theme',
+    PRICE_SLIPPAGE: 'price-slippage',
     REFERRAL_WALLET: 'referral-wallet',
     SESSION_P_KEY: {
         10: 'sessionPKey_10',
