@@ -29,7 +29,6 @@ import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAsse
 import { buildHref } from 'utils/routes';
 import { useAccount, useChainId, useClient } from 'wagmi';
 import AmmSpeedTrading from './components/AmmSpeedTrading';
-import ClosedPositions from './components/ClosedPositions';
 import SelectAsset from './components/SelectAsset';
 import SelectBuyin from './components/SelectBuyin';
 import SelectPosition from './components/SelectPosition';
@@ -246,7 +245,7 @@ const SpeedMarkets: React.FC = () => {
                                 selectedPrice={
                                     !isChained && positionType !== undefined ? currentPrices[currencyKey] : undefined
                                 }
-                                selectedDate={getTimeStampForDelta(deltaTimeSec)}
+                                selectedDate={Date.now() + secondsToMilliseconds(deltaTimeSec)}
                                 deltaTimeSec={deltaTimeSec}
                                 explicitCurrentPrice={currentPrices[currencyKey]}
                                 prevExplicitPrice={prevPrice.current}
@@ -281,14 +280,11 @@ const SpeedMarkets: React.FC = () => {
                     />
                     <PageLinkBanner link={LINKS.Markets.Thales} />
                     {isConnected && (
-                        <>
-                            <OpenPositions
-                                isChained={isChained}
-                                maxPriceDelayForResolvingSec={ammSpeedMarketsLimitsData?.maxPriceDelayForResolvingSec}
-                                currentPrices={currentPrices}
-                            />
-                            <ClosedPositions isChained={isChained} />
-                        </>
+                        <OpenPositions
+                            isChained={isChained}
+                            maxPriceDelayForResolvingSec={ammSpeedMarketsLimitsData?.maxPriceDelayForResolvingSec}
+                            currentPrices={currentPrices}
+                        />
                     )}
                     <OverviewLinkWrapper>
                         <SPAAnchor href={buildHref(`${ROUTES.Markets.SpeedMarketsOverview}?isChained=${isChained}`)}>
@@ -304,13 +300,6 @@ const SpeedMarkets: React.FC = () => {
             )}
         </>
     );
-};
-
-const getTimeStampForDelta = (seconds: number) => {
-    if (seconds) {
-        const reuslt = Number(Date.now() + seconds * 1000);
-        return reuslt;
-    }
 };
 
 const Container = styled.div`
@@ -375,7 +364,10 @@ const Info = styled.span`
 `;
 
 const OverviewLinkWrapper = styled.div`
-    margin-top: 20px;
+    margin-top: -39px;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        margin-top: 10px;
+    }
 `;
 
 const OverviewLinkText = styled.span`

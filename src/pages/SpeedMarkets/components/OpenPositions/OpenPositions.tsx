@@ -20,12 +20,13 @@ import { formatCurrencyWithSign } from 'thales-utils';
 import { ChainedSpeedMarket, UserOpenPositions } from 'types/market';
 import { RootState, ThemeInterface } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
+import erc20Contract from 'utils/contracts/collateralContract';
+import multipleCollateral from 'utils/contracts/multipleCollateralContract';
 import { getCollateral, getDefaultCollateral } from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
 import { resolveAllChainedMarkets, resolveAllSpeedPositions } from 'utils/speedAmm';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
-import multipleCollateral from 'utils/contracts/multipleCollateralContract';
-import erc20Contract from 'utils/contracts/collateralContract';
+import CardPositions from '../CardPositions';
 import TablePositions from './components/TablePositions';
 
 type OpenPositionsProps = {
@@ -262,6 +263,8 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, maxPriceDelayF
                                     key={`position${position.address}${index}`}
                                 />
                             ))
+                        ) : isMobile ? (
+                            <CardPositions data={positions} />
                         ) : (
                             <TablePositions data={positions} currentPrices={currentPrices} />
                         )}

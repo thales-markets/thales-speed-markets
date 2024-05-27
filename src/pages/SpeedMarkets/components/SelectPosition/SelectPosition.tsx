@@ -135,7 +135,7 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
                             <Icon className="icon icon--caret-up" />
                             {Positions.UP}
 
-                            {(bonusPercentage[Positions.UP] || skew[Positions.UP] === 0) && (
+                            {(bonusPercentage[Positions.UP] > 0 || skew[Positions.DOWN] > 0) && (
                                 <Bonus $isSelected={selected[0] === Positions.UP}>
                                     {bonusPercentage[Positions.UP]
                                         ? `+${formatPercentage(bonusPercentage[Positions.UP])}`
@@ -156,7 +156,7 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
                             <Icon className="icon icon--caret-down" />
                             {Positions.DOWN}
 
-                            {(bonusPercentage[Positions.DOWN] || skew[Positions.DOWN] === 0) && (
+                            {(bonusPercentage[Positions.DOWN] > 0 || skew[Positions.UP] > 0) && (
                                 <Bonus $isSelected={selected[0] === Positions.DOWN}>
                                     {bonusPercentage[Positions.DOWN]
                                         ? `+${formatPercentage(bonusPercentage[Positions.DOWN])}`

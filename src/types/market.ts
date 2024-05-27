@@ -12,6 +12,7 @@ export type MarketInfo = {
     url?: string;
 };
 
+// TODO: rename to UserPosition
 export type UserOpenPositions = {
     currencyKey: string;
     strikePrice: number;
@@ -21,12 +22,14 @@ export type UserOpenPositions = {
     side: Positions;
     paid: number;
     value: number;
-    claimable?: boolean;
-    finalPrice?: number;
     currentPrice?: number;
-    user?: string;
+    finalPrice?: number;
+    claimable?: boolean;
+    isUserWinner?: boolean;
+    user?: string; // TODO: change to mandatory
 };
 
+// TODO: remove
 export type UserClosedPositions = {
     currencyKey: string;
     strikePrice: number;

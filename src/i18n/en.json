@@ -114,7 +114,8 @@
             "user-rejected-tx": "User rejected transaction",
             "enter-percentage": "Enter percentage",
             "invalid-percentage-range": "The percentage must be between {{min}} and {{max}}",
-            "something-went-wrong": "Something went wrong!"
+            "something-went-wrong": "Something went wrong!",
+            "unexpected": "Please help us about this issue by writing to help-and-questions"
         },
         "enable-wallet-access": {
             "approve": "Approve",
@@ -137,7 +138,7 @@
             "medium": "Medium",
             "twitter": "X",
             "docs": "Documentation",
-            "description": "This frontend is hosted decentrally on IPFS (InterPlanetary File System). It serves to visualise the blockchain data and help users interact with the Thales Speed Market contracts that belong to Thales DAO. By doing so it helps users understand the risks of using those smart contracts and what the specific interactions entail. The frontend does not facilitate anything else apart from interacting with those contracts in a visually comprehensive way. In doing so, it is no different than the functionality provided by Etherscan or RPCs (Remote Procedure Calls). The frontend itself does not belong to Thales DAO or any individual. It stores no user data and has no dedicated backend or database. All code is uploaded statically directly to the IPFS. Just as the blockchain does no geo-fencing and no KYC, neither can this frontend do so. However, by interacting with Thales DAO contracts, you commit to have read, understood and accepted Thales DAO’s terms of use and you take full liability in case you have not adhered to those terms. Thales DAO uses the decentralised sUSD token as collateral for all its transactions. In doing so it inherits all the usage rules from Synthetix DAO with regards to collateral and does not introduce its own."
+            "description": "This frontend is hosted decentrally on IPFS (InterPlanetary File System). It serves to visualise the blockchain data and help users interact with the Thales Speed Market contracts that belong to Thales DAO. By doing so it helps users understand the risks of using those smart contracts and what the specific interactions entail. The frontend does not facilitate anything else apart from interacting with those contracts in a visually comprehensive way. In doing so, it is no different than the functionality provided by Etherscan or RPCs (Remote Procedure Calls). The frontend itself does not belong to Thales DAO or any individual. It stores no user data and has no dedicated backend or database. All code is uploaded statically directly to the IPFS. Just as the blockchain does no geo-fencing and no KYC, neither can this frontend do so. However, by interacting with Thales DAO contracts, you commit to have read, understood and accepted Thales DAO’s terms of use and you take full liability in case you have not adhered to those terms."
         },
         "sidebar": {
             "speed-markets": "Speed markets",
@@ -266,10 +267,12 @@
             "asset": "Asset",
             "direction": "Direction",
             "price": "Price",
+            "current-price": "Current price",
             "status": "Status",
             "size": "Size",
             "paid": "Paid",
             "payout": "Payout",
+            "claim-in": "Claim in",
             "claim-win": "Claim win",
             "claim-win-progress": "Claiming win",
             "results": "Results in",

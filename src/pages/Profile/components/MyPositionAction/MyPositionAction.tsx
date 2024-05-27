@@ -333,6 +333,8 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({ position, maxPriceD
                         selectedItem={selectedCollateralIndex}
                         onChangeCollateral={() => {}}
                         disabled={isSubmitting || isAllowing}
+                        isIconHidden
+                        additionalStyles={{ margin: '0 12px 0 0' }}
                     />
                 )}
                 {getButton()}

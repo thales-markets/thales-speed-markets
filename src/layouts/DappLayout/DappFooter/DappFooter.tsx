@@ -67,7 +67,7 @@ const Container = styled.div<{ $isLandingPage?: boolean }>`
     gap: 20px;
     padding: ${(props) => (props.$isLandingPage ? '75px 10px 0 10px' : '75px 0 0 0')};
     margin: auto auto 25px auto;
-    z-index: 1;
+    ${(props) => (props.$isLandingPage ? 'z-index: 1;' : '')}
 
     @media screen and (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         padding-top: 50px;

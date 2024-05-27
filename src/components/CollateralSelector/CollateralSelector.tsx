@@ -15,6 +15,7 @@ type CollateralSelectorProps = {
     onChangeCollateral: (index: number) => void;
     disabled?: boolean;
     isDetailedView?: boolean;
+    isIconHidden?: boolean;
     collateralBalances?: any;
     exchangeRates?: Rates | null;
     dropDownWidth?: string;
@@ -27,6 +28,7 @@ const CollateralSelector: React.FC<CollateralSelectorProps> = ({
     onChangeCollateral,
     disabled,
     isDetailedView,
+    isIconHidden,
     collateralBalances,
     exchangeRates,
     dropDownWidth,
@@ -60,9 +62,13 @@ const CollateralSelector: React.FC<CollateralSelectorProps> = ({
             <OutsideClickHandler onOutsideClick={() => setOpen(false)}>
                 <SelectedCollateral disabled={!!disabled} onClick={() => !disabled && setOpen(!open)}>
                     <TextCollateralWrapper>
-                        <AssetIcon
-                            className={`currency-icon currency-icon--${collateralArray[selectedItem].toLowerCase()}`}
-                        />
+                        {!isIconHidden && (
+                            <AssetIcon
+                                className={`currency-icon currency-icon--${collateralArray[
+                                    selectedItem
+                                ].toLowerCase()}`}
+                            />
+                        )}
                         <SelectedTextCollateral color={additionalStyles?.color}>
                             {collateralArray[selectedItem]}
                         </SelectedTextCollateral>
@@ -179,9 +185,8 @@ const SelectedCollateral = styled(FlexDivRowCentered)<{ disabled: boolean }>`
 
 const Dropdown = styled(FlexDivColumnCentered)<{ width?: string }>`
     position: absolute;
-    top: 12px;
-    margin-top: 8px;
-    margin-left: -10px;
+    top: 26px;
+    right: 0;
     width: ${(props) => (props.width ? props.width : '71px')};
     padding: 5px 3px;
     border-radius: 8px;

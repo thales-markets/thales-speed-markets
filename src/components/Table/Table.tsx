@@ -97,8 +97,6 @@ const Table: React.FC<TableProps> = ({
         },
     });
 
-    console.log(pagination);
-
     return (
         <>
             {tableInstance.getHeaderGroups().map((headerGroup: any, headerGroupIndex: any) => (

@@ -22,7 +22,7 @@ const UnexpectedError: React.FC<{ theme: ThemeInterface }> = ({ theme }) => {
     if (crate) {
         if (isMobile()) {
             // notify user with a message
-            crate.notify('Please help us about this issue by writing to Thales/help-and-questions');
+            crate.notify(t('common.errors.unexpected'));
             setTimeout(() => {
                 // change channel to Help and Questions
                 crate.navigate(DISCORD_HELP_CHANNEL_ID);

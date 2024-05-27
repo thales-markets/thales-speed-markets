@@ -4,10 +4,11 @@ import { t } from 'i18next';
 import MyPositionAction from 'pages/Profile/components/MyPositionAction';
 import React from 'react';
 import styled from 'styled-components';
-import { formatCurrency, getPrecision } from 'thales-utils';
+import { formatCurrencyWithSign } from 'thales-utils';
 import { UserOpenPositions } from 'types/market';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
 
+// TODO: move to folder up, will be general for all user positions not only open
 const TablePositions: React.FC<{ data: UserOpenPositions[]; currentPrices?: { [key: string]: number } }> = ({
     data,
     currentPrices,
@@ -132,18 +133,5 @@ const AssetName = styled.i`
     font-size: 13px;
     font-weight: 700;
 `;
-
-export const formatCurrencyWithSign = (
-    sign: string | null | undefined,
-    value: number,
-    decimals?: number,
-    trimDecimals?: boolean
-) => {
-    return `${Number(value) < 0 ? '-' : ''}${sign ? sign + '' : ''}${formatCurrency(
-        typeof value == 'number' ? Math.abs(value) : value,
-        decimals !== undefined ? decimals : getPrecision(value),
-        trimDecimals
-    )}`;
-};
 
 export default TablePositions;
