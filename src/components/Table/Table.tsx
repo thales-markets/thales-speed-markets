@@ -14,7 +14,6 @@ import {
 } from '@tanstack/react-table';
 import styled from 'styled-components';
 import { FlexDiv, FlexDivCentered } from 'styles/common';
-import Button from 'components/Button';
 import SelectInput from 'components/SelectInput';
 
 const PAGINATION_SIZE = [
@@ -192,22 +191,18 @@ const Table: React.FC<TableProps> = ({
             </ReactTable>
             <PaginationWrapper>
                 <SelectWrapper>
-                    <Button
-                        height="24px"
-                        fontSize="14px"
+                    <ArrowWrapper
                         onClick={() => tableInstance.firstPage()}
                         disabled={!tableInstance.getCanPreviousPage()}
                     >
                         {'<<'}
-                    </Button>
-                    <Button
-                        height="24px"
-                        fontSize="14px"
+                    </ArrowWrapper>
+                    <ArrowWrapper
                         onClick={() => tableInstance.previousPage()}
                         disabled={!tableInstance.getCanPreviousPage()}
                     >
                         {'<'}
-                    </Button>
+                    </ArrowWrapper>
                 </SelectWrapper>
 
                 <SelectWrapper className="flex items-center gap-1">
@@ -219,22 +214,12 @@ const Table: React.FC<TableProps> = ({
                 </SelectWrapper>
 
                 <SelectWrapper>
-                    <Button
-                        height="24px"
-                        fontSize="14px"
-                        onClick={() => tableInstance.nextPage()}
-                        disabled={!tableInstance.getCanNextPage()}
-                    >
+                    <ArrowWrapper onClick={() => tableInstance.nextPage()} disabled={!tableInstance.getCanNextPage()}>
                         {'>'}
-                    </Button>
-                    <Button
-                        height="24px"
-                        fontSize="14px"
-                        onClick={() => tableInstance.lastPage()}
-                        disabled={!tableInstance.getCanNextPage()}
-                    >
+                    </ArrowWrapper>
+                    <ArrowWrapper onClick={() => tableInstance.lastPage()} disabled={!tableInstance.getCanNextPage()}>
                         {'>>'}
-                    </Button>
+                    </ArrowWrapper>
                 </SelectWrapper>
 
                 <SelectWrapper>
@@ -399,6 +384,21 @@ const PaginationLabel = styled.p`
     font-weight: 700;
     line-height: 10%;
     letter-spacing: 0.13px;
+`;
+
+const ArrowWrapper = styled.span<{ disabled: boolean }>`
+    height: 24px;
+    font-size: 14px;
+    padding: 4px;
+    border-radius: 14px;
+    border: 2px solid ${(props) => props.theme.borderColor.quaternary};
+    color: ${(props) => props.theme.textColor.primary};
+    opacity: ${(props) => (props.disabled ? 0.5 : 1)};
+    cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
+    width: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 `;
 
 export default Table;
