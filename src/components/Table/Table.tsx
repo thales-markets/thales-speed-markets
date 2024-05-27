@@ -256,7 +256,7 @@ const ExpandableRowReact: React.FC<{
                 cursorPointer={true}
                 onClick={setHidden.bind(this, !hidden)}
             >
-                {row.cells.map((cell: any, cellIndex: any) => (
+                {row.getAllCells().map((cell: any, cellIndex: any) => (
                     <TableCell style={tableRowCellStyles} key={cellIndex} width={cell.column.width} id={cell.column.id}>
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
