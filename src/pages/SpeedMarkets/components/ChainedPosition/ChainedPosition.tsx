@@ -31,7 +31,6 @@ type ChainedPositionProps = {
     isOverview?: boolean;
     isAdmin?: boolean;
     isSubmittingBatch?: boolean;
-    isMultipleMarkets?: boolean;
     setIsClaimable?: (isClaimable: boolean) => void;
 };
 
@@ -41,7 +40,6 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
     isOverview,
     isAdmin,
     isSubmittingBatch,
-    isMultipleMarkets,
     setIsClaimable,
 }) => {
     const { t } = useTranslation();
@@ -126,6 +124,8 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
         setIsClaimable && setIsClaimable(claimable);
     }, [setIsClaimable, claimable]);
 
+    console.log('positionWithPrices: ', positionWithPrices);
+
     const displayShare = !isOverview && (positionWithPrices.canResolve || positionWithPrices.isMatured);
 
     return (
@@ -208,13 +208,6 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
             ) : (
                 <>
                     <AssetInfo>
-                        <FlexDivCentered>
-                            <Icon
-                                size={30}
-                                color={theme.textColor.primary}
-                                className={`currency-icon currency-icon--${position.currencyKey.toLowerCase()}`}
-                            />
-                        </FlexDivCentered>
                         <Text lineHeight="30px">{t('speed-markets.user-positions.end-time')}</Text>
                         <Text>{t('common.strike-price')}</Text>
                         <Text>{t('profile.final-price')}</Text>
@@ -225,11 +218,6 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                         {positionWithPrices.sides.map((side, index) => {
                             return (
                                 <Postion isDisabled={!position.isOpen && index > userFirstLostOrWonIndex} key={index}>
-                                    {index !== 0 && (
-                                        <Chain>
-                                            <Icon className="icon icon--chain" />
-                                        </Chain>
-                                    )}
                                     {side === Positions.UP ? (
                                         <PositionsSymbol size={30}>
                                             <Icon size={16} className="icon icon--caret-up" />
@@ -307,7 +295,6 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                                 isOverview={isOverview}
                                 isAdmin={isAdmin}
                                 isSubmittingBatch={isSubmittingBatch}
-                                isMultipleContainerRows={isMultipleMarkets}
                             />
                         </Result>
                         {isOverview && (
@@ -354,11 +341,11 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
 
 const Container = styled(FlexDivSpaceBetween)`
     background: ${(props) => props.theme.background.primary};
-    border: 2px solid ${(props) => props.theme.background.secondary};
-    border-radius: 8px;
+    border-bottom: 1px solid ${(props) => props.theme.borderColor.quaternary};
     min-height: 144px;
     width: 100%;
     padding: 10px;
+    justify-content: flex-end;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         display: flex;
         flex-direction: column;
@@ -402,14 +389,6 @@ const PositionDetails = styled(FlexDivCentered)`
     width: 710px;
     gap: 10px;
 `;
-
-const Chain = styled(FlexDivCentered)`
-    position: absolute;
-    width: 16px;
-    left: -13px;
-    color: ${(props) => props.theme.textColor.secondary};
-`;
-
 const Dash = styled.div`
     width: 14px;
     height: 3px;
@@ -450,9 +429,9 @@ const Separator = styled.div`
     min-width: 2px;
     width: 2px;
     height: 90px;
-    background: ${(props) => props.theme.background.secondary};
+    background: ${(props) => props.theme.borderColor.quaternary};
     border-radius: 3px;
-    margin: 30px 10px 0 10px;
+    margin: 10px 60px 0px 10px;
 `;
 
 const AlignedFlex = styled.div`
