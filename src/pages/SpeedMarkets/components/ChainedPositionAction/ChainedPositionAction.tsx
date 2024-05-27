@@ -17,8 +17,6 @@ import { ZERO_ADDRESS } from 'constants/network';
 import { CONNECTION_TIMEOUT_MS, PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
 import { differenceInSeconds, millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
 import {
-    CollateralSelectorContainer,
-    InLabel,
     Label,
     ResultsContainer,
     Value,
@@ -74,8 +72,6 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
     isOverview,
     isAdmin,
     isSubmittingBatch,
-    isProfileAction,
-    isMultipleContainerRows,
 }) => {
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
@@ -347,7 +343,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
 
     const getResolveButton = () => {
         const additionalButtonStyle: CSSProperties = {
-            minWidth: isOverview || isProfileAction ? '180px' : '152px',
+            minWidth: '180px',
             lineHeight: '100%',
             border: 'none',
         };
@@ -357,9 +353,6 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 {...getDefaultButtonProps(isMobile)}
                 disabled={isSubmitting || (isOverview && !position.canResolve)}
                 additionalStyles={additionalButtonStyle}
-                backgroundColor={!isOverview ? theme.button.textColor.quaternary : undefined}
-                borderColor={!isOverview ? theme.button.textColor.quaternary : undefined}
-                textColor={!isOverview ? theme.button.textColor.secondary : undefined}
                 onClick={() =>
                     hasAllowance || isDefaultCollateral || isOverview ? handleResolve() : setOpenApprovalModal(true)
                 }
@@ -442,20 +435,12 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
             <FlexDivCentered>
                 {getButton()}
                 {!isOverview && isMultiCollateralSupported && position.claimable && (
-                    <CollateralSelectorContainer>
-                        <InLabel color={theme.button.textColor.quaternary}>{t('common.in')}</InLabel>
-                        <CollateralSelector
-                            collateralArray={getCollaterals(networkId)}
-                            selectedItem={selectedCollateralIndex}
-                            onChangeCollateral={() => {}}
-                            disabled={isSubmitting || isAllowing}
-                            additionalStyles={{
-                                position: isProfileAction || !isMultipleContainerRows ? undefined : 'relative',
-                                margin: '0 0 0 7px',
-                                color: theme.button.textColor.quaternary,
-                            }}
-                        />
-                    </CollateralSelectorContainer>
+                    <CollateralSelector
+                        collateralArray={getCollaterals(networkId)}
+                        selectedItem={selectedCollateralIndex}
+                        onChangeCollateral={() => {}}
+                        disabled={isSubmitting || isAllowing}
+                    />
                 )}
             </FlexDivCentered>
             {openApprovalModal && (

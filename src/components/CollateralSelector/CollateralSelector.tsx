@@ -165,6 +165,7 @@ const SelectedTextCollateral = styled(TextCollateral)`
 
 const TextCollateralWrapper = styled.div`
     min-width: 45px;
+    white-space: pre;
 `;
 
 const Arrow = styled.i<{ color?: string }>`

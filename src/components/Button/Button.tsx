@@ -152,6 +152,7 @@ const ButtonWrapper = styled.button<{
     &:disabled {
         cursor: default;
     }
+    white-space: pre;
     &:hover {
         ${(props) => (!props.disabled && !props.$textColor ? `color: ${props.theme.button.textColor.tertiary};` : '')}
         // color on hover for icons inside button

@@ -275,19 +275,6 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                     </PositionDetails>
                     <Separator />
                     <Summary>
-                        <BuyInfo>
-                            <Text>
-                                {t('speed-markets.user-positions.size')}
-                                <Text isActiveColor>{` ${formatNumberShort(positionWithPrices.payout)}`}</Text>
-                            </Text>
-                            <Text padding="0 0 0 30px">
-                                {t('speed-markets.user-positions.paid')}
-                                <Text isActiveColor>{` ${formatCurrencyWithSign(
-                                    USD_SIGN,
-                                    positionWithPrices.paid
-                                )}`}</Text>
-                            </Text>
-                        </BuyInfo>
                         <Result isSmaller={isOverview || displayShare}>
                             <ChainedPositionAction
                                 position={positionWithPrices}
@@ -415,10 +402,6 @@ const Postion = styled(FlexDivColumnCentered)<{ isDisabled: boolean }>`
 
 const Summary = styled(FlexDivColumn)`
     min-width: 235px;
-`;
-
-const BuyInfo = styled(FlexDivCentered)`
-    height: 30px;
 `;
 
 const Result = styled(FlexDivCentered)<{ isSmaller?: boolean }>`
