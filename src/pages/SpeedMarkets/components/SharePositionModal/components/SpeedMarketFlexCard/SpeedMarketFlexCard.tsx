@@ -125,6 +125,7 @@ const ItemName = styled.span<{ type: SharePositionType }>`
 const Value = styled.span<{ type: SharePositionType }>`
     font-weight: 700;
     text-transform: capitalize;
+    text-wrap: nowrap;
     text-align: ${(props) => (props.type == 'potential-speed' ? '' : 'center')};
     font-size: ${(props) => (props.type == 'potential-speed' ? '18px' : '13px')};
     color: ${(props) => props.theme.textColor.primary};

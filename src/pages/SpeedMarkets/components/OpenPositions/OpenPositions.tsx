@@ -108,7 +108,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, currentPrices 
         }
     };
 
-    console.log(updateChainedClaimable);
+    console.log(updateChainedClaimable); // TODO:
 
     // For chained sorting purpose update claimable status when it is known
     useEffect(() => {

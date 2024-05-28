@@ -210,11 +210,11 @@ const SpeedMarkets: React.FC = () => {
     };
 
     return (
-        <>
+        <Container>
             {!isAppReady || ammSpeedMarketsLimitsQuery.isLoading || ammChainedSpeedMarketsLimitsQuery.isLoading ? (
                 <SimpleLoader />
             ) : (
-                <Container>
+                <>
                     <HeaderImage />
                     <ContentWrapper>
                         <LeftSide>
@@ -296,16 +296,20 @@ const SpeedMarkets: React.FC = () => {
                             <ArrowRight className="icon icon--arrow" />
                         </SPAAnchor>
                     </OverviewLinkWrapper>
-                </Container>
+                </>
             )}
-        </>
+        </Container>
     );
 };
 
 const Container = styled.div`
+    position: relative;
     width: 100%;
     max-width: ${PAGE_MAX_WIDTH};
-    min-height: 799px;
+    min-height: 580px;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        min-height: 190px;
+    }
 `;
 
 const HeaderImage = styled.div`

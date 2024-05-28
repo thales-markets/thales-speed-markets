@@ -13,7 +13,7 @@ import { MarketInfo } from 'types/market';
 import { RootState } from 'types/ui';
 import { getDefaultCollateral } from 'utils/currency';
 import { useChainId } from 'wagmi';
-import { Cotainer, PositionText, SentanceTextValue, Text, TextLabel } from './styled-components';
+import { Cotainer, PositionText, Text, TextLabel, TextValue } from './styled-components';
 
 type SpeedMarketsTrade = {
     address: string;
@@ -113,46 +113,50 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
                         })}
                     </TextLabel>
                     {isChained && (
-                        <SentanceTextValue>
-                            {`(${t('speed-markets.chained.starting-from')} ${formatCurrencyWithSign(
-                                USD_SIGN,
-                                (market as MarketInfo).strikePrice
-                            )})`}
-                        </SentanceTextValue>
+                        <>
+                            <br />
+                            <TextValue>
+                                {`(${t('speed-markets.chained.starting-from')} ${formatCurrencyWithSign(
+                                    USD_SIGN,
+                                    (market as MarketInfo).strikePrice
+                                )})`}
+                            </TextValue>
+                        </>
                     )}
                     {market.address ? (
                         <>
                             {!isMobile && !isChained && (
-                                <SentanceTextValue
-                                    $uppercase={!!positionTypeFormatted}
-                                    $lowercase={!positionTypeFormatted}
-                                >
+                                <TextValue $uppercase={!!positionTypeFormatted} $lowercase={!positionTypeFormatted}>
+                                    {' '}
                                     {positionTypeFormatted
                                         ? positionTypeFormatted
                                         : `( ${t('speed-markets.amm-trading.choose-direction')} )`}
-                                </SentanceTextValue>
+                                </TextValue>
                             )}
                             {!isChained && (
-                                <SentanceTextValue>
+                                <TextValue>
+                                    {' '}
                                     {formatCurrencyWithSign(USD_SIGN, (market as MarketInfo).strikePrice)}
-                                </SentanceTextValue>
+                                </TextValue>
                             )}
                         </>
                     ) : (
-                        <SentanceTextValue>{'( ' + t('speed-markets.amm-trading.pick-price') + ' )'}</SentanceTextValue>
+                        <TextValue>{' ( ' + t('speed-markets.amm-trading.pick-price') + ' )'}</TextValue>
                     )}
                 </Text>
             </FlexDivCentered>
             {isChained && (
                 <FlexDivCentered>
-                    <SentanceTextValue $uppercase={!!positionTypeFormatted} $lowercase={!positionTypeFormatted}>
+                    <TextValue $uppercase={!!positionTypeFormatted} $lowercase={!positionTypeFormatted}>
+                        {' '}
                         <TextLabel>{t('speed-markets.chained.follows')}&nbsp;</TextLabel>
                         {isAllChainedMarketsSelected
                             ? getChainedPositions()
                             : `( ${t('speed-markets.chained.errors.choose-directions')} )`}
-                    </SentanceTextValue>
+                    </TextValue>
                 </FlexDivCentered>
             )}
+
             {/* Second line */}
             <FlexDivCentered>
                 <Text>
@@ -161,29 +165,26 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
                     </TextLabel>
                     {isChained ? (
                         <>
-                            <SentanceTextValue $lowercase>{deltaTimeFormatted}</SentanceTextValue>
+                            <TextValue $lowercase> {deltaTimeFormatted}</TextValue>
                             <TextLabel>{` ${t('speed-markets.chained.between-rounds')}`}</TextLabel>
                         </>
                     ) : (
-                        <SentanceTextValue $lowercase>{timeFormatted}</SentanceTextValue>
+                        <TextValue $lowercase> {timeFormatted}</TextValue>
                     )}
                 </Text>
             </FlexDivCentered>
-            {isChained && isMobile && (
-                <FlexDivCentered>
-                    <SentanceTextValue $lowercase>{fullDateFromDeltaTimeFormatted}</SentanceTextValue>
-                </FlexDivCentered>
-            )}
+
             {/* Third line */}
             <FlexDivCentered>
                 <Text>
                     <TextLabel>{t('speed-markets.amm-trading.you-win')}</TextLabel>
                     {hasCollateralConversion && <TextLabel>{` ${t('speed-markets.amm-trading.at-least')}`}</TextLabel>}
-                    <SentanceTextValue $isProfit>
+                    <TextValue $isProfit>
+                        {' '}
                         {profit > 0 && paidAmount > 0
                             ? potentialWinFormatted
                             : '( ' + t('speed-markets.amm-trading.based-amount') + ' )'}
-                    </SentanceTextValue>
+                    </TextValue>
                     {hasCollateralConversion && profit > 0 && paidAmount > 0 && (
                         <Tooltip overlay={t('speed-markets.tooltips.payout-conversion')} />
                     )}

@@ -28,7 +28,6 @@ import { CSSProperties, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { getIsMobile } from 'redux/modules/ui';
 import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
 import { useTheme } from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
@@ -85,7 +84,6 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
     const walletClient = useWalletClient();
     const { isConnected, address: walletAddress } = useAccount();
     const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
-    const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
 
     const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
@@ -354,7 +352,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
 
         return (
             <Button
-                {...getDefaultButtonProps(isMobile)}
+                {...getDefaultButtonProps()}
                 disabled={isSubmitting || (isOverview && !position.canResolve)}
                 additionalStyles={additionalButtonStyle}
                 backgroundColor={!isOverview ? theme.button.textColor.quaternary : undefined}

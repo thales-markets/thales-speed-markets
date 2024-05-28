@@ -24,7 +24,7 @@ const TablePositions: React.FC<{ data: UserOpenPositions[]; currentPrices?: { [k
                             className={`currency-icon currency-icon--${cellProps.cell.getValue().toLowerCase()}`}
                         />
                         <AssetName>{cellProps.cell.value}</AssetName>
-                        <AssetName>{formatCurrencyWithSign(USD_SIGN, cellProps.row.original.strikePrice, 2)}</AssetName>
+                        <AssetName>{formatCurrencyWithSign(USD_SIGN, cellProps.row.original.strikePrice)}</AssetName>
                     </AssetWrapper>
                 );
             },
@@ -44,11 +44,11 @@ const TablePositions: React.FC<{ data: UserOpenPositions[]; currentPrices?: { [k
             cell: (cellProps: any) => (
                 <AssetWrapper>
                     {cellProps.cell.value ? (
-                        <AssetName>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue(), 2)}</AssetName>
+                        <AssetName>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())}</AssetName>
                     ) : (
                         <AssetName>
                             {currentPrices
-                                ? formatCurrencyWithSign(USD_SIGN, currentPrices[cellProps.row.original.currencyKey], 2)
+                                ? formatCurrencyWithSign(USD_SIGN, currentPrices[cellProps.row.original.currencyKey])
                                 : ''}
                         </AssetName>
                     )}
@@ -69,7 +69,7 @@ const TablePositions: React.FC<{ data: UserOpenPositions[]; currentPrices?: { [k
             accessorKey: 'paid',
             cell: (cellProps: any) => (
                 <AssetWrapper>
-                    <AssetName>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue(), 2)}</AssetName>
+                    <AssetName>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())}</AssetName>
                 </AssetWrapper>
             ),
             size: 120,
@@ -79,7 +79,7 @@ const TablePositions: React.FC<{ data: UserOpenPositions[]; currentPrices?: { [k
             accessorKey: 'payout',
             cell: (cellProps: any) => (
                 <AssetWrapper>
-                    <AssetName>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue(), 2)}</AssetName>
+                    <AssetName>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())}</AssetName>
                 </AssetWrapper>
             ),
             size: 100,
@@ -112,7 +112,7 @@ const AssetWrapper = styled.div<{ first?: boolean }>`
     align-items: center;
     gap: 4px;
     width: 100%;
-    padding: 14px 0 10px 0;
+    padding: 10px 0;
 `;
 
 const AssetIcon = styled.i`

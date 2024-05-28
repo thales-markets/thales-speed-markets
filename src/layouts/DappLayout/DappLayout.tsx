@@ -2,21 +2,18 @@ import { LINKS } from 'constants/links';
 import useWidgetBotScript from 'hooks/useWidgetBotScript';
 import queryString from 'query-string';
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { getIsMobile } from 'redux/modules/ui';
 import styled, { useTheme } from 'styled-components';
 import { PAGE_MAX_WIDTH } from 'styles/common';
 import { isAndroid, isMetamask } from 'thales-utils';
-import { RootState, ThemeInterface } from 'types/ui';
+import { ThemeInterface } from 'types/ui';
 import { isMobile } from 'utils/device';
 import { setReferralWallet } from 'utils/referral';
 import { ScreenSizeBreakpoint } from '../../enums/ui';
 import DappFooter from './DappFooter';
 import DappHeader from './DappHeader';
-import DappSidebar from './DappSidebar';
 
 type DappLayoutProps = {
     children: React.ReactNode;
@@ -27,8 +24,6 @@ const DappLayout: React.FC<DappLayoutProps> = ({ children }) => {
 
     const rawParams = useLocation();
     const queryParams = queryString.parse(rawParams?.search);
-
-    const isMobileResponsive = useSelector((state: RootState) => getIsMobile(state));
 
     const [preventDiscordWidgetLoad, setPreventDiscordWidgetLoad] = useState(true);
 
@@ -69,7 +64,6 @@ const DappLayout: React.FC<DappLayoutProps> = ({ children }) => {
     return (
         <Background id="main-content">
             <Wrapper>
-                {isMobileResponsive && <DappSidebar />}
                 <DappHeader />
                 {children}
                 <DappFooter />
@@ -102,13 +96,12 @@ const Wrapper = styled.div`
     justify-content: flex-start;
     align-items: center;
     width: 100%;
-    margin: 30px auto 0 auto;
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        padding: 10px 10px 0 10px;
-        padding-bottom: 50px !important;
-    }
     max-width: ${PAGE_MAX_WIDTH};
     min-height: 100vh;
+    margin: 0 auto;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        padding: 10px 10px 0 10px;
+    }
 `;
 
 const StyledToastContainer = styled(ToastContainer)`

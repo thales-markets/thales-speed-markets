@@ -1,5 +1,6 @@
 import OutsideClickHandler from 'components/OutsideClick';
 import { USD_SIGN } from 'constants/currency';
+import { ScreenSizeBreakpoint } from 'enums/ui';
 import { Rates } from 'queries/rates/useExchangeRatesQuery';
 import React, { CSSProperties, useCallback, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -61,18 +62,14 @@ const CollateralSelector: React.FC<CollateralSelectorProps> = ({
         <Container margin={additionalStyles?.margin?.toString()} position={additionalStyles?.position}>
             <OutsideClickHandler onOutsideClick={() => setOpen(false)}>
                 <SelectedCollateral disabled={!!disabled} onClick={() => !disabled && setOpen(!open)}>
-                    <TextCollateralWrapper>
-                        {!isIconHidden && (
-                            <AssetIcon
-                                className={`currency-icon currency-icon--${collateralArray[
-                                    selectedItem
-                                ].toLowerCase()}`}
-                            />
-                        )}
-                        <SelectedTextCollateral color={additionalStyles?.color}>
-                            {collateralArray[selectedItem]}
-                        </SelectedTextCollateral>
-                    </TextCollateralWrapper>
+                    {!isIconHidden && (
+                        <AssetIcon
+                            className={`currency-icon currency-icon--${collateralArray[selectedItem].toLowerCase()}`}
+                        />
+                    )}
+                    <SelectedTextCollateral color={additionalStyles?.color}>
+                        {collateralArray[selectedItem]}
+                    </SelectedTextCollateral>
                     {collateralArray.length > 1 && (
                         <Arrow
                             color={additionalStyles?.color}
@@ -152,6 +149,9 @@ const Text = styled.span<{ fontWeight?: string }>`
     font-weight: ${(props) => (props.fontWeight ? props.fontWeight : '600')};
     font-size: 13px;
     line-height: 20px;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        line-height: 13px;
+    }
 `;
 
 const TextCollateral = styled(Text)<{ color?: string }>`
@@ -169,14 +169,11 @@ const SelectedTextCollateral = styled(TextCollateral)`
     margin-right: 4px;
 `;
 
-const TextCollateralWrapper = styled.div`
-    min-width: 45px;
-`;
-
 const Arrow = styled.i<{ color?: string }>`
     font-size: 10px;
     text-transform: none;
     color: ${(props) => (props.color ? props.color : props.theme.dropDown.textColor.primary)};
+    margin-bottom: 2px;
 `;
 
 const SelectedCollateral = styled(FlexDivRowCentered)<{ disabled: boolean }>`
@@ -185,7 +182,7 @@ const SelectedCollateral = styled(FlexDivRowCentered)<{ disabled: boolean }>`
 
 const Dropdown = styled(FlexDivColumnCentered)<{ width?: string }>`
     position: absolute;
-    top: 26px;
+    top: 20px;
     right: 0;
     width: ${(props) => (props.width ? props.width : '71px')};
     padding: 5px 3px;

@@ -55,10 +55,16 @@ const ONE_HUNDRED_AND_THREE_PERCENT = 1.03;
 type MyPositionActionProps = {
     position: UserPosition | UserOpenPositions;
     maxPriceDelayForResolvingSec?: number;
-    isMultipleContainerRows?: boolean;
+    isCollateralHidden?: boolean;
+    setIsActionInProgress?: React.Dispatch<boolean>;
 };
 
-const MyPositionAction: React.FC<MyPositionActionProps> = ({ position, maxPriceDelayForResolvingSec }) => {
+const MyPositionAction: React.FC<MyPositionActionProps> = ({
+    position,
+    maxPriceDelayForResolvingSec,
+    isCollateralHidden,
+    setIsActionInProgress,
+}) => {
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 
@@ -126,6 +132,13 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({ position, maxPriceD
         isDefaultCollateral,
         client,
     ]);
+
+    // Update action in progress status
+    useEffect(() => {
+        if (setIsActionInProgress) {
+            setIsActionInProgress(isAllowing || isSubmitting);
+        }
+    }, [isAllowing, isSubmitting, setIsActionInProgress]);
 
     const handleAllowance = async (approveAmount: bigint) => {
         const erc20Instance = getContract({
@@ -271,9 +284,9 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({ position, maxPriceD
 
     const getResolveButton = () => (
         <Button
-            {...getDefaultButtonProps(isMobile)}
+            {...getDefaultButtonProps()}
+            additionalStyles={getAdditionalButtonStyle(isMobile)}
             disabled={isSubmitting}
-            additionalStyles={additionalButtonStyle}
             onClick={() => (hasAllowance || isDefaultCollateral ? handleResolve() : setOpenApprovalModal(true))}
         >
             {hasAllowance || isDefaultCollateral
@@ -327,7 +340,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({ position, maxPriceD
     return (
         <>
             <Wrapper>
-                {isMultiCollateralSupported && position.claimable && (
+                {!isCollateralHidden && isMultiCollateralSupported && position.claimable && (
                     <CollateralSelector
                         collateralArray={getCollaterals(networkId)}
                         selectedItem={selectedCollateralIndex}
@@ -357,16 +370,16 @@ const Wrapper = styled(FlexDivCentered)`
     white-space: pre;
 `;
 
-export const getDefaultButtonProps = (isMobile: boolean) => ({
-    height: isMobile ? '24px' : '27px',
-    fontSize: isMobile ? '12px' : '13px',
+export const getDefaultButtonProps = () => ({
+    height: '30px',
+    fontSize: '13px',
 });
 
-const additionalButtonStyle: CSSProperties = {
-    minWidth: '180px',
+const getAdditionalButtonStyle = (isMobile: boolean): CSSProperties => ({
+    minWidth: isMobile ? '282px' : '180px',
     lineHeight: '100%',
     border: 'none',
-};
+});
 
 export const ResultsContainer = styled(FlexDivCentered)<{ $minWidth?: string }>`
     gap: 4px;
