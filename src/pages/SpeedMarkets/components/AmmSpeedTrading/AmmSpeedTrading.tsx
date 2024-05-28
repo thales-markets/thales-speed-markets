@@ -20,7 +20,6 @@ import { secondsToMilliseconds } from 'date-fns';
 import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import useDebouncedEffect from 'hooks/useDebouncedEffect';
-import SharePositionModal from 'pages/SpeedMarkets/components/SharePositionModal';
 import TradingDetailsSentence from 'pages/SpeedMarkets/components/TradingDetailsSentence';
 import useExchangeRatesQuery, { Rates } from 'queries/rates/useExchangeRatesQuery';
 import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipleCollateralBalanceQuery';
@@ -73,6 +72,7 @@ import { waitForTransactionReceipt } from 'viem/actions';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 import PriceSlippage from '../PriceSlippage';
 import { SelectedPosition } from '../SelectPosition/SelectPosition';
+import SharePosition from '../SharePosition';
 
 type AmmSpeedTradingProps = {
     isChained: boolean;
@@ -732,12 +732,31 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                         hasCollateralConversion={selectedCollateral !== defaultCollateral}
                     />
                     {!isChained && (
-                        <ShareWrapper
-                            disabled={isButtonDisabled}
-                            onClick={() => !isButtonDisabled && setOpenTwitterShareModal(true)}
-                        >
-                            {t('common.flex-card.share')}
-                            <Icon className="icon-home icon-home--twitter-x" />
+                        <ShareWrapper>
+                            <ShareText
+                                $isDisabled={isButtonDisabled}
+                                onClick={() => !isButtonDisabled && setOpenTwitterShareModal(true)}
+                            >
+                                {' '}
+                                {t('common.flex-card.share')}
+                            </ShareText>
+                            <SharePosition
+                                position={{
+                                    user: walletAddress,
+                                    currencyKey: currencyKey,
+                                    strikePrice: currentPrice ?? 0,
+                                    payout: SPEED_MARKETS_QUOTE * convertToStable(paidAmount),
+                                    maturityDate: Date.now() + secondsToMilliseconds(deltaTimeSec || 100),
+                                    market: '',
+                                    side: positionType || Positions.UP,
+                                    paid: convertToStable(paidAmount),
+                                    value: SPEED_MARKETS_QUOTE * convertToStable(paidAmount),
+                                    claimable: false,
+                                }}
+                                isDisabled={isButtonDisabled}
+                                isOpen={openTwitterShareModal}
+                                onClose={() => setOpenTwitterShareModal(false)}
+                            />
                         </ShareWrapper>
                     )}
                 </TradingDetailsContainer>
@@ -761,18 +780,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                     {getSubmitButton()}
                 </ColumnSpaceBetween>
             </FinalizeTrade>
-            {openTwitterShareModal && positionType && (
-                <SharePositionModal
-                    type="potential-speed"
-                    positions={[positionType]}
-                    currencyKey={currencyKey}
-                    strikeDate={Date.now() + secondsToMilliseconds(deltaTimeSec)}
-                    strikePrices={[currentPrice ?? 0]}
-                    buyIn={convertToStable(paidAmount)}
-                    payout={SPEED_MARKETS_QUOTE * convertToStable(paidAmount)}
-                    onClose={() => setOpenTwitterShareModal(false)}
-                />
-            )}
             {openApprovalModal && (
                 <ApprovalModal
                     defaultAmount={
@@ -836,23 +843,20 @@ const ColumnSpaceBetween = styled(FlexDivColumn)`
     }
 `;
 
-const ShareWrapper = styled.div<{ disabled: boolean }>`
+const ShareWrapper = styled.div`
     position: absolute;
     bottom: 12px;
     right: 12px;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 18px;
-    color: ${(props) => props.theme.textColor.quinary};
-    cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
-    opacity: ${(props) => (props.disabled ? '0.5' : '1')};
-    text-transform: lowercase;
 `;
 
-const Icon = styled.i`
-    font-size: 14px;
+const ShareText = styled.span<{ $isDisabled: boolean }>`
+    margin-right: 5px;
     color: ${(props) => props.theme.textColor.quinary};
-    margin-left: 5px;
+    cursor: ${(props) => (props.$isDisabled ? 'default' : 'pointer')};
+    opacity: ${(props) => (props.$isDisabled ? '0.5' : '1')};
+    font-size: 14px;
+    font-weight: 400;
+    text-transform: lowercase;
 `;
 
 const CollateralText = styled.span`

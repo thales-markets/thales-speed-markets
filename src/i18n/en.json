@@ -262,7 +262,7 @@
         "user-positions": {
             "open-single": "Open single markets",
             "open-chained": "Open chained markets",
-            "your-positions": "Your open positions",
+            "your-positions": "Your open markets",
             "your-closed-positions": "Your closed positions (last 10)",
             "no-positions": "Your open positions will be visible here",
             "end-date": "End date",
@@ -282,7 +282,8 @@
             "approve-swap-tooltip": "To get payout in {{currencyKey}}, you need to approve swap from {{defaultCurrency}} to {{currencyKey}}.",
             "claim-all": "Claim all wins",
             "claim-all-progress": "Claiming all wins",
-            "claim-all-in": "Claim all winnings in",
+            "claim-all-in": "Claim all in",
+            "claim-all-win-in": "Claim all winnings in",
             "end-time": "End time",
             "confirmation-message": "Positions successfully claimed",
             "no-closed-positions": "Your closed positions will be visible here",

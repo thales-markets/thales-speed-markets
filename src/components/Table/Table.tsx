@@ -295,10 +295,10 @@ const TableCell = styled(FlexDivCentered)<{ width?: number | string; id: string 
     width: 100%;
     justify-content: center;
     &:first-child {
-        padding-left: 18px;
+        padding-left: 16px;
     }
     &:last-child {
-        padding-right: 18px;
+        padding-right: 16px;
     }
 `;
 

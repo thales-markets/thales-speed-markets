@@ -7,6 +7,8 @@ import styled from 'styled-components';
 import { formatCurrencyWithSign } from 'thales-utils';
 import { UserOpenPositions } from 'types/market';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
+import MarketPrice from '../MarketPrice';
+import SharePosition from '../SharePosition';
 
 const TablePositions: React.FC<{ data: UserOpenPositions[]; currentPrices?: { [key: string]: number } }> = ({
     data,
@@ -18,13 +20,13 @@ const TablePositions: React.FC<{ data: UserOpenPositions[]; currentPrices?: { [k
             accessorKey: 'currencyKey',
             cell: (cellProps: any) => {
                 return (
-                    <AssetWrapper first>
+                    <Wrapper first>
                         <AssetIcon
                             className={`currency-icon currency-icon--${cellProps.cell.getValue().toLowerCase()}`}
                         />
-                        <AssetName>{cellProps.cell.value}</AssetName>
-                        <AssetName>{formatCurrencyWithSign(USD_SIGN, cellProps.row.original.strikePrice)}</AssetName>
-                    </AssetWrapper>
+                        <AssetName>{cellProps.cell.getValue()}</AssetName>
+                        <Value>{formatCurrencyWithSign(USD_SIGN, cellProps.row.original.strikePrice)}</Value>
+                    </Wrapper>
                 );
             },
         },
@@ -32,70 +34,68 @@ const TablePositions: React.FC<{ data: UserOpenPositions[]; currentPrices?: { [k
             header: <Header>{t('speed-markets.user-positions.direction')}</Header>,
             accessorKey: 'side',
             cell: (cellProps: any) => (
-                <AssetWrapper>
+                <Wrapper>
                     <DirectionIcon className={`icon icon--caret-${cellProps.cell.getValue().toLowerCase()}`} />
-                </AssetWrapper>
+                </Wrapper>
             ),
         },
         {
             header: <Header>{t('speed-markets.user-positions.price')}</Header>,
             accessorKey: 'finalPrice',
             cell: (cellProps: any) => (
-                <AssetWrapper>
-                    {cellProps.cell.value ? (
-                        <AssetName>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())}</AssetName>
-                    ) : (
-                        <AssetName>
-                            {currentPrices
-                                ? formatCurrencyWithSign(USD_SIGN, currentPrices[cellProps.row.original.currencyKey])
-                                : ''}
-                        </AssetName>
-                    )}
-                </AssetWrapper>
+                <Wrapper>
+                    <Value>
+                        <MarketPrice position={cellProps.row.original} currentPrices={currentPrices} />
+                    </Value>
+                </Wrapper>
             ),
         },
         {
             header: <Header>{t('speed-markets.user-positions.end-time')}</Header>,
             accessorKey: 'maturityDate',
             cell: (cellProps: any) => (
-                <AssetWrapper>
-                    <AssetName>{formatShortDateWithFullTime(cellProps.cell.getValue())}</AssetName>
-                </AssetWrapper>
+                <Wrapper>
+                    <Value>{formatShortDateWithFullTime(cellProps.cell.getValue())}</Value>
+                </Wrapper>
             ),
+            size: 180,
         },
         {
             header: <Header>{t('speed-markets.user-positions.paid')}</Header>,
             accessorKey: 'paid',
             cell: (cellProps: any) => (
-                <AssetWrapper>
-                    <AssetName>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())}</AssetName>
-                </AssetWrapper>
+                <Wrapper>
+                    <Value>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())}</Value>
+                </Wrapper>
             ),
-            size: 120,
+            size: 100,
         },
         {
             header: <Header>{t('speed-markets.user-positions.payout')}</Header>,
             accessorKey: 'payout',
             cell: (cellProps: any) => (
-                <AssetWrapper>
-                    <AssetName>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())}</AssetName>
-                </AssetWrapper>
+                <Wrapper>
+                    <Value>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())}</Value>
+                </Wrapper>
             ),
-            size: 100,
+            size: 120,
         },
         {
             header: <Header>{t('speed-markets.user-positions.status')}</Header>,
             accessorKey: 'action',
             cell: (cellProps: any) => (
-                <AssetWrapper>
+                <Wrapper>
                     <MyPositionAction position={cellProps.row.original} />
-                </AssetWrapper>
+                    <ShareWrapper>
+                        <SharePosition position={cellProps.row.original} />
+                    </ShareWrapper>
+                </Wrapper>
             ),
-            size: 400,
+            size: 300,
         },
     ];
 
-    return <Table data={data} columns={columns as any}></Table>;
+    return <Table data={data} columns={columns as any} />;
 };
 
 const Header = styled.p`
@@ -105,7 +105,7 @@ const Header = styled.p`
     font-weight: 700;
 `;
 
-const AssetWrapper = styled.div<{ first?: boolean }>`
+const Wrapper = styled.div<{ first?: boolean }>`
     display: flex;
     justify-content: ${(props) => (props.first ? 'flex-start' : 'center')};
     align-items: center;
@@ -127,10 +127,20 @@ const DirectionIcon = styled(AssetIcon)`
     color: ${(props) => props.theme.icon.background.tertiary};
 `;
 
-const AssetName = styled.i`
+const AssetName = styled.span`
+    color: ${(props) => props.theme.textColor.primary};
+    font-size: 13px;
+    font-weight: 800;
+`;
+
+const Value = styled.span`
     color: ${(props) => props.theme.textColor.primary};
     font-size: 13px;
     font-weight: 700;
+`;
+
+const ShareWrapper = styled.div`
+    margin-left: auto;
 `;
 
 export default TablePositions;

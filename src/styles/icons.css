@@ -206,6 +206,10 @@
     content: '\002A';
 }
 
+.icon--market:before {
+    content: '\002F';
+}
+
 .icon--unverified:before {
     content: '\0030';
 }
@@ -436,6 +440,10 @@
 
 .icon--reload:before {
     content: '\007B';
+}
+
+.icon--share:before {
+    content: '\02DC';
 }
 
 .icon--info-full:before {

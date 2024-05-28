@@ -1,5 +1,4 @@
 import CollateralSelector from 'components/CollateralSelector';
-import Tooltip from 'components/Tooltip';
 import { USD_SIGN } from 'constants/currency';
 import { secondsToMilliseconds } from 'date-fns';
 import useInterval from 'hooks/useInterval';
@@ -7,19 +6,18 @@ import MyPositionAction from 'pages/Profile/components/MyPositionAction';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
+import { getSelectedCollateralIndex } from 'redux/modules/wallet';
 import styled, { useTheme } from 'styled-components';
 import { FlexDivColumn, FlexDivRow, FlexDivSpaceBetween, FlexDivStart } from 'styles/common';
 import { formatCurrencyWithSign } from 'thales-utils';
 import { UserOpenPositions } from 'types/market';
 import { RootState, ThemeInterface } from 'types/ui';
-import biconomyConnector from 'utils/biconomyWallet';
 import { getCollaterals } from 'utils/currency';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
-import { refetchUserSpeedMarkets } from 'utils/queryConnector';
 import { getColorPerPosition } from 'utils/style';
-import { useAccount, useChainId } from 'wagmi';
-import SharePositionModal from '../../SharePositionModal';
+import { useChainId } from 'wagmi';
+import MarketPrice from '../../MarketPrice';
+import SharePosition from '../../SharePosition';
 
 const CardPosition: React.FC<{ position: UserOpenPositions; currentPrices?: { [key: string]: number } }> = ({
     position,
@@ -29,30 +27,18 @@ const CardPosition: React.FC<{ position: UserOpenPositions; currentPrices?: { [k
     const theme: ThemeInterface = useTheme();
 
     const networkId = useChainId();
-    const { address: walletAddress } = useAccount();
-    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
     const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
 
     const [isMatured, setIsMatured] = useState(Date.now() > position.maturityDate);
     const [isActionInProgress, setIsActionInProgress] = useState(false);
-    const [openTwitterShareModal, setOpenTwitterShareModal] = useState(false);
 
     useInterval(() => {
         if (Date.now() > position.maturityDate) {
             if (!isMatured) {
                 setIsMatured(true);
             }
-            if (!position.finalPrice) {
-                refetchUserSpeedMarkets(
-                    false,
-                    networkId,
-                    (isBiconomy ? biconomyConnector.address : walletAddress) as string
-                );
-            }
         }
     }, secondsToMilliseconds(10));
-
-    const displayShare = position.claimable || !isMatured;
 
     return (
         <Container>
@@ -73,21 +59,7 @@ const CardPosition: React.FC<{ position: UserOpenPositions; currentPrices?: { [k
                             :
                         </Label>
                         <Value>
-                            {isMatured ? (
-                                position.finalPrice ? (
-                                    formatCurrencyWithSign(USD_SIGN, position.finalPrice)
-                                ) : (
-                                    <>
-                                        {'. . .'}
-                                        <Tooltip overlay={t('speed-markets.tooltips.final-price-missing')} />
-                                    </>
-                                )
-                            ) : (
-                                formatCurrencyWithSign(
-                                    USD_SIGN,
-                                    currentPrices ? currentPrices[position.currencyKey] : 0
-                                )
-                            )}
+                            <MarketPrice position={position} currentPrices={currentPrices} />
                         </Value>
                     </InfoRow>
                     <InfoRow>
@@ -123,33 +95,14 @@ const CardPosition: React.FC<{ position: UserOpenPositions; currentPrices?: { [k
                     isCollateralHidden
                     setIsActionInProgress={setIsActionInProgress}
                 />
-                <ShareDiv>
-                    {displayShare && (
-                        <ShareIcon
-                            className="icon-home icon-home--twitter-x"
-                            disabled={false}
-                            onClick={() => setOpenTwitterShareModal(true)}
-                        />
-                    )}
-                </ShareDiv>
+                <SharePosition position={position} />
             </Action>
-            {openTwitterShareModal && (
-                <SharePositionModal
-                    type={position.claimable ? 'resolved-speed' : 'potential-speed'}
-                    positions={[position.side]}
-                    currencyKey={position.currencyKey}
-                    strikeDate={position.maturityDate}
-                    strikePrices={[position.strikePrice]}
-                    buyIn={position.paid}
-                    payout={position.payout}
-                    onClose={() => setOpenTwitterShareModal(false)}
-                />
-            )}
         </Container>
     );
 };
 
 const Container = styled(FlexDivColumn)`
+    justify-content: space-between;
     width: 100%;
     min-height: 123px;
     border: 1px solid ${(props) => props.theme.borderColor.quaternary};
@@ -190,18 +143,6 @@ const Label = styled(Text)`
 const Value = styled(Text)<{ $color?: string }>`
     ${(props) => (props.$color ? `color: ${props.$color};` : '')}
     margin-left: 5px;
-`;
-
-const ShareDiv = styled.div`
-    height: 20px;
-`;
-
-const ShareIcon = styled.i<{ disabled: boolean }>`
-    color: ${(props) => props.theme.textColor.secondary};
-    cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
-    opacity: ${(props) => (props.disabled ? '0.5' : '1')};
-    font-size: 20px;
-    text-transform: none;
 `;
 
 export default CardPosition;

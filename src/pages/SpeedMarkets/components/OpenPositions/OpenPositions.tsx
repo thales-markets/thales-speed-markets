@@ -35,11 +35,6 @@ type OpenPositionsProps = {
     currentPrices?: { [key: string]: number };
 };
 
-enum HeaderTabs {
-    SINGLE = 0,
-    CHAINED = 1,
-}
-
 const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, currentPrices }) => {
     const { t } = useTranslation();
 
@@ -61,10 +56,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, currentPrices 
         ? multipleCollateral[selectedCollateral].addresses[networkId]
         : erc20Contract.addresses[networkId];
 
-    const [isChainedSelected, setIsChainedSelected] = useState(isChained);
-    const [selectedTabIndex, setSelectedTabIndex] = useState(
-        isChainedSelected ? HeaderTabs.CHAINED : HeaderTabs.SINGLE
-    );
+    const [isChainedSelected, setIsChainedSelected] = useState(!!isChained);
     const [isSubmitting, setIsSubmitting] = useState(false);
     // For sorting purpose as claimable status is unknown until all chained positions is rendered
     const [chainedClaimableStatuses, setChainedClaimableStatuses] = useState<
@@ -205,12 +197,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, currentPrices 
     };
 
     const getClaimAllButton = () => (
-        <Button
-            {...getDefaultButtonProps()}
-            disabled={isSubmitting}
-            additionalStyles={getAdditionalButtonStyle(isMobile)}
-            onClick={handleSubmit}
-        >
+        <Button disabled={isSubmitting} additionalStyles={additionalButtonStyle} fontSize="13px" onClick={handleSubmit}>
             {`${
                 isSubmitting
                     ? t('speed-markets.user-positions.claim-all-progress')
@@ -226,32 +213,20 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, currentPrices 
     return (
         <Container>
             <Header>
-                {/* <Title>{t('speed-markets.user-positions.your-positions')}</Title> */}
+                <Title>{t('speed-markets.user-positions.your-positions')}</Title>
                 <Tabs>
-                    <Tab
-                        $isSelected={selectedTabIndex === HeaderTabs.SINGLE}
-                        onClick={() => {
-                            setSelectedTabIndex(HeaderTabs.SINGLE);
-                            setIsChainedSelected(false);
-                        }}
-                    >
-                        {t('speed-markets.user-positions.open-single')}
+                    <Tab $isSelected={!isChainedSelected} onClick={() => setIsChainedSelected(false)}>
+                        {isMobile ? t('speed-markets.single') : t('speed-markets.user-positions.open-single')}
                         {claimableSpeedPositions.length > 0 && (
-                            <Notification $isSelected={selectedTabIndex === HeaderTabs.SINGLE}>
+                            <Notification $isSelected={!isChainedSelected}>
                                 {claimableSpeedPositions.length}
                             </Notification>
                         )}
                     </Tab>
-                    <Tab
-                        $isSelected={selectedTabIndex === HeaderTabs.CHAINED}
-                        onClick={() => {
-                            setSelectedTabIndex(HeaderTabs.CHAINED);
-                            setIsChainedSelected(true);
-                        }}
-                    >
-                        {t('speed-markets.user-positions.open-chained')}
+                    <Tab $isSelected={isChainedSelected} onClick={() => setIsChainedSelected(true)}>
+                        {isMobile ? t('speed-markets.chained.label') : t('speed-markets.user-positions.open-chained')}
                         {claimableChainedPositions.length > 0 && (
-                            <Notification $isSelected={selectedTabIndex === HeaderTabs.CHAINED}>
+                            <Notification $isSelected={isChainedSelected}>
                                 {claimableChainedPositions.length}
                             </Notification>
                         )}
@@ -262,7 +237,12 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, currentPrices 
                     <ButtonWrapper>
                         {isMultiCollateralSupported && (
                             <CollateralSelectorContainer>
-                                <ClaimAll>{t('speed-markets.user-positions.claim-all-in')}:</ClaimAll>
+                                <ClaimAll>
+                                    {isMobile
+                                        ? t('speed-markets.user-positions.claim-all-in')
+                                        : t('speed-markets.user-positions.claim-all-win-in')}
+                                    :
+                                </ClaimAll>
                                 <CollateralSelector
                                     collateralArray={[getDefaultCollateral(networkId)]}
                                     selectedItem={0}
@@ -322,15 +302,14 @@ const Container = styled.div`
     margin-top: 20px;
 `;
 
-const Header = styled(FlexDivColumn)`
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        // TODO:
-    }
-`;
+const Header = styled(FlexDivColumn)``;
 
 const Tabs = styled(FlexDivStart)`
     align-items: center;
     gap: 150px;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        gap: 100px;
+    }
 `;
 
 const Tab = styled.span<{ $isSelected: boolean }>`
@@ -372,37 +351,38 @@ const PositionsWrapper = styled.div<{ $noPositions?: boolean }>`
     ${(props) => (props.$noPositions ? 'filter: blur(10px);' : '')}
 `;
 
-export const Title = styled.span`
+const Title = styled.span`
+    display: none;
     font-weight: 700;
-    font-size: 13px;
+    font-size: 18px;
     line-height: 100%;
-    margin-left: 20px;
     text-transform: uppercase;
-    color: ${(props) => props.theme.textColor.secondary};
+    color: ${(props) => props.theme.textColor.primary};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        margin-left: 5px;
+        display: flex;
     }
 `;
 
 const ButtonWrapper = styled(FlexDivEnd)`
     gap: 70px;
-    padding-right: 50px;
+    padding-right: 52px;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        justify-content: space-between;
+        gap: unset;
+        padding-right: 0;
+        margin-bottom: 13px;
+    }
 `;
 
-const getDefaultButtonProps = () => ({
-    fontSize: '13px',
-});
-
-const getAdditionalButtonStyle = (isMobile: boolean): CSSProperties => ({
-    minWidth: isMobile ? '282px' : '180px',
+const additionalButtonStyle: CSSProperties = {
     lineHeight: '100%',
     border: 'none',
-});
+};
 
 const ClaimAll = styled.span`
     font-size: 13px;
     font-weight: 800;
-    line-height: 90%;
+    line-height: 100%;
     text-align: center;
     color: ${(props) => props.theme.textColor.quinary};
 `;

@@ -22,7 +22,7 @@ export type UserOpenPositions = {
     market: string;
     side: Positions;
     paid: number;
-    value: number;
+    value: number; // TODO: remove
     currentPrice?: number;
     finalPrice?: number;
     claimable?: boolean;

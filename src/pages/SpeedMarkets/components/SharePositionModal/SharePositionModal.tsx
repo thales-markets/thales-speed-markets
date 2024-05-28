@@ -293,7 +293,7 @@ const CloseIcon = styled.i`
     right: -20px;
     font-size: 20px;
     cursor: pointer;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.quinary};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         top: 10px;
         right: 10px;
@@ -313,14 +313,14 @@ const TwitterShare = styled(FlexDivColumnCentered)<{ disabled?: boolean }>`
     width: 100%;
     height: 55px;
     border-radius: 15px;
-    background: ${(props) => props.theme.button.background.primary};
+    background: ${(props) => props.theme.button.background.secondary};
     cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
     opacity: ${(props) => (props.disabled ? '0.4' : '1')};
 `;
 
 const TwitterIcon = styled.i<{ disabled?: boolean; fontSize?: string; padding?: string }>`
     font-size: ${(props) => (props.fontSize ? props.fontSize : '20px')};
-    color: ${(props) => props.theme.button.textColor.primary};
+    color: ${(props) => props.theme.button.textColor.secondary};
     cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
     opacity: ${(props) => (props.disabled ? '0.4' : '1')};
     margin-right: 10px;
@@ -332,7 +332,7 @@ const TwitterShareLabel = styled.span`
     font-size: 18px;
     line-height: 25px;
     text-transform: uppercase;
-    color: ${(props) => props.theme.button.textColor.primary};
+    color: ${(props) => props.theme.button.textColor.secondary};
 `;
 
 export default React.memo(SharePositionModal);
