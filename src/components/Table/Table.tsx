@@ -224,10 +224,7 @@ const Table: React.FC<TableProps> = ({
                     <PaginationLabel>{t('common.pagination.rows-per-page')}</PaginationLabel>
                     <div>
                         <SelectInput
-                            handleChange={(e) => {
-                                console.log(e);
-                                tableInstance.setPageSize(Number(e));
-                            }}
+                            handleChange={(e) => tableInstance.setPageSize(Number(e))}
                             value={{ value: pagination.pageSize, label: '' + pagination.pageSize }}
                             options={PAGINATION_SIZE}
                         />

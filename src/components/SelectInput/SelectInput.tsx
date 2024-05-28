@@ -1,6 +1,5 @@
 import React from 'react';
 import Select, { CSSObjectWithLabel, ControlProps, GroupBase, OptionProps, components } from 'react-select';
-
 import styled, { useTheme } from 'styled-components';
 import { ThemeInterface } from 'types/ui';
 
@@ -41,6 +40,12 @@ const SelectInput: React.FC<SelectInputProps> = ({ options, handleChange, defaul
             backgroundColor: props?.isFocused ? theme.background.primary : 'transparent',
             cursor: 'pointer',
             borderRadius: 8,
+            '&:hover': {
+                color: theme.textColor.quinary,
+            },
+            '&:active': {
+                backgroundColor: theme.background.primary,
+            },
         }),
         control: (base: CSSObjectWithLabel, props: ControlProps<SelectOption, boolean, GroupBase<SelectOption>>) => ({
             ...base,
@@ -48,7 +53,6 @@ const SelectInput: React.FC<SelectInputProps> = ({ options, handleChange, defaul
             border: `2px solid ${theme.borderColor.quaternary}`,
             color: theme.textColor.primary,
             borderRadius: '8px',
-            // width: width,
             minHeight: 38,
             height: 38,
             cursor: 'pointer',
@@ -74,7 +78,6 @@ const SelectInput: React.FC<SelectInputProps> = ({ options, handleChange, defaul
         }),
         dropdownIndicator: (base: CSSObjectWithLabel) => ({
             ...base,
-
             color: theme.textColor.quinary,
             [':hover']: {
                 ...base[':hover'],
