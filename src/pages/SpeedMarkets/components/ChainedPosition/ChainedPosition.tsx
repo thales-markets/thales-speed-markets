@@ -208,6 +208,7 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
             ) : (
                 <>
                     <AssetInfo>
+                        <Text>{t('speed-markets.user-positions.direction')}</Text>
                         <Text lineHeight="30px">{t('speed-markets.user-positions.end-time')}</Text>
                         <Text>{t('common.strike-price')}</Text>
                         <Text>{t('profile.final-price')}</Text>
@@ -227,25 +228,25 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                                             <Icon size={16} className="icon icon--caret-down" />
                                         </PositionsSymbol>
                                     )}
-                                    <Text fontWeight={400} lineHeight="14px" padding="1px 0 0 0">
+                                    <Text fontWeight={400} lineHeight="13px" padding="1px 0 0 0">
                                         {formatShortDate(positionWithPrices.strikeTimes[index])}
                                     </Text>
-                                    <Text lineHeight="14px" padding="0 0 1px 0">
+                                    <Text fontWeight={800} lineHeight="13px" padding="0 0 1px 0">
                                         {formatHoursMinutesSecondsFromTimestamp(positionWithPrices.strikeTimes[index])}
                                     </Text>
                                     {positionWithPrices.strikePrices[index] ? (
-                                        <Text isActiveColor={!maturedStrikeTimes[index]}>
+                                        <Text fontWeight={800} isActiveColor={!maturedStrikeTimes[index]}>
                                             {formatCurrencyWithSign(USD_SIGN, positionWithPrices.strikePrices[index])}
                                         </Text>
                                     ) : (
                                         <Dash />
                                     )}
                                     {positionWithPrices.finalPrices[index] ? (
-                                        <Text>
+                                        <Text fontWeight={800}>
                                             {formatCurrencyWithSign(USD_SIGN, positionWithPrices.finalPrices[index])}
                                         </Text>
                                     ) : position.isOpen && maturedStrikeTimes[index] ? (
-                                        <Text fontSize={16}>
+                                        <Text fontWeight={800} fontSize={16}>
                                             <Tooltip overlay={t('speed-markets.tooltips.final-price-missing')} />
                                         </Text>
                                     ) : (
@@ -254,11 +255,11 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                                     {userWonStatuses[index] !== undefined ? (
                                         <Text lineHeight="100%">
                                             <Icon
-                                                size={userWonStatuses[index] ? 20 : 18}
+                                                size={userWonStatuses[index] ? 18 : 16}
                                                 padding={userWonStatuses[index] ? undefined : '1px 0'}
                                                 color={
                                                     userWonStatuses[index]
-                                                        ? theme.textColor.quaternary
+                                                        ? theme.textColor.quinary
                                                         : theme.error.textColor.primary
                                                 }
                                                 className={
@@ -275,19 +276,6 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                     </PositionDetails>
                     <Separator />
                     <Summary>
-                        <BuyInfo>
-                            <Text>
-                                {t('speed-markets.user-positions.size')}
-                                <Text isActiveColor>{` ${formatNumberShort(positionWithPrices.payout)}`}</Text>
-                            </Text>
-                            <Text padding="0 0 0 30px">
-                                {t('speed-markets.user-positions.paid')}
-                                <Text isActiveColor>{` ${formatCurrencyWithSign(
-                                    USD_SIGN,
-                                    positionWithPrices.paid
-                                )}`}</Text>
-                            </Text>
-                        </BuyInfo>
                         <Result isSmaller={isOverview || displayShare}>
                             <ChainedPositionAction
                                 position={positionWithPrices}
@@ -359,6 +347,7 @@ const Container = styled(FlexDivSpaceBetween)`
 
 const AssetInfo = styled(FlexDivColumn)`
     max-width: 70px;
+    margin-top: 10px;
 `;
 
 const Text = styled.span<{
@@ -377,7 +366,7 @@ const Text = styled.span<{
             ? props.color
             : props.isActiveColor
             ? props.theme.textColor.primary
-            : props.theme.textColor.secondary};
+            : props.theme.textColor.primary};
     white-space: nowrap;
     ${(props) => (props.padding ? `padding: ${props.padding};` : '')}
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
@@ -417,10 +406,6 @@ const Summary = styled(FlexDivColumn)`
     min-width: 235px;
 `;
 
-const BuyInfo = styled(FlexDivCentered)`
-    height: 30px;
-`;
-
 const Result = styled(FlexDivCentered)<{ isSmaller?: boolean }>`
     height: ${(props) => (props.isSmaller ? '70' : '90')}px;
 `;
@@ -428,7 +413,7 @@ const Result = styled(FlexDivCentered)<{ isSmaller?: boolean }>`
 const Separator = styled.div`
     min-width: 2px;
     width: 2px;
-    height: 90px;
+    height: 110px;
     background: ${(props) => props.theme.borderColor.quaternary};
     border-radius: 3px;
     margin: 10px 60px 0px 10px;
