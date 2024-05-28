@@ -31,7 +31,7 @@ export default {
             primary: Colors.BLACK,
             secondary: Colors.PURPLE,
             tertiary: Colors.BLUE,
-            quaternary: '',
+            quaternary: Colors.WHITE,
         },
         textColor: {
             primary: Colors.WHITE,

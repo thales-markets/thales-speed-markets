@@ -7,7 +7,6 @@ import './styles/currencies.css';
 import './styles/fonts.css';
 import './styles/icons.css';
 import './styles/main.css';
-import './styles/sidebar-icons.css';
 import './styles/social-icons.css';
 import './styles/network-icons.css';
 

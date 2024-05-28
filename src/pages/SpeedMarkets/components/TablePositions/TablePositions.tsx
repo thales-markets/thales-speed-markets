@@ -8,7 +8,6 @@ import { formatCurrencyWithSign } from 'thales-utils';
 import { UserOpenPositions } from 'types/market';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
 
-// TODO: move to folder up, will be general for all user positions not only open
 const TablePositions: React.FC<{ data: UserOpenPositions[]; currentPrices?: { [key: string]: number } }> = ({
     data,
     currentPrices,

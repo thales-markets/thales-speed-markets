@@ -9,7 +9,7 @@ import { formatCurrency, getPrecision } from 'thales-utils';
 import { ChainedSpeedMarket } from 'types/market';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
 
-const ChainedTablePositions: React.FC<{ data: ChainedSpeedMarket[]; currentPrices?: { [key: string]: number } }> = ({
+const TableChainedPositions: React.FC<{ data: ChainedSpeedMarket[]; currentPrices?: { [key: string]: number } }> = ({
     data,
     currentPrices,
 }) => {
@@ -160,4 +160,4 @@ export const formatCurrencyWithSign = (
     )}`;
 };
 
-export default ChainedTablePositions;
+export default TableChainedPositions;

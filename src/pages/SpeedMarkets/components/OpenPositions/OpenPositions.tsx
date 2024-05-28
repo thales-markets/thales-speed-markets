@@ -4,7 +4,7 @@ import SimpleLoader from 'components/SimpleLoader/SimpleLoader';
 import { USD_SIGN } from 'constants/currency';
 import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
-import { CollateralSelectorContainer, InLabel } from 'pages/Profile/components/MyPositionAction/MyPositionAction';
+import { CollateralSelectorContainer } from 'pages/Profile/components/MyPositionAction/MyPositionAction';
 import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
 import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveSpeedMarketsDataQuery';
 import React, { CSSProperties, useEffect, useMemo, useState } from 'react';
@@ -13,11 +13,11 @@ import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
 import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
-import styled, { useTheme } from 'styled-components';
-import { FlexDivCentered, FlexDivRow, FlexDivRowCentered } from 'styles/common';
+import styled from 'styled-components';
+import { FlexDivColumn, FlexDivEnd, FlexDivStart, GradientContainer } from 'styles/common';
 import { formatCurrencyWithSign } from 'thales-utils';
 import { ChainedSpeedMarket, UserOpenPositions } from 'types/market';
-import { RootState, ThemeInterface } from 'types/ui';
+import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
 import erc20Contract from 'utils/contracts/collateralContract';
 import multipleCollateral from 'utils/contracts/multipleCollateralContract';
@@ -26,8 +26,8 @@ import { getIsMultiCollateralSupported } from 'utils/network';
 import { resolveAllChainedMarkets, resolveAllSpeedPositions } from 'utils/speedAmm';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 import CardPositions from '../CardPositions';
-import TablePositions from './components/TablePositions';
-import ChainedTablePositions from './components/ChainedPositions/ChainedTablePositions';
+import TableChainedPositions from '../TableChainedPositions/ChainedTablePositions';
+import TablePositions from '../TablePositions';
 
 type OpenPositionsProps = {
     isChained?: boolean;
@@ -35,9 +35,13 @@ type OpenPositionsProps = {
     currentPrices?: { [key: string]: number };
 };
 
+enum HeaderTabs {
+    SINGLE = 0,
+    CHAINED = 1,
+}
+
 const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, currentPrices }) => {
     const { t } = useTranslation();
-    const theme: ThemeInterface = useTheme();
 
     const networkId = useChainId();
     const client = useClient();
@@ -57,6 +61,10 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, currentPrices 
         ? multipleCollateral[selectedCollateral].addresses[networkId]
         : erc20Contract.addresses[networkId];
 
+    const [isChainedSelected, setIsChainedSelected] = useState(isChained);
+    const [selectedTabIndex, setSelectedTabIndex] = useState(
+        isChainedSelected ? HeaderTabs.CHAINED : HeaderTabs.SINGLE
+    );
     const [isSubmitting, setIsSubmitting] = useState(false);
     // For sorting purpose as claimable status is unknown until all chained positions is rendered
     const [chainedClaimableStatuses, setChainedClaimableStatuses] = useState<
@@ -68,7 +76,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, currentPrices 
         { networkId, client },
         (isBiconomy ? biconomyConnector.address : walletAddress) as string,
         {
-            enabled: isAppReady && isConnected && !isChained,
+            enabled: isAppReady && isConnected && !isChainedSelected,
         }
     );
 
@@ -84,7 +92,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, currentPrices 
         { networkId, client },
         (isBiconomy ? biconomyConnector.address : walletAddress) as string,
         {
-            enabled: isAppReady && isConnected && !!isChained,
+            enabled: isAppReady && isConnected && !!isChainedSelected,
         }
     );
 
@@ -157,12 +165,12 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, currentPrices 
         chainedWithClaimableStatus.length ? chainedWithClaimableStatus : userOpenChainedSpeedMarketsData
     ) as ChainedSpeedMarket[];
 
-    const noPositions = isChained
-        ? userOpenChainedSpeedMarketsData.length === 0
-        : userOpenSpeedMarketsData.length === 0;
-    const positions = noPositions ? dummyPositions : sortedUserOpenSpeedMarketsData;
-
     const isLoading = userActiveSpeedMarketsDataQuery.isLoading || userChainedSpeedMarketsDataQuery.isLoading;
+
+    const noPositions =
+        !isLoading &&
+        (isChainedSelected ? userOpenChainedSpeedMarketsData.length === 0 : userOpenSpeedMarketsData.length === 0);
+    const positions = noPositions ? dummyPositions : sortedUserOpenSpeedMarketsData;
 
     const claimableSpeedPositions = userOpenSpeedMarketsData.filter((p) => p.claimable);
     const claimableSpeedPositionsSum = claimableSpeedPositions.reduce((acc, pos) => acc + pos.value, 0);
@@ -170,13 +178,13 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, currentPrices 
     const claimableChainedPositions = chainedWithClaimableStatus.filter((p) => p.claimable);
     const claimableChainedPositionsSum = claimableChainedPositions.reduce((acc, pos) => acc + pos.payout, 0);
 
-    const hasClaimableSpeedPositions = isChained
+    const hasClaimableSpeedPositions = isChainedSelected
         ? !!claimableChainedPositions.length
         : !!claimableSpeedPositions.length;
 
     const handleSubmit = async () => {
         setIsSubmitting(true);
-        if (isChained) {
+        if (isChainedSelected) {
             await resolveAllChainedMarkets(
                 claimableChainedPositions,
                 false,
@@ -198,12 +206,9 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, currentPrices 
 
     const getClaimAllButton = () => (
         <Button
-            {...getDefaultButtonProps(isMobile)}
+            {...getDefaultButtonProps()}
             disabled={isSubmitting}
-            additionalStyles={additionalButtonStyle}
-            backgroundColor={theme.button.textColor.quaternary}
-            borderColor={theme.button.textColor.quaternary}
-            textColor={theme.button.textColor.secondary}
+            additionalStyles={getAdditionalButtonStyle(isMobile)}
             onClick={handleSubmit}
         >
             {`${
@@ -212,58 +217,78 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, currentPrices 
                     : t('speed-markets.user-positions.claim-all')
             } ${formatCurrencyWithSign(
                 USD_SIGN,
-                isChained ? claimableChainedPositionsSum : claimableSpeedPositionsSum,
+                isChainedSelected ? claimableChainedPositionsSum : claimableSpeedPositionsSum,
                 2
             )}`}
         </Button>
     );
 
     return (
-        <Wrapper>
+        <Container>
             <Header>
-                <Title>{t('speed-markets.user-positions.your-positions')}</Title>
+                {/* <Title>{t('speed-markets.user-positions.your-positions')}</Title> */}
+                <Tabs>
+                    <Tab
+                        $isSelected={selectedTabIndex === HeaderTabs.SINGLE}
+                        onClick={() => {
+                            setSelectedTabIndex(HeaderTabs.SINGLE);
+                            setIsChainedSelected(false);
+                        }}
+                    >
+                        {t('speed-markets.user-positions.open-single')}
+                        {claimableSpeedPositions.length > 0 && (
+                            <Notification $isSelected={selectedTabIndex === HeaderTabs.SINGLE}>
+                                {claimableSpeedPositions.length}
+                            </Notification>
+                        )}
+                    </Tab>
+                    <Tab
+                        $isSelected={selectedTabIndex === HeaderTabs.CHAINED}
+                        onClick={() => {
+                            setSelectedTabIndex(HeaderTabs.CHAINED);
+                            setIsChainedSelected(true);
+                        }}
+                    >
+                        {t('speed-markets.user-positions.open-chained')}
+                        {claimableChainedPositions.length > 0 && (
+                            <Notification $isSelected={selectedTabIndex === HeaderTabs.CHAINED}>
+                                {claimableChainedPositions.length}
+                            </Notification>
+                        )}
+                    </Tab>
+                </Tabs>
+                <TabsSeparator />
                 {hasClaimableSpeedPositions && (
                     <ButtonWrapper>
-                        {getClaimAllButton()}
                         {isMultiCollateralSupported && (
                             <CollateralSelectorContainer>
-                                <InLabel color={theme.button.textColor.quaternary}>{t('common.in')}</InLabel>
+                                <ClaimAll>{t('speed-markets.user-positions.claim-all-in')}:</ClaimAll>
                                 <CollateralSelector
                                     collateralArray={[getDefaultCollateral(networkId)]}
                                     selectedItem={0}
                                     onChangeCollateral={() => {}}
                                     disabled
-                                    additionalStyles={{
-                                        color: theme.button.textColor.quaternary,
-                                    }}
+                                    isIconHidden
                                 />
                             </CollateralSelectorContainer>
                         )}
+                        {getClaimAllButton()}
                     </ButtonWrapper>
                 )}
             </Header>
-            {isLoading ? (
-                <LoaderContainer>
+            <PositionsWrapper $noPositions={noPositions}>
+                {isLoading ? (
                     <SimpleLoader />
-                </LoaderContainer>
-            ) : (
-                <>
-                    <PositionsWrapper $noPositions={noPositions} $isChained={isChained}>
-                        {isChained ? (
-                            <ChainedTablePositions
-                                data={sortedUserOpenChainedSpeedMarketsData}
-                                currentPrices={currentPrices}
-                            />
-                        ) : isMobile ? (
-                            <CardPositions data={positions} />
-                        ) : (
-                            <TablePositions data={positions} currentPrices={currentPrices} />
-                        )}
-                    </PositionsWrapper>
-                    {noPositions && <NoPositionsText>{t('speed-markets.user-positions.no-positions')}</NoPositionsText>}
-                </>
-            )}
-        </Wrapper>
+                ) : isChainedSelected ? (
+                    <TableChainedPositions data={sortedUserOpenChainedSpeedMarketsData} currentPrices={currentPrices} />
+                ) : isMobile ? (
+                    <CardPositions data={positions} />
+                ) : (
+                    <TablePositions data={positions} currentPrices={currentPrices} />
+                )}
+            </PositionsWrapper>
+            {noPositions && <NoPositionsText>{t('speed-markets.user-positions.no-positions')}</NoPositionsText>}
+        </Container>
     );
 };
 
@@ -290,34 +315,64 @@ const dummyPositions: UserOpenPositions[] = [
     },
 ];
 
-const Wrapper = styled.div`
+const Container = styled.div`
     position: relative;
     display: flex;
     flex-direction: column;
     margin-top: 20px;
 `;
 
-const PositionsWrapper = styled.div<{ $noPositions?: boolean; $isChained?: boolean }>`
-    display: flex;
-    flex-direction: column;
+const Header = styled(FlexDivColumn)`
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        // TODO:
+    }
+`;
+
+const Tabs = styled(FlexDivStart)`
+    align-items: center;
+    gap: 150px;
+`;
+
+const Tab = styled.span<{ $isSelected: boolean }>`
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 36px;
+    text-align: left;
+    text-transform: uppercase;
+    color: ${(props) => (props.$isSelected ? props.theme.textColor.quinary : props.theme.textColor.primary)};
+    cursor: pointer;
+`;
+
+const Notification = styled.span<{ $isSelected: boolean }>`
+    display: inline-block;
+    background: ${(props) =>
+        props.$isSelected ? props.theme.button.background.secondary : props.theme.button.background.quaternary};
+    border-radius: 30px;
+    color: ${(props) => props.theme.button.textColor.secondary};
+    font-family: ${(props) => props.theme.fontFamily.secondary};
+    font-size: 13px;
+    font-weight: 700;
+    min-width: 20px;
+    line-height: 20px;
+    padding: 0 5px;
+    margin-left: 6px;
+    text-align: center;
+`;
+
+const TabsSeparator = styled(GradientContainer)`
+    height: 2px;
+    padding-top: 0;
+    margin-bottom: 13px;
+`;
+
+const PositionsWrapper = styled.div<{ $noPositions?: boolean }>`
+    position: relative;
+    min-height: 200px;
+    width: 100%;
     ${(props) => (props.$noPositions ? 'filter: blur(10px);' : '')}
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        flex-direction: row;
-        overflow: auto;
-    }
 `;
 
-const Header = styled(FlexDivRowCentered)`
-    min-height: 37px;
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        flex: 1;
-        flex-direction: column;
-        align-items: start;
-        justify-content: center;
-    }
-`;
-
-const Title = styled.span`
+export const Title = styled.span`
     font-weight: 700;
     font-size: 13px;
     line-height: 100%;
@@ -329,30 +384,27 @@ const Title = styled.span`
     }
 `;
 
-const ButtonWrapper = styled(FlexDivRow)`
-    height: 27px;
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        height: 40px;
-        margin-left: 5px;
-        padding: 5px 0;
-    }
+const ButtonWrapper = styled(FlexDivEnd)`
+    gap: 70px;
+    padding-right: 50px;
 `;
 
-const getDefaultButtonProps = (isMobile: boolean) => ({
-    width: isMobile ? '175px' : '220px',
-    height: isMobile ? '24px' : '27px',
-    fontSize: isMobile ? '12px' : '13px',
+const getDefaultButtonProps = () => ({
+    fontSize: '13px',
 });
 
-const additionalButtonStyle: CSSProperties = {
+const getAdditionalButtonStyle = (isMobile: boolean): CSSProperties => ({
+    minWidth: isMobile ? '282px' : '180px',
     lineHeight: '100%',
     border: 'none',
-};
+});
 
-const LoaderContainer = styled(FlexDivCentered)`
-    position: relative;
-    min-height: 200px;
-    width: 100%;
+const ClaimAll = styled.span`
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 90%;
+    text-align: center;
+    color: ${(props) => props.theme.textColor.quinary};
 `;
 
 const NoPositionsText = styled.span`
@@ -363,7 +415,7 @@ const NoPositionsText = styled.span`
     font-weight: 600;
     font-size: 15px;
     line-height: 100%;
-    color: ${(props) => props.theme.textColor.secondary};
+    color: ${(props) => props.theme.textColor.primary};
     min-width: max-content;
 `;
 
