@@ -15,8 +15,10 @@ import {
 import styled from 'styled-components';
 import { FlexDiv, FlexDivCentered } from 'styles/common';
 import SelectInput from 'components/SelectInput';
+import { localStore } from 'thales-utils';
+import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 
-const PAGINATION_SIZE = [
+export const PAGINATION_SIZE = [
     { value: 5, label: '5' },
     { value: 10, label: '10' },
     { value: 20, label: '20' },
@@ -47,8 +49,6 @@ type TableProps = {
     tableHeadCellStyles?: CSSProperties;
     tableRowCellStyles?: CSSProperties;
     initialState?: any;
-    onSortByChanged?: any;
-    currentPage?: number;
     rowsPerPage?: number;
     tableHeight?: string;
     expandedRow?: (row: Row<any>) => JSX.Element;
@@ -72,12 +72,13 @@ const Table: React.FC<TableProps> = ({
     expandedRow,
     stickyRow,
     tableHeight,
+    rowsPerPage,
 }) => {
     const { t } = useTranslation();
 
     const [pagination, setPagination] = useState({
         pageIndex: 0, //initial page index
-        pageSize: 5, //default page size
+        pageSize: rowsPerPage || PAGINATION_SIZE[0].value, //default page size
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const memoizedColumns = useMemo(() => columns, [...columnsDeps, t]);
@@ -224,7 +225,10 @@ const Table: React.FC<TableProps> = ({
                     <PaginationLabel>{t('common.pagination.rows-per-page')}</PaginationLabel>
                     <div>
                         <SelectInput
-                            handleChange={(e) => tableInstance.setPageSize(Number(e))}
+                            handleChange={(e) => {
+                                tableInstance.setPageSize(Number(e));
+                                localStore.set(LOCAL_STORAGE_KEYS.TABLE_ROWS_PER_PAGE, Number(e));
+                            }}
                             value={{ value: pagination.pageSize, label: '' + pagination.pageSize }}
                             options={PAGINATION_SIZE}
                         />
@@ -331,15 +335,15 @@ const NoResultContainer = styled(TableRow)`
 const SortIcon = styled.i<{ selected: boolean; sortDirection: SortDirection }>`
     font-size: ${(props) => (props.selected && props.sortDirection !== SortDirection.NONE ? 22 : 19)}px;
     &:before {
-        font-family: ExoticIcons !important;
+        font-family: Icons !important;
         content: ${(props) =>
             props.selected
                 ? props.sortDirection === SortDirection.ASC
-                    ? "'\\0046'"
+                    ? "'\\0068'"
                     : props.sortDirection === SortDirection.DESC
-                    ? "'\\0047'"
-                    : "'\\0045'"
-                : "'\\0045'"};
+                    ? "'\\006B'"
+                    : "'\\006A'"
+                : "'\\006A'"};
     }
     @media (max-width: 512px) {
         font-size: ${(props) => (props.selected && props.sortDirection !== SortDirection.NONE ? 17 : 14)}px;

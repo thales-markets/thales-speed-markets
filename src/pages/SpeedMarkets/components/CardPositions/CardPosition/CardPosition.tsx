@@ -19,10 +19,7 @@ import { useChainId } from 'wagmi';
 import MarketPrice from '../../MarketPrice';
 import SharePosition from '../../SharePosition';
 
-const CardPosition: React.FC<{ position: UserOpenPositions; currentPrices?: { [key: string]: number } }> = ({
-    position,
-    currentPrices,
-}) => {
+const CardPosition: React.FC<{ position: UserOpenPositions }> = ({ position }) => {
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 
@@ -59,7 +56,7 @@ const CardPosition: React.FC<{ position: UserOpenPositions; currentPrices?: { [k
                             :
                         </Label>
                         <Value>
-                            <MarketPrice position={position} currentPrices={currentPrices} />
+                            <MarketPrice position={position} />
                         </Value>
                     </InfoRow>
                     <InfoRow>

@@ -282,11 +282,11 @@ const SpeedMarkets: React.FC = () => {
                     {isConnected && (
                         <OpenPositions
                             isChained={isChained}
-                            maxPriceDelayForResolvingSec={ammSpeedMarketsLimitsData?.maxPriceDelayForResolvingSec}
                             currentPrices={currentPrices}
+                            maxPriceDelayForResolvingSec={ammSpeedMarketsLimitsData?.maxPriceDelayForResolvingSec}
                         />
                     )}
-                    <OverviewLinkWrapper>
+                    <OverviewLinkWrapper $isTableAbove={isConnected}>
                         <SPAAnchor href={buildHref(`${ROUTES.Markets.SpeedMarketsOverview}?isChained=${isChained}`)}>
                             <OverviewLinkText>
                                 {isChained
@@ -367,8 +367,10 @@ const Info = styled.span`
     min-height: 40px;
 `;
 
-const OverviewLinkWrapper = styled.div`
-    margin-top: -39px;
+const OverviewLinkWrapper = styled.div<{ $isTableAbove: boolean }>`
+    position: relative;
+    width: max-content;
+    margin-top: ${(props) => (props.$isTableAbove ? '-39px' : '20px')};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         margin-top: 10px;
     }

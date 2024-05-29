@@ -1,5 +1,5 @@
 import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
-import { UseQueryOptions, useQueries } from '@tanstack/react-query';
+import { UseQueryResult, UseQueryOptions, useQueries } from '@tanstack/react-query';
 import { CONNECTION_TIMEOUT_MS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds } from 'date-fns';
@@ -15,7 +15,7 @@ const usePythPriceQueries = (
     networkId: NetworkId,
     priceRequests: PriceRequest[],
     options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
-) => {
+): UseQueryResult<number>[] => {
     const fetchPythPrice = async (priceRequest: PriceRequest) => {
         const priceConnection = new EvmPriceServiceConnection(getPriceServiceEndpoint(networkId), {
             timeout: CONNECTION_TIMEOUT_MS,

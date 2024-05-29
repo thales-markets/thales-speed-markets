@@ -2,9 +2,11 @@ import Button from 'components/Button';
 import CollateralSelector from 'components/CollateralSelector';
 import SimpleLoader from 'components/SimpleLoader/SimpleLoader';
 import { USD_SIGN } from 'constants/currency';
+import { millisecondsToSeconds } from 'date-fns';
 import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import { CollateralSelectorContainer } from 'pages/Profile/components/MyPositionAction/MyPositionAction';
+import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
 import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveSpeedMarketsDataQuery';
 import React, { CSSProperties, useEffect, useMemo, useState } from 'react';
@@ -23,16 +25,17 @@ import erc20Contract from 'utils/contracts/collateralContract';
 import multipleCollateral from 'utils/contracts/multipleCollateralContract';
 import { getCollateral, getDefaultCollateral } from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
-import { resolveAllChainedMarkets, resolveAllSpeedPositions } from 'utils/speedAmm';
+import { getPriceId } from 'utils/pyth';
+import { isUserWinner, resolveAllChainedMarkets, resolveAllSpeedPositions } from 'utils/speedAmm';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 import CardPositions from '../CardPositions';
 import TableChainedPositions from '../TableChainedPositions/ChainedTablePositions';
 import TablePositions from '../TablePositions';
 
 type OpenPositionsProps = {
-    isChained?: boolean;
+    isChained: boolean;
+    currentPrices: { [key: string]: number };
     maxPriceDelayForResolvingSec?: number;
-    currentPrices?: { [key: string]: number };
 };
 
 const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, currentPrices }) => {
@@ -59,9 +62,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, currentPrices 
     const [isChainedSelected, setIsChainedSelected] = useState(!!isChained);
     const [isSubmitting, setIsSubmitting] = useState(false);
     // For sorting purpose as claimable status is unknown until all chained positions is rendered
-    const [chainedClaimableStatuses, setChainedClaimableStatuses] = useState<
-        { address: string; isClaimable: boolean }[]
-    >([]);
+    const [chainedClaimableStatuses] = useState<{ address: string; isClaimable: boolean }[]>([]); // TODO: set
     const [chainedWithClaimableStatus, setChainedWithClaimableStatus] = useState<ChainedSpeedMarket[]>([]);
 
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
@@ -84,7 +85,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, currentPrices 
         { networkId, client },
         (isBiconomy ? biconomyConnector.address : walletAddress) as string,
         {
-            enabled: isAppReady && isConnected && !!isChainedSelected,
+            enabled: isAppReady && isConnected && isChainedSelected,
         }
     );
 
@@ -96,19 +97,44 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, currentPrices 
         [userChainedSpeedMarketsDataQuery]
     );
 
-    // For chained sorting purpose
-    const updateChainedClaimable = (address: string, isClaimable: boolean) => {
-        const status = chainedClaimableStatuses.find((s) => s.address === address);
-        if (status === undefined) {
-            setChainedClaimableStatuses([...chainedClaimableStatuses, { address, isClaimable }]);
-        } else if (status.isClaimable !== isClaimable) {
-            setChainedClaimableStatuses(
-                chainedClaimableStatuses.map((s) => (s.address === address ? { ...s, isClaimable } : s))
-            );
-        }
-    };
+    const activeSpeedNotMatured: UserOpenPositions[] = userOpenSpeedMarketsData
+        .filter((marketData) => marketData.maturityDate >= Date.now())
+        .map((marketData) => ({
+            ...marketData,
+            currentPrice: currentPrices[marketData.currencyKey],
+        }));
+    const activeSpeedMatured = userOpenSpeedMarketsData.filter((marketData) => marketData.maturityDate < Date.now());
 
-    console.log(updateChainedClaimable); // TODO:
+    const priceRequests = activeSpeedMatured.map((marketData) => ({
+        priceId: getPriceId(networkId, marketData.currencyKey),
+        publishTime: millisecondsToSeconds(marketData.maturityDate),
+    }));
+    const pythPricesQueries = usePythPriceQueries(networkId, priceRequests, {
+        enabled: priceRequests.length > 0,
+    });
+    // set final prices and claimable status
+    const maturedUserSpeedMarketsWithPrices: UserOpenPositions[] = activeSpeedMatured.map((marketData, index) => {
+        const finalPrice = pythPricesQueries[index].data || 0;
+        const claimable = !!isUserWinner(marketData.side, marketData.strikePrice, finalPrice);
+        return {
+            ...marketData,
+            finalPrice,
+            claimable,
+        };
+    });
+    const allUserOpenSpeedMarketsData = activeSpeedNotMatured.concat(maturedUserSpeedMarketsWithPrices);
+
+    // TODO: For chained sorting purpose
+    // const updateChainedClaimable = (address: string, isClaimable: boolean) => {
+    //     const status = chainedClaimableStatuses.find((s) => s.address === address);
+    //     if (status === undefined) {
+    //         setChainedClaimableStatuses([...chainedClaimableStatuses, { address, isClaimable }]);
+    //     } else if (status.isClaimable !== isClaimable) {
+    //         setChainedClaimableStatuses(
+    //             chainedClaimableStatuses.map((s) => (s.address === address ? { ...s, isClaimable } : s))
+    //         );
+    //     }
+    // };
 
     // For chained sorting purpose update claimable status when it is known
     useEffect(() => {
@@ -135,36 +161,23 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, currentPrices 
         }
     }, [userOpenChainedSpeedMarketsData, chainedWithClaimableStatus, chainedClaimableStatuses]);
 
-    const sortSpeedMarkets = (markets: (UserOpenPositions | ChainedSpeedMarket)[]) =>
-        markets
-            // 1. sort open by maturity asc
-            .filter((position) => position.maturityDate > Date.now())
-            .sort((a, b) => a.maturityDate - b.maturityDate)
-            .concat(
-                // 2. sort claimable by maturity desc
-                markets.filter((position) => position.claimable).sort((a, b) => b.maturityDate - a.maturityDate)
-            )
-            .concat(
-                markets
-                    // 3. sort lost by maturity desc
-                    .filter((position) => position.maturityDate < Date.now() && !position.claimable)
-                    .sort((a, b) => b.maturityDate - a.maturityDate)
-            );
-
-    const sortedUserOpenSpeedMarketsData = sortSpeedMarkets(userOpenSpeedMarketsData) as UserOpenPositions[];
+    const sortedUserOpenSpeedMarketsData = sortSpeedMarkets(allUserOpenSpeedMarketsData) as UserOpenPositions[];
 
     const sortedUserOpenChainedSpeedMarketsData = sortSpeedMarkets(
         chainedWithClaimableStatus.length ? chainedWithClaimableStatus : userOpenChainedSpeedMarketsData
     ) as ChainedSpeedMarket[];
 
-    const isLoading = userActiveSpeedMarketsDataQuery.isLoading || userChainedSpeedMarketsDataQuery.isLoading;
+    const isLoading =
+        userActiveSpeedMarketsDataQuery.isLoading ||
+        (isChainedSelected && userChainedSpeedMarketsDataQuery.isLoading) ||
+        pythPricesQueries.filter((query) => query.isLoading).length > 1;
 
     const noPositions =
         !isLoading &&
-        (isChainedSelected ? userOpenChainedSpeedMarketsData.length === 0 : userOpenSpeedMarketsData.length === 0);
+        (isChainedSelected ? userOpenChainedSpeedMarketsData.length === 0 : allUserOpenSpeedMarketsData.length === 0);
     const positions = noPositions ? dummyPositions : sortedUserOpenSpeedMarketsData;
 
-    const claimableSpeedPositions = userOpenSpeedMarketsData.filter((p) => p.claimable);
+    const claimableSpeedPositions = allUserOpenSpeedMarketsData.filter((p) => p.claimable);
     const claimableSpeedPositionsSum = claimableSpeedPositions.reduce((acc, pos) => acc + pos.value, 0);
 
     const claimableChainedPositions = chainedWithClaimableStatus.filter((p) => p.claimable);
@@ -260,17 +273,33 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ isChained, currentPrices 
                 {isLoading ? (
                     <SimpleLoader />
                 ) : isChainedSelected ? (
-                    <TableChainedPositions data={sortedUserOpenChainedSpeedMarketsData} currentPrices={currentPrices} />
+                    <TableChainedPositions data={sortedUserOpenChainedSpeedMarketsData} />
                 ) : isMobile ? (
                     <CardPositions data={positions} />
                 ) : (
-                    <TablePositions data={positions} currentPrices={currentPrices} />
+                    <TablePositions data={positions} />
                 )}
             </PositionsWrapper>
             {noPositions && <NoPositionsText>{t('speed-markets.user-positions.no-positions')}</NoPositionsText>}
         </Container>
     );
 };
+
+const sortSpeedMarkets = (markets: (UserOpenPositions | ChainedSpeedMarket)[]) =>
+    markets
+        // 1. sort open by maturity asc
+        .filter((position) => position.maturityDate > Date.now())
+        .sort((a, b) => a.maturityDate - b.maturityDate)
+        .concat(
+            // 2. sort claimable by maturity desc
+            markets.filter((position) => position.claimable).sort((a, b) => b.maturityDate - a.maturityDate)
+        )
+        .concat(
+            markets
+                // 3. sort lost by maturity desc
+                .filter((position) => position.maturityDate < Date.now() && !position.claimable)
+                .sort((a, b) => b.maturityDate - a.maturityDate)
+        );
 
 const dummyPositions: UserOpenPositions[] = [
     {
@@ -280,6 +309,7 @@ const dummyPositions: UserOpenPositions[] = [
         paid: 100,
         maturityDate: 1684483200000,
         strikePrice: 25000,
+        finalPrice: 0,
         side: Positions.UP,
         value: 0,
     },
@@ -290,6 +320,7 @@ const dummyPositions: UserOpenPositions[] = [
         paid: 200,
         maturityDate: 1684483200000,
         strikePrice: 35000,
+        finalPrice: 0,
         side: Positions.DOWN,
         value: 0,
     },
@@ -365,7 +396,7 @@ const Title = styled.span`
 
 const ButtonWrapper = styled(FlexDivEnd)`
     gap: 70px;
-    padding-right: 52px;
+    padding-right: 66px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         justify-content: space-between;
         gap: unset;

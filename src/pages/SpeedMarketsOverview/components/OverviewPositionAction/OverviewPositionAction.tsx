@@ -175,8 +175,9 @@ const OverviewPositionAction: React.FC<OverviewPositionActionProps> = ({
                 <>
                     <Separator />
                     <ResultsContainer>
-                        <Label>{t('speed-markets.user-positions.results')}</Label>
-                        <TimeRemaining fontSize={13} end={position.maturityDate} showFullCounter showSecondsCounter />
+                        <TimeRemaining end={position.maturityDate} showFullCounter showSecondsCounter>
+                            <Label>{t('speed-markets.user-positions.result-in')}</Label>
+                        </TimeRemaining>
                     </ResultsContainer>
                 </>
             ) : (
@@ -234,6 +235,7 @@ export const Label = styled.span`
     line-height: 100%;
     color: ${(props) => props.theme.textColor.secondary};
     white-space: nowrap;
+    padding-right: 5px;
 `;
 
 export default OverviewPositionAction;

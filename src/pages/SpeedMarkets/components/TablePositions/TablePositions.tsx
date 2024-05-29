@@ -4,16 +4,15 @@ import { t } from 'i18next';
 import MyPositionAction from 'pages/Profile/components/MyPositionAction';
 import React from 'react';
 import styled from 'styled-components';
-import { formatCurrencyWithSign } from 'thales-utils';
+import { formatCurrencyWithSign, localStore } from 'thales-utils';
 import { UserOpenPositions } from 'types/market';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import MarketPrice from '../MarketPrice';
 import SharePosition from '../SharePosition';
+import { PAGINATION_SIZE } from 'components/Table/Table';
+import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 
-const TablePositions: React.FC<{ data: UserOpenPositions[]; currentPrices?: { [key: string]: number } }> = ({
-    data,
-    currentPrices,
-}) => {
+const TablePositions: React.FC<{ data: UserOpenPositions[] }> = ({ data }) => {
     const columns = [
         {
             header: <Header>{t('speed-markets.user-positions.asset')}</Header>,
@@ -38,6 +37,7 @@ const TablePositions: React.FC<{ data: UserOpenPositions[]; currentPrices?: { [k
                     <DirectionIcon className={`icon icon--caret-${cellProps.cell.getValue().toLowerCase()}`} />
                 </Wrapper>
             ),
+            size: 110,
         },
         {
             header: <Header>{t('speed-markets.user-positions.price')}</Header>,
@@ -45,7 +45,7 @@ const TablePositions: React.FC<{ data: UserOpenPositions[]; currentPrices?: { [k
             cell: (cellProps: any) => (
                 <Wrapper>
                     <Value>
-                        <MarketPrice position={cellProps.row.original} currentPrices={currentPrices} />
+                        <MarketPrice position={cellProps.row.original} />
                     </Value>
                 </Wrapper>
             ),
@@ -86,16 +86,29 @@ const TablePositions: React.FC<{ data: UserOpenPositions[]; currentPrices?: { [k
             cell: (cellProps: any) => (
                 <Wrapper>
                     <MyPositionAction position={cellProps.row.original} />
+                </Wrapper>
+            ),
+            size: 300,
+        },
+        {
+            header: <></>,
+            accessorKey: 'share',
+            cell: (cellProps: any) => (
+                <Wrapper>
                     <ShareWrapper>
                         <SharePosition position={cellProps.row.original} />
                     </ShareWrapper>
                 </Wrapper>
             ),
-            size: 300,
+            size: 40,
         },
     ];
 
-    return <Table data={data} columns={columns as any} />;
+    const rowsPerPageLS = localStore.get(LOCAL_STORAGE_KEYS.TABLE_ROWS_PER_PAGE);
+    const rowsPerPage =
+        PAGINATION_SIZE.filter((obj) => obj.value === Number(rowsPerPageLS))[0].value || PAGINATION_SIZE[0].value;
+
+    return <Table data={data} columns={columns as any} rowsPerPage={rowsPerPage} />;
 };
 
 const Header = styled.p`

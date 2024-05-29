@@ -1,48 +1,45 @@
 import Tooltip from 'components/Tooltip';
 import { USD_SIGN } from 'constants/currency';
-import { secondsToMilliseconds } from 'date-fns';
+import { millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
 import useInterval from 'hooks/useInterval';
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
-import { getIsBiconomy } from 'redux/modules/wallet';
 import { formatCurrencyWithSign } from 'thales-utils';
 import { UserOpenPositions } from 'types/market';
-import { RootState } from 'types/ui';
-import biconomyConnector from 'utils/biconomyWallet';
-import { refetchUserSpeedMarkets } from 'utils/queryConnector';
-import { useAccount, useChainId } from 'wagmi';
+import { getPriceId } from 'utils/pyth';
+import { refetchPythPrice } from 'utils/queryConnector';
+import { useChainId } from 'wagmi';
 
-const MarketPrice: React.FC<{ position: UserOpenPositions; currentPrices?: { [key: string]: number } }> = ({
-    position,
-    currentPrices,
-}) => {
+const MarketPrice: React.FC<{ position: UserOpenPositions }> = ({ position }) => {
     const { t } = useTranslation();
 
-    const [isMatured, setIsMatured] = useState(Date.now() > position.maturityDate);
     const networkId = useChainId();
-    const { address: walletAddress } = useAccount();
-    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
+
+    const [isMatured, setIsMatured] = useState(Date.now() > position.maturityDate);
 
     useInterval(() => {
+        // when becomes matured
         if (Date.now() > position.maturityDate) {
-            if (!isMatured) {
-                setIsMatured(true);
-            }
+            setIsMatured(true);
+
             if (!position.finalPrice) {
-                refetchUserSpeedMarkets(
-                    false,
-                    networkId,
-                    (isBiconomy ? biconomyConnector.address : walletAddress) as string
+                refetchPythPrice(
+                    getPriceId(networkId, position.currencyKey),
+                    millisecondsToSeconds(position.maturityDate)
                 );
             }
         }
     }, secondsToMilliseconds(10));
 
+    // when new position is added, refresh maturity status
+    useEffect(() => {
+        setIsMatured(Date.now() > position.maturityDate);
+    }, [position.maturityDate]);
+
     return (
         <>
             {isMatured ? (
-                position.finalPrice ? (
+                position.finalPrice > 0 ? (
                     formatCurrencyWithSign(USD_SIGN, position.finalPrice)
                 ) : (
                     <>
@@ -51,7 +48,7 @@ const MarketPrice: React.FC<{ position: UserOpenPositions; currentPrices?: { [ke
                     </>
                 )
             ) : (
-                formatCurrencyWithSign(USD_SIGN, currentPrices ? currentPrices[position.currencyKey] : 0)
+                formatCurrencyWithSign(USD_SIGN, position.currentPrice || 0)
             )}
         </>
     );

@@ -1,5 +1,6 @@
 export const LOCAL_STORAGE_KEYS = {
     UI_THEME: 'ui-theme',
+    TABLE_ROWS_PER_PAGE: 'tabel-rows-per-page',
     PRICE_SLIPPAGE: 'price-slippage',
     REFERRAL_WALLET: 'referral-wallet',
     SESSION_P_KEY: {

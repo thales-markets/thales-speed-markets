@@ -99,7 +99,7 @@ const UnresolvedPositions: React.FC = () => {
     }));
 
     const pythPricesQueries = usePythPriceQueries(networkId, priceRequests, {
-        enabled: activeSpeedMarketsDataQuery.isSuccess,
+        enabled: priceRequests.length > 0,
     });
 
     const maturedUnresolvedWithPrices = activeMatured.map((marketData, index) => {
@@ -107,9 +107,8 @@ const UnresolvedPositions: React.FC = () => {
         const claimable = !!isUserWinner(marketData.side, marketData.strikePrice, finalPrice);
         return {
             ...marketData,
-            claimable,
             finalPrice,
-            strikePrice: marketData.strikePrice,
+            claimable,
         };
     });
 
@@ -134,7 +133,7 @@ const UnresolvedPositions: React.FC = () => {
 
     const isLoading =
         isLoadingEnabled &&
-        (activeSpeedMarketsDataQuery.isLoading || pythPricesQueries.some((price) => price.isLoading));
+        (activeSpeedMarketsDataQuery.isLoading || pythPricesQueries.some((query) => query.isLoading));
 
     const priceConnection = useMemo(() => {
         return new EvmPriceServiceConnection(getPriceServiceEndpoint(networkId), { timeout: CONNECTION_TIMEOUT_MS });

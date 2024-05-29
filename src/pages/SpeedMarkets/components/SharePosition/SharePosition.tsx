@@ -1,14 +1,8 @@
 import { secondsToMilliseconds } from 'date-fns';
 import useInterval from 'hooks/useInterval';
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { getIsBiconomy } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { UserOpenPositions } from 'types/market';
-import { RootState } from 'types/ui';
-import biconomyConnector from 'utils/biconomyWallet';
-import { refetchUserSpeedMarkets } from 'utils/queryConnector';
-import { useAccount, useChainId } from 'wagmi';
 import SharePositionModal from '../SharePositionModal';
 
 const SharePosition: React.FC<{
@@ -17,27 +11,22 @@ const SharePosition: React.FC<{
     isOpen?: boolean;
     onClose?: React.Dispatch<void>;
 }> = ({ position, isDisabled, isOpen, onClose }) => {
-    const networkId = useChainId();
-    const { address: walletAddress } = useAccount();
-    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
-
     const [isMatured, setIsMatured] = useState(Date.now() > position.maturityDate);
     const [openTwitterShareModal, setOpenTwitterShareModal] = useState(isOpen);
 
     useInterval(() => {
+        // when becomes matured
         if (Date.now() > position.maturityDate) {
             if (!isMatured) {
                 setIsMatured(true);
             }
-            if (!position.finalPrice) {
-                refetchUserSpeedMarkets(
-                    false,
-                    networkId,
-                    (isBiconomy ? biconomyConnector.address : walletAddress) as string
-                );
-            }
         }
     }, secondsToMilliseconds(10));
+
+    // when new position is added, refresh maturity status
+    useEffect(() => {
+        setIsMatured(Date.now() > position.maturityDate);
+    }, [position.maturityDate]);
 
     useEffect(() => {
         if (isOpen) {

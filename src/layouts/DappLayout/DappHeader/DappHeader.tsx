@@ -118,7 +118,7 @@ const DappHeader: React.FC = () => {
 const Container = styled(FlexDivRowCentered)`
     width: 100%;
     max-width: ${PAGE_MAX_WIDTH};
-    margin: 30px auto 6px auto;
+    margin: 30px auto 16px auto;
     max-height: 40px;
 `;
 

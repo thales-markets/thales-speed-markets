@@ -743,14 +743,15 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                             <SharePosition
                                 position={{
                                     user: walletAddress,
-                                    currencyKey: currencyKey,
-                                    strikePrice: currentPrice ?? 0,
-                                    payout: SPEED_MARKETS_QUOTE * convertToStable(paidAmount),
-                                    maturityDate: Date.now() + secondsToMilliseconds(deltaTimeSec || 100),
                                     market: '',
+                                    currencyKey: currencyKey,
                                     side: positionType || Positions.UP,
+                                    strikePrice: currentPrice ?? 0,
+                                    maturityDate: Date.now() + secondsToMilliseconds(deltaTimeSec || 100),
                                     paid: convertToStable(paidAmount),
+                                    payout: SPEED_MARKETS_QUOTE * convertToStable(paidAmount),
                                     value: SPEED_MARKETS_QUOTE * convertToStable(paidAmount),
+                                    finalPrice: currentPrice ?? 0,
                                     claimable: false,
                                 }}
                                 isDisabled={isButtonDisabled}

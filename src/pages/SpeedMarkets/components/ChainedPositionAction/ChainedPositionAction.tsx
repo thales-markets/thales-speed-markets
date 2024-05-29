@@ -408,8 +408,9 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
             } else {
                 return (
                     <ResultsContainer $minWidth="180px">
-                        <Label>{t('speed-markets.user-positions.results')}</Label>
-                        <TimeRemaining fontSize={13} end={position.maturityDate} showFullCounter showSecondsCounter />
+                        <TimeRemaining end={position.maturityDate} showFullCounter showSecondsCounter>
+                            <Label>{t('speed-markets.user-positions.results-in')}</Label>
+                        </TimeRemaining>
                     </ResultsContainer>
                 );
             }

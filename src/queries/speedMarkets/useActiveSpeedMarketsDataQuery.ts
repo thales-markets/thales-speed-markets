@@ -80,17 +80,17 @@ const useActiveSpeedMarketsDataQuery = (
                     const fees = lpFee + safeBoxImpact;
 
                     const userData: UserOpenPositions = {
-                        currencyKey: parseBytes32String(marketData.asset),
-                        strikePrice: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS),
-                        payout: payout,
-                        maturityDate,
-                        market: marketData.market,
-                        side,
-                        paid: coinFormatter(marketData.buyinAmount, queryConfig.networkId) * (1 + fees),
-                        value: payout,
-                        claimable: undefined,
-                        finalPrice: undefined,
                         user: marketData.user,
+                        market: marketData.market,
+                        currencyKey: parseBytes32String(marketData.asset),
+                        side,
+                        strikePrice: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS),
+                        maturityDate,
+                        paid: coinFormatter(marketData.buyinAmount, queryConfig.networkId) * (1 + fees),
+                        payout: payout,
+                        value: payout,
+                        finalPrice: 0,
+                        claimable: undefined,
                     };
 
                     activeSpeedMarketsData.push(userData);

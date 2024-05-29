@@ -15,18 +15,18 @@ export type MarketInfo = {
 // TODO: rename to UserPosition
 export type UserOpenPositions = {
     user?: string; // TODO: change to mandatory
-    currencyKey: string;
-    strikePrice: number;
-    payout: number;
-    maturityDate: number;
     market: string;
+    currencyKey: string;
     side: Positions;
+    strikePrice: number;
+    maturityDate: number;
     paid: number;
+    payout: number;
     value: number; // TODO: remove
-    currentPrice?: number;
-    finalPrice?: number;
-    claimable?: boolean;
-    isUserWinner?: boolean;
+    currentPrice?: number; // TODO: change to mandatory
+    finalPrice: number;
+    claimable?: boolean; // TODO: change to mandatory and rename to isClaimable
+    isResolved?: boolean; // TODO: change to mandatory
 };
 
 // TODO: remove

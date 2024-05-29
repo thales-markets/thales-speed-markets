@@ -160,7 +160,7 @@ const UnresolvedChainedPositions: React.FC = () => {
 
     const isLoading =
         isLoadingEnabled &&
-        (activeChainedSpeedMarketsDataQuery.isLoading || pythPricesQueries.some((price) => price.isLoading));
+        (activeChainedSpeedMarketsDataQuery.isLoading || pythPricesQueries.some((query) => query.isLoading));
 
     // Used for canceling asynchronous tasks
     const mountedRef = useRef(true);

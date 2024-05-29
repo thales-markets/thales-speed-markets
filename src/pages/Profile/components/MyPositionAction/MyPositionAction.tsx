@@ -21,13 +21,13 @@ import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsMobile } from 'redux/modules/ui';
 import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
-import styled, { CSSProperties, useTheme } from 'styled-components';
+import styled, { CSSProperties } from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
 import { coinParser, formatCurrencyWithSign, roundNumberToDecimals } from 'thales-utils';
 import { UserOpenPositions } from 'types/market';
 import { SupportedNetwork } from 'types/network';
 import { UserPosition } from 'types/profile';
-import { RootState, ThemeInterface } from 'types/ui';
+import { RootState } from 'types/ui';
 import { ViemContract } from 'types/viem';
 import { executeBiconomyTransaction } from 'utils/biconomy';
 import biconomyConnector from 'utils/biconomyWallet';
@@ -66,7 +66,6 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     setIsActionInProgress,
 }) => {
     const { t } = useTranslation();
-    const theme: ThemeInterface = useTheme();
 
     const networkId = useChainId() as SupportedNetwork;
     const client = useClient();
@@ -304,7 +303,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
         </Button>
     );
 
-    const getButton = () => {
+    const getActionStatus = () => {
         if (position.claimable) {
             return hasAllowance || isDefaultCollateral ? (
                 getResolveButton()
@@ -318,20 +317,16 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                     <div>{getResolveButton()}</div>
                 </Tooltip>
             );
-        } else if (position.finalPrice) {
-            return (
-                <ResultsContainer>
-                    <Label>{t('common.result')}</Label>
-                    <Value $isUpperCase color={theme.error.textColor.primary}>
-                        {t('common.loss')}
-                    </Value>
-                </ResultsContainer>
-            );
         } else {
             return (
-                <ResultsContainer $minWidth="180px">
-                    <Label>{t('speed-markets.user-positions.results')}</Label>
-                    <TimeRemaining fontSize={13} end={position.maturityDate} showFullCounter showSecondsCounter />
+                <ResultsContainer>
+                    <TimeRemaining end={position.maturityDate} showFullCounter showSecondsCounter>
+                        <Label>
+                            {Date.now() > position.maturityDate
+                                ? t('common.result')
+                                : t('speed-markets.user-positions.result-in')}
+                        </Label>
+                    </TimeRemaining>
                 </ResultsContainer>
             );
         }
@@ -350,7 +345,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                         additionalStyles={{ margin: '0 12px 0 0' }}
                     />
                 )}
-                {getButton()}
+                {getActionStatus()}
             </Wrapper>
             {openApprovalModal && (
                 <ApprovalModal
@@ -383,15 +378,15 @@ const getAdditionalButtonStyle = (isMobile: boolean): CSSProperties => ({
 
 export const ResultsContainer = styled(FlexDivCentered)<{ $minWidth?: string }>`
     gap: 4px;
-    font-weight: 700;
+    font-weight: 800;
     font-size: 13px;
     line-height: 100%;
     white-space: nowrap;
     min-width: ${(props) => (props.$minWidth ? props.$minWidth : '174px')};
 `;
 
-export const Label = styled.span<{ color?: string }>`
-    color: ${(props) => (props.color ? props.color : props.theme.textColor.secondary)};
+export const Label = styled.span`
+    padding-right: 5px;
 `;
 
 export const Value = styled.span<{ color?: string; $isUpperCase?: boolean }>`

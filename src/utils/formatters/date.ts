@@ -78,7 +78,9 @@ export const formattedDurationFull = (
         duration?.months && duration.months > 0
             ? formatted.push(`${duration.months}${dateTimeTranslationMap['months-short']}`)
             : '';
-        formatted.push(`${duration.days}${dateTimeTranslationMap['days-short']}`);
+        duration?.months && duration.months > 0
+            ? formatted.push(`${duration.days}${dateTimeTranslationMap['days-short']}`)
+            : '';
         formatted.push(`${duration.hours}${dateTimeTranslationMap['hours-short']}`);
         formatted.push(`${duration.minutes}${dateTimeTranslationMap['minutes-short']}`);
     }
