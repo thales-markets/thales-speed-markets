@@ -6,7 +6,7 @@ const speedMarketsAMMContract = {
         [NetworkId.OptimismMainnet]: '0xE16B8a01490835EC1e76bAbbB3Cadd8921b32001' as Address,
         [NetworkId.OptimismSepolia]: '0xc3DF62752CeF27Cd449A196421e54d22C7BFadfa' as Address,
         [NetworkId.PolygonMainnet]: '0x4B1aED25f1877E1E9fBECBd77EeE95BB1679c361' as Address,
-        [NetworkId.Arbitrum]: '0x02D0123a89Ae6ef27419d5EBb158d1ED4Cf24FA3' as Address,
+        [NetworkId.Arbitrum]: '0x9cF89a7067D2E564803CC2Ba5dAbf03B1Daaf469' as Address, // TODO: revert to 0x02D0123a89Ae6ef27419d5EBb158d1ED4Cf24FA3
         [NetworkId.Base]: '0x85b827d133FEDC36B844b20f4a198dA583B25BAA' as Address,
         [NetworkId.ZkSync]: '0x508F31897c25C436b257E37763E157Cb53D0a6fa' as Address,
         [NetworkId.ZkSyncSepolia]: '0xF0C711f9DBd9937fc43BEa168B3F40614B3D6821' as Address,
