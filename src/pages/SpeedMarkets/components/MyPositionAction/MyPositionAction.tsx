@@ -334,7 +334,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
 
     return (
         <>
-            <Container>
+            <Container $isClaimable={position.isClaimable}>
                 {!isCollateralHidden && isMultiCollateralSupported && position.isClaimable && (
                     <CollateralSelector
                         collateralArray={getCollaterals(networkId)}
@@ -361,11 +361,11 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     );
 };
 
-const Container = styled(FlexDivCentered)`
+const Container = styled(FlexDivCentered)<{ $isClaimable: boolean }>`
     white-space: pre;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        width: 100%;
-        padding-left: 20px;
+        ${(props) => (!props.$isClaimable ? 'width: 100%;' : '')}
+        ${(props) => (!props.$isClaimable ? 'padding-left: 20px;' : '')}
     }
 `;
 

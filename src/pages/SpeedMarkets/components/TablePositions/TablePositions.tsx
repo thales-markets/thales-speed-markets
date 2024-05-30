@@ -105,8 +105,8 @@ const TablePositions: React.FC<{ data: UserPosition[] }> = ({ data }) => {
     ];
 
     const rowsPerPageLS = localStore.get(LOCAL_STORAGE_KEYS.TABLE_ROWS_PER_PAGE);
-    const rowsPerPage =
-        PAGINATION_SIZE.filter((obj) => obj.value === Number(rowsPerPageLS))[0].value || PAGINATION_SIZE[0].value;
+    const foundPagination = PAGINATION_SIZE.filter((obj) => obj.value === Number(rowsPerPageLS));
+    const rowsPerPage = foundPagination.length ? foundPagination[0].value : PAGINATION_SIZE[0].value;
 
     return <Table data={data} columns={columns as any} rowsPerPage={rowsPerPage} />;
 };
