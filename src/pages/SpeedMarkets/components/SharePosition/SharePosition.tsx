@@ -2,11 +2,11 @@ import { secondsToMilliseconds } from 'date-fns';
 import useInterval from 'hooks/useInterval';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { UserOpenPositions } from 'types/market';
+import { UserPosition } from 'types/market';
 import SharePositionModal from '../SharePositionModal';
 
 const SharePosition: React.FC<{
-    position: UserOpenPositions;
+    position: UserPosition;
     isDisabled?: boolean;
     isOpen?: boolean;
     onClose?: React.Dispatch<void>;
@@ -34,7 +34,7 @@ const SharePosition: React.FC<{
         }
     }, [isOpen]);
 
-    const displayShare = position.claimable || !isMatured;
+    const displayShare = position.isClaimable || !isMatured;
 
     return (
         <>
@@ -47,7 +47,7 @@ const SharePosition: React.FC<{
             )}
             {openTwitterShareModal && (
                 <SharePositionModal
-                    type={position.claimable ? 'resolved-speed' : 'potential-speed'}
+                    type={position.isClaimable ? 'resolved-speed' : 'potential-speed'}
                     positions={[position.side]}
                     currencyKey={position.currencyKey}
                     strikeDate={position.maturityDate}

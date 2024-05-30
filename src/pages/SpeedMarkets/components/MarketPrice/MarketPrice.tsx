@@ -5,12 +5,12 @@ import useInterval from 'hooks/useInterval';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatCurrencyWithSign } from 'thales-utils';
-import { UserOpenPositions } from 'types/market';
+import { UserPosition } from 'types/market';
 import { getPriceId } from 'utils/pyth';
 import { refetchPythPrice } from 'utils/queryConnector';
 import { useChainId } from 'wagmi';
 
-const MarketPrice: React.FC<{ position: UserOpenPositions }> = ({ position }) => {
+const MarketPrice: React.FC<{ position: UserPosition }> = ({ position }) => {
     const { t } = useTranslation();
 
     const networkId = useChainId();

@@ -4,7 +4,7 @@ import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
 import { bigNumberFormatter, coinFormatter, parseBytes32String } from 'thales-utils';
-import { UserOpenPositions } from 'types/market';
+import { UserPosition } from 'types/market';
 import { QueryConfig } from 'types/network';
 import { ViemContract } from 'types/viem';
 import { getContarctAbi } from 'utils/contracts/abi';
@@ -18,10 +18,10 @@ const useUserActiveSpeedMarketsDataQuery = (
     walletAddress: string,
     options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
-    return useQuery<UserOpenPositions[]>({
+    return useQuery<UserPosition[]>({
         queryKey: QUERY_KEYS.User.SpeedMarkets(queryConfig.networkId, walletAddress),
         queryFn: async () => {
-            const userSpeedMarketsData: UserOpenPositions[] = [];
+            const userSpeedMarketsData: UserPosition[] = [];
 
             try {
                 const speedMarketsDataContractLocal = getContract({
@@ -73,7 +73,8 @@ const useUserActiveSpeedMarketsDataQuery = (
                             : getFeesFromHistory(createdAt).safeBoxImpact;
                     const fees = lpFee + safeBoxImpact;
 
-                    const userData: UserOpenPositions = {
+                    const userData: UserPosition = {
+                        user: marketData.user,
                         market: marketData.market,
                         currencyKey: parseBytes32String(marketData.asset),
                         side,
@@ -81,9 +82,10 @@ const useUserActiveSpeedMarketsDataQuery = (
                         maturityDate,
                         paid: coinFormatter(marketData.buyinAmount, queryConfig.networkId) * (1 + fees),
                         payout: payout,
-                        value: payout,
+                        currentPrice: 0,
                         finalPrice: 0,
-                        claimable: false,
+                        isClaimable: false,
+                        isResolved: false,
                     };
 
                     userSpeedMarketsData.push(userData);

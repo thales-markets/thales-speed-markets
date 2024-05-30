@@ -39,7 +39,7 @@ const Notifications: React.FC = () => {
     );
     const speedMarketsNotifications = useMemo(() => {
         if (userActiveSpeedMarketsDataQuery.isSuccess && userActiveSpeedMarketsDataQuery.data) {
-            return userActiveSpeedMarketsDataQuery.data.filter((marketData) => marketData.claimable).length;
+            return userActiveSpeedMarketsDataQuery.data.filter((marketData) => marketData.isClaimable).length;
         }
         return 0;
     }, [userActiveSpeedMarketsDataQuery]);

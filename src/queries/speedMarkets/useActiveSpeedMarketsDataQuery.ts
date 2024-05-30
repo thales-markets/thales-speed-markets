@@ -6,7 +6,7 @@ import { CONNECTION_TIMEOUT_MS, PYTH_CURRENCY_DECIMALS, SUPPORTED_ASSETS } from 
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
 import { bigNumberFormatter, coinFormatter, parseBytes32String } from 'thales-utils';
-import { UserOpenPositions } from 'types/market';
+import { UserPosition } from 'types/market';
 import { QueryConfig } from 'types/network';
 import { ViemContract } from 'types/viem';
 import { getContarctAbi } from 'utils/contracts/abi';
@@ -20,10 +20,10 @@ const useActiveSpeedMarketsDataQuery = (
     queryConfig: QueryConfig,
     options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
-    return useQuery<UserOpenPositions[]>({
+    return useQuery<UserPosition[]>({
         queryKey: QUERY_KEYS.Markets.ActiveSpeedMarkets(queryConfig.networkId),
         queryFn: async () => {
-            const activeSpeedMarketsData: UserOpenPositions[] = [];
+            const activeSpeedMarketsData: UserPosition[] = [];
 
             try {
                 const speedMarketsAMMContractLocal = getContract({
@@ -79,7 +79,7 @@ const useActiveSpeedMarketsDataQuery = (
                             : getFeesFromHistory(createdAt).safeBoxImpact;
                     const fees = lpFee + safeBoxImpact;
 
-                    const userData: UserOpenPositions = {
+                    const userData: UserPosition = {
                         user: marketData.user,
                         market: marketData.market,
                         currencyKey: parseBytes32String(marketData.asset),
@@ -88,9 +88,10 @@ const useActiveSpeedMarketsDataQuery = (
                         maturityDate,
                         paid: coinFormatter(marketData.buyinAmount, queryConfig.networkId) * (1 + fees),
                         payout: payout,
-                        value: payout,
+                        currentPrice: 0,
                         finalPrice: 0,
-                        claimable: undefined,
+                        isClaimable: false,
+                        isResolved: false,
                     };
 
                     activeSpeedMarketsData.push(userData);
@@ -120,19 +121,19 @@ const useActiveSpeedMarketsDataQuery = (
                             : getFeesFromHistory(Date.now()).safeBoxImpact;
                     const fees = lpFee + safeBoxImpact;
 
-                    const userData: UserOpenPositions = {
-                        currencyKey: currencyKey,
-                        strikePrice: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS),
-                        payout: payout,
-                        maturityDate: secondsToMilliseconds(Number(marketData.strikeTime)),
-                        market: marketData.market,
-                        side,
-                        paid: coinFormatter(marketData.buyinAmount, queryConfig.networkId) * (1 + fees),
-                        value: payout,
-                        claimable: false,
-                        finalPrice: 0,
-                        currentPrice: prices[currencyKey],
+                    const userData: UserPosition = {
                         user: marketData.user,
+                        market: marketData.market,
+                        currencyKey: currencyKey,
+                        side,
+                        strikePrice: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS),
+                        maturityDate: secondsToMilliseconds(Number(marketData.strikeTime)),
+                        paid: coinFormatter(marketData.buyinAmount, queryConfig.networkId) * (1 + fees),
+                        payout: payout,
+                        currentPrice: prices[currencyKey],
+                        finalPrice: 0,
+                        isClaimable: false,
+                        isResolved: false,
                     };
 
                     activeSpeedMarketsData.push(userData);

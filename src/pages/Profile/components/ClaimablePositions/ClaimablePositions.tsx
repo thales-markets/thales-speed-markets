@@ -3,7 +3,6 @@ import { USD_SIGN } from 'constants/currency';
 import { millisecondsToSeconds } from 'date-fns';
 import { orderBy } from 'lodash';
 import ChainedPositionAction from 'pages/SpeedMarkets/components/ChainedPositionAction';
-import { ShareIcon } from 'pages/SpeedMarkets/components/OpenPosition/OpenPosition';
 import SharePositionModal from 'pages/SpeedMarkets/components/SharePositionModal/SharePositionModal';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
@@ -13,20 +12,21 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
+import { getIsBiconomy } from 'redux/modules/wallet';
 import { useTheme } from 'styled-components';
 import { formatCurrency, formatCurrencyWithSign } from 'thales-utils';
 import { SharePositionData } from 'types/flexCards';
-import { UserPosition } from 'types/profile';
+import { UserPosition } from 'types/market';
+import { UserProfilePosition } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
+import biconomyConnector from 'utils/biconomyWallet';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getPriceId } from 'utils/pyth';
 import { isUserWinner } from 'utils/speedAmm';
-import MyPositionAction from '../MyPositionAction';
-import { getDirections } from '../styled-components';
 import { useAccount, useChainId, useClient } from 'wagmi';
-import { getIsBiconomy } from 'redux/modules/wallet';
-import biconomyConnector from 'utils/biconomyWallet';
+import MyPositionAction from '../../../SpeedMarkets/components/MyPositionAction';
+import { ShareIcon, getDirections } from '../styled-components';
 
 type ClaimablePositionsProps = {
     searchAddress: string;
@@ -126,9 +126,9 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
         })
         .filter((marketData) => marketData.claimable);
 
-    const data: UserPosition[] = useMemo(() => {
-        const speedMarketsOpenPositions: UserPosition[] = userOpenSpeedMarketsData
-            .filter((marketData) => marketData.claimable)
+    const data: UserProfilePosition[] = useMemo(() => {
+        const speedMarketsOpenPositions: UserProfilePosition[] = userOpenSpeedMarketsData
+            .filter((marketData) => marketData.isClaimable)
             .map((marketData) => {
                 return {
                     currencyKey: marketData.currencyKey,
@@ -142,14 +142,14 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
                     market: marketData.market,
                     sides: [marketData.side],
                     paid: marketData.paid,
-                    value: marketData.value,
-                    claimable: !!marketData.claimable,
+                    value: marketData.payout,
+                    claimable: !!marketData.isClaimable,
                     claimed: false,
                     isChained: false,
                 };
             });
 
-        const chainedSpeedMarketsOpenPositions: UserPosition[] = userOpenChainedSpeedMarketsDataWithPrices.map(
+        const chainedSpeedMarketsOpenPositions: UserProfilePosition[] = userOpenChainedSpeedMarketsDataWithPrices.map(
             (marketData) => {
                 return {
                     currencyKey: marketData.currencyKey,
@@ -181,19 +181,34 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
     const filteredData = useMemo(() => {
         if (searchText === '') return data;
         return data.filter(
-            (position: UserPosition) => position.currencyKey.toLowerCase().indexOf(searchText.toLowerCase()) > -1
+            (position: UserProfilePosition) => position.currencyKey.toLowerCase().indexOf(searchText.toLowerCase()) > -1
         );
     }, [searchText, data]);
 
     const rows = useMemo(() => {
-        const generateRows = (data: UserPosition[]) => {
+        const generateRows = (data: UserProfilePosition[]) => {
             try {
-                return data.map((row: UserPosition) => {
+                return data.map((row: UserProfilePosition) => {
                     const chainedPosition = row.isChained
                         ? userOpenChainedSpeedMarketsDataWithPrices.find(
                               (marketData) => marketData.address === row.market
                           )
                         : undefined;
+
+                    const mappedRow: UserPosition = {
+                        user: '',
+                        market: row.market,
+                        currencyKey: row.currencyKey,
+                        side: row.sides[0],
+                        strikePrice: row.strikePrice,
+                        maturityDate: row.maturityDate,
+                        paid: row.paid,
+                        payout: row.payout,
+                        currentPrice: 0,
+                        finalPrice: row.finalPrice,
+                        isClaimable: row.claimable,
+                        isResolved: false,
+                    };
 
                     const cells: any = [
                         {
@@ -226,7 +241,7 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
                                     isProfileAction
                                 />
                             ) : (
-                                <MyPositionAction position={row} />
+                                <MyPositionAction position={mappedRow} />
                             ),
                         },
                         {

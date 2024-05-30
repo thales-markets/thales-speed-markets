@@ -3,7 +3,6 @@ import { USD_SIGN } from 'constants/currency';
 import { millisecondsToSeconds } from 'date-fns';
 import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
-import { ShareIcon } from 'pages/SpeedMarkets/components/OpenPosition/OpenPosition';
 import SharePositionModal from 'pages/SpeedMarkets/components/SharePositionModal';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -87,8 +86,8 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
         : position.canResolve;
 
     const claimable = useMemo(
-        () => (position.isOpen ? userWonStatuses.every((status) => status) : position.claimable),
-        [position.isOpen, position.claimable, userWonStatuses]
+        () => (position.isOpen ? userWonStatuses.every((status) => status) : position.isClaimable),
+        [position.isOpen, position.isClaimable, userWonStatuses]
     );
 
     const positionWithPrices = {
@@ -438,6 +437,14 @@ const FlexContainer = styled(AlignedFlex)`
 const ShareDiv = styled(FlexDivCentered)`
     width: 20px;
     height: 20px;
+`;
+
+const ShareIcon = styled.i<{ disabled: boolean }>`
+    color: ${(props) => props.theme.textColor.secondary};
+    cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
+    opacity: ${(props) => (props.disabled ? '0.5' : '1')};
+    font-size: 20px;
+    text-transform: none;
 `;
 
 export default ChainedPosition;

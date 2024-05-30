@@ -742,7 +742,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                             </ShareText>
                             <SharePosition
                                 position={{
-                                    user: walletAddress,
+                                    user: walletAddress || '',
                                     market: '',
                                     currencyKey: currencyKey,
                                     side: positionType || Positions.UP,
@@ -750,9 +750,10 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                                     maturityDate: Date.now() + secondsToMilliseconds(deltaTimeSec || 100),
                                     paid: convertToStable(paidAmount),
                                     payout: SPEED_MARKETS_QUOTE * convertToStable(paidAmount),
-                                    value: SPEED_MARKETS_QUOTE * convertToStable(paidAmount),
+                                    currentPrice: currentPrice ?? 0,
                                     finalPrice: currentPrice ?? 0,
-                                    claimable: false,
+                                    isClaimable: false,
+                                    isResolved: false,
                                 }}
                                 isDisabled={isButtonDisabled}
                                 isOpen={openTwitterShareModal}

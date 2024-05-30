@@ -2,7 +2,7 @@ import CollateralSelector from 'components/CollateralSelector';
 import { USD_SIGN } from 'constants/currency';
 import { secondsToMilliseconds } from 'date-fns';
 import useInterval from 'hooks/useInterval';
-import MyPositionAction from 'pages/Profile/components/MyPositionAction';
+import MyPositionAction from 'pages/SpeedMarkets/components/MyPositionAction';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -10,7 +10,7 @@ import { getSelectedCollateralIndex } from 'redux/modules/wallet';
 import styled, { useTheme } from 'styled-components';
 import { FlexDivColumn, FlexDivRow, FlexDivSpaceBetween, FlexDivStart } from 'styles/common';
 import { formatCurrencyWithSign } from 'thales-utils';
-import { UserOpenPositions } from 'types/market';
+import { UserPosition } from 'types/market';
 import { RootState, ThemeInterface } from 'types/ui';
 import { getCollaterals } from 'utils/currency';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
@@ -19,7 +19,7 @@ import { useChainId } from 'wagmi';
 import MarketPrice from '../../MarketPrice';
 import SharePosition from '../../SharePosition';
 
-const CardPosition: React.FC<{ position: UserOpenPositions }> = ({ position }) => {
+const CardPosition: React.FC<{ position: UserPosition }> = ({ position }) => {
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 

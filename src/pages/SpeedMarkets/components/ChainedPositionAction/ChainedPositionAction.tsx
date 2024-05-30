@@ -21,7 +21,7 @@ import {
     ResultsContainer,
     Value,
     getDefaultButtonProps,
-} from 'pages/Profile/components/MyPositionAction/MyPositionAction';
+} from 'pages/SpeedMarkets/components/MyPositionAction/MyPositionAction';
 import { CSSProperties, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -103,7 +103,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
     }, [isSubmittingBatch]);
 
     useEffect(() => {
-        if (!position.claimable || isDefaultCollateral || isOverview) {
+        if (!position.isClaimable || isDefaultCollateral || isOverview) {
             return;
         }
 
@@ -135,7 +135,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
     }, [
         position.payout,
         position.isOpen,
-        position.claimable,
+        position.isClaimable,
         networkId,
         walletAddress,
         isBiconomy,
@@ -381,7 +381,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
 
     const getButton = () => {
         if (position.isOpen) {
-            if (position.claimable) {
+            if (position.isClaimable) {
                 return hasAllowance || isDefaultCollateral ? (
                     getResolveButton()
                 ) : (
@@ -433,7 +433,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
         <>
             <FlexDivCentered>
                 {getButton()}
-                {!isOverview && isMultiCollateralSupported && position.claimable && (
+                {!isOverview && isMultiCollateralSupported && position.isClaimable && (
                     <CollateralSelector
                         collateralArray={getCollaterals(networkId)}
                         selectedItem={selectedCollateralIndex}

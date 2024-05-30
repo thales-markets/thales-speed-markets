@@ -24,9 +24,8 @@ import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet'
 import styled, { CSSProperties } from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
 import { coinParser, formatCurrencyWithSign, roundNumberToDecimals } from 'thales-utils';
-import { UserOpenPositions } from 'types/market';
+import { UserPosition } from 'types/market';
 import { SupportedNetwork } from 'types/network';
-import { UserPosition } from 'types/profile';
 import { RootState } from 'types/ui';
 import { ViemContract } from 'types/viem';
 import { executeBiconomyTransaction } from 'utils/biconomy';
@@ -53,7 +52,7 @@ import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 const ONE_HUNDRED_AND_THREE_PERCENT = 1.03;
 
 type MyPositionActionProps = {
-    position: UserPosition | UserOpenPositions;
+    position: UserPosition;
     maxPriceDelayForResolvingSec?: number;
     isCollateralHidden?: boolean;
     setIsActionInProgress?: React.Dispatch<boolean>;
@@ -105,7 +104,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
 
         const getAllowance = async () => {
             try {
-                const parsedAmount = coinParser(position.value.toString(), networkId);
+                const parsedAmount = coinParser(position.payout.toString(), networkId);
                 const allowance = await checkAllowance(
                     parsedAmount,
                     erc20Instance,
@@ -121,7 +120,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
             getAllowance();
         }
     }, [
-        position.value,
+        position.payout,
         networkId,
         walletAddress,
         isBiconomy,
@@ -293,7 +292,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                       isSubmitting
                           ? t('speed-markets.user-positions.claim-win-progress')
                           : t('speed-markets.user-positions.claim-win')
-                  } ${formatCurrencyWithSign(USD_SIGN, position.value, 2)}`
+                  } ${formatCurrencyWithSign(USD_SIGN, position.payout, 2)}`
                 : isAllowing
                 ? `${t('common.enable-wallet-access.approve-progress')} ${defaultCollateral}...`
                 : t('common.enable-wallet-access.approve-swap', {
@@ -304,7 +303,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     );
 
     const getActionStatus = () => {
-        if (position.claimable) {
+        if (position.isClaimable) {
             return hasAllowance || isDefaultCollateral ? (
                 getResolveButton()
             ) : (
@@ -335,7 +334,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     return (
         <>
             <Wrapper>
-                {!isCollateralHidden && isMultiCollateralSupported && position.claimable && (
+                {!isCollateralHidden && isMultiCollateralSupported && position.isClaimable && (
                     <CollateralSelector
                         collateralArray={getCollaterals(networkId)}
                         selectedItem={selectedCollateralIndex}
@@ -350,7 +349,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
             {openApprovalModal && (
                 <ApprovalModal
                     // add three percent to approval amount to take into account price changes
-                    defaultAmount={roundNumberToDecimals(ONE_HUNDRED_AND_THREE_PERCENT * position.value)}
+                    defaultAmount={roundNumberToDecimals(ONE_HUNDRED_AND_THREE_PERCENT * position.payout)}
                     tokenSymbol={defaultCollateral}
                     isAllowing={isAllowing}
                     onSubmit={handleAllowance}

@@ -1,10 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 import { FlexDivColumn } from 'styles/common';
-import { UserOpenPositions } from 'types/market';
+import { UserPosition } from 'types/market';
 import CardPosition from './CardPosition/CardPosition';
 
-const CardPositions: React.FC<{ data: UserOpenPositions[] }> = ({ data }) => {
+const CardPositions: React.FC<{ data: UserPosition[] }> = ({ data }) => {
     return (
         <Container>
             {data.map((position, index) => (

@@ -10,7 +10,7 @@ import { secondsToMilliseconds } from 'date-fns';
 import { Positions, TradingSteps } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import useInterval from 'hooks/useInterval';
-import OpenPositions from 'pages/SpeedMarkets/components/OpenPositions';
+import OpenPositions from 'pages/SpeedMarkets/components/UserOpenPositions';
 import LightweightChart from 'pages/SpeedMarkets/components/PriceChart/LightweightChart';
 import useAmmChainedSpeedMarketsLimitsQuery from 'queries/speedMarkets/useAmmChainedSpeedMarketsLimitsQuery';
 import useAmmSpeedMarketsLimitsQuery from 'queries/speedMarkets/useAmmSpeedMarketsLimitsQuery';

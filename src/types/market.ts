@@ -12,9 +12,8 @@ export type MarketInfo = {
     url?: string;
 };
 
-// TODO: rename to UserPosition
-export type UserOpenPositions = {
-    user?: string; // TODO: change to mandatory
+export type UserPosition = {
+    user: string;
     market: string;
     currencyKey: string;
     side: Positions;
@@ -22,25 +21,10 @@ export type UserOpenPositions = {
     maturityDate: number;
     paid: number;
     payout: number;
-    value: number; // TODO: remove
-    currentPrice?: number; // TODO: change to mandatory
+    currentPrice: number;
     finalPrice: number;
-    claimable?: boolean; // TODO: change to mandatory and rename to isClaimable
-    isResolved?: boolean; // TODO: change to mandatory
-};
-
-// TODO: remove
-export type UserClosedPositions = {
-    currencyKey: string;
-    strikePrice: number;
-    payout: number;
-    maturityDate: number;
-    market: string;
-    side: Positions;
-    paid: number;
-    value: number;
-    finalPrice: number;
-    isUserWinner: boolean;
+    isClaimable: boolean;
+    isResolved: boolean;
 };
 
 export type Risk = { current: number; max: number };
@@ -104,7 +88,7 @@ export type ChainedSpeedMarket = {
     isOpen: boolean;
     isMatured: boolean;
     canResolve: boolean;
-    claimable: boolean;
+    isClaimable: boolean;
     isUserWinner: boolean;
     user: string;
 };

@@ -13,7 +13,7 @@ import { millisecondsToSeconds, secondsToMinutes } from 'date-fns';
 import { Positions } from 'enums/market';
 import i18n from 'i18n';
 import { toast } from 'react-toastify';
-import { ChainedSpeedMarket, UserOpenPositions } from 'types/market';
+import { ChainedSpeedMarket, UserPosition } from 'types/market';
 import { QueryConfig } from 'types/network';
 import { ViemContract } from 'types/viem';
 import { getPriceId, getPriceServiceEndpoint, priceParser } from 'utils/pyth';
@@ -172,7 +172,7 @@ export const getUserLostAtSideIndex = (position: ChainedSpeedMarket) => {
 };
 
 export const resolveAllSpeedPositions = async (
-    positions: UserOpenPositions[],
+    positions: UserPosition[],
     isAdmin: boolean,
     queryConfig: QueryConfig,
     isBiconomy?: boolean,

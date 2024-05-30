@@ -19,7 +19,7 @@ import { getIsMobile } from 'redux/modules/ui';
 import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
 import styled, { CSSProperties } from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
-import { UserOpenPositions } from 'types/market';
+import { UserPosition } from 'types/market';
 import { SupportedNetwork } from 'types/network';
 import { RootState } from 'types/ui';
 import { ViemContract } from 'types/viem';
@@ -38,7 +38,7 @@ import { waitForTransactionReceipt } from 'viem/actions';
 import { useChainId, useClient, useWalletClient } from 'wagmi';
 
 type OverviewPositionActionProps = {
-    position: UserOpenPositions;
+    position: UserPosition;
     maxPriceDelayForResolvingSec: number;
     isAdmin: boolean;
     isSubmittingBatch: boolean;

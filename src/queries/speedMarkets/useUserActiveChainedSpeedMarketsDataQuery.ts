@@ -88,7 +88,7 @@ const useUserActiveChainedSpeedMarketsDataQuery = (
                         isOpen: true,
                         isMatured: maturityDate < Date.now(),
                         canResolve: false,
-                        claimable: false,
+                        isClaimable: false,
                         isUserWinner: false,
                         user: marketData.user,
                     };

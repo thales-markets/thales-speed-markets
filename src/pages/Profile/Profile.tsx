@@ -11,10 +11,12 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { getIsAppReady } from 'redux/modules/app';
+import { getIsBiconomy } from 'redux/modules/wallet';
 import { useTheme } from 'styled-components';
 import { formatCurrencyWithSign, formatPercentage } from 'thales-utils';
 import { UserProfileData } from 'types/profile';
 import { RootState, ThemeInterface } from 'types/ui';
+import biconomyConnector from 'utils/biconomyWallet';
 import { getPriceId } from 'utils/pyth';
 import { history } from 'utils/routes';
 import { isUserWinner } from 'utils/speedAmm';
@@ -22,7 +24,6 @@ import { useAccount, useChainId, useClient } from 'wagmi';
 import { MARKET_DURATION_IN_DAYS } from '../../constants/market';
 import ClaimablePositions from './components/ClaimablePositions';
 import OpenPositions from './components/OpenPositions';
-import PositionHistory from './components/PositionHistory';
 import ProfileSection from './components/ProfileSection';
 import TransactionHistory from './components/TransactionHistory';
 import {
@@ -38,8 +39,6 @@ import {
     StatsValue,
     Title,
 } from './styled-components';
-import { getIsBiconomy } from 'redux/modules/wallet';
-import biconomyConnector from 'utils/biconomyWallet';
 
 enum NavItems {
     MyPositions = 'my-positions',
@@ -69,7 +68,7 @@ const Profile: React.FC = () => {
     );
     const speedMarketsNotifications =
         userActiveSpeedMarketsDataQuery.isSuccess && userActiveSpeedMarketsDataQuery.data
-            ? userActiveSpeedMarketsDataQuery.data.filter((marketData) => marketData.claimable).length
+            ? userActiveSpeedMarketsDataQuery.data.filter((marketData) => marketData.isClaimable).length
             : 0;
 
     const userActiveChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
@@ -268,15 +267,6 @@ const Profile: React.FC = () => {
                                 subtitle={t('profile.history-limit', { days: MARKET_DURATION_IN_DAYS })}
                             >
                                 <TransactionHistory
-                                    searchAddress={searchAddress}
-                                    searchText={searchAddress ? '' : searchText}
-                                />
-                            </ProfileSection>
-                            <ProfileSection
-                                title={t('profile.accordions.position-history')}
-                                subtitle={t('profile.history-limit', { days: MARKET_DURATION_IN_DAYS })}
-                            >
-                                <PositionHistory
                                     searchAddress={searchAddress}
                                     searchText={searchAddress ? '' : searchText}
                                 />

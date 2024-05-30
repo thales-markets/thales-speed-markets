@@ -5,7 +5,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
 import { formatCurrencyWithSign } from 'thales-utils';
-import { UserOpenPositions } from 'types/market';
+import { UserPosition } from 'types/market';
 import { ThemeInterface } from 'types/ui';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import { formatNumberShort } from 'utils/formatters/number';
@@ -14,7 +14,7 @@ import OverviewPositionAction from '../OverviewPositionAction';
 import { Label, Separator } from '../OverviewPositionAction/OverviewPositionAction';
 
 type UnresolvedPositionProps = {
-    position: UserOpenPositions;
+    position: UserPosition;
     maxPriceDelayForResolvingSec: number;
     isAdmin: boolean;
     isSubmittingBatch: boolean;

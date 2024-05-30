@@ -1,18 +1,18 @@
 import Table from 'components/Table';
 import { USD_SIGN } from 'constants/currency';
 import { t } from 'i18next';
-import MyPositionAction from 'pages/Profile/components/MyPositionAction';
+import MyPositionAction from 'pages/SpeedMarkets/components/MyPositionAction';
 import React from 'react';
 import styled from 'styled-components';
 import { formatCurrencyWithSign, localStore } from 'thales-utils';
-import { UserOpenPositions } from 'types/market';
+import { UserPosition } from 'types/market';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import MarketPrice from '../MarketPrice';
 import SharePosition from '../SharePosition';
 import { PAGINATION_SIZE } from 'components/Table/Table';
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 
-const TablePositions: React.FC<{ data: UserOpenPositions[] }> = ({ data }) => {
+const TablePositions: React.FC<{ data: UserPosition[] }> = ({ data }) => {
     const columns = [
         {
             header: <Header>{t('speed-markets.user-positions.asset')}</Header>,

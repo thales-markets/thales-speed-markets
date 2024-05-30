@@ -24,7 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
-import { UserOpenPositions } from 'types/market';
+import { UserPosition } from 'types/market';
 import { RootState } from 'types/ui';
 import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAssetsAsObject } from 'utils/pyth';
 import { refetchActiveSpeedMarkets, refetchPythPrice } from 'utils/queryConnector';
@@ -170,7 +170,7 @@ const UnresolvedPositions: React.FC = () => {
         setIsLoadingEnabled(true);
     }, [networkId]);
 
-    const handleResolveAll = async (positions: UserOpenPositions[], isAdmin: boolean) => {
+    const handleResolveAll = async (positions: UserPosition[], isAdmin: boolean) => {
         setIsSubmitting(true);
         await resolveAllSpeedPositions(
             positions,
@@ -184,7 +184,7 @@ const UnresolvedPositions: React.FC = () => {
     };
 
     const getButton = (
-        positions: UserOpenPositions[],
+        positions: UserPosition[],
         sectionName: typeof SECTIONS[keyof typeof SECTIONS],
         isAdmin: boolean
     ) => {
@@ -210,7 +210,7 @@ const UnresolvedPositions: React.FC = () => {
         );
     };
 
-    const getSection = (section: typeof SECTIONS[keyof typeof SECTIONS], positions: UserOpenPositions[]) => {
+    const getSection = (section: typeof SECTIONS[keyof typeof SECTIONS], positions: UserPosition[]) => {
         let titleKey = '';
         switch (section) {
             case SECTIONS.userWinner:
