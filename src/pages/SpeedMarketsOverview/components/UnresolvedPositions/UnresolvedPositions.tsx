@@ -104,22 +104,22 @@ const UnresolvedPositions: React.FC = () => {
 
     const maturedUnresolvedWithPrices = activeMatured.map((marketData, index) => {
         const finalPrice = pythPricesQueries[index].data || 0;
-        const claimable = !!isUserWinner(marketData.side, marketData.strikePrice, finalPrice);
+        const isClaimable = !!isUserWinner(marketData.side, marketData.strikePrice, finalPrice);
         return {
             ...marketData,
             finalPrice,
-            claimable,
+            isClaimable,
         };
     });
 
     const userWinnerSpeedMarketsData = maturedUnresolvedWithPrices.filter(
-        (marketData) => marketData.claimable && !!marketData.finalPrice
+        (marketData) => marketData.isClaimable && !!marketData.finalPrice
     );
     const ammWinnerSpeedMarketsData = maturedUnresolvedWithPrices.filter(
-        (marketData) => !marketData.claimable && !!marketData.finalPrice
+        (marketData) => !marketData.isClaimable && !!marketData.finalPrice
     );
     const unknownPriceSpeedMarketsData = maturedUnresolvedWithPrices.filter(
-        (marketData) => !marketData.claimable && !marketData.finalPrice
+        (marketData) => !marketData.isClaimable && !marketData.finalPrice
     );
     const openSpeedMarketsData = activeSpeedMarketsData
         .filter((marketData) => marketData.maturityDate > Date.now())

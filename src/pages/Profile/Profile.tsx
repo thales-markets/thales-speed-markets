@@ -122,11 +122,11 @@ const Profile: React.FC = () => {
             const userWonStatuses = marketData.sides.map((side, i) =>
                 isUserWinner(side, strikePrices[i], finalPrices[i])
             );
-            const claimable = userWonStatuses.every((status) => status);
+            const isClaimable = userWonStatuses.every((status) => status);
 
-            return { ...marketData, finalPrices, claimable };
+            return { ...marketData, finalPrices, isClaimable };
         })
-        .filter((marketData) => marketData.claimable).length;
+        .filter((marketData) => marketData.isClaimable).length;
 
     const totalNotifications = speedMarketsNotifications + chainedSpeedMarketsNotifications;
 

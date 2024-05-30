@@ -127,17 +127,17 @@ const UnresolvedChainedPositions: React.FC = () => {
         const canResolve =
             userWonStatuses.some((status) => status === false) ||
             userWonStatuses.every((status) => status !== undefined);
-        const claimable = userWonStatuses.every((status) => status);
+        const isClaimable = userWonStatuses.every((status) => status);
         const isUnknownPrice = marketData.isMatured && userWonStatuses.some((status) => status === undefined);
 
-        return { ...marketData, strikePrices, finalPrices, canResolve, claimable, isUnknownPrice };
+        return { ...marketData, strikePrices, finalPrices, canResolve, isClaimable, isUnknownPrice };
     });
 
     const userWinnerSpeedMarketsData = partiallyMaturedUnresolvedWithPrices.filter(
-        (marketData) => marketData.claimable
+        (marketData) => marketData.isClaimable
     );
     const ammWinnerSpeedMarketsData = partiallyMaturedUnresolvedWithPrices.filter(
-        (marketData) => marketData.canResolve && !marketData.claimable
+        (marketData) => marketData.canResolve && !marketData.isClaimable
     );
     const unknownPriceSpeedMarketsData = partiallyMaturedUnresolvedWithPrices.filter(
         (marketData) => !marketData.canResolve && marketData.isUnknownPrice

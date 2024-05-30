@@ -115,11 +115,11 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
     // set final prices and claimable status
     const maturedUserSpeedMarketsWithPrices: UserPosition[] = activeSpeedMatured.map((marketData, index) => {
         const finalPrice = pythPricesQueries[index].data || 0;
-        const claimable = !!isUserWinner(marketData.side, marketData.strikePrice, finalPrice);
+        const isClaimable = !!isUserWinner(marketData.side, marketData.strikePrice, finalPrice);
         return {
             ...marketData,
             finalPrice,
-            claimable,
+            isClaimable,
         };
     });
     const allUserOpenSpeedMarketsData = activeSpeedNotMatured.concat(maturedUserSpeedMarketsWithPrices);
@@ -142,16 +142,17 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
             let isStatusChanged = false;
             const chainedPositionsWithStatusUpdated: ChainedSpeedMarket[] = userOpenChainedSpeedMarketsData.map(
                 (position) => {
-                    const claimable = chainedClaimableStatuses.find((p) => p.address === position.address)?.isClaimable;
+                    const isClaimable = chainedClaimableStatuses.find((p) => p.address === position.address)
+                        ?.isClaimable;
                     const claimableUpdated = chainedWithClaimableStatus.find((p) => p.address === position.address)
                         ?.isClaimable;
 
                     isStatusChanged =
-                        isStatusChanged || (position.isClaimable !== claimable && claimableUpdated !== claimable);
+                        isStatusChanged || (position.isClaimable !== isClaimable && claimableUpdated !== isClaimable);
 
                     return {
                         ...position,
-                        isClaimable: claimable,
+                        isClaimable,
                     } as ChainedSpeedMarket;
                 }
             );

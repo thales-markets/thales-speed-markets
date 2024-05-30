@@ -85,7 +85,7 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
         ? userWonStatuses.some((status) => status === false) || userWonStatuses.every((status) => status !== undefined)
         : position.canResolve;
 
-    const claimable = useMemo(
+    const isClaimable = useMemo(
         () => (position.isOpen ? userWonStatuses.every((status) => status) : position.isClaimable),
         [position.isOpen, position.isClaimable, userWonStatuses]
     );
@@ -95,14 +95,14 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
         strikePrices,
         finalPrices,
         canResolve,
-        claimable,
+        isClaimable,
     };
 
     const size = useMemo(() => position.sides.length, [position.sides]);
     const userFirstLostIndex = userWonStatuses.findIndex((wonStatus) => !wonStatus);
     const userFirstLostOrWonIndex = userFirstLostIndex > -1 ? userFirstLostIndex : size - 1;
 
-    const statusDecisionIndex = positionWithPrices.claimable
+    const statusDecisionIndex = positionWithPrices.isClaimable
         ? size - 1
         : position.isOpen
         ? fetchLastFinalPriceIndex
@@ -120,8 +120,8 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
     }, [canResolve, finalPrices, size, position.isOpen, fetchLastFinalPriceIndex]);
 
     useEffect(() => {
-        setIsClaimable && setIsClaimable(claimable);
-    }, [setIsClaimable, claimable]);
+        setIsClaimable && setIsClaimable(isClaimable);
+    }, [setIsClaimable, isClaimable]);
 
     console.log('positionWithPrices: ', positionWithPrices);
 
@@ -307,7 +307,7 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
             {openTwitterShareModal && (
                 <SharePositionModal
                     type={
-                        positionWithPrices.claimable || positionWithPrices.isUserWinner
+                        positionWithPrices.isClaimable || positionWithPrices.isUserWinner
                             ? 'chained-speed-won'
                             : 'chained-speed-lost'
                     }
