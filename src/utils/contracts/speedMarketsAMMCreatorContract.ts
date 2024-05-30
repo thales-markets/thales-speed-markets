@@ -7,7 +7,7 @@ const speedMarketsAMMCreatorContract = {
         [NetworkId.OptimismMainnet]: TBD_ADDRESS,
         [NetworkId.OptimismSepolia]: '0xE114677AaBf957d5EeE55f73C6b93fdEDfC849C3' as Address,
         [NetworkId.PolygonMainnet]: TBD_ADDRESS,
-        [NetworkId.Arbitrum]: '0x101948A58C35cc84499c4eE282A27bc59217D98B', // TODO: Update to new
+        [NetworkId.Arbitrum]: '0x101948A58C35cc84499c4eE282A27bc59217D98B' as Address, // TODO: Update to new
         [NetworkId.Base]: TBD_ADDRESS,
         [NetworkId.ZkSync]: TBD_ADDRESS,
         [NetworkId.ZkSyncSepolia]: TBD_ADDRESS,
