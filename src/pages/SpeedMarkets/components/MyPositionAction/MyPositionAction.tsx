@@ -226,16 +226,14 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                           collateralAddress,
                           speedMarketsAMMContractWithSigner,
                           'resolveMarket',
-                          [position.market, priceUpdateData],
-                          updateFee
+                          [position.market, priceUpdateData]
                       )
                     : await executeBiconomyTransaction(
                           networkId,
                           collateralAddress,
                           speedMarketsAMMContractWithSigner,
                           'resolveMarketWithOfframp',
-                          [position.market, priceUpdateData, collateralAddress, isEth],
-                          updateFee
+                          [position.market, priceUpdateData, collateralAddress, isEth]
                       );
             } else {
                 hash = isDefaultCollateral

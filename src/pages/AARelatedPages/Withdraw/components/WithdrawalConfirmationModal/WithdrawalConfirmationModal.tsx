@@ -13,6 +13,7 @@ import { useChainId, useWalletClient } from 'wagmi';
 import { getContract } from 'viem';
 import multipleCollateral from 'utils/contracts/multipleCollateralContract';
 import { ViemContract } from 'types/viem';
+import Button from 'components/Button';
 
 type WithdrawalConfirmationModalProps = {
     amount: number;
@@ -44,7 +45,7 @@ const WithdrawalConfirmationModal: React.FC<WithdrawalConfirmationModalProps> = 
 
     const handleSubmit = async () => {
         const id = toast.loading(t('withdraw.toast-messages.pending'));
-
+        console.log('submit');
         try {
             if (multipleCollateral && walletClient.data) {
                 const collateralContractWithSigner = getContract({
@@ -104,9 +105,8 @@ const WithdrawalConfirmationModal: React.FC<WithdrawalConfirmationModalProps> = 
                         <ItemDescription>{networkName}</ItemDescription>
                     </ItemContainer>
                 </DetailsContainer>
-                <ButtonContainer>
-                    <Button onClick={() => handleSubmit()}>{t('withdraw.confirmation-modal.confirm')}</Button>
-                </ButtonContainer>
+
+                <Button onClick={() => handleSubmit()}>{t('withdraw.confirmation-modal.confirm')}</Button>
             </MainContainer>
         </Modal>
     );
@@ -193,26 +193,6 @@ const ItemDescription = styled.div`
         max-width: 150px;
         text-align: right;
     }
-`;
-
-const ButtonContainer = styled(FlexDiv)`
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    margin-top: 24px;
-`;
-
-const Button = styled(FlexDiv)`
-    cursor: pointer;
-    padding: 8px 20px;
-    align-items: center;
-    justify-content: center;
-    color: ${(props) => props.theme.button.textColor.primary};
-    background-color: ${(props) => props.theme.button.background.primary};
-    font-size: 22px;
-    font-weight: 700;
-    text-transform: uppercase;
-    border-radius: 5px;
 `;
 
 export default WithdrawalConfirmationModal;

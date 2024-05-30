@@ -15,7 +15,7 @@ import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
 import { getCollaterals } from 'utils/currency';
 import { getNetworkNameByNetworkId } from 'utils/network';
-import { isAddress } from 'viem';
+import { getContract, isAddress } from 'viem';
 import { useAccount, useChainId, useClient } from 'wagmi';
 import CollateralDropdown from './components/CollateralDropdown';
 import {
@@ -26,8 +26,14 @@ import {
     WarningIcon,
     Wrapper,
 } from '../styled-components';
-import WithdrawalConfirmationModal from './components/WithdrawalConfirmationModal';
 import Modal from 'components/Modal';
+import { executeBiconomyTransactionWithConfirmation } from 'utils/biconomy';
+import { getErrorToastOptions, getSuccessToastOptions } from 'components/ToastMessage/ToastMessage';
+import { toast } from 'react-toastify';
+import multipleCollateral from 'utils/contracts/multipleCollateralContract';
+import { useWalletClient } from 'wagmi';
+import { ViemContract } from 'types/viem';
+import { coinParser } from 'thales-utils';
 
 type FormValidation = {
     walletAddress: boolean;
@@ -45,12 +51,13 @@ const Withdraw: React.FC<DepositProps> = ({ isOpen, onClose }) => {
     const walletAddress = biconomyConnector.address;
     const { isConnected: isWalletConnected } = useAccount();
     const client = useClient();
+    const walletClient = useWalletClient();
+
     const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
 
     const [withdrawalWalletAddress, setWithdrawalWalletAddress] = useState<string>('');
     const [amount, setAmount] = useState<number>(0);
-    const [showWithdrawalConfirmationModal, setWithdrawalConfirmationModalVisibility] = useState<boolean>(false);
     const [validation, setValidation] = useState<FormValidation>({ walletAddress: false, amount: false });
 
     const selectedTokenFromUrl = queryString.parse(location.search)['coin-index'];
@@ -97,6 +104,34 @@ const Withdraw: React.FC<DepositProps> = ({ isOpen, onClose }) => {
 
     const handleChangeCollateral = (index: number) => {
         setSelectedToken(index);
+    };
+
+    const handleSubmit = async () => {
+        const id = toast.loading(t('withdraw.toast-messages.pending'));
+        console.log('submit');
+        try {
+            if (multipleCollateral && walletClient.data) {
+                const collateralContractWithSigner = getContract({
+                    abi: multipleCollateral[getCollaterals(networkId)[selectedToken]].abi,
+                    address: multipleCollateral[getCollaterals(networkId)[selectedToken]].addresses[networkId] as any,
+                    client: walletClient.data as any,
+                }) as ViemContract;
+
+                await executeBiconomyTransactionWithConfirmation(
+                    collateralContractWithSigner?.address as string,
+                    collateralContractWithSigner,
+                    'transfer',
+                    [
+                        withdrawalWalletAddress,
+                        coinParser('' + amount, networkId, getCollaterals(networkId)[selectedToken]),
+                    ]
+                );
+                toast.update(id, getSuccessToastOptions(t('withdraw.toast-messages.success'), ''));
+            }
+        } catch (e) {
+            console.log('Error ', e);
+            toast.update(id, getErrorToastOptions(t('withdraw.toast-messages.error'), ''));
+        }
     };
 
     return (
@@ -164,22 +199,13 @@ const Withdraw: React.FC<DepositProps> = ({ isOpen, onClose }) => {
                             fontSize={'22px'}
                             width="220px"
                             additionalStyles={{ alignSelf: 'center' }}
-                            onClick={() => setWithdrawalConfirmationModalVisibility(true)}
+                            onClick={() => handleSubmit()}
                         >
                             {t('withdraw.button-label-withdraw')}
                         </Button>
                     </FormContainer>
                 </Wrapper>
             </OutsideClick>
-            {showWithdrawalConfirmationModal && (
-                <WithdrawalConfirmationModal
-                    amount={amount}
-                    token={getCollaterals(networkId)[selectedToken]}
-                    withdrawalAddress={withdrawalWalletAddress}
-                    network={networkId}
-                    onClose={() => setWithdrawalConfirmationModalVisibility(false)}
-                />
-            )}
         </Modal>
     );
 };

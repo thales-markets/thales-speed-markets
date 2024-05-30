@@ -14,7 +14,7 @@ import { Positions } from 'enums/market';
 import i18n from 'i18n';
 import { toast } from 'react-toastify';
 import { ChainedSpeedMarket, UserPosition } from 'types/market';
-import { QueryConfig } from 'types/network';
+import { QueryConfig, SupportedNetwork } from 'types/network';
 import { ViemContract } from 'types/viem';
 import { getPriceId, getPriceServiceEndpoint, priceParser } from 'utils/pyth';
 import { refetchActiveSpeedMarkets } from 'utils/queryConnector';
@@ -25,6 +25,7 @@ import chainedSpeedMarketsAMMContract from './contracts/chainedSpeedMarketsAMMCo
 import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
 import { executeBiconomyTransaction } from './biconomy';
 import biconomyConnector from './biconomyWallet';
+import erc20Contract from './contracts/collateralContract';
 
 export const getTransactionForSpeedAMM = async (
     creatorContractWithSigner: any,
@@ -46,7 +47,10 @@ export const getTransactionForSpeedAMM = async (
         if (isBiconomy) {
             txHash = await executeBiconomyTransaction(
                 biconomyConnector.wallet?.biconomySmartAccountConfig.chainId as any,
-                collateralAddress,
+                collateralAddress ||
+                    erc20Contract.addresses[
+                        biconomyConnector.wallet?.biconomySmartAccountConfig.chainId as SupportedNetwork
+                    ],
                 creatorContractWithSigner,
                 'addPendingChainedSpeedMarket',
                 [
@@ -80,7 +84,10 @@ export const getTransactionForSpeedAMM = async (
         if (isBiconomy) {
             txHash = await executeBiconomyTransaction(
                 biconomyConnector.wallet?.biconomySmartAccountConfig.chainId as any,
-                collateralAddress,
+                collateralAddress ||
+                    erc20Contract.addresses[
+                        biconomyConnector.wallet?.biconomySmartAccountConfig.chainId as SupportedNetwork
+                    ],
                 creatorContractWithSigner,
                 'addPendingSpeedMarket',
                 [
