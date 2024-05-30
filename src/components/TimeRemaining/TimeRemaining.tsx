@@ -125,9 +125,6 @@ const Time = styled.span<{
     border: none;
     text-align: center;
     white-space: pre;
-    @media (max-width: 512px) {
-        font-size: ${(props) => props.fontSize || 10}px;
-    }
 `;
 
 export default TimeRemaining;

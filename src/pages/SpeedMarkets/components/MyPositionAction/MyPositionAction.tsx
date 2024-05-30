@@ -15,6 +15,7 @@ import { USD_SIGN } from 'constants/currency';
 import { ZERO_ADDRESS } from 'constants/network';
 import { CONNECTION_TIMEOUT_MS, PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
 import { differenceInSeconds, millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
+import { ScreenSizeBreakpoint } from 'enums/ui';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -333,7 +334,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
 
     return (
         <>
-            <Wrapper>
+            <Container>
                 {!isCollateralHidden && isMultiCollateralSupported && position.isClaimable && (
                     <CollateralSelector
                         collateralArray={getCollaterals(networkId)}
@@ -345,7 +346,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                     />
                 )}
                 {getActionStatus()}
-            </Wrapper>
+            </Container>
             {openApprovalModal && (
                 <ApprovalModal
                     // add three percent to approval amount to take into account price changes
@@ -360,8 +361,12 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     );
 };
 
-const Wrapper = styled(FlexDivCentered)`
+const Container = styled(FlexDivCentered)`
     white-space: pre;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        width: 100%;
+        padding-left: 20px;
+    }
 `;
 
 export const getDefaultButtonProps = () => ({
