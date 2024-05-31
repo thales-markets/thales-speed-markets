@@ -86,6 +86,7 @@ const useUserActiveSpeedMarketsDataQuery = (
                         finalPrice: 0,
                         isClaimable: false,
                         isResolved: false,
+                        createdAt,
                     };
 
                     userSpeedMarketsData.push(userData);

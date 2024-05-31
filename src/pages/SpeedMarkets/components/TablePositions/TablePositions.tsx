@@ -106,19 +106,18 @@ const TablePositions: React.FC<{ data: UserPosition[] }> = ({ data }) => {
 
     const rowsPerPageLS = localStore.get(LOCAL_STORAGE_KEYS.TABLE_ROWS_PER_PAGE);
     const foundPagination = PAGINATION_SIZE.filter((obj) => obj.value === Number(rowsPerPageLS));
-    const rowsPerPage = foundPagination.length ? foundPagination[0].value : PAGINATION_SIZE[0].value;
+    const rowsPerPage = foundPagination.length ? foundPagination[0].value : undefined;
 
     return <Table data={data} columns={columns as any} rowsPerPage={rowsPerPage} />;
 };
 
-const Header = styled.p`
+export const Header = styled.p`
     color: ${(props) => props.theme.textColor.quinary};
     font-size: 13px;
-    font-style: normal;
     font-weight: 700;
 `;
 
-const Wrapper = styled.div<{ first?: boolean }>`
+export const Wrapper = styled.div<{ first?: boolean }>`
     display: flex;
     justify-content: ${(props) => (props.first ? 'flex-start' : 'center')};
     align-items: center;
@@ -127,32 +126,30 @@ const Wrapper = styled.div<{ first?: boolean }>`
     padding: 10px 0;
 `;
 
-const AssetIcon = styled.i`
+export const AssetIcon = styled.i`
     font-size: 25px;
     line-height: 100%;
-    background: ${(props) => props.theme.dropDown.background.primary};
-    color: ${(props) => props.theme.dropDown.textColor.primary};
+    background: ${(props) => props.theme.icon.background.secondary};
+    color: ${(props) => props.theme.icon.textColor.quaternary};
     border-radius: 50%;
 `;
 
-const DirectionIcon = styled(AssetIcon)`
+export const DirectionIcon = styled(AssetIcon)`
     background: ${(props) => props.theme.background.primary};
     color: ${(props) => props.theme.icon.background.tertiary};
 `;
 
-const AssetName = styled.span`
-    color: ${(props) => props.theme.textColor.primary};
-    font-size: 13px;
-    font-weight: 800;
-`;
-
-const Value = styled.span`
+export const Value = styled.span`
     color: ${(props) => props.theme.textColor.primary};
     font-size: 13px;
     font-weight: 700;
 `;
 
-const ShareWrapper = styled.div`
+export const AssetName = styled(Value)`
+    font-weight: 800;
+`;
+
+export const ShareWrapper = styled.div`
     margin-left: auto;
 `;
 

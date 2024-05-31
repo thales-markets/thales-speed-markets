@@ -721,7 +721,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                         currencyKey={currencyKey}
                         deltaTimeSec={deltaTimeSec}
                         market={{
-                            address: 'Any',
                             strikePrice: submittedStrikePrice ? submittedStrikePrice : currentPrice,
                             positionType: isChained ? undefined : positionType,
                             chainedPositions: isChained ? chainedPositions : undefined,

@@ -9,22 +9,20 @@ import { useSelector } from 'react-redux';
 import { getIsMobile } from 'redux/modules/ui';
 import { FlexDivCentered } from 'styles/common';
 import { formatCurrencyWithKey, formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
-import { MarketInfo } from 'types/market';
 import { RootState } from 'types/ui';
 import { getDefaultCollateral } from 'utils/currency';
 import { useChainId } from 'wagmi';
 import { Cotainer, PositionText, Text, TextLabel, TextValue } from './styled-components';
 
 type SpeedMarketsTrade = {
-    address: string;
     strikePrice: number;
-    positionType?: Positions.UP | Positions.DOWN | undefined;
-    chainedPositions?: (Positions.UP | Positions.DOWN | undefined)[];
+    positionType?: Positions | undefined;
+    chainedPositions?: (Positions | undefined)[];
 };
 
 type TradingDetailsSentenceProps = {
     currencyKey: string;
-    market: MarketInfo | SpeedMarketsTrade;
+    market: SpeedMarketsTrade;
     isFetchingQuote: boolean;
     profit: number;
     paidAmount: number;
@@ -118,31 +116,20 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
                             <TextValue>
                                 {`(${t('speed-markets.chained.starting-from')} ${formatCurrencyWithSign(
                                     USD_SIGN,
-                                    (market as MarketInfo).strikePrice
+                                    market.strikePrice
                                 )})`}
                             </TextValue>
                         </>
                     )}
-                    {market.address ? (
-                        <>
-                            {!isMobile && !isChained && (
-                                <TextValue $uppercase={!!positionTypeFormatted} $lowercase={!positionTypeFormatted}>
-                                    {' '}
-                                    {positionTypeFormatted
-                                        ? positionTypeFormatted
-                                        : `( ${t('speed-markets.amm-trading.choose-direction')} )`}
-                                </TextValue>
-                            )}
-                            {!isChained && (
-                                <TextValue>
-                                    {' '}
-                                    {formatCurrencyWithSign(USD_SIGN, (market as MarketInfo).strikePrice)}
-                                </TextValue>
-                            )}
-                        </>
-                    ) : (
-                        <TextValue>{' ( ' + t('speed-markets.amm-trading.pick-price') + ' )'}</TextValue>
+                    {!isMobile && !isChained && (
+                        <TextValue $uppercase={!!positionTypeFormatted} $lowercase={!positionTypeFormatted}>
+                            {' '}
+                            {positionTypeFormatted
+                                ? positionTypeFormatted
+                                : `( ${t('speed-markets.amm-trading.choose-direction')} )`}
+                        </TextValue>
                     )}
+                    {!isChained && <TextValue> {formatCurrencyWithSign(USD_SIGN, market.strikePrice)}</TextValue>}
                 </Text>
             </FlexDivCentered>
             {isChained && (

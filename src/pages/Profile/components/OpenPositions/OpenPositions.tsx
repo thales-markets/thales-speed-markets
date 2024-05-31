@@ -120,7 +120,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
                 .map((strikeTime) => ({
                     priceId: data.pythPriceId,
                     publishTime: millisecondsToSeconds(strikeTime),
-                    market: data.address,
+                    market: data.market,
                 }))
         )
         .flat();
@@ -134,7 +134,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
     // Based on Pyth prices populate strike prices
     const userOpenChainedSpeedMarketsDataWithPrices = userOpenChainedMarkets.map((marketData) => {
         const finalPrices = marketData.finalPrices.map(
-            (_, i) => pythPricesWithMarket.filter((pythPrice) => pythPrice.market === marketData.address)[i]?.price || 0
+            (_, i) => pythPricesWithMarket.filter((pythPrice) => pythPrice.market === marketData.market)[i]?.price || 0
         );
         const strikePrices = marketData.strikePrices.map((strikePrice, i) =>
             i === 0 ? strikePrice : finalPrices[i - 1]
@@ -180,7 +180,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
                     payout: marketData.payout,
                     maturityDate: marketData.maturityDate,
                     expiryDate: marketData.maturityDate,
-                    market: marketData.address,
+                    market: marketData.market,
                     sides: marketData.sides,
                     paid: marketData.paid,
                     value: marketData.payout,

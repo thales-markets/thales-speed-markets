@@ -94,7 +94,7 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
             data.strikeTimes.map((strikeTime) => ({
                 priceId: data.pythPriceId,
                 publishTime: millisecondsToSeconds(strikeTime),
-                market: data.address,
+                market: data.market,
             }))
         )
         .flat();
@@ -110,7 +110,7 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
         .map((marketData) => {
             const finalPrices = marketData.finalPrices.map(
                 (_, i) =>
-                    pythPricesWithMarket.filter((pythPrice) => pythPrice.market === marketData.address)[i]?.price || 0
+                    pythPricesWithMarket.filter((pythPrice) => pythPrice.market === marketData.market)[i]?.price || 0
             );
             const strikePrices = marketData.strikePrices.map((strikePrice, i) =>
                 i === 0 ? strikePrice : finalPrices[i - 1]
@@ -160,7 +160,7 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
                     payout: marketData.payout,
                     maturityDate: marketData.maturityDate,
                     expiryDate: marketData.maturityDate,
-                    market: marketData.address,
+                    market: marketData.market,
                     sides: marketData.sides,
                     paid: marketData.paid,
                     value: marketData.payout,
@@ -191,7 +191,7 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
                 return data.map((row: UserProfilePosition) => {
                     const chainedPosition = row.isChained
                         ? userOpenChainedSpeedMarketsDataWithPrices.find(
-                              (marketData) => marketData.address === row.market
+                              (marketData) => marketData.market === row.market
                           )
                         : undefined;
 
@@ -238,7 +238,6 @@ const ClaimablePositions: React.FC<ClaimablePositionsProps> = ({ searchAddress, 
                                     isOverview={false}
                                     isAdmin={false}
                                     isSubmittingBatch={false}
-                                    isProfileAction
                                 />
                             ) : (
                                 <MyPositionAction position={mappedRow} />

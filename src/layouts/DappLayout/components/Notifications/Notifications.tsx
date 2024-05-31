@@ -76,7 +76,7 @@ const Notifications: React.FC = () => {
             data.strikeTimes.map((strikeTime) => ({
                 priceId: data.pythPriceId,
                 publishTime: strikeTime,
-                market: data.address,
+                market: data.market,
             }))
         )
         .flat();
@@ -90,7 +90,7 @@ const Notifications: React.FC = () => {
     const chainedSpeedMarketsNotifications = maturedChainedMarkets
         .map((marketData) => {
             const finalPrices = marketData.strikeTimes.map(
-                (_, i) => pythPricesWithMarket.filter((pythPrice) => pythPrice.market === marketData.address)[i].price
+                (_, i) => pythPricesWithMarket.filter((pythPrice) => pythPrice.market === marketData.market)[i].price
             );
             const strikePrices = marketData.strikePrices.map((strikePrice, i) =>
                 i > 0 ? finalPrices[i - 1] : strikePrice

@@ -3,16 +3,21 @@ import { USD_SIGN } from 'constants/currency';
 import { millisecondsToSeconds } from 'date-fns';
 import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
-import SharePositionModal from 'pages/SpeedMarkets/components/SharePositionModal';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsMobile } from 'redux/modules/ui';
 import styled, { useTheme } from 'styled-components';
-import { FlexDivCentered, FlexDivColumn, FlexDivColumnCentered, FlexDivSpaceBetween } from 'styles/common';
+import {
+    FlexDivCentered,
+    FlexDivColumn,
+    FlexDivColumnCentered,
+    FlexDivSpaceBetween,
+    FlexDivStart,
+} from 'styles/common';
 import { formatCurrencyWithSign, formatShortDate } from 'thales-utils';
-import { ChainedSpeedMarket } from 'types/market';
+import { UserChainedPosition } from 'types/market';
 import { RootState, ThemeInterface } from 'types/ui';
 import { formatHoursMinutesSecondsFromTimestamp, formatShortDateWithFullTime } from 'utils/formatters/date';
 import { formatNumberShort } from 'utils/formatters/number';
@@ -25,7 +30,7 @@ import ChainedPositionAction from '../ChainedPositionAction';
 import { AssetIcon, Icon, PositionsSymbol } from '../SelectPosition/styled-components';
 
 type ChainedPositionProps = {
-    position: ChainedSpeedMarket;
+    position: UserChainedPosition;
     maxPriceDelayForResolvingSec?: number;
     isOverview?: boolean;
     isAdmin?: boolean;
@@ -48,25 +53,24 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const [fetchLastFinalPriceIndex, setFetchLastFinalPriceIndex] = useState(0);
-    const [openTwitterShareModal, setOpenTwitterShareModal] = useState(false);
 
     const isMissingPrices = position.finalPrices.some((finalPrice) => !finalPrice);
     const maturedStrikeTimes = isMissingPrices
         ? position.strikeTimes.slice(0, fetchLastFinalPriceIndex + 1).filter((strikeTime) => strikeTime < Date.now())
         : position.strikeTimes;
 
-    const pythPriceId = position.isOpen ? getPriceId(networkId, position.currencyKey) : '';
-    const priceRequests = position.isOpen
+    const pythPriceId = !position.isResolved ? getPriceId(networkId, position.currencyKey) : '';
+    const priceRequests = !position.isResolved
         ? maturedStrikeTimes.map((strikeTime) => ({
               priceId: pythPriceId,
               publishTime: millisecondsToSeconds(strikeTime),
           }))
         : [];
 
-    const pythPricesQueries = usePythPriceQueries(networkId, priceRequests, { enabled: position.isOpen });
+    const pythPricesQueries = usePythPriceQueries(networkId, priceRequests, { enabled: !position.isResolved });
 
     const finalPrices =
-        isMissingPrices && position.isOpen
+        isMissingPrices && !position.isResolved
             ? position.finalPrices.map((_, i) => {
                   if (!pythPricesQueries[i]?.data) {
                       refetchPythPrice(pythPriceId, millisecondsToSeconds(maturedStrikeTimes[i]));
@@ -75,19 +79,18 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
               })
             : position.finalPrices;
     const strikePrices =
-        isMissingPrices && position.isOpen
+        isMissingPrices && !position.isResolved
             ? position.strikePrices.map((strikePrice, i) =>
                   i > 0 && i <= fetchLastFinalPriceIndex ? finalPrices[i - 1] : strikePrice
               )
             : position.strikePrices;
     const userWonStatuses = position.sides.map((side, i) => isUserWinner(side, strikePrices[i], finalPrices[i]));
-    const canResolve = position.isOpen
-        ? userWonStatuses.some((status) => status === false) || userWonStatuses.every((status) => status !== undefined)
-        : position.canResolve;
-
+    const canResolve = position.isResolved
+        ? position.canResolve
+        : userWonStatuses.some((status) => status === false) || userWonStatuses.every((status) => status !== undefined);
     const isClaimable = useMemo(
-        () => (position.isOpen ? userWonStatuses.every((status) => status) : position.isClaimable),
-        [position.isOpen, position.isClaimable, userWonStatuses]
+        () => (position.isResolved ? position.isClaimable : userWonStatuses.every((status) => status)),
+        [position.isResolved, position.isClaimable, userWonStatuses]
     );
 
     const positionWithPrices = {
@@ -104,28 +107,24 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
 
     const statusDecisionIndex = positionWithPrices.isClaimable
         ? size - 1
-        : position.isOpen
-        ? fetchLastFinalPriceIndex
-        : userFirstLostOrWonIndex;
+        : position.isResolved
+        ? userFirstLostOrWonIndex
+        : fetchLastFinalPriceIndex;
 
     useEffect(() => {
         if (
-            position.isOpen &&
+            !position.isResolved &&
             !canResolve &&
             finalPrices[fetchLastFinalPriceIndex] &&
             fetchLastFinalPriceIndex < size
         ) {
             setFetchLastFinalPriceIndex(fetchLastFinalPriceIndex + 1);
         }
-    }, [canResolve, finalPrices, size, position.isOpen, fetchLastFinalPriceIndex]);
+    }, [canResolve, finalPrices, size, position.isResolved, fetchLastFinalPriceIndex]);
 
     useEffect(() => {
         setIsClaimable && setIsClaimable(isClaimable);
     }, [setIsClaimable, isClaimable]);
-
-    console.log('positionWithPrices: ', positionWithPrices);
-
-    const displayShare = !isOverview && (positionWithPrices.canResolve || positionWithPrices.isMatured);
 
     return (
         <Container>
@@ -192,17 +191,6 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                         isAdmin={isAdmin}
                         isSubmittingBatch={isSubmittingBatch}
                     />
-                    {!isOverview && (
-                        <ShareDiv>
-                            {displayShare && (
-                                <ShareIcon
-                                    className="icon-home icon-home--twitter-x"
-                                    disabled={false}
-                                    onClick={() => setOpenTwitterShareModal(true)}
-                                />
-                            )}
-                        </ShareDiv>
-                    )}
                 </AlignedFlex>
             ) : (
                 <>
@@ -217,7 +205,10 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                     <PositionDetails>
                         {positionWithPrices.sides.map((side, index) => {
                             return (
-                                <Postion isDisabled={!position.isOpen && index > userFirstLostOrWonIndex} key={index}>
+                                <Postion
+                                    isDisabled={position.isResolved && index > userFirstLostOrWonIndex}
+                                    key={index}
+                                >
                                     {side === Positions.UP ? (
                                         <PositionsSymbol size={30}>
                                             <Icon size={16} className="icon icon--caret-up" />
@@ -244,7 +235,7 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                                         <Text fontWeight={800}>
                                             {formatCurrencyWithSign(USD_SIGN, positionWithPrices.finalPrices[index])}
                                         </Text>
-                                    ) : position.isOpen && maturedStrikeTimes[index] ? (
+                                    ) : !position.isResolved && maturedStrikeTimes[index] ? (
                                         <Text fontWeight={800} fontSize={16}>
                                             <Tooltip overlay={t('speed-markets.tooltips.final-price-missing')} />
                                         </Text>
@@ -273,54 +264,30 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                             );
                         })}
                     </PositionDetails>
-                    <Separator />
-                    <Summary>
-                        <Result isSmaller={isOverview || displayShare}>
-                            <ChainedPositionAction
-                                position={positionWithPrices}
-                                maxPriceDelayForResolvingSec={maxPriceDelayForResolvingSec}
-                                isOverview={isOverview}
-                                isAdmin={isAdmin}
-                                isSubmittingBatch={isSubmittingBatch}
-                            />
-                        </Result>
-                        {isOverview && (
-                            <FlexDivCentered>
-                                <Text>
-                                    {t('speed-markets.overview.user')}
-                                    <Text isActiveColor>{` ${position.user}`}</Text>
-                                </Text>
-                            </FlexDivCentered>
-                        )}
-                        {displayShare && (
-                            <FlexDivCentered>
-                                <ShareIcon
-                                    className="icon-home icon-home--twitter-x"
-                                    disabled={false}
-                                    onClick={() => setOpenTwitterShareModal(true)}
-                                />
-                            </FlexDivCentered>
-                        )}
-                    </Summary>
+                    {isOverview && (
+                        <>
+                            <Separator />
+                            <Summary>
+                                <Result isSmaller>
+                                    <ChainedPositionAction
+                                        position={positionWithPrices}
+                                        maxPriceDelayForResolvingSec={maxPriceDelayForResolvingSec}
+                                        isOverview
+                                        isAdmin={isAdmin}
+                                        isSubmittingBatch={isSubmittingBatch}
+                                    />
+                                </Result>
+
+                                <FlexDivCentered>
+                                    <Text>
+                                        {t('speed-markets.overview.user')}
+                                        <Text isActiveColor>{` ${position.user}`}</Text>
+                                    </Text>
+                                </FlexDivCentered>
+                            </Summary>
+                        </>
+                    )}
                 </>
-            )}
-            {openTwitterShareModal && (
-                <SharePositionModal
-                    type={
-                        positionWithPrices.isClaimable || positionWithPrices.isUserWinner
-                            ? 'chained-speed-won'
-                            : 'chained-speed-lost'
-                    }
-                    positions={positionWithPrices.sides}
-                    currencyKey={positionWithPrices.currencyKey}
-                    strikeDate={positionWithPrices.maturityDate}
-                    strikePrices={positionWithPrices.strikePrices}
-                    finalPrices={positionWithPrices.finalPrices}
-                    buyIn={positionWithPrices.paid}
-                    payout={positionWithPrices.payout}
-                    payoutMultiplier={positionWithPrices.payoutMultiplier}
-                    onClose={() => setOpenTwitterShareModal(false)}
-                />
             )}
         </Container>
     );
@@ -373,14 +340,15 @@ const Text = styled.span<{
     }
 `;
 
-const PositionDetails = styled(FlexDivCentered)`
+const PositionDetails = styled(FlexDivStart)`
     width: 710px;
     gap: 10px;
 `;
+
 const Dash = styled.div`
     width: 14px;
     height: 3px;
-    background: ${(props) => props.theme.background.tertiary};
+    background: ${(props) => props.theme.background.quinary};
     border-radius: 3px;
     margin: 9px 0 8px 0;
 `;
@@ -432,19 +400,6 @@ const FlexContainer = styled(AlignedFlex)`
     flex: 1;
     flex-direction: row;
     justify-content: center;
-`;
-
-const ShareDiv = styled(FlexDivCentered)`
-    width: 20px;
-    height: 20px;
-`;
-
-const ShareIcon = styled.i<{ disabled: boolean }>`
-    color: ${(props) => props.theme.textColor.secondary};
-    cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
-    opacity: ${(props) => (props.disabled ? '0.5' : '1')};
-    font-size: 20px;
-    text-transform: none;
 `;
 
 export default ChainedPosition;

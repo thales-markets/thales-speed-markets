@@ -256,7 +256,12 @@ const ExpandableRowReact: React.FC<{
                 onClick={setHidden.bind(this, !hidden)}
             >
                 {row.getAllCells().map((cell: any, cellIndex: any) => (
-                    <TableCell style={tableRowCellStyles} key={cellIndex} width={cell.column.width} id={cell.column.id}>
+                    <TableCell
+                        style={tableRowCellStyles}
+                        key={cellIndex}
+                        width={cell.column.getSize()}
+                        id={cell.column.id}
+                    >
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                 ))}
@@ -355,10 +360,10 @@ const ExpandableRow = styled.div`
 `;
 
 const ArrowIcon = styled.i`
-    font-size: 9px;
+    font-size: 10px;
     display: flex;
     align-items: center;
-    margin-right: 6px;
+    margin-left: 10px;
 `;
 
 const SelectWrapper = styled.div`

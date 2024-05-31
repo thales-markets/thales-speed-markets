@@ -92,6 +92,7 @@ const useActiveSpeedMarketsDataQuery = (
                         finalPrice: 0,
                         isClaimable: false,
                         isResolved: false,
+                        createdAt,
                     };
 
                     activeSpeedMarketsData.push(userData);
@@ -110,15 +111,20 @@ const useActiveSpeedMarketsDataQuery = (
                     const currencyKey = parseBytes32String(marketData.asset);
                     const side = SIDE_TO_POSITION_MAP[marketData.direction];
                     const payout = coinFormatter(marketData.buyinAmount, queryConfig.networkId) * SPEED_MARKETS_QUOTE;
+                    const maturityDate = secondsToMilliseconds(Number(marketData.strikeTime));
 
+                    const createdAt =
+                        marketData.createdAt != 0
+                            ? secondsToMilliseconds(Number(marketData.createdAt))
+                            : maturityDate - hoursToMilliseconds(1);
                     const lpFee =
                         marketData.lpFee != 0
                             ? bigNumberFormatter(marketData.lpFee)
-                            : getFeesFromHistory(Date.now()).lpFee;
+                            : getFeesFromHistory(createdAt).lpFee;
                     const safeBoxImpact =
                         marketData.safeBoxImpact != 0
                             ? bigNumberFormatter(marketData.safeBoxImpact)
-                            : getFeesFromHistory(Date.now()).safeBoxImpact;
+                            : getFeesFromHistory(createdAt).safeBoxImpact;
                     const fees = lpFee + safeBoxImpact;
 
                     const userData: UserPosition = {
@@ -127,13 +133,14 @@ const useActiveSpeedMarketsDataQuery = (
                         currencyKey: currencyKey,
                         side,
                         strikePrice: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS),
-                        maturityDate: secondsToMilliseconds(Number(marketData.strikeTime)),
+                        maturityDate,
                         paid: coinFormatter(marketData.buyinAmount, queryConfig.networkId) * (1 + fees),
                         payout: payout,
                         currentPrice: prices[currencyKey],
                         finalPrice: 0,
                         isClaimable: false,
                         isResolved: false,
+                        createdAt,
                     };
 
                     activeSpeedMarketsData.push(userData);

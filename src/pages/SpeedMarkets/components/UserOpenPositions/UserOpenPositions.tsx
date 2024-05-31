@@ -9,7 +9,7 @@ import { CollateralSelectorContainer } from 'pages/SpeedMarkets/components/MyPos
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
 import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveSpeedMarketsDataQuery';
-import React, { CSSProperties, useEffect, useMemo, useState } from 'react';
+import React, { CSSProperties, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
@@ -18,7 +18,7 @@ import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet'
 import styled from 'styled-components';
 import { FlexDivColumn, FlexDivEnd, FlexDivStart, GradientContainer } from 'styles/common';
 import { formatCurrencyWithSign } from 'thales-utils';
-import { ChainedSpeedMarket, UserPosition } from 'types/market';
+import { UserChainedPosition, UserPosition } from 'types/market';
 import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
 import erc20Contract from 'utils/contracts/collateralContract';
@@ -61,10 +61,8 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
 
     const [isChainedSelected, setIsChainedSelected] = useState(!!isChained);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    // For sorting purpose as claimable status is unknown until all chained positions is rendered
-    const [chainedClaimableStatuses] = useState<{ address: string; isClaimable: boolean }[]>([]); // TODO: set
-    const [chainedWithClaimableStatus, setChainedWithClaimableStatus] = useState<ChainedSpeedMarket[]>([]);
 
+    // SINGLE
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
         { networkId, client },
         (isBiconomy ? biconomyConnector.address : walletAddress) as string,
@@ -79,22 +77,6 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
                 ? userActiveSpeedMarketsDataQuery.data
                 : [],
         [userActiveSpeedMarketsDataQuery]
-    );
-
-    const userChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
-        { networkId, client },
-        (isBiconomy ? biconomyConnector.address : walletAddress) as string,
-        {
-            enabled: isAppReady && isConnected && isChainedSelected,
-        }
-    );
-
-    const userOpenChainedSpeedMarketsData = useMemo(
-        () =>
-            userChainedSpeedMarketsDataQuery.isSuccess && userChainedSpeedMarketsDataQuery.data
-                ? userChainedSpeedMarketsDataQuery.data
-                : [],
-        [userChainedSpeedMarketsDataQuery]
     );
 
     const activeSpeedNotMatured: UserPosition[] = userOpenSpeedMarketsData
@@ -112,6 +94,7 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
     const pythPricesQueries = usePythPriceQueries(networkId, priceRequests, {
         enabled: priceRequests.length > 0,
     });
+
     // set final prices and claimable status
     const maturedUserSpeedMarketsWithPrices: UserPosition[] = activeSpeedMatured.map((marketData, index) => {
         const finalPrice = pythPricesQueries[index].data || 0;
@@ -124,64 +107,113 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
     });
     const allUserOpenSpeedMarketsData = activeSpeedNotMatured.concat(maturedUserSpeedMarketsWithPrices);
 
-    // TODO: For chained sorting purpose
-    // const updateChainedClaimable = (address: string, isClaimable: boolean) => {
-    //     const status = chainedClaimableStatuses.find((s) => s.address === address);
-    //     if (status === undefined) {
-    //         setChainedClaimableStatuses([...chainedClaimableStatuses, { address, isClaimable }]);
-    //     } else if (status.isClaimable !== isClaimable) {
-    //         setChainedClaimableStatuses(
-    //             chainedClaimableStatuses.map((s) => (s.address === address ? { ...s, isClaimable } : s))
-    //         );
-    //     }
-    // };
-
-    // For chained sorting purpose update claimable status when it is known
-    useEffect(() => {
-        if (userOpenChainedSpeedMarketsData.length === chainedClaimableStatuses.length) {
-            let isStatusChanged = false;
-            const chainedPositionsWithStatusUpdated: ChainedSpeedMarket[] = userOpenChainedSpeedMarketsData.map(
-                (position) => {
-                    const isClaimable = chainedClaimableStatuses.find((p) => p.address === position.address)
-                        ?.isClaimable;
-                    const claimableUpdated = chainedWithClaimableStatus.find((p) => p.address === position.address)
-                        ?.isClaimable;
-
-                    isStatusChanged =
-                        isStatusChanged || (position.isClaimable !== isClaimable && claimableUpdated !== isClaimable);
-
-                    return {
-                        ...position,
-                        isClaimable,
-                    } as ChainedSpeedMarket;
-                }
-            );
-            if (isStatusChanged) {
-                setChainedWithClaimableStatus(chainedPositionsWithStatusUpdated);
-            }
-        }
-    }, [userOpenChainedSpeedMarketsData, chainedWithClaimableStatus, chainedClaimableStatuses]);
-
     const sortedUserOpenSpeedMarketsData = sortSpeedMarkets(allUserOpenSpeedMarketsData) as UserPosition[];
 
-    const sortedUserOpenChainedSpeedMarketsData = sortSpeedMarkets(
-        chainedWithClaimableStatus.length ? chainedWithClaimableStatus : userOpenChainedSpeedMarketsData
-    ) as ChainedSpeedMarket[];
+    // CHAINED
+    const userChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
+        { networkId, client },
+        (isBiconomy ? biconomyConnector.address : walletAddress) as string,
+        {
+            enabled: isAppReady && isConnected && isChainedSelected,
+        }
+    );
+
+    const userOpenChainedSpeedMarketsData = useMemo(
+        () =>
+            userChainedSpeedMarketsDataQuery.isSuccess && userChainedSpeedMarketsDataQuery.data
+                ? userChainedSpeedMarketsDataQuery.data
+                : [],
+        [userChainedSpeedMarketsDataQuery]
+    );
+
+    const chainedWithoutMaturedPositions: UserChainedPosition[] = userOpenChainedSpeedMarketsData
+        .filter((marketData) => marketData.strikeTimes[0] >= Date.now())
+        .map((marketData) => ({
+            ...marketData,
+            currentPrice: currentPrices[marketData.currencyKey],
+        }));
+    // Prepare chained speed markets that are partially matured to fetch Pyth prices
+    const partiallyMaturedChainedMarkets = userOpenChainedSpeedMarketsData
+        .filter((marketData) => marketData.strikeTimes.some((strikeTime) => strikeTime < Date.now()))
+        .map((marketData) => {
+            return {
+                ...marketData,
+                pythPriceId: getPriceId(networkId, marketData.currencyKey),
+            };
+        });
+
+    const chainedPriceRequests = partiallyMaturedChainedMarkets
+        .map((data) =>
+            data.strikeTimes
+                .filter((strikeTime) => strikeTime < Date.now())
+                .map((strikeTime) => ({
+                    priceId: data.pythPriceId,
+                    publishTime: millisecondsToSeconds(strikeTime),
+                    market: data.market,
+                }))
+        )
+        .flat();
+    const chainedPythPricesQueries = usePythPriceQueries(networkId, chainedPriceRequests, {
+        enabled: chainedPriceRequests.length > 0,
+    });
+    const chainedPythPricesWithMarket = chainedPriceRequests.map((request, i) => ({
+        market: request.market,
+        price: chainedPythPricesQueries[i].data || 0,
+    }));
+
+    // Based on Pyth prices set finalPrices, strikePrices, canResolve, isMatured, isClaimable, isUserWinner
+    const partiallyMaturedWithPrices: UserChainedPosition[] = partiallyMaturedChainedMarkets.map((marketData) => {
+        const finalPrices = marketData.strikeTimes.map(
+            (_, i) => chainedPythPricesWithMarket.filter((pythPrice) => pythPrice.market === marketData.market)[i].price
+        );
+        const strikePrices = marketData.strikePrices.map((strikePrice, i) =>
+            i > 0 ? finalPrices[i - 1] : strikePrice
+        );
+        const userWonStatuses = marketData.sides.map((side, i) => isUserWinner(side, strikePrices[i], finalPrices[i]));
+        const canResolve =
+            userWonStatuses.some((status) => status === false) ||
+            userWonStatuses.every((status) => status !== undefined);
+
+        const lossIndex = userWonStatuses.findIndex((status) => status === false);
+        const resolveIndex = canResolve ? (lossIndex > -1 ? lossIndex : marketData.sides.length - 1) : undefined;
+
+        const isClaimable = userWonStatuses.every((status) => status);
+        const isMatured = marketData.maturityDate < Date.now();
+
+        return {
+            ...marketData,
+            strikePrices,
+            finalPrices,
+            canResolve,
+            resolveIndex,
+            isMatured,
+            isClaimable,
+            isUserWinner: isClaimable,
+        };
+    });
+
+    const allUserOpenChainedMarketsData = chainedWithoutMaturedPositions.concat(partiallyMaturedWithPrices);
+
+    const sortedUserOpenChainedMarketsData = sortSpeedMarkets(allUserOpenChainedMarketsData) as UserChainedPosition[];
 
     const isLoading =
-        userActiveSpeedMarketsDataQuery.isLoading ||
-        (isChainedSelected && userChainedSpeedMarketsDataQuery.isLoading) ||
+        (isChainedSelected ? userChainedSpeedMarketsDataQuery.isLoading : userActiveSpeedMarketsDataQuery.isLoading) ||
         pythPricesQueries.filter((query) => query.isLoading).length > 1;
 
     const noPositions =
         !isLoading &&
         (isChainedSelected ? userOpenChainedSpeedMarketsData.length === 0 : allUserOpenSpeedMarketsData.length === 0);
-    const positions = noPositions ? dummyPositions : sortedUserOpenSpeedMarketsData;
+
+    const positions = noPositions
+        ? dummyPositions
+        : isChainedSelected
+        ? sortedUserOpenChainedMarketsData
+        : sortedUserOpenSpeedMarketsData;
 
     const claimableSpeedPositions = allUserOpenSpeedMarketsData.filter((p) => p.isClaimable);
     const claimableSpeedPositionsSum = claimableSpeedPositions.reduce((acc, pos) => acc + pos.payout, 0);
 
-    const claimableChainedPositions = chainedWithClaimableStatus.filter((p) => p.isClaimable);
+    const claimableChainedPositions = sortedUserOpenChainedMarketsData.filter((p) => p.isClaimable);
     const claimableChainedPositionsSum = claimableChainedPositions.reduce((acc, pos) => acc + pos.payout, 0);
 
     const hasClaimableSpeedPositions = isChainedSelected
@@ -248,7 +280,7 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
                 </Tabs>
                 <TabsSeparator />
                 {hasClaimableSpeedPositions && (
-                    <ButtonWrapper>
+                    <ButtonWrapper $isChained={isChainedSelected}>
                         {isMultiCollateralSupported && (
                             <CollateralSelectorContainer>
                                 <ClaimAll>
@@ -274,11 +306,11 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
                 {isLoading ? (
                     <SimpleLoader />
                 ) : isChainedSelected ? (
-                    <TableChainedPositions data={sortedUserOpenChainedSpeedMarketsData} />
+                    <TableChainedPositions data={positions as UserChainedPosition[]} />
                 ) : isMobile ? (
-                    <CardPositions data={positions} />
+                    <CardPositions data={positions as UserPosition[]} />
                 ) : (
-                    <TablePositions data={positions} />
+                    <TablePositions data={positions as UserPosition[]} />
                 )}
             </PositionsWrapper>
             {noPositions && <NoPositionsText>{t('speed-markets.user-positions.no-positions')}</NoPositionsText>}
@@ -286,7 +318,7 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
     );
 };
 
-const sortSpeedMarkets = (markets: (UserPosition | ChainedSpeedMarket)[]) =>
+const sortSpeedMarkets = (markets: (UserPosition | UserChainedPosition)[]) =>
     markets
         // 1. sort open by maturity asc
         .filter((position) => position.maturityDate > Date.now())
@@ -316,6 +348,7 @@ const dummyPositions: UserPosition[] = [
         finalPrice: 0,
         isClaimable: false,
         isResolved: false,
+        createdAt: Date.now(),
     },
     {
         user: '',
@@ -330,6 +363,7 @@ const dummyPositions: UserPosition[] = [
         finalPrice: 0,
         isClaimable: false,
         isResolved: false,
+        createdAt: Date.now(),
     },
 ];
 
@@ -401,9 +435,9 @@ const Title = styled.span`
     }
 `;
 
-const ButtonWrapper = styled(FlexDivEnd)`
+const ButtonWrapper = styled(FlexDivEnd)<{ $isChained?: boolean }>`
     gap: 70px;
-    padding-right: 66px;
+    padding-right: ${(props) => (props.$isChained ? '84px' : '66px')};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         justify-content: space-between;
         gap: unset;

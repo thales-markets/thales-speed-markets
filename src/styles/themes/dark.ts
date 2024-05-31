@@ -97,6 +97,7 @@ export default {
             primary: `linear-gradient(180deg, ${Colors.PURPLE_DARK_2} 0%, ${Colors.BLUE_DEEP_SKY} 100%)`,
             secondary: Colors.BLACK,
             tertiary: Colors.PURPLE,
+            quaternary: Colors.WHITE,
         },
     },
     error: {

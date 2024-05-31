@@ -1,17 +1,5 @@
 import { Positions } from 'enums/market';
 
-export type MarketInfo = {
-    currencyKey: string;
-    address: string;
-    liquidity: number;
-    price: number;
-    roi: number;
-    strikePrice: number;
-    discount: number;
-    positionType: Positions;
-    url?: string;
-};
-
 export type UserPosition = {
     user: string;
     market: string;
@@ -25,6 +13,29 @@ export type UserPosition = {
     finalPrice: number;
     isClaimable: boolean;
     isResolved: boolean;
+    createdAt?: number; // TODO: change to mandatory
+};
+
+export type UserChainedPosition = {
+    user: string;
+    market: string;
+    currencyKey: string;
+    sides: Positions[];
+    strikePrices: number[];
+    strikeTimes: number[];
+    maturityDate: number;
+    paid: number;
+    payout: number;
+    payoutMultiplier: number;
+    currentPrice: number;
+    finalPrices: number[];
+    canResolve: boolean;
+    resolveIndex?: number;
+    isMatured: boolean;
+    isClaimable: boolean;
+    isUserWinner: boolean;
+    isResolved: boolean;
+    createdAt: number;
 };
 
 export type Risk = { current: number; max: number };
@@ -62,6 +73,7 @@ export type AmmChainedSpeedMarketsLimits = {
     whitelistedAddress: boolean;
 };
 
+// TODO: remove
 export type SpeedMarket = {
     address: string;
     timestamp: number;
@@ -73,6 +85,7 @@ export type SpeedMarket = {
     finalPrice?: number;
 };
 
+// TODO: remove
 export type ChainedSpeedMarket = {
     address: string;
     timestamp: number;

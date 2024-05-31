@@ -22,18 +22,18 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
-import { ChainedSpeedMarket } from 'types/market';
+import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
+import { UserChainedPosition } from 'types/market';
 import { RootState } from 'types/ui';
+import biconomyConnector from 'utils/biconomyWallet';
+import erc20Contract from 'utils/contracts/collateralContract';
+import multipleCollateral from 'utils/contracts/multipleCollateralContract';
+import { getCollateral } from 'utils/currency';
+import { getIsMultiCollateralSupported } from 'utils/network';
 import { getPriceId } from 'utils/pyth';
 import { refetchActiveSpeedMarkets, refetchPythPrice } from 'utils/queryConnector';
 import { isUserWinner, resolveAllChainedMarkets } from 'utils/speedAmm';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
-import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
-import biconomyConnector from 'utils/biconomyWallet';
-import { getIsMultiCollateralSupported } from 'utils/network';
-import { getCollateral } from 'utils/currency';
-import multipleCollateral from 'utils/contracts/multipleCollateralContract';
-import erc20Contract from 'utils/contracts/collateralContract';
 
 const UnresolvedChainedPositions: React.FC = () => {
     const { t } = useTranslation();
@@ -105,7 +105,7 @@ const UnresolvedChainedPositions: React.FC = () => {
                 .map((strikeTime) => ({
                     priceId: data.pythPriceId,
                     publishTime: millisecondsToSeconds(strikeTime),
-                    market: data.address,
+                    market: data.market,
                 }))
         )
         .flat();
@@ -118,7 +118,7 @@ const UnresolvedChainedPositions: React.FC = () => {
     // Based on Pyth prices determine if chained position is claimable
     const partiallyMaturedUnresolvedWithPrices = partiallyMaturedChainedMarkets.map((marketData) => {
         const finalPrices = marketData.strikeTimes.map(
-            (_, i) => pythPricesWithMarket.filter((pythPrice) => pythPrice.market === marketData.address)[i]?.price || 0
+            (_, i) => pythPricesWithMarket.filter((pythPrice) => pythPrice.market === marketData.market)[i]?.price || 0
         );
         const strikePrices = marketData.strikePrices.map((strikePrice, i) =>
             i > 0 ? finalPrices[i - 1] : strikePrice
@@ -146,15 +146,15 @@ const UnresolvedChainedPositions: React.FC = () => {
         .filter(
             (marketData) =>
                 !partiallyMaturedUnresolvedWithPrices.some(
-                    (maturedMarket) => maturedMarket.address === marketData.address
+                    (maturedMarket) => maturedMarket.market === marketData.market
                 )
         )
         .concat(
             partiallyMaturedUnresolvedWithPrices.filter(
                 (marketData) =>
-                    !userWinnerSpeedMarketsData.some((maturedMarket) => maturedMarket.address === marketData.address) &&
-                    !ammWinnerSpeedMarketsData.some((maturedMarket) => maturedMarket.address === marketData.address) &&
-                    !unknownPriceSpeedMarketsData.some((maturedMarket) => maturedMarket.address === marketData.address)
+                    !userWinnerSpeedMarketsData.some((maturedMarket) => maturedMarket.market === marketData.market) &&
+                    !ammWinnerSpeedMarketsData.some((maturedMarket) => maturedMarket.market === marketData.market) &&
+                    !unknownPriceSpeedMarketsData.some((maturedMarket) => maturedMarket.market === marketData.market)
             )
         );
 
@@ -194,7 +194,7 @@ const UnresolvedChainedPositions: React.FC = () => {
         }
     }, secondsToMilliseconds(10));
 
-    const handleResolveAll = async (positions: ChainedSpeedMarket[], isAdmin: boolean) => {
+    const handleResolveAll = async (positions: UserChainedPosition[], isAdmin: boolean) => {
         setIsSubmitting(true);
         await resolveAllChainedMarkets(
             positions,
@@ -209,7 +209,7 @@ const UnresolvedChainedPositions: React.FC = () => {
     };
 
     const getButton = (
-        positions: ChainedSpeedMarket[],
+        positions: UserChainedPosition[],
         sectionName: typeof SECTIONS[keyof typeof SECTIONS],
         isAdmin: boolean
     ) => {
@@ -235,7 +235,7 @@ const UnresolvedChainedPositions: React.FC = () => {
         );
     };
 
-    const getSection = (section: typeof SECTIONS[keyof typeof SECTIONS], positions: ChainedSpeedMarket[]) => {
+    const getSection = (section: typeof SECTIONS[keyof typeof SECTIONS], positions: UserChainedPosition[]) => {
         let titleKey = '';
         switch (section) {
             case SECTIONS.userWinner:

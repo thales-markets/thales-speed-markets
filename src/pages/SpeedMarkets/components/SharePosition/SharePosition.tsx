@@ -2,15 +2,16 @@ import { secondsToMilliseconds } from 'date-fns';
 import useInterval from 'hooks/useInterval';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { UserPosition } from 'types/market';
+import { UserChainedPosition, UserPosition } from 'types/market';
 import SharePositionModal from '../SharePositionModal';
 
 const SharePosition: React.FC<{
-    position: UserPosition;
+    position: UserPosition | UserChainedPosition;
     isDisabled?: boolean;
     isOpen?: boolean;
+    isChained?: boolean;
     onClose?: React.Dispatch<void>;
-}> = ({ position, isDisabled, isOpen, onClose }) => {
+}> = ({ position, isDisabled, isOpen, isChained, onClose }) => {
     const [isMatured, setIsMatured] = useState(Date.now() > position.maturityDate);
     const [openTwitterShareModal, setOpenTwitterShareModal] = useState(isOpen);
 
@@ -34,7 +35,7 @@ const SharePosition: React.FC<{
         }
     }, [isOpen]);
 
-    const displayShare = position.isClaimable || !isMatured;
+    const displayShare = isChained ? (position as UserChainedPosition).canResolve : position.isClaimable || !isMatured;
 
     return (
         <>
@@ -45,21 +46,39 @@ const SharePosition: React.FC<{
                     onClick={() => !isDisabled && setOpenTwitterShareModal(true)}
                 />
             )}
-            {openTwitterShareModal && (
-                <SharePositionModal
-                    type={position.isClaimable ? 'resolved-speed' : 'potential-speed'}
-                    positions={[position.side]}
-                    currencyKey={position.currencyKey}
-                    strikeDate={position.maturityDate}
-                    strikePrices={[position.strikePrice]}
-                    buyIn={position.paid}
-                    payout={position.payout}
-                    onClose={() => {
-                        setOpenTwitterShareModal(false);
-                        onClose && onClose();
-                    }}
-                />
-            )}
+            {openTwitterShareModal &&
+                (isChained ? (
+                    <SharePositionModal
+                        type={
+                            position.isClaimable || (position as UserChainedPosition).isUserWinner
+                                ? 'chained-speed-won'
+                                : 'chained-speed-lost'
+                        }
+                        positions={(position as UserChainedPosition).sides}
+                        currencyKey={position.currencyKey}
+                        strikeDate={position.maturityDate}
+                        strikePrices={(position as UserChainedPosition).strikePrices}
+                        finalPrices={(position as UserChainedPosition).finalPrices}
+                        buyIn={position.paid}
+                        payout={position.payout}
+                        payoutMultiplier={(position as UserChainedPosition).payoutMultiplier}
+                        onClose={() => setOpenTwitterShareModal(false)}
+                    />
+                ) : (
+                    <SharePositionModal
+                        type={position.isClaimable ? 'resolved-speed' : 'potential-speed'}
+                        positions={[(position as UserPosition).side]}
+                        currencyKey={position.currencyKey}
+                        strikeDate={position.maturityDate}
+                        strikePrices={[(position as UserPosition).strikePrice]}
+                        buyIn={position.paid}
+                        payout={position.payout}
+                        onClose={() => {
+                            setOpenTwitterShareModal(false);
+                            onClose && onClose();
+                        }}
+                    />
+                ))}
         </>
     );
 };

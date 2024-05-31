@@ -13,18 +13,18 @@ import { millisecondsToSeconds, secondsToMinutes } from 'date-fns';
 import { Positions } from 'enums/market';
 import i18n from 'i18n';
 import { toast } from 'react-toastify';
-import { ChainedSpeedMarket, UserPosition } from 'types/market';
+import { UserChainedPosition, UserPosition } from 'types/market';
 import { QueryConfig } from 'types/network';
 import { ViemContract } from 'types/viem';
 import { getPriceId, getPriceServiceEndpoint, priceParser } from 'utils/pyth';
 import { refetchActiveSpeedMarkets } from 'utils/queryConnector';
 import { delay } from 'utils/timer';
 import { getContract } from 'viem';
+import { executeBiconomyTransaction } from './biconomy';
+import biconomyConnector from './biconomyWallet';
 import { getContarctAbi } from './contracts/abi';
 import chainedSpeedMarketsAMMContract from './contracts/chainedSpeedMarketsAMMContract';
 import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
-import { executeBiconomyTransaction } from './biconomy';
-import biconomyConnector from './biconomyWallet';
 
 export const getTransactionForSpeedAMM = async (
     creatorContractWithSigner: any,
@@ -164,7 +164,7 @@ export const isUserWinner = (position: Positions, strikePrice: number, finalPric
           (position === Positions.DOWN && finalPrice < strikePrice)
         : undefined;
 
-export const getUserLostAtSideIndex = (position: ChainedSpeedMarket) => {
+export const getUserLostAtSideIndex = (position: UserChainedPosition) => {
     const userLostIndex = position.finalPrices.findIndex(
         (finalPrice, i) => isUserWinner(position.sides[i], position.strikePrices[i], finalPrice) === false
     );
@@ -281,7 +281,7 @@ export const resolveAllSpeedPositions = async (
 };
 
 export const resolveAllChainedMarkets = async (
-    positions: ChainedSpeedMarket[],
+    positions: UserChainedPosition[],
     isAdmin: boolean,
     queryConfig: QueryConfig,
     isBiconomy?: boolean,
@@ -304,7 +304,7 @@ export const resolveAllChainedMarkets = async (
     }) as ViemContract;
 
     const marketsToResolve: string[] = isAdmin
-        ? positions.filter((position) => position.canResolve).map((position) => position.address)
+        ? positions.filter((position) => position.canResolve).map((position) => position.market)
         : [];
 
     const fetchUntilFinalPriceEndIndexes = positions.map((position) => getUserLostAtSideIndex(position) + 1);
@@ -354,9 +354,9 @@ export const resolveAllChainedMarkets = async (
 
             const updateFees = await Promise.all(promises);
             totalUpdateFee = totalUpdateFee + updateFees.reduce((a: bigint, b: bigint) => a + b, BigInt(0));
-            marketsToResolve.push(position.address);
+            marketsToResolve.push(position.market);
         } catch (e) {
-            console.log(`Can't fetch VAA from Pyth API for marekt ${position.address}`, e);
+            console.log(`Can't fetch VAA from Pyth API for marekt ${position.market}`, e);
         }
     }
 

@@ -361,7 +361,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     );
 };
 
-const Container = styled(FlexDivCentered)<{ $isClaimable: boolean }>`
+export const Container = styled(FlexDivCentered)<{ $isClaimable: boolean }>`
     white-space: pre;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         ${(props) => (!props.$isClaimable ? 'width: 100%;' : '')}
@@ -380,13 +380,13 @@ const getAdditionalButtonStyle = (isMobile: boolean): CSSProperties => ({
     border: 'none',
 });
 
-export const ResultsContainer = styled(FlexDivCentered)<{ $minWidth?: string }>`
+export const ResultsContainer = styled(FlexDivCentered)`
     gap: 4px;
     font-weight: 800;
     font-size: 13px;
     line-height: 100%;
     white-space: nowrap;
-    min-width: ${(props) => (props.$minWidth ? props.$minWidth : '174px')};
+    min-width: 174px;
 `;
 
 export const Label = styled.span`

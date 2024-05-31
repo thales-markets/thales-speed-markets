@@ -10,7 +10,7 @@
         "buy": {
             "label": "Buy",
             "progress-label": "Buying in progress...",
-            "confirmation-message": "Successfully bought"
+            "confirmation-message": "Successfully submitted market creation"
         },
         "mint": {
             "label": "Get",
@@ -48,6 +48,7 @@
         "end-date": "End date",
         "balance": "Balance",
         "result": "Result",
+        "results": "Results",
         "status-label": "Status",
         "won": "Won",
         "loss": "Loss",
@@ -278,7 +279,7 @@
             "claim-win": "Claim win",
             "claim-win-progress": "Claiming win",
             "result-in": "Result in",
-            "results-in": "Results in",
+            "next-result-in": "Next result in",
             "position-value": "Position value",
             "approve-swap-tooltip": "To get payout in {{currencyKey}}, you need to approve swap from {{defaultCurrency}} to {{currencyKey}}.",
             "claim-all": "Claim all wins",

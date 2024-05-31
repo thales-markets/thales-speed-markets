@@ -1,19 +1,14 @@
 import Tooltip from 'components/Tooltip';
 import { USD_SIGN } from 'constants/currency';
-import { millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
+import { secondsToMilliseconds } from 'date-fns';
 import useInterval from 'hooks/useInterval';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatCurrencyWithSign } from 'thales-utils';
 import { UserPosition } from 'types/market';
-import { getPriceId } from 'utils/pyth';
-import { refetchPythPrice } from 'utils/queryConnector';
-import { useChainId } from 'wagmi';
 
 const MarketPrice: React.FC<{ position: UserPosition }> = ({ position }) => {
     const { t } = useTranslation();
-
-    const networkId = useChainId();
 
     const [isMatured, setIsMatured] = useState(Date.now() > position.maturityDate);
 
@@ -21,15 +16,8 @@ const MarketPrice: React.FC<{ position: UserPosition }> = ({ position }) => {
         // when becomes matured
         if (Date.now() > position.maturityDate) {
             setIsMatured(true);
-
-            if (!position.finalPrice) {
-                refetchPythPrice(
-                    getPriceId(networkId, position.currencyKey),
-                    millisecondsToSeconds(position.maturityDate)
-                );
-            }
         }
-    }, secondsToMilliseconds(10));
+    }, secondsToMilliseconds(1));
 
     // when new position is added, refresh maturity status
     useEffect(() => {
@@ -48,7 +36,7 @@ const MarketPrice: React.FC<{ position: UserPosition }> = ({ position }) => {
                     </>
                 )
             ) : (
-                formatCurrencyWithSign(USD_SIGN, position.currentPrice || 0)
+                formatCurrencyWithSign(USD_SIGN, position.currentPrice)
             )}
         </>
     );

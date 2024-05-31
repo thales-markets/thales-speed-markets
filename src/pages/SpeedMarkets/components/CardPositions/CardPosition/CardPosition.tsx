@@ -81,7 +81,7 @@ const CardPosition: React.FC<{ position: UserPosition }> = ({ position }) => {
                             onChangeCollateral={() => {}}
                             disabled={isActionInProgress}
                             isIconHidden
-                            additionalStyles={{ margin: '0 0 0 5px' }}
+                            additionalStyles={{ margin: '0' }}
                         />
                     </InfoRow>
                 </InfoColumn>
@@ -135,11 +135,11 @@ const Text = styled.span`
 const Label = styled(Text)`
     color: ${(props) => props.theme.textColor.quinary};
     font-weight: 500;
+    margin-right: 5px;
 `;
 
 const Value = styled(Text)<{ $color?: string }>`
     ${(props) => (props.$color ? `color: ${props.$color};` : '')}
-    margin-left: 5px;
 `;
 
 export default CardPosition;

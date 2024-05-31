@@ -5,7 +5,7 @@ import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { secondsToMilliseconds } from 'date-fns';
 import { bigNumberFormatter, coinFormatter, parseBytes32String, roundNumberToDecimals } from 'thales-utils';
-import { ChainedSpeedMarket } from 'types/market';
+import { UserChainedPosition } from 'types/market';
 import { QueryConfig } from 'types/network';
 import { ViemContract } from 'types/viem';
 import { getContarctAbi } from 'utils/contracts/abi';
@@ -17,11 +17,11 @@ const useActiveChainedSpeedMarketsDataQuery = (
     queryConfig: QueryConfig,
     options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
-    return useQuery<ChainedSpeedMarket[]>({
+    return useQuery<UserChainedPosition[]>({
         ...options,
         queryKey: QUERY_KEYS.Markets.ActiveChainedSpeedMarkets(queryConfig.networkId),
         queryFn: async () => {
-            const chainedSpeedMarketsData: ChainedSpeedMarket[] = [];
+            const chainedSpeedMarketsData: UserChainedPosition[] = [];
 
             try {
                 const speedMarketsDataContractLocal = getContract({
@@ -73,24 +73,25 @@ const useActiveChainedSpeedMarketsDataQuery = (
                         8
                     );
 
-                    const chainedData: ChainedSpeedMarket = {
-                        address: marketData.market,
-                        timestamp: secondsToMilliseconds(Number(marketData.createdAt)),
+                    const chainedData: UserChainedPosition = {
+                        user: marketData.user,
+                        market: marketData.market,
                         currencyKey: parseBytes32String(marketData.asset),
                         sides,
                         strikePrices,
                         strikeTimes,
                         maturityDate,
-                        payout: payout,
                         paid: buyinAmount * (1 + fee),
+                        payout: payout,
                         payoutMultiplier: bigNumberFormatter(marketData.payoutMultiplier),
+                        currentPrice: 0,
                         finalPrices: Array(sides.length).fill(0),
-                        isOpen: true,
-                        isMatured: maturityDate < Date.now(),
                         canResolve: false,
+                        isMatured: maturityDate < Date.now(),
                         isClaimable: false,
                         isUserWinner: false,
-                        user: marketData.user,
+                        isResolved: false,
+                        createdAt: secondsToMilliseconds(Number(marketData.createdAt)),
                     };
 
                     chainedSpeedMarketsData.push(chainedData);
