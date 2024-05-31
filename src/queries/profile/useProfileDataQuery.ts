@@ -1,19 +1,19 @@
+import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { BATCH_NUMBER_OF_SPEED_MARKETS, SPEED_MARKETS_QUOTE } from 'constants/market';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
-import { UseQueryOptions, useQuery } from '@tanstack/react-query';
-import { NetworkId, bigNumberFormatter, coinFormatter, roundNumberToDecimals } from 'thales-utils';
+import { bigNumberFormatter, coinFormatter, roundNumberToDecimals } from 'thales-utils';
 import { UserProfileData } from 'types/profile';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
 
-import { getFeesFromHistory } from 'utils/speedAmm';
 import { QueryConfig } from 'types/network';
-import { getContract } from 'viem';
-import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
-import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
-import chainedSpeedMarketsAMMContract from 'utils/contracts/chainedSpeedMarketsAMMContract';
 import { ViemContract } from 'types/viem';
 import { getContarctAbi } from 'utils/contracts/abi';
+import chainedSpeedMarketsAMMContract from 'utils/contracts/chainedSpeedMarketsAMMContract';
+import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
+import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
+import { getFeesFromHistory } from 'utils/speedAmm';
+import { getContract } from 'viem';
 
 const useProfileDataQuery = (
     queryConfig: QueryConfig,
@@ -122,31 +122,10 @@ const useProfileDataQuery = (
                             i++
                         ) {
                             const start = i * BATCH_NUMBER_OF_SPEED_MARKETS;
-                            const batchMarkets = maturedChainedSpeedMarkets
-                                .slice(start, start + BATCH_NUMBER_OF_SPEED_MARKETS)
-                                .map((market: string) => {
-                                    let marketAddresss;
-                                    // Hot fix for 2 markets when resolved with final price 0 and fetching data for that market is failing
-                                    if (
-                                        queryConfig.networkId === NetworkId.OptimismMainnet &&
-                                        walletAddress === '0x5ef88d0a93e5773DB543bd421864504618A18de4' &&
-                                        market === '0x79F6f48410fC659a274c0A236e19e581373bf2f9'
-                                    ) {
-                                        // some other market address of this user
-                                        marketAddresss = '0x6A01283c0F4579B55FB7214CaF619CFe72044b68';
-                                    } else if (
-                                        queryConfig.networkId === NetworkId.PolygonMainnet &&
-                                        walletAddress === '0x8AAcec3D7077D04F19aC924d2743fc0DE1456941' &&
-                                        market === '0x1e195Ea2ABf23C1A793F01c934692A230bb5Fc40'
-                                    ) {
-                                        // some other market address of this user
-                                        marketAddresss = '0x9c5e5c979dbcab721336ad3ed6eac76650f7eb2c';
-                                    } else {
-                                        marketAddresss = market;
-                                    }
-
-                                    return marketAddresss;
-                                });
+                            const batchMarkets = maturedChainedSpeedMarkets.slice(
+                                start,
+                                start + BATCH_NUMBER_OF_SPEED_MARKETS
+                            );
                             promises.push(speedMarketsDataContractLocal.read.getChainedMarketsData([batchMarkets]));
                         }
                     }
