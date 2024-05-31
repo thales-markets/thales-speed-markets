@@ -14,7 +14,7 @@ import { Positions } from 'enums/market';
 import i18n from 'i18n';
 import { toast } from 'react-toastify';
 import { UserChainedPosition, UserPosition } from 'types/market';
-import { QueryConfig } from 'types/network';
+import { QueryConfig, SupportedNetwork } from 'types/network';
 import { ViemContract } from 'types/viem';
 import { getPriceId, getPriceServiceEndpoint, priceParser } from 'utils/pyth';
 import { refetchActiveSpeedMarkets } from 'utils/queryConnector';
@@ -24,6 +24,7 @@ import { executeBiconomyTransaction } from './biconomy';
 import biconomyConnector from './biconomyWallet';
 import { getContarctAbi } from './contracts/abi';
 import chainedSpeedMarketsAMMContract from './contracts/chainedSpeedMarketsAMMContract';
+import erc20Contract from './contracts/collateralContract';
 import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
 
 export const getTransactionForSpeedAMM = async (
@@ -44,9 +45,11 @@ export const getTransactionForSpeedAMM = async (
 
     if (isChained) {
         if (isBiconomy) {
+            const biconomyChainId = biconomyConnector.wallet?.biconomySmartAccountConfig.chainId as SupportedNetwork;
+
             txHash = await executeBiconomyTransaction(
-                biconomyConnector.wallet?.biconomySmartAccountConfig.chainId as any,
-                collateralAddress,
+                biconomyChainId,
+                collateralAddress || erc20Contract.addresses[biconomyChainId],
                 creatorContractWithSigner,
                 'addPendingChainedSpeedMarket',
                 [
@@ -78,9 +81,11 @@ export const getTransactionForSpeedAMM = async (
         }
     } else {
         if (isBiconomy) {
+            const biconomyChainId = biconomyConnector.wallet?.biconomySmartAccountConfig.chainId as SupportedNetwork;
+
             txHash = await executeBiconomyTransaction(
-                biconomyConnector.wallet?.biconomySmartAccountConfig.chainId as any,
-                collateralAddress,
+                biconomyChainId,
+                collateralAddress || erc20Contract.addresses[biconomyChainId],
                 creatorContractWithSigner,
                 'addPendingSpeedMarket',
                 [

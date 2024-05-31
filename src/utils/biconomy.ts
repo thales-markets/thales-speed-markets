@@ -73,6 +73,12 @@ export const executeBiconomyTransaction = async (
     value?: any
 ): Promise<any | undefined> => {
     if (biconomyConnector.wallet && contract) {
+        console.log('networkID: ', networkId);
+        console.log('collateral: ', collateral);
+        console.log('methodName: ', methodName);
+        console.log('contract: ', contract);
+        console.log('value: ', value);
+
         const encodedCall = encodeFunctionData({
             abi: contract.abi,
             functionName: methodName,
@@ -102,6 +108,7 @@ export const executeBiconomyTransaction = async (
                     paymasterServiceData: {
                         mode: PaymasterMode.ERC20,
                         preferredToken: collateral,
+                        maxApproval: true,
                     },
                 });
 
@@ -109,6 +116,9 @@ export const executeBiconomyTransaction = async (
                     receipt: { transactionHash },
                     success,
                 } = await wait();
+
+                console.log('tx hash: ', transactionHash);
+                console.log('success: ', success);
 
                 if (success === 'false') {
                     window.localStorage.removeItem(LOCAL_STORAGE_KEYS.SESSION_P_KEY[networkId]);
@@ -131,6 +141,7 @@ export const executeBiconomyTransaction = async (
                     paymasterServiceData: {
                         mode: PaymasterMode.ERC20,
                         preferredToken: collateral,
+                        maxApproval: true,
                     },
                     params: {
                         sessionSigner: sessionSigner,
@@ -142,6 +153,9 @@ export const executeBiconomyTransaction = async (
                     receipt: { transactionHash },
                     success,
                 } = await wait();
+
+                console.log('tx hash: ', transactionHash);
+                console.log('success: ', success);
 
                 if (success === 'false') {
                     throw new Error('tx failed');
