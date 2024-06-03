@@ -10,8 +10,8 @@ import { secondsToMilliseconds } from 'date-fns';
 import { Positions, TradingSteps } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import useInterval from 'hooks/useInterval';
-import OpenPositions from 'pages/SpeedMarkets/components/UserOpenPositions';
 import LightweightChart from 'pages/SpeedMarkets/components/PriceChart/LightweightChart';
+import UserOpenPositions from 'pages/SpeedMarkets/components/UserOpenPositions';
 import useAmmChainedSpeedMarketsLimitsQuery from 'queries/speedMarkets/useAmmChainedSpeedMarketsLimitsQuery';
 import useAmmSpeedMarketsLimitsQuery from 'queries/speedMarkets/useAmmSpeedMarketsLimitsQuery';
 import queryString from 'query-string';
@@ -280,7 +280,7 @@ const SpeedMarkets: React.FC = () => {
                     />
                     <PageLinkBanner link={LINKS.Markets.Thales} />
                     {isConnected && (
-                        <OpenPositions
+                        <UserOpenPositions
                             isChained={isChained}
                             currentPrices={currentPrices}
                             maxPriceDelayForResolvingSec={ammSpeedMarketsLimitsData?.maxPriceDelayForResolvingSec}

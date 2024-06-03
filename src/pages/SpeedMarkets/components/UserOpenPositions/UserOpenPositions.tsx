@@ -9,7 +9,7 @@ import { CollateralSelectorContainer } from 'pages/SpeedMarkets/components/MyPos
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
 import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveSpeedMarketsDataQuery';
-import React, { CSSProperties, useMemo, useState } from 'react';
+import React, { CSSProperties, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
@@ -29,7 +29,7 @@ import { getPriceId } from 'utils/pyth';
 import { isUserWinner, resolveAllChainedMarkets, resolveAllSpeedPositions } from 'utils/speedAmm';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 import CardPositions from '../CardPositions';
-import TableChainedPositions from '../TableChainedPositions/ChainedTablePositions';
+import TableChainedPositions from '../TableChainedPositions/TableChainedPositions';
 import TablePositions from '../TablePositions';
 
 type UserOpenPositionsProps = {
@@ -200,6 +200,11 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
     const allUserOpenChainedMarketsData = chainedWithoutMaturedPositions.concat(partiallyMaturedWithPrices);
 
     const sortedUserOpenChainedMarketsData = sortSpeedMarkets(allUserOpenChainedMarketsData) as UserChainedPosition[];
+
+    // Table tab selection to follow choosen positions
+    useEffect(() => {
+        setIsChainedSelected(isChained);
+    }, [isChained]);
 
     const isLoading =
         (isChainedSelected ? userChainedSpeedMarketsDataQuery.isLoading : userActiveSpeedMarketsDataQuery.isLoading) ||

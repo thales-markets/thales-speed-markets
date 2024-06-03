@@ -63,7 +63,12 @@ import {
 } from 'utils/currency';
 import { checkAllowance, getIsMultiCollateralSupported } from 'utils/network';
 import { getPriceId, getPriceServiceEndpoint, priceParser } from 'utils/pyth';
-import { refetchBalances, refetchSpeedMarketsLimits, refetchUserSpeedMarkets } from 'utils/queryConnector';
+import {
+    refetchActiveSpeedMarkets,
+    refetchBalances,
+    refetchSpeedMarketsLimits,
+    refetchUserSpeedMarkets,
+} from 'utils/queryConnector';
 import { getReferralWallet } from 'utils/referral';
 import { getFeeByTimeThreshold, getTransactionForSpeedAMM } from 'utils/speedAmm';
 import { delay } from 'utils/timer';
@@ -583,6 +588,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                     networkId,
                     (isBiconomy ? biconomyConnector.address : walletAddress) as string
                 );
+                refetchActiveSpeedMarkets(isChained, networkId);
                 refetchSpeedMarketsLimits(isChained, networkId);
                 refetchBalances((isBiconomy ? biconomyConnector.address : walletAddress) as string, networkId);
                 PLAUSIBLE.trackEvent(

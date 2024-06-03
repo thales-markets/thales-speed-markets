@@ -1,23 +1,28 @@
 import Table from 'components/Table';
 import { USD_SIGN } from 'constants/currency';
 import { t } from 'i18next';
-import MyPositionAction from 'pages/SpeedMarkets/components/MyPositionAction';
+import MarketPrice from 'pages/SpeedMarkets/components/MarketPrice';
+import { DirectionIcon } from 'pages/SpeedMarkets/components/TablePositions/TablePositions';
+import OverviewPositionAction from 'pages/SpeedMarketsOverview/components/OverviewPositionAction';
 import React from 'react';
 import styled from 'styled-components';
-import { formatCurrencyWithSign, localStore } from 'thales-utils';
+import { formatCurrencyWithSign } from 'thales-utils';
 import { UserPosition } from 'types/market';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
-import MarketPrice from '../MarketPrice';
-import SharePosition from '../SharePosition';
-import { PAGINATION_SIZE } from 'components/Table/Table';
-import { LOCAL_STORAGE_KEYS } from 'constants/storage';
-import { Icon } from '../SelectPosition/styled-components';
 
 type TablePositionsProps = {
     data: UserPosition[];
+    maxPriceDelayForResolvingSec: number;
+    isAdmin: boolean;
+    isSubmittingBatch: boolean;
 };
 
-const TablePositions: React.FC<TablePositionsProps> = ({ data }) => {
+const TablePositions: React.FC<TablePositionsProps> = ({
+    data,
+    maxPriceDelayForResolvingSec,
+    isAdmin,
+    isSubmittingBatch,
+}) => {
     const columns = [
         {
             header: <Header>{t('speed-markets.user-positions.asset')}</Header>,
@@ -45,7 +50,7 @@ const TablePositions: React.FC<TablePositionsProps> = ({ data }) => {
                     />
                 </Wrapper>
             ),
-            size: 110,
+            size: 70,
         },
         {
             header: <Header>{t('speed-markets.user-positions.price')}</Header>,
@@ -57,6 +62,7 @@ const TablePositions: React.FC<TablePositionsProps> = ({ data }) => {
                     </Value>
                 </Wrapper>
             ),
+            size: 100,
         },
         {
             header: <Header>{t('speed-markets.user-positions.end-time')}</Header>,
@@ -66,7 +72,7 @@ const TablePositions: React.FC<TablePositionsProps> = ({ data }) => {
                     <Value>{formatShortDateWithFullTime(cellProps.cell.getValue())}</Value>
                 </Wrapper>
             ),
-            size: 180,
+            size: 160,
         },
         {
             header: <Header>{t('speed-markets.user-positions.paid')}</Header>,
@@ -76,7 +82,7 @@ const TablePositions: React.FC<TablePositionsProps> = ({ data }) => {
                     <Value>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())}</Value>
                 </Wrapper>
             ),
-            size: 100,
+            size: 70,
         },
         {
             header: <Header>{t('speed-markets.user-positions.payout')}</Header>,
@@ -86,37 +92,36 @@ const TablePositions: React.FC<TablePositionsProps> = ({ data }) => {
                     <Value>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())}</Value>
                 </Wrapper>
             ),
-            size: 120,
+            size: 80,
+        },
+        {
+            header: <Header>{t('speed-markets.overview.user')}</Header>,
+            accessorKey: 'user',
+            cell: (cellProps: any) => (
+                <Wrapper>
+                    <Value>{cellProps.cell.getValue()}</Value>
+                </Wrapper>
+            ),
+            size: 340,
         },
         {
             header: <Header>{t('speed-markets.user-positions.status')}</Header>,
             accessorKey: 'action',
             cell: (cellProps: any) => (
                 <Wrapper>
-                    <MyPositionAction position={cellProps.row.original} />
+                    <OverviewPositionAction
+                        position={cellProps.row.original}
+                        maxPriceDelayForResolvingSec={maxPriceDelayForResolvingSec}
+                        isAdmin={isAdmin}
+                        isSubmittingBatch={isSubmittingBatch}
+                    />
                 </Wrapper>
             ),
-            size: 300,
-        },
-        {
-            header: <></>,
-            accessorKey: 'share',
-            cell: (cellProps: any) => (
-                <Wrapper>
-                    <ShareWrapper>
-                        <SharePosition position={cellProps.row.original} />
-                    </ShareWrapper>
-                </Wrapper>
-            ),
-            size: 40,
+            size: 180,
         },
     ];
 
-    const rowsPerPageLS = localStore.get(LOCAL_STORAGE_KEYS.TABLE_ROWS_PER_PAGE);
-    const foundPagination = PAGINATION_SIZE.filter((obj) => obj.value === Number(rowsPerPageLS));
-    const rowsPerPage = foundPagination.length ? foundPagination[0].value : undefined;
-
-    return <Table data={data} columns={columns as any} rowsPerPage={rowsPerPage} />;
+    return <Table data={data} columns={columns as any} />;
 };
 
 export const Header = styled.p`
@@ -140,11 +145,6 @@ export const AssetIcon = styled.i`
     background: ${(props) => props.theme.icon.background.secondary};
     color: ${(props) => props.theme.icon.textColor.quaternary};
     border-radius: 50%;
-`;
-
-export const DirectionIcon = styled(Icon)<{ $alignUp?: boolean; $alignEmptyUp?: boolean }>`
-    color: ${(props) => props.theme.icon.textColor.tertiary};
-    ${(props) => (props.$alignUp ? 'margin-bottom: -4px;' : props.$alignEmptyUp ? 'margin-bottom: 2px;' : '')}
 `;
 
 export const Value = styled.span`

@@ -9,13 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsMobile } from 'redux/modules/ui';
 import styled, { useTheme } from 'styled-components';
-import {
-    FlexDivCentered,
-    FlexDivColumn,
-    FlexDivColumnCentered,
-    FlexDivSpaceBetween,
-    FlexDivStart,
-} from 'styles/common';
+import { FlexDivColumn, FlexDivColumnCentered, FlexDivSpaceBetween, FlexDivStart } from 'styles/common';
 import { formatCurrencyWithSign, formatShortDate } from 'thales-utils';
 import { UserChainedPosition } from 'types/market';
 import { RootState, ThemeInterface } from 'types/ui';
@@ -282,29 +276,6 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                             );
                         })}
                     </PositionDetails>
-                    {isOverview && (
-                        <>
-                            <Separator />
-                            <Summary>
-                                <Result isSmaller>
-                                    <ChainedPositionAction
-                                        position={positionWithPrices}
-                                        maxPriceDelayForResolvingSec={maxPriceDelayForResolvingSec}
-                                        isOverview
-                                        isAdmin={isAdmin}
-                                        isSubmittingBatch={isSubmittingBatch}
-                                    />
-                                </Result>
-
-                                <FlexDivCentered>
-                                    <Text>
-                                        {t('speed-markets.overview.user')}
-                                        <Text isActiveColor>{` ${position.user}`}</Text>
-                                    </Text>
-                                </FlexDivCentered>
-                            </Summary>
-                        </>
-                    )}
                 </>
             )}
         </Container>
@@ -379,14 +350,6 @@ const Postion = styled(FlexDivColumnCentered)<{ isDisabled: boolean }>`
     div {
         ${(props) => (props.isDisabled ? `opacity: 0.4;` : '')}
     }
-`;
-
-const Summary = styled(FlexDivColumn)`
-    min-width: 235px;
-`;
-
-const Result = styled(FlexDivCentered)<{ isSmaller?: boolean }>`
-    height: ${(props) => (props.isSmaller ? '70' : '90')}px;
 `;
 
 const Separator = styled.div`

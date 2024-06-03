@@ -1,7 +1,8 @@
+import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
 import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { SIDE_TO_POSITION_MAP } from 'constants/market';
 import { ZERO_ADDRESS } from 'constants/network';
-import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
+import { CONNECTION_TIMEOUT_MS, PYTH_CURRENCY_DECIMALS, SUPPORTED_ASSETS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { secondsToMilliseconds } from 'date-fns';
 import { bigNumberFormatter, coinFormatter, parseBytes32String, roundNumberToDecimals } from 'thales-utils';
@@ -11,6 +12,7 @@ import { ViemContract } from 'types/viem';
 import { getContarctAbi } from 'utils/contracts/abi';
 import chainedSpeedMarketsAMMContract from 'utils/contracts/chainedSpeedMarketsAMMContract';
 import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
+import { getCurrentPrices, getPriceId, getPriceServiceEndpoint } from 'utils/pyth';
 import { getContract } from 'viem';
 
 const useActiveChainedSpeedMarketsDataQuery = (
@@ -52,9 +54,23 @@ const useActiveChainedSpeedMarketsDataQuery = (
                     market: activeMarketsAddresses[index],
                 }));
 
+                // Fetch current prices
+                let prices: { [key: string]: number } = {};
+                if (activeMarkets.length) {
+                    const priceConnection = new EvmPriceServiceConnection(
+                        getPriceServiceEndpoint(queryConfig.networkId),
+                        {
+                            timeout: CONNECTION_TIMEOUT_MS,
+                        }
+                    );
+                    const priceIds = SUPPORTED_ASSETS.map((asset) => getPriceId(queryConfig.networkId, asset));
+                    prices = await getCurrentPrices(priceConnection, queryConfig.networkId, priceIds);
+                }
+
                 for (let i = 0; i < activeMarkets.length; i++) {
                     const marketData = activeMarkets[i];
 
+                    const currencyKey = parseBytes32String(marketData.asset);
                     const sides = marketData.directions.map((direction: number) => SIDE_TO_POSITION_MAP[direction]);
                     const maturityDate = secondsToMilliseconds(Number(marketData.strikeTime));
                     const strikeTimes = Array(sides.length)
@@ -76,7 +92,7 @@ const useActiveChainedSpeedMarketsDataQuery = (
                     const chainedData: UserChainedPosition = {
                         user: marketData.user,
                         market: marketData.market,
-                        currencyKey: parseBytes32String(marketData.asset),
+                        currencyKey,
                         sides,
                         strikePrices,
                         strikeTimes,
@@ -84,7 +100,7 @@ const useActiveChainedSpeedMarketsDataQuery = (
                         paid: buyinAmount * (1 + fee),
                         payout: payout,
                         payoutMultiplier: bigNumberFormatter(marketData.payoutMultiplier),
-                        currentPrice: 0,
+                        currentPrice: prices[currencyKey],
                         finalPrices: Array(sides.length).fill(0),
                         canResolve: false,
                         isMatured: maturityDate < Date.now(),

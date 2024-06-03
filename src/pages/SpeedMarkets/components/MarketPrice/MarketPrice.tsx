@@ -14,7 +14,7 @@ const MarketPrice: React.FC<{ position: UserPosition }> = ({ position }) => {
 
     useInterval(() => {
         // when becomes matured
-        if (Date.now() > position.maturityDate) {
+        if (Date.now() > position.maturityDate && !isMatured) {
             setIsMatured(true);
         }
     }, secondsToMilliseconds(1));

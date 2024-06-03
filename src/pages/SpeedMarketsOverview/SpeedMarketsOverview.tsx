@@ -6,10 +6,10 @@ import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { getSupportedNetworksByRoute } from 'utils/network';
 import { buildHref } from 'utils/routes';
-import UnresolvedChainedPositions from './components/UnresolvedChainedPositions';
-import UnresolvedPositions from './components/UnresolvedPositions';
-import { Container, Header, LinkContainer, NavigationIcon } from './styled-components';
 import { useChainId } from 'wagmi';
+import OpenChainedPositions from './components/OpenChainedPositions';
+import OpenPositions from './components/OpenPositions';
+import { Container, Header, LinkContainer, NavigationIcon } from './styled-components';
 
 const SpeedMarketsOverview: React.FC = () => {
     const { t } = useTranslation();
@@ -46,7 +46,7 @@ const SpeedMarketsOverview: React.FC = () => {
                     </div>
                 )}
             </Header>
-            {isChainedMarkets ? <UnresolvedChainedPositions /> : <UnresolvedPositions />}
+            {isChainedMarkets ? <OpenChainedPositions /> : <OpenPositions />}
         </Container>
     );
 };

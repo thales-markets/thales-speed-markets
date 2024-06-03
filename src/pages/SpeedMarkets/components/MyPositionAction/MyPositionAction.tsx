@@ -368,6 +368,7 @@ export const Container = styled(FlexDivCentered)<{ $isClaimable: boolean }>`
 `;
 
 export const getDefaultButtonProps = () => ({
+    minWidth: '150px',
     height: '30px',
     fontSize: '13px',
 });

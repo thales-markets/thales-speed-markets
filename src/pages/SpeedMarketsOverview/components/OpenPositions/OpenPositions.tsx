@@ -6,16 +6,7 @@ import { SPEED_MARKETS_OVERVIEW_SECTIONS as SECTIONS } from 'constants/market';
 import { CONNECTION_TIMEOUT_MS, SUPPORTED_ASSETS } from 'constants/pyth';
 import { millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
 import useInterval from 'hooks/useInterval';
-import {
-    LoaderContainer,
-    NoPositionsText,
-    PositionsWrapper,
-    Row,
-    Title,
-    Wrapper,
-    getAdditionalButtonStyle,
-    getDefaultButtonProps,
-} from 'pages/SpeedMarketsOverview/styled-components';
+import CardPositions from 'pages/SpeedMarkets/components/CardPositions';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import useActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useActiveSpeedMarketsDataQuery';
 import useAmmSpeedMarketsLimitsQuery from 'queries/speedMarkets/useAmmSpeedMarketsLimitsQuery';
@@ -24,31 +15,34 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
+import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
+import styled from 'styled-components';
+import { FlexDivCentered, FlexDivRow } from 'styles/common';
 import { UserPosition } from 'types/market';
 import { RootState } from 'types/ui';
+import biconomyConnector from 'utils/biconomyWallet';
+import erc20Contract from 'utils/contracts/collateralContract';
+import multipleCollateral from 'utils/contracts/multipleCollateralContract';
+import { getCollateral } from 'utils/currency';
+import { getIsMultiCollateralSupported } from 'utils/network';
 import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAssetsAsObject } from 'utils/pyth';
 import { refetchActiveSpeedMarkets, refetchPythPrice } from 'utils/queryConnector';
 import { isUserWinner, resolveAllSpeedPositions } from 'utils/speedAmm';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
-import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
-import biconomyConnector from 'utils/biconomyWallet';
-import UnresolvedPosition from '../UnresolvedPosition';
-import { getIsMultiCollateralSupported } from 'utils/network';
-import { getCollateral } from 'utils/currency';
-import multipleCollateral from 'utils/contracts/multipleCollateralContract';
-import erc20Contract from 'utils/contracts/collateralContract';
+import TablePositions from './components/TablePositions';
 
-const UnresolvedPositions: React.FC = () => {
+const OpenPositions: React.FC = () => {
     const { t } = useTranslation();
 
     const networkId = useChainId();
-    const { address: walletAddress } = useAccount();
-    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
     const client = useClient();
     const walletClient = useWalletClient();
-    const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
+    const { isConnected, address: walletAddress } = useAccount();
 
+    const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
+    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
+    const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
 
     const [currentPrices, setCurrentPrices] = useState<{ [key: string]: number }>(getSupportedAssetsAsObject());
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -56,7 +50,6 @@ const UnresolvedPositions: React.FC = () => {
     const [isLoadingEnabled, setIsLoadingEnabled] = useState(true);
 
     const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
-    const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
     const selectedCollateral = useMemo(() => getCollateral(networkId, selectedCollateralIndex), [
         networkId,
         selectedCollateralIndex,
@@ -80,7 +73,7 @@ const UnresolvedPositions: React.FC = () => {
     const activeSpeedMarketsDataQuery = useActiveSpeedMarketsDataQuery(
         { networkId, client },
         {
-            enabled: isAppReady,
+            enabled: isAppReady && isConnected,
         }
     );
 
@@ -92,17 +85,21 @@ const UnresolvedPositions: React.FC = () => {
         [activeSpeedMarketsDataQuery]
     );
 
-    const activeMatured = activeSpeedMarketsData.filter((marketData) => marketData.maturityDate < Date.now());
-    const priceRequests = activeMatured.map((marketData) => ({
+    const activeSpeedNotMatured: UserPosition[] = activeSpeedMarketsData.filter(
+        (marketData) => marketData.maturityDate >= Date.now()
+    );
+    const activeSpeedMatured = activeSpeedMarketsData.filter((marketData) => marketData.maturityDate < Date.now());
+
+    const priceRequests = activeSpeedMatured.map((marketData) => ({
         priceId: getPriceId(networkId, marketData.currencyKey),
         publishTime: millisecondsToSeconds(marketData.maturityDate),
     }));
-
     const pythPricesQueries = usePythPriceQueries(networkId, priceRequests, {
         enabled: priceRequests.length > 0,
     });
 
-    const maturedUnresolvedWithPrices = activeMatured.map((marketData, index) => {
+    // set final prices and claimable status
+    const maturedUserSpeedMarketsWithPrices: UserPosition[] = activeSpeedMatured.map((marketData, index) => {
         const finalPrice = pythPricesQueries[index].data || 0;
         const isClaimable = !!isUserWinner(marketData.side, marketData.strikePrice, finalPrice);
         return {
@@ -112,28 +109,25 @@ const UnresolvedPositions: React.FC = () => {
         };
     });
 
-    const userWinnerSpeedMarketsData = maturedUnresolvedWithPrices.filter(
-        (marketData) => marketData.isClaimable && !!marketData.finalPrice
-    );
-    const ammWinnerSpeedMarketsData = maturedUnresolvedWithPrices.filter(
-        (marketData) => !marketData.isClaimable && !!marketData.finalPrice
-    );
-    const unknownPriceSpeedMarketsData = maturedUnresolvedWithPrices.filter(
-        (marketData) => !marketData.isClaimable && !marketData.finalPrice
-    );
-    const openSpeedMarketsData = activeSpeedMarketsData
-        .filter((marketData) => marketData.maturityDate > Date.now())
-        .map((marketData) => ({
-            ...marketData,
-            strikePrice: marketData.strikePrice,
-            currentPrice: currentPrices[marketData.currencyKey]
-                ? currentPrices[marketData.currencyKey]
-                : marketData.currentPrice,
-        }));
+    const userWinnerSpeedMarketsData = maturedUserSpeedMarketsWithPrices
+        .filter((marketData) => marketData.isClaimable && !!marketData.finalPrice)
+        .sort((a, b) => b.maturityDate - a.maturityDate);
+
+    const ammWinnerSpeedMarketsData = maturedUserSpeedMarketsWithPrices
+        .filter((marketData) => !marketData.isClaimable && !!marketData.finalPrice)
+        .sort((a, b) => b.maturityDate - a.maturityDate);
+
+    const unknownPriceSpeedMarketsData = maturedUserSpeedMarketsWithPrices
+        .filter((marketData) => !marketData.isClaimable && !marketData.finalPrice)
+        .sort((a, b) => b.maturityDate - a.maturityDate);
+
+    const openSpeedMarketsData = activeSpeedNotMatured.sort((a, b) => b.maturityDate - a.maturityDate);
 
     const isLoading =
         isLoadingEnabled &&
-        (activeSpeedMarketsDataQuery.isLoading || pythPricesQueries.some((query) => query.isLoading));
+        (ammSpeedMarketsLimitsQuery.isLoading ||
+            activeSpeedMarketsDataQuery.isLoading ||
+            pythPricesQueries.some((query) => query.isLoading));
 
     const priceConnection = useMemo(() => {
         return new EvmPriceServiceConnection(getPriceServiceEndpoint(networkId), { timeout: CONNECTION_TIMEOUT_MS });
@@ -192,13 +186,12 @@ const UnresolvedPositions: React.FC = () => {
             !isLoading &&
             !!positions.length && (
                 <Button
-                    {...getDefaultButtonProps(isMobile, positions.length > 10)}
                     disabled={isSubmitting || !positions.length}
-                    additionalStyles={getAdditionalButtonStyle()}
                     onClick={() => {
                         setIsSubmittingSection(sectionName);
                         handleResolveAll(positions, isAdmin);
                     }}
+                    fontSize="13px"
                 >
                     {isSubmittingSection === sectionName
                         ? t(`speed-markets.overview.resolve-progress`)
@@ -234,56 +227,96 @@ const UnresolvedPositions: React.FC = () => {
             <>
                 <Row>
                     <Title>{`${t(titleKey)} (${positions.length})`}</Title>
-                    {[SECTIONS.userWinner, SECTIONS.ammWinner].includes(section) &&
-                        getButton(positions, section, isAdmin)}
+                    <ButtonWrapper>
+                        {[SECTIONS.userWinner, SECTIONS.ammWinner].includes(section) &&
+                            getButton(positions, section, isAdmin)}
+                    </ButtonWrapper>
                 </Row>
-                {isLoading ? (
-                    <LoaderContainer>
-                        <SimpleLoader />
-                    </LoaderContainer>
-                ) : (
-                    <PositionsWrapper $hasPositions={positions.length > 0}>
-                        {positions.length > 0 ? (
-                            positions.map((position, index) => (
-                                <UnresolvedPosition
-                                    position={position}
+                {
+                    <PositionsWrapper>
+                        {isLoading ? (
+                            <SimpleLoader />
+                        ) : positions.length > 0 ? (
+                            isMobile ? (
+                                <CardPositions positions={positions as UserPosition[]} />
+                            ) : (
+                                <TablePositions
+                                    data={positions}
                                     maxPriceDelayForResolvingSec={
                                         ammSpeedMarketsLimitsData?.maxPriceDelayForResolvingSec || 0
                                     }
                                     isAdmin={isAdmin}
                                     isSubmittingBatch={isSubmitting}
-                                    key={`${section}${index}`}
                                 />
-                            ))
+                            )
                         ) : (
-                            <NoPositionsText>{t('speed-markets.overview.no-positions')}</NoPositionsText>
+                            <NoPositions>
+                                <NoPositionsText>{t('speed-markets.overview.no-positions')}</NoPositionsText>
+                            </NoPositions>
                         )}
                     </PositionsWrapper>
-                )}
+                }
             </>
         );
     };
 
     return (
-        <Wrapper>
-            {getSection(
-                SECTIONS.userWinner,
-                userWinnerSpeedMarketsData.sort((a, b) => b.maturityDate - a.maturityDate)
-            )}
-            {getSection(
-                SECTIONS.ammWinner,
-                ammWinnerSpeedMarketsData.sort((a, b) => b.maturityDate - a.maturityDate)
-            )}
-            {getSection(
-                SECTIONS.unknownPrice,
-                unknownPriceSpeedMarketsData.sort((a, b) => b.maturityDate - a.maturityDate)
-            )}
-            {getSection(
-                SECTIONS.openPositions,
-                openSpeedMarketsData.sort((a, b) => a.maturityDate - b.maturityDate)
-            )}
-        </Wrapper>
+        <Container>
+            {getSection(SECTIONS.userWinner, userWinnerSpeedMarketsData)}
+            {getSection(SECTIONS.ammWinner, ammWinnerSpeedMarketsData)}
+            {getSection(SECTIONS.unknownPrice, unknownPriceSpeedMarketsData)}
+            {getSection(SECTIONS.openPositions, openSpeedMarketsData)}
+        </Container>
     );
 };
 
-export default UnresolvedPositions;
+const Container = styled.div`
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+`;
+
+const Row = styled(FlexDivRow)`
+    align-items: center;
+    margin-bottom: 10px;
+    :not(:first-child) {
+        margin-top: 40px;
+    }
+`;
+
+const Title = styled.span`
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 100%;
+    margin-left: 20px;
+    text-transform: uppercase;
+    color: ${(props) => props.theme.textColor.primary};
+`;
+
+const PositionsWrapper = styled.div`
+    position: relative;
+    min-height: 200px;
+    width: 100%;
+`;
+
+const ButtonWrapper = styled.div`
+    width: 164px;
+    margin-right: 16px;
+`;
+
+const NoPositions = styled(FlexDivCentered)`
+    min-height: inherit;
+`;
+
+const NoPositionsText = styled.span`
+    text-align: center;
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 100%;
+    color: ${(props) => props.theme.textColor.primary};
+    min-width: max-content;
+    overflow: hidden;
+`;
+
+export default OpenPositions;

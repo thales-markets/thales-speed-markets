@@ -350,7 +350,6 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
 
     const getResolveButton = () => {
         const additionalButtonStyle: CSSProperties = {
-            minWidth: '180px',
             lineHeight: '100%',
             border: 'none',
         };
@@ -377,7 +376,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                                   ? `${t('common.admin')} ${t('speed-markets.overview.resolve')}`
                                   : t('speed-markets.overview.resolve')
                               : t('speed-markets.user-positions.claim-win')
-                      } ${formatCurrencyWithSign(USD_SIGN, position.payout, 2)}`
+                      }${isOverview ? '' : ' ' + formatCurrencyWithSign(USD_SIGN, position.payout, 2)}`
                     : isAllowing
                     ? `${t('common.enable-wallet-access.approve-progress')} ${defaultCollateral}...`
                     : t('common.enable-wallet-access.approve-swap', {
@@ -404,7 +403,9 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                     </Tooltip>
                 );
             } else if (position.resolveIndex !== undefined) {
-                return (
+                return isOverview ? (
+                    getResolveButton()
+                ) : (
                     <ResultsContainer>
                         <Value
                             $isUpperCase
@@ -450,7 +451,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
     return (
         <>
             <Container $isClaimable={position.isClaimable}>
-                {!isCollateralHidden && isMultiCollateralSupported && position.isClaimable && (
+                {!isOverview && !isCollateralHidden && isMultiCollateralSupported && position.isClaimable && (
                     <CollateralSelector
                         collateralArray={getCollaterals(networkId)}
                         selectedItem={selectedCollateralIndex}

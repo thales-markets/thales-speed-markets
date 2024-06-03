@@ -38,10 +38,6 @@ const useActiveSpeedMarketsDataQuery = (
                     client: queryConfig.client,
                 }) as ViemContract;
 
-                const priceConnection = new EvmPriceServiceConnection(getPriceServiceEndpoint(queryConfig.networkId), {
-                    timeout: CONNECTION_TIMEOUT_MS,
-                });
-
                 const ammParams = await speedMarketsDataContractLocal.read.getSpeedMarketsAMMParameters([ZERO_ADDRESS]);
 
                 const activeMarkets = await speedMarketsAMMContractLocal.read.activeMarkets([
@@ -101,6 +97,12 @@ const useActiveSpeedMarketsDataQuery = (
                 // Fetch current prices
                 let prices: { [key: string]: number } = {};
                 if (openMarkets.length) {
+                    const priceConnection = new EvmPriceServiceConnection(
+                        getPriceServiceEndpoint(queryConfig.networkId),
+                        {
+                            timeout: CONNECTION_TIMEOUT_MS,
+                        }
+                    );
                     const priceIds = SUPPORTED_ASSETS.map((asset) => getPriceId(queryConfig.networkId, asset));
                     prices = await getCurrentPrices(priceConnection, queryConfig.networkId, priceIds);
                 }

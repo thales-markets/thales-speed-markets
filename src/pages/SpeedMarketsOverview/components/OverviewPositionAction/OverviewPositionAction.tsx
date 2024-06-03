@@ -10,12 +10,11 @@ import {
 } from 'components/ToastMessage/ToastMessage';
 import { CONNECTION_TIMEOUT_MS, PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
 import { differenceInSeconds, millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
-import { ScreenSizeBreakpoint } from 'enums/ui';
+import { Label, getDefaultButtonProps } from 'pages/SpeedMarkets/components/MyPositionAction/MyPositionAction';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { getIsMobile } from 'redux/modules/ui';
 import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
 import styled, { CSSProperties } from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
@@ -55,7 +54,6 @@ const OverviewPositionAction: React.FC<OverviewPositionActionProps> = ({
     const networkId = useChainId() as SupportedNetwork;
     const client = useClient();
     const walletClient = useWalletClient();
-    const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
 
     const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
@@ -172,17 +170,14 @@ const OverviewPositionAction: React.FC<OverviewPositionActionProps> = ({
     return (
         <>
             {position.maturityDate > Date.now() ? (
-                <>
-                    <Separator />
-                    <ResultsContainer>
-                        <TimeRemaining end={position.maturityDate} showFullCounter showSecondsCounter>
-                            <Label>{t('speed-markets.user-positions.result-in')}</Label>
-                        </TimeRemaining>
-                    </ResultsContainer>
-                </>
+                <ResultsContainer>
+                    <TimeRemaining end={position.maturityDate} showFullCounter showSecondsCounter>
+                        <Label>{t('speed-markets.user-positions.result-in')}</Label>
+                    </TimeRemaining>
+                </ResultsContainer>
             ) : (
                 <Button
-                    {...getDefaultButtonProps(isMobile)}
+                    {...getDefaultButtonProps()}
                     disabled={isSubmitting || !position.finalPrice}
                     additionalStyles={additionalButtonStyle}
                     onClick={() => handleResolve()}
@@ -198,12 +193,6 @@ const OverviewPositionAction: React.FC<OverviewPositionActionProps> = ({
     );
 };
 
-const getDefaultButtonProps = (isMobile: boolean) => ({
-    minWidth: '180px',
-    height: isMobile ? '24px' : '27px',
-    fontSize: isMobile ? '12px' : '13px',
-});
-
 const additionalButtonStyle: CSSProperties = {
     lineHeight: '100%',
     border: 'none',
@@ -216,26 +205,6 @@ const ResultsContainer = styled(FlexDivCentered)`
     line-height: 100%;
     white-space: nowrap;
     min-width: 174px;
-`;
-
-export const Separator = styled.div`
-    min-width: 2px;
-    width: 2px;
-    height: 14px;
-    background: ${(props) => props.theme.background.secondary};
-    border-radius: 3px;
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        display: none;
-    }
-`;
-
-export const Label = styled.span`
-    font-weight: 700;
-    font-size: 13px;
-    line-height: 100%;
-    color: ${(props) => props.theme.textColor.secondary};
-    white-space: nowrap;
-    padding-right: 5px;
 `;
 
 export default OverviewPositionAction;
