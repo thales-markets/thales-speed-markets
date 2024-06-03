@@ -313,7 +313,7 @@ const Container = styled.div`
 `;
 
 const HeaderImage = styled.div`
-    height: 120px;
+    height: 130px;
     background-image: url(${banner});
     background-position: center;
     border: 1px solid ${(props) => props.theme.borderColor.quinary};

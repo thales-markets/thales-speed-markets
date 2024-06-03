@@ -1,32 +1,33 @@
 import CollateralSelector from 'components/CollateralSelector';
 import { USD_SIGN } from 'constants/currency';
 import { secondsToMilliseconds } from 'date-fns';
+import { Positions } from 'enums/market';
 import useInterval from 'hooks/useInterval';
-import MyPositionAction from 'pages/SpeedMarkets/components/MyPositionAction';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getSelectedCollateralIndex } from 'redux/modules/wallet';
-import styled, { useTheme } from 'styled-components';
-import { FlexDivColumn, FlexDivRow, FlexDivSpaceBetween, FlexDivStart } from 'styles/common';
+import styled from 'styled-components';
+import { FlexDivCentered, FlexDivColumn, FlexDivRow, FlexDivSpaceBetween, FlexDivStart } from 'styles/common';
 import { formatCurrencyWithSign } from 'thales-utils';
-import { UserPosition } from 'types/market';
-import { RootState, ThemeInterface } from 'types/ui';
+import { UserChainedPosition } from 'types/market';
+import { RootState } from 'types/ui';
 import { getCollaterals } from 'utils/currency';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
-import { getColorPerPosition } from 'utils/style';
 import { useChainId } from 'wagmi';
-import MarketPrice from '../../MarketPrice';
+import ChainedMarketPrice from '../../ChainedMarketPrice';
+import ChainedPositionAction from '../../ChainedPositionAction';
 import SharePosition from '../../SharePosition';
+import { DirectionIcon } from '../../TablePositions/TablePositions';
 
-const CardPosition: React.FC<{ position: UserPosition }> = ({ position }) => {
+const CardChainedPosition: React.FC<{ position: UserChainedPosition }> = ({ position }) => {
     const { t } = useTranslation();
-    const theme: ThemeInterface = useTheme();
 
     const networkId = useChainId();
     const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
 
     const [isMatured, setIsMatured] = useState(Date.now() > position.maturityDate);
+    const [resolveIndex, setResolveindex] = useState(position.resolveIndex);
     const [isActionInProgress, setIsActionInProgress] = useState(false);
 
     useInterval(() => {
@@ -42,6 +43,19 @@ const CardPosition: React.FC<{ position: UserPosition }> = ({ position }) => {
         setIsMatured(Date.now() > position.maturityDate);
     }, [position.maturityDate]);
 
+    // refresh resolve index
+    useEffect(() => {
+        setResolveindex(position.resolveIndex);
+    }, [position.resolveIndex]);
+
+    const strikeTimeIndex = position.strikeTimes.findIndex((t) => t > Date.now());
+    const endTime =
+        resolveIndex !== undefined
+            ? position.strikeTimes[resolveIndex]
+            : strikeTimeIndex > -1
+            ? position.strikeTimes[strikeTimeIndex]
+            : position.maturityDate;
+
     return (
         <Container>
             <Info>
@@ -49,24 +63,50 @@ const CardPosition: React.FC<{ position: UserPosition }> = ({ position }) => {
                     <InfoRow>
                         <Label>{t('common.market')}:</Label>
                         <Value>
-                            {position.currencyKey} {formatCurrencyWithSign(USD_SIGN, position.strikePrice)}{' '}
-                            <Value $color={getColorPerPosition(position.side, theme)}>{position.side}</Value>
+                            {position.currencyKey} <ChainedMarketPrice position={position} isStrikePrice />
                         </Value>
                     </InfoRow>
                     <InfoRow>
                         <Label>
-                            {isMatured
+                            {resolveIndex !== undefined || isMatured
                                 ? t('speed-markets.user-positions.price')
                                 : t('speed-markets.user-positions.current-price')}
                             :
                         </Label>
                         <Value>
-                            <MarketPrice position={position} />
+                            <ChainedMarketPrice position={position} />
                         </Value>
                     </InfoRow>
                     <InfoRow>
                         <Label>{t('speed-markets.user-positions.end-time')}:</Label>
-                        <Value>{formatShortDateWithFullTime(position.maturityDate)}</Value>
+                        <Value>{formatShortDateWithFullTime(endTime)}</Value>
+                    </InfoRow>
+                    <InfoRow>
+                        <Label>{t('speed-markets.chained.directions')}:</Label>
+                        <DirectionsWrapper>
+                            {position.sides.map((side, index) => {
+                                const hasFinalPrice = position.finalPrices[index];
+                                const isPositionLost = !position.isClaimable && index === resolveIndex;
+                                const isPositionIrrelevant =
+                                    !position.isClaimable && resolveIndex !== undefined && index > resolveIndex;
+                                const isEmptyIcon = !hasFinalPrice || isPositionLost || isPositionIrrelevant;
+
+                                return (
+                                    <DirectionIcon
+                                        key={index}
+                                        className={
+                                            isEmptyIcon
+                                                ? `icon icon--caret-${side.toLowerCase()}-empty`
+                                                : `icon icon--caret-${side.toLowerCase()}`
+                                        }
+                                        size={25}
+                                        isDisabled={isPositionIrrelevant}
+                                        $alignUp={!isEmptyIcon && side === Positions.UP}
+                                        $alignEmptyUp={isEmptyIcon && side === Positions.UP}
+                                    />
+                                );
+                            })}
+                        </DirectionsWrapper>
                     </InfoRow>
                 </InfoColumn>
                 <InfoColumn>
@@ -94,12 +134,12 @@ const CardPosition: React.FC<{ position: UserPosition }> = ({ position }) => {
                 </InfoColumn>
             </Info>
             <Action>
-                <MyPositionAction
+                <ChainedPositionAction
                     position={position}
                     isCollateralHidden
                     setIsActionInProgress={setIsActionInProgress}
                 />
-                <SharePosition position={position} />
+                <SharePosition position={position} isChained />
             </Action>
         </Container>
     );
@@ -108,7 +148,7 @@ const CardPosition: React.FC<{ position: UserPosition }> = ({ position }) => {
 const Container = styled(FlexDivColumn)`
     justify-content: space-between;
     width: 100%;
-    min-height: 123px;
+    min-height: 155px;
     border: 1px solid ${(props) => props.theme.borderColor.quaternary};
     border-radius: 8px;
     padding: 14px 10px;
@@ -149,4 +189,8 @@ const Value = styled(Text)<{ $color?: string }>`
     ${(props) => (props.$color ? `color: ${props.$color};` : '')}
 `;
 
-export default CardPosition;
+const DirectionsWrapper = styled(FlexDivCentered)`
+    gap: 10px;
+`;
+
+export default CardChainedPosition;

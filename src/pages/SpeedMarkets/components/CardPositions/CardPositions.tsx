@@ -1,15 +1,23 @@
 import React from 'react';
 import styled from 'styled-components';
 import { FlexDivColumn } from 'styles/common';
-import { UserPosition } from 'types/market';
+import { UserChainedPosition, UserPosition } from 'types/market';
+import CardChainedPosition from './CardChainedPosition';
 import CardPosition from './CardPosition/CardPosition';
 
-const CardPositions: React.FC<{ data: UserPosition[] }> = ({ data }) => {
+const CardPositions: React.FC<{ positions: (UserPosition | UserChainedPosition)[]; isChained?: boolean }> = ({
+    positions,
+    isChained,
+}) => {
     return (
         <Container>
-            {data.map((position, index) => (
-                <CardPosition key={index} position={position} />
-            ))}
+            {positions.map((position, index) =>
+                isChained ? (
+                    <CardChainedPosition key={index} position={position as UserChainedPosition} />
+                ) : (
+                    <CardPosition key={index} position={position as UserPosition} />
+                )
+            )}
         </Container>
     );
 };

@@ -11,6 +11,7 @@ import MarketPrice from '../MarketPrice';
 import SharePosition from '../SharePosition';
 import { PAGINATION_SIZE } from 'components/Table/Table';
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
+import { Icon } from '../SelectPosition/styled-components';
 
 const TablePositions: React.FC<{ data: UserPosition[] }> = ({ data }) => {
     const columns = [
@@ -34,7 +35,10 @@ const TablePositions: React.FC<{ data: UserPosition[] }> = ({ data }) => {
             accessorKey: 'side',
             cell: (cellProps: any) => (
                 <Wrapper>
-                    <DirectionIcon className={`icon icon--caret-${cellProps.cell.getValue().toLowerCase()}`} />
+                    <DirectionIcon
+                        className={`icon icon--caret-${cellProps.cell.getValue().toLowerCase()}`}
+                        size={25}
+                    />
                 </Wrapper>
             ),
             size: 110,
@@ -134,9 +138,9 @@ export const AssetIcon = styled.i`
     border-radius: 50%;
 `;
 
-export const DirectionIcon = styled(AssetIcon)`
-    background: ${(props) => props.theme.background.primary};
-    color: ${(props) => props.theme.icon.background.tertiary};
+export const DirectionIcon = styled(Icon)<{ $alignUp?: boolean; $alignEmptyUp?: boolean }>`
+    color: ${(props) => props.theme.icon.textColor.tertiary};
+    ${(props) => (props.$alignUp ? 'margin-bottom: -4px;' : props.$alignEmptyUp ? 'margin-bottom: 1px;' : '')}
 `;
 
 export const Value = styled.span`

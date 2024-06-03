@@ -28,6 +28,7 @@ import { getColorPerPosition } from 'utils/style';
 import { useChainId } from 'wagmi';
 import ChainedPositionAction from '../ChainedPositionAction';
 import { AssetIcon, Icon, PositionsSymbol } from '../SelectPosition/styled-components';
+import { DirectionIcon } from '../TablePositions/TablePositions';
 
 type ChainedPositionProps = {
     position: UserChainedPosition;
@@ -102,7 +103,7 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
     };
 
     const size = useMemo(() => position.sides.length, [position.sides]);
-    const userFirstLostIndex = userWonStatuses.findIndex((wonStatus) => !wonStatus);
+    const userFirstLostIndex = userWonStatuses.findIndex((wonStatus) => wonStatus === false);
     const userFirstLostOrWonIndex = userFirstLostIndex > -1 ? userFirstLostIndex : size - 1;
 
     const statusDecisionIndex = positionWithPrices.isClaimable
@@ -194,28 +195,44 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                 </AlignedFlex>
             ) : (
                 <>
-                    <AssetInfo>
-                        <Text>{t('speed-markets.user-positions.direction')}</Text>
-                        <Text lineHeight="30px">{t('speed-markets.user-positions.end-time')}</Text>
+                    <PositionInfo>
+                        <Text lineHeight="30px">{t('speed-markets.user-positions.direction')}</Text>
+                        <Text lineHeight="28px">{t('speed-markets.user-positions.end-time')}</Text>
                         <Text>{t('common.strike-price')}</Text>
                         <Text>{t('profile.final-price')}</Text>
                         <Text>{t('common.status-label')}</Text>
-                    </AssetInfo>
+                    </PositionInfo>
                     <Separator />
                     <PositionDetails>
                         {positionWithPrices.sides.map((side, index) => {
+                            const hasFinalPrice = position.finalPrices[index];
+                            const isPositionLost = userFirstLostIndex > -1 && index === userFirstLostIndex;
+                            const isPositionIrrelevant = userFirstLostIndex > -1 && index > userFirstLostIndex;
+                            const isEmptyIcon = !hasFinalPrice || isPositionLost || isPositionIrrelevant;
+
                             return (
-                                <Postion
-                                    isDisabled={position.isResolved && index > userFirstLostOrWonIndex}
-                                    key={index}
-                                >
+                                <Postion isDisabled={isPositionIrrelevant} key={index}>
                                     {side === Positions.UP ? (
                                         <PositionsSymbol size={30}>
-                                            <Icon size={16} className="icon icon--caret-up" />
+                                            <DirectionIcon
+                                                size={20}
+                                                className={
+                                                    isEmptyIcon ? 'icon icon--caret-up-empty' : 'icon icon--caret-up'
+                                                }
+                                                $alignUp={!isEmptyIcon}
+                                                $alignEmptyUp={isEmptyIcon}
+                                            />
                                         </PositionsSymbol>
                                     ) : (
                                         <PositionsSymbol size={30}>
-                                            <Icon size={16} className="icon icon--caret-down" />
+                                            <DirectionIcon
+                                                size={20}
+                                                className={
+                                                    isEmptyIcon
+                                                        ? 'icon icon--caret-down-empty'
+                                                        : 'icon icon--caret-down'
+                                                }
+                                            />
                                         </PositionsSymbol>
                                     )}
                                     <Text fontWeight={400} lineHeight="13px" padding="1px 0 0 0">
@@ -224,25 +241,26 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({
                                     <Text fontWeight={800} lineHeight="13px" padding="0 0 1px 0">
                                         {formatHoursMinutesSecondsFromTimestamp(positionWithPrices.strikeTimes[index])}
                                     </Text>
-                                    {positionWithPrices.strikePrices[index] ? (
+                                    {!isPositionIrrelevant && positionWithPrices.strikePrices[index] ? (
                                         <Text fontWeight={800} isActiveColor={!maturedStrikeTimes[index]}>
                                             {formatCurrencyWithSign(USD_SIGN, positionWithPrices.strikePrices[index])}
                                         </Text>
                                     ) : (
                                         <Dash />
                                     )}
-                                    {positionWithPrices.finalPrices[index] ? (
+                                    {!isPositionIrrelevant && positionWithPrices.finalPrices[index] ? (
                                         <Text fontWeight={800}>
                                             {formatCurrencyWithSign(USD_SIGN, positionWithPrices.finalPrices[index])}
                                         </Text>
-                                    ) : !position.isResolved && maturedStrikeTimes[index] ? (
+                                    ) : !isPositionIrrelevant && !position.isResolved && maturedStrikeTimes[index] ? (
                                         <Text fontWeight={800} fontSize={16}>
+                                            {'. . .'}
                                             <Tooltip overlay={t('speed-markets.tooltips.final-price-missing')} />
                                         </Text>
                                     ) : (
                                         <Dash />
                                     )}
-                                    {userWonStatuses[index] !== undefined ? (
+                                    {!isPositionIrrelevant && userWonStatuses[index] !== undefined ? (
                                         <Text lineHeight="100%">
                                             <Icon
                                                 size={userWonStatuses[index] ? 18 : 16}
@@ -311,9 +329,8 @@ const Container = styled(FlexDivSpaceBetween)`
     }
 `;
 
-const AssetInfo = styled(FlexDivColumn)`
+const PositionInfo = styled(FlexDivColumn)`
     max-width: 70px;
-    margin-top: 10px;
 `;
 
 const Text = styled.span<{
@@ -360,12 +377,7 @@ const Postion = styled(FlexDivColumnCentered)<{ isDisabled: boolean }>`
 
     span,
     div {
-        ${(props) => (props.isDisabled ? `color: ${props.theme.background.secondary};` : '')}
-        ${(props) => (props.isDisabled ? `border-color: ${props.theme.background.secondary};` : '')}
-    }
-
-    ${Dash} {
-        ${(props) => (props.isDisabled ? `background: ${props.theme.background.secondary};` : '')}
+        ${(props) => (props.isDisabled ? `opacity: 0.4;` : '')}
     }
 `;
 

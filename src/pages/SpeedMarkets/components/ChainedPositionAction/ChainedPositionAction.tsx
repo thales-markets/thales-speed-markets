@@ -62,6 +62,7 @@ type ChainedPositionActionProps = {
     isAdmin?: boolean;
     isSubmittingBatch?: boolean;
     isCollateralHidden?: boolean;
+    setIsActionInProgress?: React.Dispatch<boolean>;
 };
 
 const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
@@ -71,6 +72,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
     isAdmin,
     isSubmittingBatch,
     isCollateralHidden,
+    setIsActionInProgress,
 }) => {
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
@@ -147,6 +149,13 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
         selectedCollateral,
         client,
     ]);
+
+    // Update action in progress status
+    useEffect(() => {
+        if (setIsActionInProgress) {
+            setIsActionInProgress(isAllowing || isSubmitting);
+        }
+    }, [isAllowing, isSubmitting, setIsActionInProgress]);
 
     const handleAllowance = async (approveAmount: bigint) => {
         const erc20Instance = getContract({
@@ -394,6 +403,17 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                         <div>{getResolveButton()}</div>
                     </Tooltip>
                 );
+            } else if (position.resolveIndex !== undefined) {
+                return (
+                    <ResultsContainer>
+                        <Value
+                            $isUpperCase
+                            color={position.isUserWinner ? theme.textColor.quaternary : theme.error.textColor.primary}
+                        >
+                            {position.isUserWinner ? t('common.won') : t('common.loss')}
+                        </Value>
+                    </ResultsContainer>
+                );
             } else {
                 const firstHigherTimeIndex = position.strikeTimes.findIndex((t) => t > Date.now());
                 const strikeTimeIndex =
@@ -416,7 +436,6 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
         } else {
             return (
                 <ResultsContainer>
-                    <Label>{t('common.result')}</Label>
                     <Value
                         $isUpperCase
                         color={position.isUserWinner ? theme.textColor.quaternary : theme.error.textColor.primary}

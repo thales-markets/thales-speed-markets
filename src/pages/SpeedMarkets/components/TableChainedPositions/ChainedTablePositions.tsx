@@ -1,5 +1,7 @@
 import Table from 'components/Table';
+import { PAGINATION_SIZE } from 'components/Table/Table';
 import { USD_SIGN } from 'constants/currency';
+import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 import { t } from 'i18next';
 import ChainedPosition from 'pages/SpeedMarkets/components/ChainedPosition';
 import ChainedPositionAction from 'pages/SpeedMarkets/components/ChainedPositionAction';
@@ -18,8 +20,7 @@ import {
     Value,
     Wrapper,
 } from '../TablePositions/TablePositions';
-import { PAGINATION_SIZE } from 'components/Table/Table';
-import { LOCAL_STORAGE_KEYS } from 'constants/storage';
+import { Positions } from 'enums/market';
 
 const TableChainedPositions: React.FC<{ data: UserChainedPosition[] }> = ({ data }) => {
     const columns = [
@@ -47,14 +48,36 @@ const TableChainedPositions: React.FC<{ data: UserChainedPosition[] }> = ({ data
                 return (
                     <Wrapper>
                         {cellProps.cell.getValue().map((cellValue: any, index: number) => {
+                            const position = cellProps.row.original as UserChainedPosition;
+
+                            const hasFinalPrice = position.finalPrices[index];
+                            const isPositionLost = !position.isClaimable && index === position.resolveIndex;
+                            const isPositionIrrelevant =
+                                !position.isClaimable &&
+                                position.resolveIndex !== undefined &&
+                                index > position.resolveIndex;
+                            const isEmptyIcon = !hasFinalPrice || isPositionLost || isPositionIrrelevant;
+                            const isUp = (cellValue.toUpperCase() as Positions) === Positions.UP;
+
                             return (
-                                <DirectionIcon key={index} className={`icon icon--caret-${cellValue.toLowerCase()}`} />
+                                <DirectionIcon
+                                    key={index}
+                                    className={
+                                        isEmptyIcon
+                                            ? `icon icon--caret-${cellValue.toLowerCase()}-empty`
+                                            : `icon icon--caret-${cellValue.toLowerCase()}`
+                                    }
+                                    size={25}
+                                    isDisabled={isPositionIrrelevant}
+                                    $alignUp={!isEmptyIcon && isUp}
+                                    $alignEmptyUp={isEmptyIcon && isUp}
+                                />
                             );
                         })}
                     </Wrapper>
                 );
             },
-            size: 170,
+            size: 180,
         },
         {
             header: <Header>{t('speed-markets.user-positions.price')}</Header>,
@@ -71,11 +94,23 @@ const TableChainedPositions: React.FC<{ data: UserChainedPosition[] }> = ({ data
         {
             header: <Header>{t('speed-markets.user-positions.end-time')}</Header>,
             accessorKey: 'maturityDate',
-            cell: (cellProps: any) => (
-                <Wrapper>
-                    <Value>{formatShortDateWithFullTime(cellProps.cell.getValue())}</Value>
-                </Wrapper>
-            ),
+            cell: (cellProps: any) => {
+                const position = cellProps.row.original as UserChainedPosition;
+
+                const strikeTimeIndex = position.strikeTimes.findIndex((t) => t > Date.now());
+                const endTime =
+                    position.resolveIndex !== undefined
+                        ? position.strikeTimes[position.resolveIndex]
+                        : strikeTimeIndex > -1
+                        ? position.strikeTimes[strikeTimeIndex]
+                        : cellProps.cell.getValue();
+
+                return (
+                    <Wrapper>
+                        <Value>{formatShortDateWithFullTime(endTime)}</Value>
+                    </Wrapper>
+                );
+            },
             size: 180,
         },
         {
@@ -96,7 +131,7 @@ const TableChainedPositions: React.FC<{ data: UserChainedPosition[] }> = ({ data
                     <Value>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())}</Value>
                 </Wrapper>
             ),
-            size: 110,
+            size: 100,
         },
         {
             header: <Header>{t('speed-markets.user-positions.status')}</Header>,

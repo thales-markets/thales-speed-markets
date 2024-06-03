@@ -145,7 +145,9 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
     const chainedPriceRequests = partiallyMaturedChainedMarkets
         .map((data) =>
             data.strikeTimes
-                .filter((strikeTime) => strikeTime < Date.now())
+                .filter(
+                    (strikeTime, i) => strikeTime < Date.now() && i <= (data.resolveIndex || data.strikeTimes.length)
+                )
                 .map((strikeTime) => ({
                     priceId: data.pythPriceId,
                     publishTime: millisecondsToSeconds(strikeTime),
@@ -163,8 +165,10 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
 
     // Based on Pyth prices set finalPrices, strikePrices, canResolve, isMatured, isClaimable, isUserWinner
     const partiallyMaturedWithPrices: UserChainedPosition[] = partiallyMaturedChainedMarkets.map((marketData) => {
+        const currentPrice = currentPrices[marketData.currencyKey];
         const finalPrices = marketData.strikeTimes.map(
-            (_, i) => chainedPythPricesWithMarket.filter((pythPrice) => pythPrice.market === marketData.market)[i].price
+            (_, i) =>
+                chainedPythPricesWithMarket.filter((pythPrice) => pythPrice.market === marketData.market)[i]?.price || 0
         );
         const strikePrices = marketData.strikePrices.map((strikePrice, i) =>
             i > 0 ? finalPrices[i - 1] : strikePrice
@@ -183,6 +187,7 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
         return {
             ...marketData,
             strikePrices,
+            currentPrice,
             finalPrices,
             canResolve,
             resolveIndex,
@@ -305,10 +310,16 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
             <PositionsWrapper $noPositions={noPositions}>
                 {isLoading ? (
                     <SimpleLoader />
-                ) : isChainedSelected ? (
-                    <TableChainedPositions data={positions as UserChainedPosition[]} />
-                ) : isMobile ? (
-                    <CardPositions data={positions as UserPosition[]} />
+                ) : isChainedSelected && !noPositions ? (
+                    // CHAINED
+                    isMobile ? (
+                        <CardPositions positions={positions as UserChainedPosition[]} isChained />
+                    ) : (
+                        <TableChainedPositions data={positions as UserChainedPosition[]} />
+                    )
+                ) : // SINGLE
+                isMobile ? (
+                    <CardPositions positions={positions as UserPosition[]} />
                 ) : (
                     <TablePositions data={positions as UserPosition[]} />
                 )}

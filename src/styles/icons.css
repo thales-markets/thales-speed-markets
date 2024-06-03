@@ -442,6 +442,14 @@
     content: '\007B';
 }
 
+.icon--caret-down-empty:before {
+    content: '\007C';
+}
+
+.icon--caret-up-empty:before {
+    content: '\007D';
+}
+
 .icon--share:before {
     content: '\02DC';
 }

@@ -404,12 +404,4 @@ export const CollateralSelectorContainer = styled(FlexDivCentered)`
     text-transform: none;
 `;
 
-export const InLabel = styled(Label)`
-    font-size: 13px;
-    font-weight: 600;
-    line-height: 18px;
-    margin-left: 5px;
-    text-transform: uppercase;
-`;
-
 export default MyPositionAction;

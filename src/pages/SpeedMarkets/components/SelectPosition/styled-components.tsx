@@ -123,11 +123,12 @@ export const PositionsSymbol = styled(PositionSymbol)<{ $isSelected?: boolean }>
     color: ${(props) => (props.$isSelected ? props.theme.background.primary : props.theme.textColor.quinary)};
 `;
 
-export const Icon = styled.i<{ size?: number; padding?: string; color?: string }>`
+export const Icon = styled.i<{ size?: number; padding?: string; color?: string; isDisabled?: boolean }>`
     font-size: ${(props) => (props.size ? props.size : '18')}px;
     line-height: 100%;
     color: ${(props) => (props.color ? props.color : 'inherit')};
     ${(props) => (props.padding ? `padding: ${props.padding};` : '')};
+    ${(props) => (props.isDisabled ? `opacity: 0.4;` : '')};
 `;
 
 export const AssetIcon = styled(Icon)`
