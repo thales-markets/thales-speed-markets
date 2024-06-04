@@ -759,6 +759,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                                     finalPrice: currentPrice ?? 0,
                                     isClaimable: false,
                                     isResolved: false,
+                                    createdAt: 0,
                                 }}
                                 isDisabled={isButtonDisabled}
                                 isOpen={openTwitterShareModal}

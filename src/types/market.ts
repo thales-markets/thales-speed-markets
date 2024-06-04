@@ -13,7 +13,7 @@ export type UserPosition = {
     finalPrice: number;
     isClaimable: boolean;
     isResolved: boolean;
-    createdAt?: number; // TODO: change to mandatory
+    createdAt: number;
 };
 
 export type UserChainedPosition = {

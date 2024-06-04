@@ -90,7 +90,7 @@
     text-decoration: none;
     border-radius: 5px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
-    max-width: 330px;
+    max-width: 350px;
     min-width: 50px;
     word-break: break-word;
 }
@@ -192,8 +192,4 @@
     .rc-tooltip-arrow {
         display: none;
     }
-}
-
-.lp-max-allowance .rc-tooltip-inner {
-    max-width: 500px;
 }
