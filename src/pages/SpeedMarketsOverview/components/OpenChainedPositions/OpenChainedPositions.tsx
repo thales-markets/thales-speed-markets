@@ -310,7 +310,15 @@ const OpenChainedPositions: React.FC = () => {
                             <SimpleLoader />
                         ) : positions.length > 0 ? (
                             isMobile ? (
-                                <CardPositions positions={positions as UserChainedPosition[]} isChained />
+                                <CardPositions
+                                    positions={positions as UserChainedPosition[]}
+                                    isChained
+                                    maxPriceDelayForResolvingSec={
+                                        ammSpeedMarketsLimitsData?.maxPriceDelayForResolvingSec || 0
+                                    }
+                                    isAdmin={isAdmin}
+                                    isSubmittingBatch={isSubmitting}
+                                />
                             ) : (
                                 <TableChainedPositions
                                     data={positions}

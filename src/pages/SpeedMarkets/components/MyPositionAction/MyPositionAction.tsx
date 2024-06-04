@@ -468,7 +468,10 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
 
     return (
         <>
-            <Container $isClaimable={position.isClaimable}>
+            <Container
+                $isFullWidth={!position.isClaimable || !!isOverview}
+                $alignCenter={!position.isClaimable && !isOverview && Date.now() < position.maturityDate}
+            >
                 {!isOverview && !isCollateralHidden && isMultiCollateralSupported && position.isClaimable && (
                     <CollateralSelector
                         collateralArray={getCollaterals(networkId)}
@@ -495,11 +498,14 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     );
 };
 
-export const Container = styled(FlexDivCentered)<{ $isClaimable: boolean }>`
+export const Container = styled(FlexDivCentered)<{
+    $isFullWidth: boolean;
+    $alignCenter: boolean;
+}>`
     white-space: pre;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        ${(props) => (!props.$isClaimable ? 'width: 100%;' : '')}
-        ${(props) => (!props.$isClaimable ? 'padding-left: 20px;' : '')}
+        ${(props) => (props.$isFullWidth ? 'width: 100%;' : '')}
+        ${(props) => (props.$alignCenter ? 'padding-left: 20px;' : '')}
     }
 `;
 
@@ -530,7 +536,7 @@ export const Label = styled.span`
 export const Value = styled.span<{ color?: string; $isUpperCase?: boolean }>`
     color: ${(props) => props.color || props.theme.textColor.primary};
     ${(props) => (props.$isUpperCase ? 'text-transform: uppercase;' : '')}
-    font-weight: bold;
+    font-weight: 700;
     line-height: 100%;
 `;
 

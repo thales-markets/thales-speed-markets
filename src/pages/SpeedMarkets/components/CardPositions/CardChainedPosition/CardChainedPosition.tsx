@@ -20,9 +20,23 @@ import ChainedPositionAction from '../../ChainedPositionAction';
 import SharePosition from '../../SharePosition';
 import { DirectionIcon } from '../../TablePositions/TablePositions';
 
-type CardChainedPositionProps = { position: UserChainedPosition; onVisibilityChange?: React.Dispatch<boolean> };
+type CardChainedPositionProps = {
+    position: UserChainedPosition;
+    isOverview?: boolean;
+    maxPriceDelayForResolvingSec?: number;
+    isAdmin?: boolean;
+    isSubmittingBatch?: boolean;
+    onVisibilityChange?: React.Dispatch<boolean>;
+};
 
-const CardChainedPosition: React.FC<CardChainedPositionProps> = ({ position, onVisibilityChange }) => {
+const CardChainedPosition: React.FC<CardChainedPositionProps> = ({
+    position,
+    maxPriceDelayForResolvingSec,
+    isOverview,
+    isAdmin,
+    isSubmittingBatch,
+    onVisibilityChange,
+}) => {
     const { t } = useTranslation();
 
     const networkId = useChainId();
@@ -166,10 +180,14 @@ const CardChainedPosition: React.FC<CardChainedPositionProps> = ({ position, onV
             <Action>
                 <ChainedPositionAction
                     position={position}
+                    maxPriceDelayForResolvingSec={maxPriceDelayForResolvingSec}
+                    isOverview={isOverview}
+                    isAdmin={isAdmin}
+                    isSubmittingBatch={isSubmittingBatch}
                     isCollateralHidden
                     setIsActionInProgress={setIsActionInProgress}
                 />
-                <SharePosition position={position} isChained />
+                {!isOverview && <SharePosition position={position} isChained />}
             </Action>
         </Container>
     );

@@ -19,9 +19,23 @@ import { useChainId } from 'wagmi';
 import MarketPrice from '../../MarketPrice';
 import SharePosition from '../../SharePosition';
 
-type CardPositionProps = { position: UserPosition; onVisibilityChange?: React.Dispatch<boolean> };
+type CardPositionProps = {
+    position: UserPosition;
+    isOverview?: boolean;
+    maxPriceDelayForResolvingSec?: number;
+    isAdmin?: boolean;
+    isSubmittingBatch?: boolean;
+    onVisibilityChange?: React.Dispatch<boolean>;
+};
 
-const CardPosition: React.FC<CardPositionProps> = ({ position, onVisibilityChange }) => {
+const CardPosition: React.FC<CardPositionProps> = ({
+    position,
+    maxPriceDelayForResolvingSec,
+    isOverview,
+    isAdmin,
+    isSubmittingBatch,
+    onVisibilityChange,
+}) => {
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 
@@ -126,10 +140,14 @@ const CardPosition: React.FC<CardPositionProps> = ({ position, onVisibilityChang
             <Action>
                 <MyPositionAction
                     position={position}
+                    maxPriceDelayForResolvingSec={maxPriceDelayForResolvingSec}
+                    isOverview={isOverview}
+                    isAdmin={isAdmin}
+                    isSubmittingBatch={isSubmittingBatch}
                     isCollateralHidden
                     setIsActionInProgress={setIsActionInProgress}
                 />
-                <SharePosition position={position} />
+                {!isOverview && <SharePosition position={position} />}
             </Action>
         </Container>
     );

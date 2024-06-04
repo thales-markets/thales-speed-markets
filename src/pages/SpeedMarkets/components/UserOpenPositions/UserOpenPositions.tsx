@@ -36,9 +36,14 @@ type UserOpenPositionsProps = {
     isChained: boolean;
     currentPrices: { [key: string]: number };
     maxPriceDelayForResolvingSec?: number;
+    onTabChainedSelectedChange?: React.Dispatch<boolean>;
 };
 
-const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, currentPrices }) => {
+const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
+    isChained,
+    currentPrices,
+    onTabChainedSelectedChange,
+}) => {
     const { t } = useTranslation();
 
     const networkId = useChainId();
@@ -202,10 +207,11 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
 
     const sortedUserOpenChainedMarketsData = sortSpeedMarkets(allUserOpenChainedMarketsData) as UserChainedPosition[];
 
-    // Table tab selection to follow choosen positions
+    // Table tab selection to follow choosen direction(s)
     useEffect(() => {
         setIsChainedSelected(isChained);
-    }, [isChained]);
+        onTabChainedSelectedChange && onTabChainedSelectedChange(isChained);
+    }, [isChained, onTabChainedSelectedChange]);
 
     const isLoading =
         (isChainedSelected ? userChainedSpeedMarketsDataQuery.isLoading : userActiveSpeedMarketsDataQuery.isLoading) ||
@@ -272,7 +278,13 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
             <Header>
                 <Title>{t('speed-markets.user-positions.your-positions')}</Title>
                 <Tabs>
-                    <Tab $isSelected={!isChainedSelected} onClick={() => setIsChainedSelected(false)}>
+                    <Tab
+                        $isSelected={!isChainedSelected}
+                        onClick={() => {
+                            setIsChainedSelected(false);
+                            onTabChainedSelectedChange && onTabChainedSelectedChange(false);
+                        }}
+                    >
                         {isMobile ? t('speed-markets.single') : t('speed-markets.user-positions.open-single')}
                         {claimableSpeedPositions.length > 0 && (
                             <Notification $isSelected={!isChainedSelected}>
@@ -280,7 +292,13 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
                             </Notification>
                         )}
                     </Tab>
-                    <Tab $isSelected={isChainedSelected} onClick={() => setIsChainedSelected(true)}>
+                    <Tab
+                        $isSelected={isChainedSelected}
+                        onClick={() => {
+                            setIsChainedSelected(true);
+                            onTabChainedSelectedChange && onTabChainedSelectedChange(true);
+                        }}
+                    >
                         {isMobile ? t('speed-markets.chained.label') : t('speed-markets.user-positions.open-chained')}
                         {claimableChainedPositions.length > 0 && (
                             <Notification $isSelected={isChainedSelected}>

@@ -245,7 +245,14 @@ const OpenPositions: React.FC = () => {
                             <SimpleLoader />
                         ) : positions.length > 0 ? (
                             isMobile ? (
-                                <CardPositions positions={positions as UserPosition[]} />
+                                <CardPositions
+                                    positions={positions as UserPosition[]}
+                                    maxPriceDelayForResolvingSec={
+                                        ammSpeedMarketsLimitsData?.maxPriceDelayForResolvingSec || 0
+                                    }
+                                    isAdmin={isAdmin}
+                                    isSubmittingBatch={isSubmitting}
+                                />
                             ) : (
                                 <TablePositions
                                     data={positions}

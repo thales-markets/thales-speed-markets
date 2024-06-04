@@ -5,9 +5,20 @@ import styled from 'styled-components';
 import { FlexDivRow } from 'styles/common';
 import { UserChainedPosition, UserPosition } from 'types/market';
 
-const CardPositions: React.FC<{ positions: (UserPosition | UserChainedPosition)[]; isChained?: boolean }> = ({
+type CardPositionsProps = {
+    positions: (UserPosition | UserChainedPosition)[];
+    isChained?: boolean;
+    maxPriceDelayForResolvingSec: number;
+    isAdmin: boolean;
+    isSubmittingBatch: boolean;
+};
+
+const CardPositions: React.FC<CardPositionsProps> = ({
     positions,
     isChained,
+    maxPriceDelayForResolvingSec,
+    isAdmin,
+    isSubmittingBatch,
 }) => {
     const [isFirstCardVisible, setIsFirstCardVisible] = useState(true);
     const [isLastCardVisible, setIsLastCardVisible] = useState(false);
@@ -28,12 +39,20 @@ const CardPositions: React.FC<{ positions: (UserPosition | UserChainedPosition)[
                         <CardChainedPosition
                             key={index}
                             position={position as UserChainedPosition}
+                            maxPriceDelayForResolvingSec={maxPriceDelayForResolvingSec}
+                            isOverview
+                            isAdmin={isAdmin}
+                            isSubmittingBatch={isSubmittingBatch}
                             onVisibilityChange={(isVisible: boolean) => onVisibilityChange(index, isVisible)}
                         />
                     ) : (
                         <CardPosition
                             key={index}
                             position={position as UserPosition}
+                            maxPriceDelayForResolvingSec={maxPriceDelayForResolvingSec}
+                            isOverview
+                            isAdmin={isAdmin}
+                            isSubmittingBatch={isSubmittingBatch}
                             onVisibilityChange={(isVisible: boolean) => onVisibilityChange(index, isVisible)}
                         />
                     )

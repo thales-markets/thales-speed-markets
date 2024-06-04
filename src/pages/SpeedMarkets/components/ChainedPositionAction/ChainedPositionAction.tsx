@@ -454,7 +454,10 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
 
     return (
         <>
-            <Container $isClaimable={position.isClaimable}>
+            <Container
+                $isFullWidth={!position.isClaimable || !!isOverview}
+                $alignCenter={!position.isClaimable && !isOverview && position.canResolve}
+            >
                 {!isOverview && !isCollateralHidden && isMultiCollateralSupported && position.isClaimable && (
                     <CollateralSelector
                         collateralArray={getCollaterals(networkId)}
