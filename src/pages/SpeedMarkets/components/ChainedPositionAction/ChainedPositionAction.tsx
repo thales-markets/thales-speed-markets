@@ -42,6 +42,7 @@ import {
     refetchUserSpeedMarkets,
 } from 'utils/queryConnector';
 
+import { getIsMobile } from 'redux/modules/ui';
 import { SupportedNetwork } from 'types/network';
 import { ViemContract } from 'types/viem';
 import { executeBiconomyTransaction } from 'utils/biconomy';
@@ -81,6 +82,8 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
     const client = useClient();
     const walletClient = useWalletClient();
     const { isConnected, address: walletAddress } = useAccount();
+
+    const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
     const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
 
@@ -356,7 +359,8 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
 
         return (
             <Button
-                {...getDefaultButtonProps()}
+                {...getDefaultButtonProps(isMobile)}
+                minWidth={isOverview && !isMobile ? '150px' : getDefaultButtonProps(isMobile).minWidth}
                 disabled={isSubmitting || (isOverview && !position.canResolve)}
                 additionalStyles={additionalButtonStyle}
                 onClick={() =>

@@ -37,8 +37,9 @@ import multipleCollateral from 'utils/contracts/multipleCollateralContract';
 import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
 import { getCollateral, getCollaterals, getDefaultCollateral } from 'utils/currency';
 import { checkAllowance, getIsMultiCollateralSupported } from 'utils/network';
-import { getPriceId, getPriceServiceEndpoint } from 'utils/pyth';
+import { getPriceId, getPriceServiceEndpoint, priceParser } from 'utils/pyth';
 import {
+    refetchActiveSpeedMarkets,
     refetchBalances,
     refetchUserNotifications,
     refetchUserProfileQueries,
@@ -56,6 +57,9 @@ type MyPositionActionProps = {
     position: UserPosition;
     maxPriceDelayForResolvingSec?: number;
     isCollateralHidden?: boolean;
+    isOverview?: boolean;
+    isAdmin?: boolean;
+    isSubmittingBatch?: boolean;
     setIsActionInProgress?: React.Dispatch<boolean>;
 };
 
@@ -63,6 +67,9 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     position,
     maxPriceDelayForResolvingSec,
     isCollateralHidden,
+    isOverview,
+    isAdmin,
+    isSubmittingBatch,
     setIsActionInProgress,
 }) => {
     const { t } = useTranslation();
@@ -71,6 +78,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     const client = useClient();
     const walletClient = useWalletClient();
     const { isConnected, address: walletAddress } = useAccount();
+
     const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
@@ -117,10 +125,13 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                 console.log(e);
             }
         };
-        if (isConnected) {
+        if (isOverview) {
+            setAllowance(true);
+        } else if (isConnected) {
             getAllowance();
         }
     }, [
+        isOverview,
         position.payout,
         networkId,
         walletAddress,
@@ -138,6 +149,10 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
             setIsActionInProgress(isAllowing || isSubmitting);
         }
     }, [isAllowing, isSubmitting, setIsActionInProgress]);
+
+    useEffect(() => {
+        isSubmittingBatch && setIsSubmitting(isSubmittingBatch);
+    }, [isSubmittingBatch]);
 
     const handleAllowance = async (approveAmount: bigint) => {
         const erc20Instance = getContract({
@@ -279,10 +294,105 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
         setIsSubmitting(false);
     };
 
+    const handleOverviewResolve = async () => {
+        const priceConnection = new EvmPriceServiceConnection(getPriceServiceEndpoint(networkId), {
+            timeout: CONNECTION_TIMEOUT_MS,
+        });
+
+        setIsSubmitting(true);
+        const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
+
+        const speedMarketsAMMContractWithSigner = getContract({
+            abi: getContarctAbi(speedMarketsAMMContract, networkId),
+            address: speedMarketsAMMContract.addresses[networkId],
+            client: walletClient.data as Client,
+        }) as ViemContract;
+        try {
+            let hash;
+            if (isAdmin) {
+                if (isBiconomy) {
+                    hash = await executeBiconomyTransaction(
+                        networkId,
+                        collateralAddress,
+                        speedMarketsAMMContractWithSigner,
+                        'resolveMarketManually',
+                        [position.market, Number(priceParser(position.finalPrice || 0))]
+                    );
+                } else {
+                    hash = await speedMarketsAMMContractWithSigner.write.resolveMarketManually([
+                        position.market,
+                        Number(priceParser(position.finalPrice || 0)),
+                    ]);
+                }
+            } else {
+                const pythContract = getContract({
+                    abi: PythInterfaceAbi,
+                    address: PYTH_CONTRACT_ADDRESS[networkId],
+                    client: client as Client,
+                }) as ViemContract;
+
+                const [priceFeedUpdateVaa, publishTime] = await priceConnection.getVaa(
+                    getPriceId(networkId, position.currencyKey),
+                    millisecondsToSeconds(position.maturityDate)
+                );
+
+                // check if price feed is not too late
+                if (
+                    maxPriceDelayForResolvingSec &&
+                    differenceInSeconds(secondsToMilliseconds(publishTime), position.maturityDate) >
+                        maxPriceDelayForResolvingSec
+                ) {
+                    await delay(800);
+                    toast.update(id, getErrorToastOptions(t('speed-markets.user-positions.errors.price-stale'), id));
+                    setIsSubmitting(false);
+                    return;
+                }
+
+                const priceUpdateData = ['0x' + Buffer.from(priceFeedUpdateVaa, 'base64').toString('hex')];
+                const updateFee = await pythContract.read.getUpdateFee([priceUpdateData]);
+
+                if (isBiconomy) {
+                    hash = await executeBiconomyTransaction(
+                        networkId,
+                        collateralAddress,
+                        speedMarketsAMMContractWithSigner,
+                        'resolveMarket',
+                        [position.market, priceUpdateData]
+                    );
+                } else {
+                    hash = await speedMarketsAMMContractWithSigner.write.resolveMarket(
+                        [position.market, priceUpdateData],
+                        {
+                            value: updateFee,
+                        }
+                    );
+                }
+            }
+
+            const txReceipt = await waitForTransactionReceipt(client as Client, {
+                hash,
+            });
+
+            if (txReceipt.status === 'success') {
+                toast.update(id, getSuccessToastOptions(t(`speed-markets.user-positions.confirmation-message`), id));
+                refetchActiveSpeedMarkets(false, networkId);
+            } else {
+                console.log('Transaction status', txReceipt.status);
+                await delay(800);
+                toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
+            }
+        } catch (e) {
+            console.log(e);
+            await delay(800);
+            toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
+        }
+        setIsSubmitting(false);
+    };
+
     const getResolveButton = () => (
         <Button
-            {...getDefaultButtonProps()}
-            additionalStyles={getAdditionalButtonStyle(isMobile)}
+            {...getDefaultButtonProps(isMobile)}
+            additionalStyles={additionalButtonStyle}
             disabled={isSubmitting}
             onClick={() => (hasAllowance || isDefaultCollateral ? handleResolve() : setOpenApprovalModal(true))}
         >
@@ -302,7 +412,33 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     );
 
     const getActionStatus = () => {
-        if (position.isClaimable) {
+        if (isOverview) {
+            return (
+                <>
+                    {position.maturityDate > Date.now() ? (
+                        <ResultsContainer>
+                            <TimeRemaining end={position.maturityDate} showFullCounter showSecondsCounter>
+                                <Label>{t('speed-markets.user-positions.result-in')}</Label>
+                            </TimeRemaining>
+                        </ResultsContainer>
+                    ) : (
+                        <Button
+                            {...getDefaultButtonProps(isMobile)}
+                            minWidth="150px"
+                            additionalStyles={additionalButtonStyle}
+                            disabled={isSubmitting || !position.finalPrice}
+                            onClick={() => handleOverviewResolve()}
+                        >
+                            {isSubmitting && !isSubmittingBatch
+                                ? t(`speed-markets.overview.resolve-progress`)
+                                : isAdmin
+                                ? `${t('common.admin')} ${t('speed-markets.overview.resolve')}`
+                                : t('speed-markets.overview.resolve')}
+                        </Button>
+                    )}
+                </>
+            );
+        } else if (position.isClaimable) {
             return hasAllowance || isDefaultCollateral ? (
                 getResolveButton()
             ) : (
@@ -333,7 +469,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     return (
         <>
             <Container $isClaimable={position.isClaimable}>
-                {!isCollateralHidden && isMultiCollateralSupported && position.isClaimable && (
+                {!isOverview && !isCollateralHidden && isMultiCollateralSupported && position.isClaimable && (
                     <CollateralSelector
                         collateralArray={getCollaterals(networkId)}
                         selectedItem={selectedCollateralIndex}
@@ -367,17 +503,16 @@ export const Container = styled(FlexDivCentered)<{ $isClaimable: boolean }>`
     }
 `;
 
-export const getDefaultButtonProps = () => ({
-    minWidth: '150px',
+export const getDefaultButtonProps = (isMobile: boolean) => ({
+    minWidth: isMobile ? '282px' : '180px',
     height: '30px',
     fontSize: '13px',
 });
 
-const getAdditionalButtonStyle = (isMobile: boolean): CSSProperties => ({
-    minWidth: isMobile ? '282px' : '180px',
+const additionalButtonStyle: CSSProperties = {
     lineHeight: '100%',
     border: 'none',
-});
+};
 
 export const ResultsContainer = styled(FlexDivCentered)`
     gap: 4px;
