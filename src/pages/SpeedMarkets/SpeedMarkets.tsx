@@ -291,11 +291,13 @@ const SpeedMarkets: React.FC = () => {
                     <OverviewLinkWrapper $isTableAbove={isConnected}>
                         <SPAAnchor
                             href={buildHref(
-                                `${ROUTES.Markets.SpeedMarketsOverview}?isChained=${isChainedLinkSelected}`
+                                `${ROUTES.Markets.SpeedMarketsOverview}?isChained=${
+                                    isConnected ? isChainedLinkSelected : isChained
+                                }`
                             )}
                         >
                             <OverviewLinkText>
-                                {isChainedLinkSelected
+                                {(isConnected ? isChainedLinkSelected : isChained)
                                     ? t('speed-markets.overview.navigate-chained')
                                     : t('speed-markets.overview.navigate')}
                             </OverviewLinkText>
