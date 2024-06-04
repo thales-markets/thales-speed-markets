@@ -29,7 +29,7 @@ import { getPriceId } from 'utils/pyth';
 import { isUserWinner, resolveAllChainedMarkets, resolveAllSpeedPositions } from 'utils/speedAmm';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 import CardPositions from '../CardPositions';
-import TableChainedPositions from '../TableChainedPositions/TableChainedPositions';
+import TableChainedPositions from '../TableChainedPositions';
 import TablePositions from '../TablePositions';
 
 type UserOpenPositionsProps = {

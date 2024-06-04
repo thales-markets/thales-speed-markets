@@ -84,24 +84,3 @@ export type SpeedMarket = {
     isChained: boolean;
     finalPrice?: number;
 };
-
-// TODO: remove
-export type ChainedSpeedMarket = {
-    address: string;
-    timestamp: number;
-    currencyKey: string;
-    sides: (Positions.UP | Positions.DOWN)[];
-    strikePrices: number[];
-    strikeTimes: number[];
-    maturityDate: number;
-    payout: number;
-    paid: number;
-    payoutMultiplier: number;
-    finalPrices: number[];
-    isOpen: boolean;
-    isMatured: boolean;
-    canResolve: boolean;
-    isClaimable: boolean;
-    isUserWinner: boolean;
-    user: string;
-};

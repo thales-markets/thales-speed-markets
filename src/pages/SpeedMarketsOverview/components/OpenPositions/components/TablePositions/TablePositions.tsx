@@ -158,8 +158,4 @@ export const AssetName = styled(Value)`
     font-weight: 800;
 `;
 
-export const ShareWrapper = styled.div`
-    margin-left: auto;
-`;
-
 export default TablePositions;
