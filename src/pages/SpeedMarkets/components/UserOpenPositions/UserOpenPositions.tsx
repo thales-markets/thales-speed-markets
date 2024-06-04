@@ -45,6 +45,7 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
     const client = useClient();
     const walletClient = useWalletClient();
     const { isConnected, address: walletAddress } = useAccount();
+
     const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));

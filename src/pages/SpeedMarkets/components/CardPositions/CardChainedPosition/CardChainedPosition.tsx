@@ -3,7 +3,7 @@ import { USD_SIGN } from 'constants/currency';
 import { secondsToMilliseconds } from 'date-fns';
 import { Positions } from 'enums/market';
 import useInterval from 'hooks/useInterval';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getSelectedCollateralIndex } from 'redux/modules/wallet';
@@ -20,7 +20,9 @@ import ChainedPositionAction from '../../ChainedPositionAction';
 import SharePosition from '../../SharePosition';
 import { DirectionIcon } from '../../TablePositions/TablePositions';
 
-const CardChainedPosition: React.FC<{ position: UserChainedPosition }> = ({ position }) => {
+type CardChainedPositionProps = { position: UserChainedPosition; onVisibilityChange?: React.Dispatch<boolean> };
+
+const CardChainedPosition: React.FC<CardChainedPositionProps> = ({ position, onVisibilityChange }) => {
     const { t } = useTranslation();
 
     const networkId = useChainId();
@@ -48,6 +50,34 @@ const CardChainedPosition: React.FC<{ position: UserChainedPosition }> = ({ posi
         setResolveindex(position.resolveIndex);
     }, [position.resolveIndex]);
 
+    const cardRef = useRef<HTMLDivElement>(null);
+
+    // check visibility of card element in the viewport
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                onVisibilityChange && onVisibilityChange(entry.isIntersecting);
+            },
+            {
+                root: null, // viewport
+                rootMargin: '0px', // no margin
+                threshold: 0.5, // 50% of target visible
+            }
+        );
+
+        if (cardRef.current) {
+            observer.observe(cardRef.current);
+        }
+
+        // Clean up the observer
+        const cardRefElement = cardRef.current;
+        return () => {
+            if (cardRefElement) {
+                observer.unobserve(cardRefElement);
+            }
+        };
+    }, [onVisibilityChange]);
+
     const strikeTimeIndex = position.strikeTimes.findIndex((t) => t > Date.now());
     const endTime =
         resolveIndex !== undefined
@@ -57,7 +87,7 @@ const CardChainedPosition: React.FC<{ position: UserChainedPosition }> = ({ posi
             : position.maturityDate;
 
     return (
-        <Container>
+        <Container ref={cardRef}>
             <Info>
                 <InfoColumn>
                     <InfoRow>
@@ -148,6 +178,7 @@ const CardChainedPosition: React.FC<{ position: UserChainedPosition }> = ({ posi
 const Container = styled(FlexDivColumn)`
     justify-content: space-between;
     width: 100%;
+    min-width: 100%;
     min-height: 155px;
     border: 1px solid ${(props) => props.theme.borderColor.quaternary};
     border-radius: 8px;

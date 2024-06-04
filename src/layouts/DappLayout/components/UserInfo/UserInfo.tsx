@@ -22,9 +22,10 @@ import { ScreenSizeBreakpoint } from 'enums/ui';
 type UserInfoProps = {
     setUserInfoOpen: React.Dispatch<React.SetStateAction<boolean>>;
     setOpenWithdraw: React.Dispatch<React.SetStateAction<boolean>>;
+    skipOutsideClickOnElement?: React.RefObject<HTMLElement>;
 };
 
-const UserInfo: React.FC<UserInfoProps> = ({ setUserInfoOpen, setOpenWithdraw }) => {
+const UserInfo: React.FC<UserInfoProps> = ({ setUserInfoOpen, setOpenWithdraw, skipOutsideClickOnElement }) => {
     const networkId = useChainId();
     const { disconnect } = useDisconnect();
     const { address } = useAccount();
@@ -43,7 +44,11 @@ const UserInfo: React.FC<UserInfoProps> = ({ setUserInfoOpen, setOpenWithdraw })
     };
 
     return (
-        <OutsideClick onOutsideClick={() => setUserInfoOpen(false)}>
+        <OutsideClick
+            onOutsideClick={(e: MouseEvent) =>
+                (e.target as HTMLImageElement) !== skipOutsideClickOnElement?.current && setUserInfoOpen(false)
+            }
+        >
             <Container>
                 <FlexColumn>
                     {isBiconomy && (
