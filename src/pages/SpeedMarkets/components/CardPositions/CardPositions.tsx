@@ -1,30 +1,35 @@
-import React from 'react';
-import styled from 'styled-components';
-import { FlexDivColumn } from 'styles/common';
 import { UserChainedPosition, UserPosition } from 'types/market';
-import CardChainedPosition from './CardChainedPosition';
-import CardPosition from './CardPosition/CardPosition';
+import CardPositionsHorizontal from './components/CardPositionsHorizontal';
+import CardPositionsVertical from './components/CardPositionsVertical';
 
-const CardPositions: React.FC<{ positions: (UserPosition | UserChainedPosition)[]; isChained?: boolean }> = ({
-    positions,
-    isChained,
-}) => {
-    return (
-        <Container>
-            {positions.map((position, index) =>
-                isChained ? (
-                    <CardChainedPosition key={index} position={position as UserChainedPosition} />
-                ) : (
-                    <CardPosition key={index} position={position as UserPosition} />
-                )
-            )}
-        </Container>
-    );
+type CardPositionsProps = {
+    isHorizontal: boolean;
+    positions: (UserPosition | UserChainedPosition)[];
+    isChained?: boolean;
+    maxPriceDelayForResolvingSec?: number;
+    isAdmin?: boolean;
+    isSubmittingBatch?: boolean;
 };
 
-const Container = styled(FlexDivColumn)`
-    width: 100%;
-    gap: 5px;
-`;
+const CardPositions: React.FC<CardPositionsProps> = ({
+    isHorizontal,
+    positions,
+    isChained,
+    maxPriceDelayForResolvingSec,
+    isAdmin,
+    isSubmittingBatch,
+}) => {
+    return isHorizontal ? (
+        <CardPositionsHorizontal
+            positions={positions}
+            isChained={isChained}
+            maxPriceDelayForResolvingSec={maxPriceDelayForResolvingSec}
+            isAdmin={isAdmin}
+            isSubmittingBatch={isSubmittingBatch}
+        />
+    ) : (
+        <CardPositionsVertical positions={positions} isChained={isChained} />
+    );
+};
 
 export default CardPositions;

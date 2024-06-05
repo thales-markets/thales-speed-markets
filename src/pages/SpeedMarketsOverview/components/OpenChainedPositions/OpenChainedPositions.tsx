@@ -26,7 +26,7 @@ import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAsse
 import { refetchActiveSpeedMarkets, refetchPythPrice } from 'utils/queryConnector';
 import { isUserWinner, resolveAllChainedMarkets } from 'utils/speedAmm';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
-import CardPositions from '../CardPositions';
+import CardPositions from '../../../SpeedMarkets/components/CardPositions/';
 import {
     ButtonWrapper,
     Container,
@@ -311,6 +311,7 @@ const OpenChainedPositions: React.FC = () => {
                         ) : positions.length > 0 ? (
                             isMobile ? (
                                 <CardPositions
+                                    isHorizontal
                                     positions={positions as UserChainedPosition[]}
                                     isChained
                                     maxPriceDelayForResolvingSec={

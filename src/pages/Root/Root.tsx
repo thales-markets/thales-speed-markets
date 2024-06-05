@@ -31,12 +31,13 @@ const rainbowCustomTheme = merge(darkTheme(), {
         accentColorForeground: ThemeMap[theme].button.textColor.secondary,
         modalBackground: ThemeMap[theme].background.primary,
         modalBorder: ThemeMap[theme].borderColor.quaternary,
-        // profileAction: ThemeMap[theme].background.quinary,
+        // TOOD: profileAction: ThemeMap[theme].background.quinary,
         profileForeground: ThemeMap[theme].background.primary,
         closeButton: ThemeMap[theme].button.textColor.tertiary,
         closeButtonBackground: ThemeMap[theme].button.background.primary,
         actionButtonBorder: 'transparent',
     },
+    shadows: { dialog: ThemeMap[theme].borderColor.quaternary },
     radii: { menuButton: '8px' },
 });
 

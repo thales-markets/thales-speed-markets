@@ -16,8 +16,8 @@ import { getCollaterals } from 'utils/currency';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import { getColorPerPosition } from 'utils/style';
 import { useChainId } from 'wagmi';
-import MarketPrice from '../../MarketPrice';
-import SharePosition from '../../SharePosition';
+import MarketPrice from '../../../MarketPrice';
+import SharePosition from '../../../SharePosition';
 
 type CardPositionProps = {
     position: UserPosition;

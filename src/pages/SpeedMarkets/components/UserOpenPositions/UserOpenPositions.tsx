@@ -16,7 +16,7 @@ import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
 import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
 import styled from 'styled-components';
-import { FlexDivColumn, FlexDivEnd, FlexDivStart, GradientContainer } from 'styles/common';
+import { FlexDivCentered, FlexDivColumn, FlexDivEnd, FlexDivRow, FlexDivStart, GradientContainer } from 'styles/common';
 import { formatCurrencyWithSign } from 'thales-utils';
 import { UserChainedPosition, UserPosition } from 'types/market';
 import { RootState } from 'types/ui';
@@ -28,7 +28,7 @@ import { getIsMultiCollateralSupported } from 'utils/network';
 import { getPriceId } from 'utils/pyth';
 import { isUserWinner, resolveAllChainedMarkets, resolveAllSpeedPositions } from 'utils/speedAmm';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
-import CardPositions from '../CardPositions';
+import CardPositions from '../CardPositions/';
 import TableChainedPositions from '../TableChainedPositions';
 import TablePositions from '../TablePositions';
 
@@ -36,13 +36,25 @@ type UserOpenPositionsProps = {
     isChained: boolean;
     currentPrices: { [key: string]: number };
     maxPriceDelayForResolvingSec?: number;
-    onTabChainedSelectedChange?: React.Dispatch<boolean>;
+    searchAddress?: string;
+    showOnlyClaimable?: boolean;
+    showOnlyOpen?: boolean; // not matured and without final price => don't show unresolved matured (still open)
+    showTabs?: boolean;
+    showFilter?: boolean;
+    setClaimablePositions?: React.Dispatch<number>;
+    onChainedSelectedChange?: React.Dispatch<boolean>;
 };
 
 const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
     isChained,
     currentPrices,
-    onTabChainedSelectedChange,
+    searchAddress,
+    showOnlyClaimable,
+    showOnlyOpen,
+    showTabs,
+    showFilter,
+    setClaimablePositions,
+    onChainedSelectedChange,
 }) => {
     const { t } = useTranslation();
 
@@ -71,7 +83,7 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
     // SINGLE
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
         { networkId, client },
-        (isBiconomy ? biconomyConnector.address : walletAddress) as string,
+        searchAddress ? searchAddress : isBiconomy ? biconomyConnector.address : walletAddress || '',
         {
             enabled: isAppReady && isConnected && !isChainedSelected,
         }
@@ -86,7 +98,7 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
     );
 
     const activeSpeedNotMatured: UserPosition[] = userOpenSpeedMarketsData
-        .filter((marketData) => marketData.maturityDate >= Date.now())
+        .filter((marketData) => marketData.maturityDate >= Date.now() && !showOnlyClaimable)
         .map((marketData) => ({
             ...marketData,
             currentPrice: currentPrices[marketData.currencyKey],
@@ -102,15 +114,20 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
     });
 
     // set final prices and claimable status
-    const maturedUserSpeedMarketsWithPrices: UserPosition[] = activeSpeedMatured.map((marketData, index) => {
-        const finalPrice = pythPricesQueries[index].data || 0;
-        const isClaimable = !!isUserWinner(marketData.side, marketData.strikePrice, finalPrice);
-        return {
-            ...marketData,
-            finalPrice,
-            isClaimable,
-        };
-    });
+    const maturedUserSpeedMarketsWithPrices: UserPosition[] = activeSpeedMatured
+        .map((marketData, index) => {
+            const finalPrice = pythPricesQueries[index].data || 0;
+            const isClaimable = !!isUserWinner(marketData.side, marketData.strikePrice, finalPrice);
+            return {
+                ...marketData,
+                finalPrice,
+                isClaimable,
+            };
+        })
+        .filter((marketData) =>
+            showOnlyClaimable ? marketData.isClaimable : showOnlyOpen ? !marketData.finalPrice : true
+        );
+
     const allUserOpenSpeedMarketsData = activeSpeedNotMatured.concat(maturedUserSpeedMarketsWithPrices);
 
     const sortedUserOpenSpeedMarketsData = sortSpeedMarkets(allUserOpenSpeedMarketsData) as UserPosition[];
@@ -118,7 +135,7 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
     // CHAINED
     const userChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
         { networkId, client },
-        (isBiconomy ? biconomyConnector.address : walletAddress) as string,
+        searchAddress ? searchAddress : isBiconomy ? biconomyConnector.address : walletAddress || '',
         {
             enabled: isAppReady && isConnected && isChainedSelected,
         }
@@ -133,7 +150,7 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
     );
 
     const chainedWithoutMaturedPositions: UserChainedPosition[] = userOpenChainedSpeedMarketsData
-        .filter((marketData) => marketData.strikeTimes[0] >= Date.now())
+        .filter((marketData) => marketData.strikeTimes[0] >= Date.now() && !showOnlyClaimable)
         .map((marketData) => ({
             ...marketData,
             currentPrice: currentPrices[marketData.currencyKey],
@@ -170,56 +187,58 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
     }));
 
     // Based on Pyth prices set finalPrices, strikePrices, canResolve, isMatured, isClaimable, isUserWinner
-    const partiallyMaturedWithPrices: UserChainedPosition[] = partiallyMaturedChainedMarkets.map((marketData) => {
-        const currentPrice = currentPrices[marketData.currencyKey];
-        const finalPrices = marketData.strikeTimes.map(
-            (_, i) =>
-                chainedPythPricesWithMarket.filter((pythPrice) => pythPrice.market === marketData.market)[i]?.price || 0
+    const partiallyMaturedWithPrices: UserChainedPosition[] = partiallyMaturedChainedMarkets
+        .map((marketData) => {
+            const currentPrice = currentPrices[marketData.currencyKey];
+            const finalPrices = marketData.strikeTimes.map(
+                (_, i) =>
+                    chainedPythPricesWithMarket.filter((pythPrice) => pythPrice.market === marketData.market)[i]
+                        ?.price || 0
+            );
+            const strikePrices = marketData.strikePrices.map((strikePrice, i) =>
+                i > 0 ? finalPrices[i - 1] : strikePrice
+            );
+            const userWonStatuses = marketData.sides.map((side, i) =>
+                isUserWinner(side, strikePrices[i], finalPrices[i])
+            );
+            const canResolve =
+                userWonStatuses.some((status) => status === false) ||
+                userWonStatuses.every((status) => status !== undefined);
+
+            const lossIndex = userWonStatuses.findIndex((status) => status === false);
+            const resolveIndex = canResolve ? (lossIndex > -1 ? lossIndex : marketData.sides.length - 1) : undefined;
+
+            const isClaimable = userWonStatuses.every((status) => status);
+            const isMatured = marketData.maturityDate < Date.now();
+
+            return {
+                ...marketData,
+                strikePrices,
+                currentPrice,
+                finalPrices,
+                canResolve,
+                resolveIndex,
+                isMatured,
+                isClaimable,
+                isUserWinner: isClaimable,
+            };
+        })
+        .filter((marketData) =>
+            showOnlyClaimable ? marketData.isClaimable : showOnlyOpen ? !marketData.canResolve : true
         );
-        const strikePrices = marketData.strikePrices.map((strikePrice, i) =>
-            i > 0 ? finalPrices[i - 1] : strikePrice
-        );
-        const userWonStatuses = marketData.sides.map((side, i) => isUserWinner(side, strikePrices[i], finalPrices[i]));
-        const canResolve =
-            userWonStatuses.some((status) => status === false) ||
-            userWonStatuses.every((status) => status !== undefined);
-
-        const lossIndex = userWonStatuses.findIndex((status) => status === false);
-        const resolveIndex = canResolve ? (lossIndex > -1 ? lossIndex : marketData.sides.length - 1) : undefined;
-
-        const isClaimable = userWonStatuses.every((status) => status);
-        const isMatured = marketData.maturityDate < Date.now();
-
-        return {
-            ...marketData,
-            strikePrices,
-            currentPrice,
-            finalPrices,
-            canResolve,
-            resolveIndex,
-            isMatured,
-            isClaimable,
-            isUserWinner: isClaimable,
-        };
-    });
 
     const allUserOpenChainedMarketsData = chainedWithoutMaturedPositions.concat(partiallyMaturedWithPrices);
 
     const sortedUserOpenChainedMarketsData = sortSpeedMarkets(allUserOpenChainedMarketsData) as UserChainedPosition[];
 
-    // Table tab selection to follow choosen direction(s)
-    useEffect(() => {
-        setIsChainedSelected(isChained);
-        onTabChainedSelectedChange && onTabChainedSelectedChange(isChained);
-    }, [isChained, onTabChainedSelectedChange]);
-
     const isLoading =
-        (isChainedSelected ? userChainedSpeedMarketsDataQuery.isLoading : userActiveSpeedMarketsDataQuery.isLoading) ||
+        userChainedSpeedMarketsDataQuery.isLoading ||
+        userActiveSpeedMarketsDataQuery.isLoading ||
         pythPricesQueries.filter((query) => query.isLoading).length > 1;
 
     const noPositions =
         !isLoading &&
-        (isChainedSelected ? userOpenChainedSpeedMarketsData.length === 0 : allUserOpenSpeedMarketsData.length === 0);
+        (isChainedSelected ? allUserOpenChainedMarketsData.length === 0 : allUserOpenSpeedMarketsData.length === 0);
 
     const positions = noPositions
         ? dummyPositions
@@ -236,6 +255,19 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
     const hasClaimableSpeedPositions = isChainedSelected
         ? !!claimableChainedPositions.length
         : !!claimableSpeedPositions.length;
+
+    // Table tab selection to follow choosen direction(s)
+    useEffect(() => {
+        setIsChainedSelected(isChained);
+        onChainedSelectedChange && onChainedSelectedChange(isChained);
+    }, [isChained, onChainedSelectedChange]);
+
+    // Update number of claimable positions
+    useEffect(() => {
+        if (setClaimablePositions && showOnlyClaimable) {
+            setClaimablePositions(claimableSpeedPositions.length + claimableChainedPositions.length);
+        }
+    }, [setClaimablePositions, showOnlyClaimable, claimableSpeedPositions.length, claimableChainedPositions.length]);
 
     const handleSubmit = async () => {
         setIsSubmitting(true);
@@ -276,59 +308,84 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
     return (
         <Container>
             <Header>
-                <Title>{t('speed-markets.user-positions.your-positions')}</Title>
-                <Tabs>
-                    <Tab
-                        $isSelected={!isChainedSelected}
-                        onClick={() => {
-                            setIsChainedSelected(false);
-                            onTabChainedSelectedChange && onTabChainedSelectedChange(false);
-                        }}
-                    >
-                        {isMobile ? t('speed-markets.single') : t('speed-markets.user-positions.open-single')}
-                        {claimableSpeedPositions.length > 0 && (
-                            <Notification $isSelected={!isChainedSelected}>
-                                {claimableSpeedPositions.length}
-                            </Notification>
-                        )}
-                    </Tab>
-                    <Tab
-                        $isSelected={isChainedSelected}
-                        onClick={() => {
-                            setIsChainedSelected(true);
-                            onTabChainedSelectedChange && onTabChainedSelectedChange(true);
-                        }}
-                    >
-                        {isMobile ? t('speed-markets.chained.label') : t('speed-markets.user-positions.open-chained')}
-                        {claimableChainedPositions.length > 0 && (
-                            <Notification $isSelected={isChainedSelected}>
-                                {claimableChainedPositions.length}
-                            </Notification>
-                        )}
-                    </Tab>
-                </Tabs>
-                <TabsSeparator />
+                <MobileTitle>{t('speed-markets.user-positions.your-positions')}</MobileTitle>
+                {showTabs && (
+                    <>
+                        <Tabs>
+                            <Tab
+                                $isSelected={!isChainedSelected}
+                                onClick={() => {
+                                    setIsChainedSelected(false);
+                                    onChainedSelectedChange && onChainedSelectedChange(false);
+                                }}
+                            >
+                                {isMobile ? t('speed-markets.single') : t('speed-markets.user-positions.open-single')}
+                                {claimableSpeedPositions.length > 0 && (
+                                    <Notification $isSelected={!isChainedSelected}>
+                                        {claimableSpeedPositions.length}
+                                    </Notification>
+                                )}
+                            </Tab>
+                            <Tab
+                                $isSelected={isChainedSelected}
+                                onClick={() => {
+                                    setIsChainedSelected(true);
+                                    onChainedSelectedChange && onChainedSelectedChange(true);
+                                }}
+                            >
+                                {isMobile
+                                    ? t('speed-markets.chained.label')
+                                    : t('speed-markets.user-positions.open-chained')}
+                                {claimableChainedPositions.length > 0 && (
+                                    <Notification $isSelected={isChainedSelected}>
+                                        {claimableChainedPositions.length}
+                                    </Notification>
+                                )}
+                            </Tab>
+                        </Tabs>
+                        <TabsSeparator />
+                    </>
+                )}
+
                 {hasClaimableSpeedPositions && (
-                    <ButtonWrapper $isChained={isChainedSelected}>
-                        {isMultiCollateralSupported && (
-                            <CollateralSelectorContainer>
-                                <ClaimAll>
-                                    {isMobile
-                                        ? t('speed-markets.user-positions.claim-all-in')
-                                        : t('speed-markets.user-positions.claim-all-win-in')}
-                                    :
-                                </ClaimAll>
-                                <CollateralSelector
-                                    collateralArray={[getDefaultCollateral(networkId)]}
-                                    selectedItem={0}
-                                    onChangeCollateral={() => {}}
-                                    disabled
-                                    isIconHidden
-                                />
-                            </CollateralSelectorContainer>
+                    <FlexDivRow>
+                        {showFilter && (
+                            <Filters>
+                                <Filter
+                                    $isSelected={!isChainedSelected}
+                                    onClick={() => onChainedSelectedChange && onChainedSelectedChange(false)}
+                                >
+                                    {t('speed-markets.single')}
+                                </Filter>
+                                <Filter
+                                    $isSelected={isChainedSelected}
+                                    onClick={() => onChainedSelectedChange && onChainedSelectedChange(true)}
+                                >
+                                    {t('speed-markets.chained.label')}
+                                </Filter>
+                            </Filters>
                         )}
-                        {getClaimAllButton()}
-                    </ButtonWrapper>
+                        <ButtonWrapper $isChained={isChainedSelected}>
+                            {isMultiCollateralSupported && (
+                                <CollateralSelectorContainer>
+                                    <ClaimAll>
+                                        {isMobile
+                                            ? t('speed-markets.user-positions.claim-all-in')
+                                            : t('speed-markets.user-positions.claim-all-win-in')}
+                                        :
+                                    </ClaimAll>
+                                    <CollateralSelector
+                                        collateralArray={[getDefaultCollateral(networkId)]}
+                                        selectedItem={0}
+                                        onChangeCollateral={() => {}}
+                                        disabled
+                                        isIconHidden
+                                    />
+                                </CollateralSelectorContainer>
+                            )}
+                            {getClaimAllButton()}
+                        </ButtonWrapper>
+                    </FlexDivRow>
                 )}
             </Header>
             <PositionsWrapper $noPositions={noPositions}>
@@ -337,13 +394,13 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
                 ) : isChainedSelected && !noPositions ? (
                     // CHAINED
                     isMobile ? (
-                        <CardPositions positions={positions as UserChainedPosition[]} isChained />
+                        <CardPositions isHorizontal={false} positions={positions as UserChainedPosition[]} isChained />
                     ) : (
                         <TableChainedPositions data={positions as UserChainedPosition[]} />
                     )
                 ) : // SINGLE
                 isMobile ? (
-                    <CardPositions positions={positions as UserPosition[]} />
+                    <CardPositions isHorizontal={false} positions={positions as UserPosition[]} />
                 ) : (
                     <TablePositions data={positions as UserPosition[]} />
                 )}
@@ -380,7 +437,7 @@ const dummyPositions: UserPosition[] = [
         paid: 100,
         payout: 15,
         currentPrice: 0,
-        finalPrice: 0,
+        finalPrice: 1,
         isClaimable: false,
         isResolved: false,
         createdAt: Date.now(),
@@ -395,7 +452,7 @@ const dummyPositions: UserPosition[] = [
         paid: 200,
         payout: 10,
         currentPrice: 0,
-        finalPrice: 0,
+        finalPrice: 1,
         isClaimable: false,
         isResolved: false,
         createdAt: Date.now(),
@@ -451,23 +508,44 @@ const TabsSeparator = styled(GradientContainer)`
     margin-bottom: 13px;
 `;
 
+const Filters = styled(FlexDivStart)`
+    gap: 10px;
+`;
+
+const Filter = styled(FlexDivCentered)<{ $isSelected: boolean }>`
+    width: 100px;
+    height: 40px;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 100%;
+    ${(props) => (props.$isSelected ? '' : `border: 2px solid ${props.theme.button.borderColor.secondary};`)}
+    background: ${(props) =>
+        props.$isSelected ? props.theme.button.background.secondary : props.theme.button.background.primary};
+    color: ${(props) =>
+        props.$isSelected ? props.theme.button.textColor.secondary : props.theme.button.textColor.tertiary};
+    cursor: pointer;
+    text-transform: uppercase;
+`;
+
+const MobileTitle = styled.span`
+    display: none;
+
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        display: flex;
+        font-weight: 700;
+        font-size: 18px;
+        line-height: 100%;
+        color: ${(props) => props.theme.textColor.primary};
+        text-transform: uppercase;
+    }
+`;
+
 const PositionsWrapper = styled.div<{ $noPositions?: boolean }>`
     position: relative;
     min-height: 200px;
     width: 100%;
     ${(props) => (props.$noPositions ? 'filter: blur(10px);' : '')}
-`;
-
-const Title = styled.span`
-    display: none;
-    font-weight: 700;
-    font-size: 18px;
-    line-height: 100%;
-    text-transform: uppercase;
-    color: ${(props) => props.theme.textColor.primary};
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        display: flex;
-    }
 `;
 
 const ButtonWrapper = styled(FlexDivEnd)<{ $isChained?: boolean }>`

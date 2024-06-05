@@ -1,19 +1,19 @@
-import CardChainedPosition from 'pages/SpeedMarkets/components/CardPositions/CardChainedPosition';
-import CardPosition from 'pages/SpeedMarkets/components/CardPositions/CardPosition';
+import CardChainedPosition from 'pages/SpeedMarkets/components/CardPositions/components/CardChainedPosition';
+import CardPosition from 'pages/SpeedMarkets/components/CardPositions/components/CardPosition';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FlexDivRow } from 'styles/common';
 import { UserChainedPosition, UserPosition } from 'types/market';
 
-type CardPositionsProps = {
+type CardPositionsHorizontalProps = {
     positions: (UserPosition | UserChainedPosition)[];
     isChained?: boolean;
-    maxPriceDelayForResolvingSec: number;
-    isAdmin: boolean;
-    isSubmittingBatch: boolean;
+    maxPriceDelayForResolvingSec?: number;
+    isAdmin?: boolean;
+    isSubmittingBatch?: boolean;
 };
 
-const CardPositions: React.FC<CardPositionsProps> = ({
+const CardPositionsHorizontal: React.FC<CardPositionsHorizontalProps> = ({
     positions,
     isChained,
     maxPriceDelayForResolvingSec,
@@ -95,4 +95,4 @@ const IconRight = styled(Icon)`
     right: -5px;
 `;
 
-export default CardPositions;
+export default CardPositionsHorizontal;

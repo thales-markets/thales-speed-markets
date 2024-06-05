@@ -29,7 +29,7 @@ const TableChainedPositions: React.FC<{ data: UserChainedPosition[] }> = ({ data
             accessorKey: 'currencyKey',
             cell: (cellProps: any) => {
                 return (
-                    <Wrapper first>
+                    <Wrapper isAlignStart>
                         <AssetIcon
                             className={`currency-icon currency-icon--${cellProps.cell.getValue().toLowerCase()}`}
                         />
@@ -42,7 +42,7 @@ const TableChainedPositions: React.FC<{ data: UserChainedPosition[] }> = ({ data
             },
         },
         {
-            header: <Header>{t('speed-markets.user-positions.direction')}</Header>,
+            header: <Header>{t('speed-markets.chained.directions')}</Header>,
             accessorKey: 'sides',
             cell: (cellProps: any) => {
                 return (

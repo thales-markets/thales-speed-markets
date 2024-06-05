@@ -22,8 +22,8 @@ export const Row = styled(FlexDivRow)`
 `;
 
 export const Title = styled.span`
-    font-weight: 700;
     font-size: 13px;
+    font-weight: 800;
     line-height: 100%;
     margin-left: 20px;
     text-transform: uppercase;

@@ -1,6 +1,7 @@
 import { Positions } from 'enums/market';
 import { SpeedMarket } from './market';
 
+// TODO: remove
 export type UserProfilePosition = {
     currencyKey: string;
     strikePrice: number;
@@ -17,6 +18,7 @@ export type UserProfilePosition = {
     isChained: boolean;
 };
 
+// TODO: remove
 export type UserProfileData = {
     profit: number;
     volume: number;
@@ -25,6 +27,7 @@ export type UserProfileData = {
     investment: number;
 };
 
+// TODO: remove
 export type TradeWithMarket = {
     user: string;
     payout: number;

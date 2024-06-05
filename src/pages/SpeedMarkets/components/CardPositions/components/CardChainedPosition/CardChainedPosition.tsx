@@ -15,10 +15,10 @@ import { RootState } from 'types/ui';
 import { getCollaterals } from 'utils/currency';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import { useChainId } from 'wagmi';
-import ChainedMarketPrice from '../../ChainedMarketPrice';
-import ChainedPositionAction from '../../ChainedPositionAction';
-import SharePosition from '../../SharePosition';
-import { DirectionIcon } from '../../TablePositions/TablePositions';
+import ChainedMarketPrice from '../../../ChainedMarketPrice';
+import ChainedPositionAction from '../../../ChainedPositionAction';
+import SharePosition from '../../../SharePosition';
+import { DirectionIcon } from '../../../TablePositions/TablePositions';
 
 type CardChainedPositionProps = {
     position: UserChainedPosition;

@@ -25,27 +25,27 @@ const SpeedMarketsOverview: React.FC = () => {
     return (
         <Container>
             <Header>
-                <div>
+                <LinkContainer>
                     <SPAAnchor href={`${buildHref(ROUTES.Markets.SpeedMarkets)}?isChained=${isChainedMarkets}`}>
-                        <LinkContainer>
+                        <LinkWrapper>
                             <NavigationIcon isLeft className={`icon icon--left`} />
                             {isChainedMarkets ? t('speed-markets.chained.name') : t('speed-markets.title')}
-                        </LinkContainer>
+                        </LinkWrapper>
                     </SPAAnchor>
                     &nbsp;/&nbsp;{t(`speed-markets.overview.title`)}
-                </div>
+                </LinkContainer>
                 {isChainedSupported && (
-                    <div>
+                    <LinkContainer>
                         {t(`speed-markets.overview.title`)}&nbsp;/&nbsp;
                         <SPAAnchor
                             href={`${buildHref(ROUTES.Markets.SpeedMarketsOverview)}?isChained=${!isChainedMarkets}`}
                         >
-                            <LinkContainer>
+                            <LinkWrapper>
                                 {isChainedMarkets ? t('speed-markets.title') : t('speed-markets.chained.name')}
                                 <NavigationIcon isLeft={false} className={`icon icon--right`} />
-                            </LinkContainer>
+                            </LinkWrapper>
                         </SPAAnchor>
-                    </div>
+                    </LinkContainer>
                 )}
             </Header>
             {isChainedMarkets ? <OpenChainedPositions /> : <OpenPositions />}
@@ -67,18 +67,24 @@ const Header = styled(FlexDivRow)`
     }
 `;
 
-const LinkContainer = styled.span`
+export const LinkContainer = styled.div`
+    font-size: 18px;
+    font-weight: 800;
+    color: ${(props) => props.theme.link.textColor.secondary};
+    text-transform: uppercase;
+`;
+
+export const LinkWrapper = styled.span`
     :hover {
         text-decoration: underline;
     }
 `;
 
-const NavigationIcon = styled.i<{ isLeft: boolean }>`
-    font-weight: 400;
-    font-size: 20px;
-    ${(props) => (props.isLeft ? 'margin-right: 6px;' : 'margin-left: 6px;')}
-    top: -1px;
+export const NavigationIcon = styled.i<{ isLeft: boolean }>`
     position: relative;
+    top: -1px;
+    ${(props) => (props.isLeft ? 'margin-right: 6px;' : 'margin-left: 6px;')}
+    text-transform: none;
 `;
 
 export default SpeedMarketsOverview;

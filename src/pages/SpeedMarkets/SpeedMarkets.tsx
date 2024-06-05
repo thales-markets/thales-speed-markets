@@ -285,7 +285,8 @@ const SpeedMarkets: React.FC = () => {
                             isChained={isChained}
                             currentPrices={currentPrices}
                             maxPriceDelayForResolvingSec={ammSpeedMarketsLimitsData?.maxPriceDelayForResolvingSec}
-                            onTabChainedSelectedChange={setIsChainedLinkSelected}
+                            onChainedSelectedChange={setIsChainedLinkSelected}
+                            showTabs
                         />
                     )}
                     <OverviewLinkWrapper $isTableAbove={isConnected}>

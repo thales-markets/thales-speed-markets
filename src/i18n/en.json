@@ -360,7 +360,7 @@
         }
     },
     "profile": {
-        "title": "Trading Profile",
+        "title": "Profile",
         "go-to-market": "Go to market",
         "strike-price": "Strike price",
         "final-price": "Final price",
@@ -368,16 +368,14 @@
         "current-price-tooltip": "This is a Speed Market position that uses Pyth oracles for querying the current price",
         "claimed": "CLAIMED",
         "rip": "RIP",
-        "winnings-are-forfeit": "* Winnings not claimed within {{days}} days of a market being resolved are forfeit.",
         "history-limit": "* Showing only markets with expiry date not older than {{days}} days.",
         "tabs": {
             "my-positions": "My Positions",
             "history": "History"
         },
         "accordions": {
-            "claimable-positions": "Claimable Positions",
-            "open-positions": "Open Positions",
-            "position-history": "Position History",
+            "claimable-positions": "Claimable",
+            "open-positions": "Open",
             "transaction-history": "Transaction History"
         },
         "search-placeholder": "Search wallet",

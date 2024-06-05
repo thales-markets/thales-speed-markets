@@ -50,7 +50,7 @@ const TableChainedPositions: React.FC<TablePositionsProps> = ({
             },
         },
         {
-            header: <Header>{t('speed-markets.user-positions.direction')}</Header>,
+            header: <Header>{t('speed-markets.chained.directions')}</Header>,
             accessorKey: 'sides',
             cell: (cellProps: any) => {
                 return (
