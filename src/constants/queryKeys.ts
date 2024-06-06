@@ -50,16 +50,6 @@ const QUERY_KEYS = {
             networkId,
             walletAddress,
         ],
-        SpeedMarketsTransactions: (networkId: NetworkId, walletAddress: string) => [
-            'userSpeedMarketsTransactions',
-            networkId,
-            walletAddress,
-        ],
-        ChainedSpeedMarketsTransactions: (networkId: NetworkId, walletAddress: string) => [
-            'userChainedSpeedMarketsTransactions',
-            networkId,
-            walletAddress,
-        ],
         ResolvedSpeedMarkets: (networkId: NetworkId, walletAddress: string) => [
             'userResolvedSpeedMarkets',
             networkId,

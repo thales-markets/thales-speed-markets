@@ -182,7 +182,7 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
                     <TooltipInfo
                         overlay={t('speed-markets.tooltips.current-price')}
                         customIconStyling={{
-                            color: isPriceUp ? theme.positionColor.up : theme.positionColor.down,
+                            color: isPriceUp ? theme.price.up : theme.price.down,
                             marginLeft: '6px',
                         }}
                     />

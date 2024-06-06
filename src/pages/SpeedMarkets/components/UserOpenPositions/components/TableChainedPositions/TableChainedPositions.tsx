@@ -81,7 +81,7 @@ const TableChainedPositions: React.FC<{ data: UserChainedPosition[] }> = ({ data
         },
         {
             header: <Header>{t('speed-markets.user-positions.price')}</Header>,
-            accessorKey: 'finalPrice',
+            accessorKey: 'finalPrices',
             cell: (cellProps: any) => (
                 <Wrapper>
                     <Value>

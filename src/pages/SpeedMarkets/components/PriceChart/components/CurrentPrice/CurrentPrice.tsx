@@ -66,9 +66,7 @@ const AnimatedPrice = styled.div`
 const Icon = styled.i<{ $isUp?: boolean }>`
     font-size: ${(props) => (props.$isUp !== undefined ? '22' : '28')}px;
     ${(props) =>
-        props.$isUp !== undefined
-            ? `color: ${props.$isUp ? props.theme.positionColor.up : props.theme.positionColor.down};`
-            : ''}
+        props.$isUp !== undefined ? `color: ${props.$isUp ? props.theme.price.up : props.theme.price.down};` : ''}
     ${(props) =>
         props.$isUp !== undefined ? (props.$isUp ? 'transform: rotate(-90deg);' : 'transform: rotate(90deg);') : ''}
     
@@ -84,8 +82,8 @@ const Price = styled.span<{ $isUp?: boolean }>`
     color: ${(props) =>
         props.$isUp !== undefined
             ? props.$isUp
-                ? props.theme.positionColor.up
-                : props.theme.positionColor.down
+                ? props.theme.price.up
+                : props.theme.price.down
             : props.theme.textColor.primary};
 
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {

@@ -148,7 +148,7 @@ const Table: React.FC<TableProps> = ({
                         {tableInstance.getPaginationRowModel().rows.map((row: any, rowIndex: any) => {
                             return (
                                 <ExpandableRow key={rowIndex}>
-                                    {expandedRow ? (
+                                    {expandedRow && expandedRow(row) && expandedRow(row).type !== React.Fragment ? (
                                         <ExpandableRowReact
                                             row={row}
                                             tableRowCellStyles={tableRowCellStyles}
@@ -295,7 +295,7 @@ const TableRowHead = styled(TableRow)`
     min-height: 40px;
 `;
 
-const TableCell = styled(FlexDivCentered)<{ width?: number | string; id: string }>`
+const TableCell = styled(FlexDivCentered)<{ width?: number | string }>`
     flex: 1;
     max-width: ${(props) => (props.width ? `${props.width}px` : 'initial')};
     width: 100%;

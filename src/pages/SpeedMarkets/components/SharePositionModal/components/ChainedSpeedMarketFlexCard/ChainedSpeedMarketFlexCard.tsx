@@ -68,13 +68,9 @@ const ChainedSpeedMarketFlexCard: React.FC<SharePositionData> = ({
                             </Text>
                             <FlexDivCentered>
                                 {position === Positions.UP ? (
-                                    <Icon size={20} color={theme.positionColor.up} className="icon icon--caret-up" />
+                                    <Icon size={20} color={theme.price.up} className="icon icon--caret-up" />
                                 ) : (
-                                    <Icon
-                                        size={20}
-                                        color={theme.positionColor.down}
-                                        className="icon icon--caret-down"
-                                    />
+                                    <Icon size={20} color={theme.price.down} className="icon icon--caret-down" />
                                 )}
                                 <Text width={50} $isBold padding="0 0 0 5px">
                                     {position}

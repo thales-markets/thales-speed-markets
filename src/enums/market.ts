@@ -15,3 +15,10 @@ export enum SortDirection {
     ASC,
     DESC,
 }
+
+export enum HistoryStatus {
+    OPEN = 'OPEN',
+    CLAIMABLE = 'CLAIMABLE',
+    WON = 'WON',
+    LOSS = 'LOSS',
+}

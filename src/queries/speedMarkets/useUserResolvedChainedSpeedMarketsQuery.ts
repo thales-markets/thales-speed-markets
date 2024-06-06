@@ -7,27 +7,26 @@ import {
 } from 'constants/market';
 import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
-import { secondsToMilliseconds } from 'date-fns';
+import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
 import { Positions } from 'enums/market';
 import { bigNumberFormatter, coinFormatter, parseBytes32String, roundNumberToDecimals } from 'thales-utils';
-import { SpeedMarket } from 'types/market';
+import { UserChainedPosition } from 'types/market';
 import { QueryConfig } from 'types/network';
-import { TradeWithMarket } from 'types/profile';
 import { ViemContract } from 'types/viem';
 import { getContarctAbi } from 'utils/contracts/abi';
 import chainedSpeedMarketsAMMContract from 'utils/contracts/chainedSpeedMarketsAMMContract';
 import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
 import { getContract } from 'viem';
 
-const useUserChainedSpeedMarketsTransactionsQuery = (
+const useUserResolvedChainedSpeedMarketsQuery = (
     queryConfig: QueryConfig,
     walletAddress: string,
     options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
-    return useQuery<TradeWithMarket[]>({
-        queryKey: QUERY_KEYS.User.ChainedSpeedMarketsTransactions(queryConfig.networkId, walletAddress),
+    return useQuery<UserChainedPosition[]>({
+        queryKey: QUERY_KEYS.User.ResolvedChainedSpeedMarkets(queryConfig.networkId, walletAddress),
         queryFn: async () => {
-            const userTransactions: TradeWithMarket[] = [];
+            const userTransactions: UserChainedPosition[] = [];
 
             try {
                 const speedMarketsDataContractLocal = getContract({
@@ -51,36 +50,33 @@ const useUserChainedSpeedMarketsTransactionsQuery = (
                     MAX_NUMBER_OF_SPEED_MARKETS_TO_FETCH
                 );
                 const index = Number(ammParams.numMaturedMarketsPerUser) - pageSize;
-                const [activeMarkets, maturedMarkets] = await Promise.all([
-                    chainedMarketsAMMContract.read.activeMarketsPerUser([
-                        0,
-                        ammParams.numActiveMarketsPerUser,
-                        walletAddress,
-                    ]),
-                    chainedMarketsAMMContract.read.maturedMarketsPerUser([index, pageSize, walletAddress]),
+                const resolvedMarkets = await chainedMarketsAMMContract.read.maturedMarketsPerUser([
+                    index,
+                    pageSize,
+                    walletAddress,
                 ]);
-                const allMarkets: any[] = activeMarkets.concat(maturedMarkets);
 
                 const promises = [];
-                for (let i = 0; i < Math.ceil(allMarkets.length / BATCH_NUMBER_OF_SPEED_MARKETS); i++) {
+                for (let i = 0; i < Math.ceil(resolvedMarkets.length / BATCH_NUMBER_OF_SPEED_MARKETS); i++) {
                     const start = i * BATCH_NUMBER_OF_SPEED_MARKETS;
-                    const batchMarkets = allMarkets.slice(start, start + BATCH_NUMBER_OF_SPEED_MARKETS);
+                    const batchMarkets = resolvedMarkets.slice(start, start + BATCH_NUMBER_OF_SPEED_MARKETS);
                     promises.push(speedMarketsDataContractLocal.read.getChainedMarketsData([batchMarkets]));
                 }
-                const allMarketsDataArray = await Promise.all(promises);
+                const allResolvedMarketsDataArray = await Promise.all(promises);
 
-                const filteredMarketsData = allMarketsDataArray
+                const filteredMarketsData = allResolvedMarketsDataArray
                     .flat()
                     .map((marketData: any, index: number) => ({
                         ...marketData,
-                        market: allMarkets[index],
+                        market: resolvedMarkets[index],
                     }))
                     .filter((marketData: any) => Number(marketData.strikeTime) > MIN_MATURITY);
 
                 for (let i = 0; i < filteredMarketsData.length; i++) {
                     const marketData = filteredMarketsData[i];
 
-                    const maturityDate = secondsToMilliseconds(Number(marketData.strikeTime));
+                    const currencyKey = parseBytes32String(marketData.asset);
+
                     const sides: Positions[] = marketData.directions.map(
                         (direction: number) => SIDE_TO_POSITION_MAP[direction]
                     );
@@ -89,41 +85,50 @@ const useUserChainedSpeedMarketsTransactionsQuery = (
                         buyinAmount * bigNumberFormatter(marketData.payoutMultiplier) ** sides.length,
                         8
                     );
-                    const createdAt = secondsToMilliseconds(Number(marketData.createdAt));
-                    const safeBoxImpact = bigNumberFormatter(marketData.safeBoxImpact);
 
-                    const strikePrice = marketData.resolved
-                        ? bigNumberFormatter(
-                              marketData.strikePrices[marketData.strikePrices.length - 1],
-                              PYTH_CURRENCY_DECIMALS
-                          )
-                        : bigNumberFormatter(marketData.initialStrikePrice, PYTH_CURRENCY_DECIMALS);
-                    const finalPrice = marketData.resolved
-                        ? bigNumberFormatter(
-                              marketData.finalPrices[marketData.finalPrices.length - 1],
-                              PYTH_CURRENCY_DECIMALS
-                          )
-                        : 0;
+                    const strikeTimes = Array(sides.length)
+                        .fill(0)
+                        .map((_, i) =>
+                            secondsToMilliseconds(
+                                Number(marketData.initialStrikeTime) + i * Number(marketData.timeFrame)
+                            )
+                        );
+                    const strikePrices = marketData.strikePrices.map((strikePrice: bigint) =>
+                        bigNumberFormatter(strikePrice, PYTH_CURRENCY_DECIMALS)
+                    );
+                    const finalPrices: number[] = marketData.finalPrices.map((finalPrice: bigint) =>
+                        bigNumberFormatter(finalPrice, PYTH_CURRENCY_DECIMALS)
+                    );
 
-                    const userData: TradeWithMarket = {
-                        user: walletAddress,
-                        payout,
-                        paid: buyinAmount * (1 + safeBoxImpact),
+                    const fee = bigNumberFormatter(marketData.safeBoxImpact);
+                    const createdAt =
+                        marketData.createdAt != 0
+                            ? secondsToMilliseconds(Number(marketData.createdAt))
+                            : secondsToMilliseconds(Number(marketData.strikeTime)) - hoursToMilliseconds(1);
+
+                    const chainedData: UserChainedPosition = {
+                        user: marketData.user,
+                        market: marketData.market,
+                        currencyKey,
                         sides,
-                        marketItem: {
-                            address: marketData.market,
-                            timestamp: createdAt,
-                            currencyKey: parseBytes32String(marketData.asset),
-                            strikePrice,
-                            maturityDate,
-                            isOpen: !marketData.resolved,
-                            result: null,
-                            finalPrice,
-                            isChained: true,
-                        } as SpeedMarket,
+                        strikePrices,
+                        strikeTimes,
+                        maturityDate: secondsToMilliseconds(Number(marketData.strikeTime)),
+                        paid: buyinAmount * (1 + fee),
+                        payout: payout,
+                        payoutMultiplier: bigNumberFormatter(marketData.payoutMultiplier),
+                        currentPrice: 0,
+                        finalPrices,
+                        canResolve: false,
+                        resolveIndex: finalPrices.length - 1,
+                        isMatured: true,
+                        isClaimable: false,
+                        isUserWinner: marketData.isUserWinner,
+                        isResolved: true,
+                        createdAt,
                     };
 
-                    userTransactions.push(userData);
+                    userTransactions.push(chainedData);
                 }
             } catch (e) {
                 console.log(e);
@@ -135,4 +140,4 @@ const useUserChainedSpeedMarketsTransactionsQuery = (
     });
 };
 
-export default useUserChainedSpeedMarketsTransactionsQuery;
+export default useUserResolvedChainedSpeedMarketsQuery;

@@ -111,28 +111,11 @@ export default {
             primary: Colors.RED,
         },
     },
-    warning: {
-        background: {
-            primary: Colors.GRAY_DARK,
-            secondary: Colors.GRAY,
-        },
-        textColor: {
-            primary: Colors.ORANGE,
-            secondary: Colors.ORANGE_DARK,
-        },
-        borderColor: {
-            primary: Colors.ORANGE,
-        },
+    status: {
+        won: Colors.GREEN,
+        loss: Colors.RED,
     },
-    table: {
-        textColor: {
-            primary: Colors.WHITE,
-            secondary: Colors.GRAY_DARK,
-            tertiary: Colors.ORANGE,
-            quaternary: Colors.GREEN,
-        },
-    },
-    positionColor: {
+    price: {
         up: Colors.GREEN,
         down: Colors.RED,
     },

@@ -72,15 +72,3 @@ export type AmmChainedSpeedMarketsLimits = {
     maxPriceDelayForResolvingSec: number;
     whitelistedAddress: boolean;
 };
-
-// TODO: remove
-export type SpeedMarket = {
-    address: string;
-    timestamp: number;
-    currencyKey: string;
-    strikePrice: number;
-    maturityDate: number;
-    isOpen: boolean;
-    isChained: boolean;
-    finalPrice?: number;
-};

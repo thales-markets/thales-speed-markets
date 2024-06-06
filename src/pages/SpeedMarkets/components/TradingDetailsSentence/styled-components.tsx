@@ -21,6 +21,6 @@ export const TextValue = styled(Text)<{ $isProfit?: boolean; $uppercase?: boolea
 `;
 
 export const PositionText = styled(TextValue)<{ $isUp: boolean }>`
-    color: ${(props) => (props.$isUp ? props.theme.positionColor.up : props.theme.positionColor.down)};
+    color: ${(props) => (props.$isUp ? props.theme.price.up : props.theme.price.down)};
     text-transform: uppercase;
 `;

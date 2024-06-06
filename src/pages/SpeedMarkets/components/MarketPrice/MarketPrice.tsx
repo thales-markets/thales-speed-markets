@@ -6,8 +6,9 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatCurrencyWithSign } from 'thales-utils';
 import { UserPosition } from 'types/market';
+import { UserHistoryPosition } from 'types/profile';
 
-const MarketPrice: React.FC<{ position: UserPosition }> = ({ position }) => {
+const MarketPrice: React.FC<{ position: UserPosition | UserHistoryPosition }> = ({ position }) => {
     const { t } = useTranslation();
 
     const [isMatured, setIsMatured] = useState(Date.now() > position.maturityDate);
@@ -24,11 +25,15 @@ const MarketPrice: React.FC<{ position: UserPosition }> = ({ position }) => {
         setIsMatured(Date.now() > position.maturityDate);
     }, [position.maturityDate]);
 
+    const finalPrice = (position as UserHistoryPosition).finalPrices
+        ? (position as UserHistoryPosition).finalPrices[0]
+        : (position as UserPosition).finalPrice;
+
     return (
         <>
             {isMatured ? (
-                position.finalPrice > 0 ? (
-                    formatCurrencyWithSign(USD_SIGN, position.finalPrice)
+                finalPrice > 0 ? (
+                    formatCurrencyWithSign(USD_SIGN, finalPrice)
                 ) : (
                     <>
                         {'. . .'}

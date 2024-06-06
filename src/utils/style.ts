@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
-import { Positions } from 'enums/market';
+import { HistoryStatus, Positions } from 'enums/market';
 import { Theme } from 'enums/ui';
 import { localStore } from 'thales-utils';
 import { ThemeInterface } from 'types/ui';
@@ -16,9 +16,20 @@ export const getDefaultTheme = (): Theme => {
 export const getColorPerPosition = (position: Positions, theme: ThemeInterface) => {
     switch (position) {
         case Positions.UP:
-            return theme.positionColor.up;
+            return theme.price.up;
         case Positions.DOWN:
-            return theme.positionColor.down;
+            return theme.price.down;
+        default:
+            return theme.textColor.primary;
+    }
+};
+
+export const getStatusColor = (status: HistoryStatus, theme: ThemeInterface) => {
+    switch (status) {
+        case HistoryStatus.WON:
+            return theme.status.won;
+        case HistoryStatus.LOSS:
+            return theme.status.loss;
         default:
             return theme.textColor.primary;
     }

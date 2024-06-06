@@ -48,7 +48,14 @@ export const Tab = styled.span<{
     }
 `;
 
-export const TabTitle = styled.p`
+export const TabSection = styled.div<{ $isEmpty?: boolean }>`
+    ${(props) => (!props.$isEmpty ? 'min-height: 390px;' : '')}
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        min-height: unset;
+    }
+`;
+
+export const TabSectionTitle = styled.p`
     font-weight: 800;
     font-size: 18px;
     line-height: 100%;
@@ -56,11 +63,12 @@ export const TabTitle = styled.p`
     margin-top: 20px;
 `;
 
-export const TabSection = styled.div<{ $isEmpty?: boolean }>`
-    ${(props) => (!props.$isEmpty ? 'min-height: 390px;' : '')}
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        min-height: unset;
-    }
+export const TabSectionSubtitle = styled.span`
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 11px;
+    color: ${(props) => props.theme.textColor.quinary};
+    text-align: left;
 `;
 
 export const Notification = styled.span`

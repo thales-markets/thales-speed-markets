@@ -147,8 +147,8 @@ export const DirectionIcon = styled(Icon)<{ $alignUp?: boolean; $alignEmptyUp?: 
     ${(props) => (props.$alignUp ? 'margin-bottom: -4px;' : props.$alignEmptyUp ? 'margin-bottom: 2px;' : '')}
 `;
 
-export const Value = styled.span`
-    color: ${(props) => props.theme.textColor.primary};
+export const Value = styled.span<{ $color?: string }>`
+    color: ${(props) => (props.$color ? props.$color : props.theme.textColor.primary)};
     font-size: 13px;
     font-weight: 700;
 `;

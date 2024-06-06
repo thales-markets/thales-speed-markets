@@ -20,7 +20,7 @@ import { RootState } from 'types/ui';
 import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAssetsAsObject } from 'utils/pyth';
 import { buildHref, history } from 'utils/routes';
 import { useChainId, useClient } from 'wagmi';
-import TransactionHistory from './components/TransactionHistory';
+import UserHistoricalPositions from './components/UserHistoricalPositions';
 import {
     Container,
     Header,
@@ -28,9 +28,11 @@ import {
     PositionsWrapper,
     Tab,
     TabSection,
-    TabTitle,
+    TabSectionSubtitle,
+    TabSectionTitle,
     Tabs,
 } from './styled-components';
+import { MARKET_DURATION_IN_DAYS } from 'constants/market';
 
 enum TabItems {
     MY_POSITIONS = 'my-positions',
@@ -51,7 +53,7 @@ const Profile: React.FC = () => {
     const [isChainedOpen, setIsChainedOpen] = useState(false);
     const [currentPrices, setCurrentPrices] = useState<{ [key: string]: number }>(getSupportedAssetsAsObject());
     const [totalNotifications, setTotalNotifications] = useState(0);
-    const [openPositionsSize, setOpenPositionsSize] = useState(0);
+    const [positionsSize, setPositionsSize] = useState(0);
     const [searchAddress, setSearchAddress] = useState<string>('');
     const [searchText, setSearchText] = useState<string>('');
 
@@ -137,7 +139,7 @@ const Profile: React.FC = () => {
                 {view === TabItems.MY_POSITIONS && (
                     <>
                         {/* CLAIMABLE */}
-                        <TabTitle>{t('profile.accordions.claimable-positions')}</TabTitle>
+                        <TabSectionTitle>{t('profile.accordions.claimable-positions')}</TabSectionTitle>
                         <TabSection $isEmpty={totalNotifications === 0}>
                             <UserOpenPositions
                                 showOnlyClaimable
@@ -152,8 +154,8 @@ const Profile: React.FC = () => {
                             />
                         </TabSection>
                         {/* OPEN */}
-                        <TabTitle>{t('profile.accordions.open-positions')}</TabTitle>
-                        <TabSection $isEmpty={openPositionsSize === 0}>
+                        <TabSectionTitle>{t('profile.accordions.open-positions')}</TabSectionTitle>
+                        <TabSection $isEmpty={positionsSize === 0}>
                             <UserOpenPositions
                                 showOnlyOpen
                                 showFilter
@@ -161,7 +163,7 @@ const Profile: React.FC = () => {
                                 currentPrices={currentPrices}
                                 maxPriceDelayForResolvingSec={ammSpeedMarketsLimitsData?.maxPriceDelayForResolvingSec}
                                 searchAddress={searchAddress}
-                                setNumberOfPositions={setOpenPositionsSize}
+                                setNumberOfPositions={setPositionsSize}
                                 onChainedSelectedChange={setIsChainedOpen}
                                 isMobileHorizontal
                             />
@@ -170,11 +172,18 @@ const Profile: React.FC = () => {
                 )}
                 {view === TabItems.HISTORY && (
                     <>
-                        <TabTitle>{t('profile.accordions.transaction-history')}</TabTitle>
-                        <TabSection $isEmpty={false /* TODO */}>
-                            <TransactionHistory
+                        <TabSectionTitle>
+                            {t('profile.accordions.transaction-history')}
+                            <br />
+                            <TabSectionSubtitle>
+                                {t('profile.history-limit', { days: MARKET_DURATION_IN_DAYS })}
+                            </TabSectionSubtitle>
+                        </TabSectionTitle>
+                        <TabSection $isEmpty={positionsSize === 0}>
+                            <UserHistoricalPositions
+                                currentPrices={currentPrices}
                                 searchAddress={searchAddress}
-                                searchText={searchAddress ? '' : searchText}
+                                setNumberOfPositions={setPositionsSize}
                             />
                         </TabSection>
                     </>

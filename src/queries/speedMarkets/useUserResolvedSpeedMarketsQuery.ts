@@ -10,8 +10,8 @@ import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
 import { bigNumberFormatter, coinFormatter, parseBytes32String } from 'thales-utils';
+import { UserPosition } from 'types/market';
 import { QueryConfig } from 'types/network';
-import { TradeWithMarket } from 'types/profile';
 import { ViemContract } from 'types/viem';
 import { getContarctAbi } from 'utils/contracts/abi';
 import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
@@ -19,15 +19,15 @@ import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContrac
 import { getFeesFromHistory } from 'utils/speedAmm';
 import { getContract } from 'viem';
 
-const useUserSpeedMarketsTransactionsQuery = (
+const useUserResolvedSpeedMarketsQuery = (
     queryConfig: QueryConfig,
     walletAddress: string,
     options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
-    return useQuery<TradeWithMarket[]>({
-        queryKey: QUERY_KEYS.User.SpeedMarketsTransactions(queryConfig.networkId, walletAddress),
+    return useQuery<UserPosition[]>({
+        queryKey: QUERY_KEYS.User.ResolvedSpeedMarkets(queryConfig.networkId, walletAddress),
         queryFn: async () => {
-            const userTransactions: TradeWithMarket[] = [];
+            const userResolvedPositions: UserPosition[] = [];
 
             try {
                 const speedMarketsAMMContractLocal = getContract({
@@ -51,35 +51,31 @@ const useUserSpeedMarketsTransactionsQuery = (
                     MAX_NUMBER_OF_SPEED_MARKETS_TO_FETCH
                 );
                 const index = Number(ammParams.numMaturedMarketsPerUser) - pageSize;
-                const [activeMarkets, maturedMarkets] = await Promise.all([
-                    speedMarketsAMMContractLocal.read.activeMarketsPerUser([
-                        0,
-                        ammParams.numActiveMarketsPerUser,
-                        walletAddress,
-                    ]),
-                    speedMarketsAMMContractLocal.read.maturedMarketsPerUser([index, pageSize, walletAddress]),
+                const resolvedMarkets = await speedMarketsAMMContractLocal.read.maturedMarketsPerUser([
+                    index,
+                    pageSize,
+                    walletAddress,
                 ]);
-                const allMarkets: any[] = activeMarkets.concat(maturedMarkets);
 
                 const promises = [];
-                for (let i = 0; i < Math.ceil(allMarkets.length / BATCH_NUMBER_OF_SPEED_MARKETS); i++) {
+                for (let i = 0; i < Math.ceil(resolvedMarkets.length / BATCH_NUMBER_OF_SPEED_MARKETS); i++) {
                     const start = i * BATCH_NUMBER_OF_SPEED_MARKETS;
-                    const batchMarkets = allMarkets.slice(start, start + BATCH_NUMBER_OF_SPEED_MARKETS);
+                    const batchMarkets = resolvedMarkets.slice(start, start + BATCH_NUMBER_OF_SPEED_MARKETS);
                     promises.push(speedMarketsDataContractLocal.read.getMarketsData([batchMarkets]));
                 }
-                const allMarketsDataArray = await Promise.all(promises);
+                const resolvedMarketsDataArray = await Promise.all(promises);
 
-                const filteredMarketsData = allMarketsDataArray
+                const filteredMarketsData = resolvedMarketsDataArray
                     .flat()
                     .map((marketData: any, index: number) => ({
                         ...marketData,
-                        market: allMarkets[index],
+                        market: resolvedMarkets[index],
                     }))
                     .filter((marketData: any) => Number(marketData.strikeTime) > MIN_MATURITY);
 
                 for (let i = 0; i < filteredMarketsData.length; i++) {
                     const marketData = filteredMarketsData[i];
-                    const sides = [SIDE_TO_POSITION_MAP[marketData.direction]];
+
                     const payout = coinFormatter(marketData.buyinAmount, queryConfig.networkId) * SPEED_MARKETS_QUOTE;
 
                     const createdAt =
@@ -96,33 +92,32 @@ const useUserSpeedMarketsTransactionsQuery = (
                             : getFeesFromHistory(createdAt).safeBoxImpact;
                     const fees = lpFee + safeBoxImpact;
 
-                    const userData: TradeWithMarket = {
-                        user: walletAddress,
-                        payout,
+                    const userData: UserPosition = {
+                        user: marketData.user,
+                        market: marketData.market,
+                        currencyKey: parseBytes32String(marketData.asset),
+                        side: SIDE_TO_POSITION_MAP[marketData.direction],
+                        strikePrice: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS),
+                        maturityDate: secondsToMilliseconds(Number(marketData.strikeTime)),
                         paid: coinFormatter(marketData.buyinAmount, queryConfig.networkId) * (1 + fees),
-                        sides,
-                        marketItem: {
-                            address: marketData.market,
-                            timestamp: createdAt,
-                            currencyKey: parseBytes32String(marketData.asset),
-                            strikePrice: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS),
-                            maturityDate: secondsToMilliseconds(Number(marketData.strikeTime)),
-                            isOpen: !marketData.resolved,
-                            isChained: false,
-                            finalPrice: bigNumberFormatter(marketData.finalPrice, PYTH_CURRENCY_DECIMALS),
-                        },
+                        payout: payout,
+                        currentPrice: 0,
+                        finalPrice: bigNumberFormatter(marketData.finalPrice, PYTH_CURRENCY_DECIMALS),
+                        isClaimable: false,
+                        isResolved: true,
+                        createdAt,
                     };
 
-                    userTransactions.push(userData);
+                    userResolvedPositions.push(userData);
                 }
             } catch (e) {
                 console.log(e);
             }
 
-            return userTransactions;
+            return userResolvedPositions;
         },
         ...options,
     });
 };
 
-export default useUserSpeedMarketsTransactionsQuery;
+export default useUserResolvedSpeedMarketsQuery;

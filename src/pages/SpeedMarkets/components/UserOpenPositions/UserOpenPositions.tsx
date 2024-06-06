@@ -77,9 +77,6 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
         networkId,
         selectedCollateralIndex,
     ]);
-    const collateralAddress = isMultiCollateralSupported
-        ? multipleCollateral[selectedCollateral].addresses[networkId]
-        : erc20Contract.addresses[networkId];
 
     const [isChainedSelected, setIsChainedSelected] = useState(!!isChained);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -281,6 +278,10 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
             setNumberOfPositions(noPositions ? 0 : positions.length);
         }
     }, [setNumberOfPositions, positions.length, noPositions]);
+
+    const collateralAddress = isMultiCollateralSupported
+        ? multipleCollateral[selectedCollateral].addresses[networkId]
+        : erc20Contract.addresses[networkId];
 
     const handleSubmit = async () => {
         setIsSubmitting(true);
