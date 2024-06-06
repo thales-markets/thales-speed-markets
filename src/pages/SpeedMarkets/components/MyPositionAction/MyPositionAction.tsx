@@ -418,6 +418,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                     {position.maturityDate > Date.now() ? (
                         <ResultsContainer>
                             <TimeRemaining end={position.maturityDate} showFullCounter showSecondsCounter>
+                                <TimeIcon className="icon icon--time" />
                                 <Label>{t('speed-markets.user-positions.result-in')}</Label>
                             </TimeRemaining>
                         </ResultsContainer>
@@ -455,6 +456,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
             return (
                 <ResultsContainer>
                     <TimeRemaining end={position.maturityDate} showFullCounter showSecondsCounter>
+                        <TimeIcon className="icon icon--time" />
                         <Label>
                             {Date.now() > position.maturityDate
                                 ? t('common.result')
@@ -527,6 +529,12 @@ export const ResultsContainer = styled(FlexDivCentered)`
     line-height: 100%;
     white-space: nowrap;
     min-width: 174px;
+`;
+
+export const TimeIcon = styled.i`
+    font-weight: normal;
+    margin-right: 5px;
+    margin-bottom: 1px;
 `;
 
 export const Label = styled.span`

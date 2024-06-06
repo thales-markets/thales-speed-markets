@@ -20,6 +20,7 @@ import {
     Container,
     Label,
     ResultsContainer,
+    TimeIcon,
     Value,
     getDefaultButtonProps,
 } from 'pages/SpeedMarkets/components/MyPositionAction/MyPositionAction';
@@ -411,12 +412,14 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                     getResolveButton()
                 ) : (
                     <ResultsContainer>
-                        <Value
-                            $isUpperCase
-                            color={position.isUserWinner ? theme.textColor.quaternary : theme.error.textColor.primary}
+                        <TimeRemaining
+                            end={position.strikeTimes[position.resolveIndex]}
+                            showFullCounter
+                            showSecondsCounter
                         >
-                            {position.isUserWinner ? t('common.won') : t('common.loss')}
-                        </Value>
+                            <TimeIcon className="icon icon--time" />
+                            <Label>{t('common.results')}</Label>
+                        </TimeRemaining>
                     </ResultsContainer>
                 );
             } else {
@@ -430,7 +433,8 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                     <ResultsContainer>
                         <TimeRemaining end={position.strikeTimes[strikeTimeIndex]} showFullCounter showSecondsCounter>
                             <Label>
-                                {Date.now() > position.maturityDate || position.canResolve
+                                <TimeIcon className="icon icon--time" />
+                                {Date.now() > position.maturityDate
                                     ? t('common.results')
                                     : t('speed-markets.user-positions.next-result-in')}
                             </Label>

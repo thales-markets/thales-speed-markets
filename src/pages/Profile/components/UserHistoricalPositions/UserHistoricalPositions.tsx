@@ -6,6 +6,8 @@ import CardPositions from 'pages/SpeedMarkets/components/CardPositions';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
 import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveSpeedMarketsDataQuery';
+import useUserResolvedChainedSpeedMarketsQuery from 'queries/speedMarkets/useUserResolvedChainedSpeedMarketsQuery';
+import useUserResolvedSpeedMarketsQuery from 'queries/speedMarkets/useUserResolvedSpeedMarketsQuery';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -17,13 +19,12 @@ import { FlexDivCentered, FlexDivStart } from 'styles/common';
 import { UserHistoryPosition } from 'types/profile';
 import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
+import { isOnlySpeedMarketsSupported } from 'utils/network';
+import { mapUserPositionToHistory } from 'utils/position';
 import { getPriceId } from 'utils/pyth';
 import { isUserWinner } from 'utils/speedAmm';
 import { useAccount, useChainId, useClient } from 'wagmi';
 import TableHistoricalPositions from './components/TableHistoricalPositions';
-import { mapUserPositionToHistory } from 'utils/position';
-import useUserResolvedSpeedMarketsQuery from 'queries/speedMarkets/useUserResolvedSpeedMarketsQuery';
-import useUserResolvedChainedSpeedMarketsQuery from 'queries/speedMarkets/useUserResolvedChainedSpeedMarketsQuery';
 
 type UserHistoricalPositionsProps = {
     currentPrices: { [key: string]: number };
@@ -46,7 +47,8 @@ const UserHistoricalPositions: React.FC<UserHistoricalPositionsProps> = ({
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
-    const [isFilterChainedSelected, setIsFilterChainedSelected] = useState<boolean | undefined>(undefined);
+    const [isFilterSingleSelected, setIsFilterSingleSelected] = useState<boolean>(false);
+    const [isFilterChainedSelected, setIsFilterChainedSelected] = useState<boolean>(false);
 
     // SINGLE OPEN(ACTIVE)
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
@@ -114,11 +116,13 @@ const UserHistoricalPositions: React.FC<UserHistoricalPositionsProps> = ({
     }));
 
     // CHAINED OPEN(ACTIVE)
+    const isNetworkSupportedForChained = !isOnlySpeedMarketsSupported(networkId);
+
     const userChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
         { networkId, client },
         searchAddress ? searchAddress : isBiconomy ? biconomyConnector.address : walletAddress || '',
         {
-            enabled: isAppReady && isConnected,
+            enabled: isAppReady && isConnected && isNetworkSupportedForChained,
         }
     );
 
@@ -207,7 +211,7 @@ const UserHistoricalPositions: React.FC<UserHistoricalPositionsProps> = ({
         { networkId, client },
         searchAddress ? searchAddress : isBiconomy ? biconomyConnector.address : walletAddress || '',
         {
-            enabled: isAppReady && isConnected,
+            enabled: isAppReady && isConnected && isNetworkSupportedForChained,
         }
     );
 
@@ -221,14 +225,13 @@ const UserHistoricalPositions: React.FC<UserHistoricalPositionsProps> = ({
 
     // ALL: (SINGLE=open(not matured + matured) + resolved) + (CHAINED=open(not matured + matured) + resolved)
 
-    const allUserOpenSpeedMarketsData = activeSpeedNotMatured.concat(
-        maturedUserSpeedMarketsWithPrices,
-        userResolvedSpeedMarketsHistoryData
-    );
-    const allUserOpenChainedMarketsData = chainedWithoutMaturedPositions.concat(
-        partiallyMaturedWithPrices,
-        userResolvedChainedSpeedMarketsData
-    );
+    const allUserOpenSpeedMarketsData = isFilterChainedSelected
+        ? []
+        : activeSpeedNotMatured.concat(maturedUserSpeedMarketsWithPrices, userResolvedSpeedMarketsHistoryData);
+
+    const allUserOpenChainedMarketsData = isFilterSingleSelected
+        ? []
+        : chainedWithoutMaturedPositions.concat(partiallyMaturedWithPrices, userResolvedChainedSpeedMarketsData);
 
     const sortedUserMarketsData = allUserOpenSpeedMarketsData
         .concat(allUserOpenChainedMarketsData)
@@ -239,7 +242,7 @@ const UserHistoricalPositions: React.FC<UserHistoricalPositionsProps> = ({
     pythPricesQueries.filter((query) => query.isLoading).length > 1;
 
     const noPositions =
-        !isLoading && (allUserOpenChainedMarketsData.length === 0 || allUserOpenSpeedMarketsData.length === 0);
+        !isLoading && allUserOpenChainedMarketsData.length === 0 && allUserOpenSpeedMarketsData.length === 0;
 
     const hasSomePositions = allUserOpenChainedMarketsData.length > 0 || allUserOpenSpeedMarketsData.length > 0;
 
@@ -255,17 +258,22 @@ const UserHistoricalPositions: React.FC<UserHistoricalPositionsProps> = ({
     return (
         <Container>
             {hasSomePositions && (
-                // TODO: DD
                 <Filters>
                     <Filter
-                        $isSelected={isFilterChainedSelected === false}
-                        onClick={() => setIsFilterChainedSelected(false)}
+                        $isSelected={isFilterSingleSelected}
+                        onClick={() => {
+                            setIsFilterSingleSelected(!isFilterSingleSelected);
+                            setIsFilterChainedSelected(false);
+                        }}
                     >
                         {t('speed-markets.single')}
                     </Filter>
                     <Filter
-                        $isSelected={isFilterChainedSelected === true}
-                        onClick={() => setIsFilterChainedSelected(true)}
+                        $isSelected={isFilterChainedSelected}
+                        onClick={() => {
+                            setIsFilterSingleSelected(false);
+                            setIsFilterChainedSelected(!isFilterChainedSelected);
+                        }}
                     >
                         {t('speed-markets.chained.label')}
                     </Filter>
@@ -275,6 +283,7 @@ const UserHistoricalPositions: React.FC<UserHistoricalPositionsProps> = ({
                 {isLoading ? (
                     <SimpleLoader />
                 ) : isMobile ? (
+                    // TODO
                     <CardPositions isHorizontal positions={positions} />
                 ) : (
                     <TableHistoricalPositions data={positions as UserHistoryPosition[]} />
@@ -283,7 +292,7 @@ const UserHistoricalPositions: React.FC<UserHistoricalPositionsProps> = ({
             {noPositions && (
                 <NoPositionsText>
                     {t('speed-markets.user-positions.no-positions', {
-                        status: t('common-all').toLowerCase(),
+                        status: t('common.all').toLowerCase(),
                     })}
                 </NoPositionsText>
             )}

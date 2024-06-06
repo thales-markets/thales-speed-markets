@@ -112,6 +112,10 @@ const getColor = (duration: Duration, theme: ThemeInterface) => {
 
 const Container = styled.span<{ duration: Duration }>`
     color: ${(props) => getColor(props.duration, props.theme)};
+
+    i {
+        color: ${(props) => getColor(props.duration, props.theme)};
+    }
 `;
 
 const Time = styled.span<{

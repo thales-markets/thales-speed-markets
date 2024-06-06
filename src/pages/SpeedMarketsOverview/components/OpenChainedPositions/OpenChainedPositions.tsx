@@ -21,7 +21,7 @@ import biconomyConnector from 'utils/biconomyWallet';
 import erc20Contract from 'utils/contracts/collateralContract';
 import multipleCollateral from 'utils/contracts/multipleCollateralContract';
 import { getCollateral } from 'utils/currency';
-import { getIsMultiCollateralSupported } from 'utils/network';
+import { getIsMultiCollateralSupported, isOnlySpeedMarketsSupported } from 'utils/network';
 import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAssetsAsObject } from 'utils/pyth';
 import { refetchActiveSpeedMarkets, refetchPythPrice } from 'utils/queryConnector';
 import { isUserWinner, resolveAllChainedMarkets } from 'utils/speedAmm';
@@ -77,10 +77,12 @@ const OpenChainedPositions: React.FC = () => {
         return ammSpeedMarketsLimitsQuery.isSuccess ? ammSpeedMarketsLimitsQuery.data : null;
     }, [ammSpeedMarketsLimitsQuery]);
 
+    const isNetworkSupportedForChained = !isOnlySpeedMarketsSupported(networkId);
+
     const activeChainedSpeedMarketsDataQuery = useActiveChainedSpeedMarketsDataQuery(
         { networkId, client },
         {
-            enabled: isAppReady && isConnected,
+            enabled: isAppReady && isConnected && isNetworkSupportedForChained,
         }
     );
 

@@ -246,6 +246,11 @@
     content: '\0038';
 }
 
+.icon--time:before {
+    content: '\003C';
+}
+
+
 .icon--stats:before {
     content: '\0041';
 }
