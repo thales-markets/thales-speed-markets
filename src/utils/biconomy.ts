@@ -3,7 +3,6 @@ import biconomyConnector from './biconomyWallet';
 import { SupportedNetwork } from 'types/network';
 import { ViemContract } from 'types/viem';
 import {
-    concat,
     createPublicClient,
     createWalletClient,
     encodeFunctionData,
@@ -11,11 +10,6 @@ import {
     getContract,
     http,
     maxUint256,
-    pad,
-    parseEther,
-    slice,
-    toFunctionSelector,
-    toHex,
 } from 'viem';
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import { DEFAULT_SESSION_KEY_MANAGER_MODULE, createSessionKeyManagerModule } from '@biconomy/account';
@@ -141,7 +135,6 @@ export const executeBiconomyTransaction = async (
                     paymasterServiceData: {
                         mode: PaymasterMode.ERC20,
                         preferredToken: collateral,
-                        maxApproval: true,
                     },
                     params: {
                         sessionSigner: sessionSigner,
@@ -163,7 +156,8 @@ export const executeBiconomyTransaction = async (
                     console.log('Transaction receipt', transactionHash);
                     return transactionHash;
                 }
-            } catch {
+            } catch (e) {
+                console.log(e);
                 const txHash = await createSessionAndExecuteTxs();
                 return txHash;
             }
@@ -181,26 +175,6 @@ const getCreateSessionTxs = async (networkId: SupportedNetwork, collateralAddres
             smartAccountAddress: biconomyConnector.address,
         });
 
-        const ammAddress = speedMarketsAMMContract.addresses[networkId];
-
-        // get only first 4 bytes for function selector
-        const functionSelector = slice(
-            toFunctionSelector(
-                'createNewMarketWithDifferentCollateral(bytes32,uint64,uint64,uint8,bytes[],address,uint256,bool,address,uint256)'
-            ),
-            0,
-            4
-        );
-
-        // create session key data
-        const sessionKeyData = await getABISVMSessionKeyData(sessionKeyEOA.address, {
-            destContract: ammAddress, // destination contract to call
-            functionSelector: functionSelector, // function selector allowed
-            valueLimit: parseEther('0'), // no native value is sent
-            // In rules, we make sure that referenceValue is equal to recipient
-            rules: [],
-        });
-
         const dateAfter = new Date();
         const dateUntil = new Date();
         dateUntil.setHours(dateAfter.getHours() + 1);
@@ -211,7 +185,7 @@ const getCreateSessionTxs = async (networkId: SupportedNetwork, collateralAddres
                 validAfter: Math.floor(dateAfter.getTime() / 1000),
                 sessionValidationModule: import.meta.env['VITE_APP_SVM_ADDRESS_' + networkId],
                 sessionPublicKey: sessionKeyEOA.address as `0x${string}`,
-                sessionKeyData: sessionKeyData as `0x${string}`,
+                sessionKeyData: sessionKeyEOA.address as `0x${string}`,
             },
         ]);
 
@@ -328,36 +302,3 @@ const getSessionSigner = async (networkId: SupportedNetwork) => {
     });
     return sessionSigner;
 };
-
-interface Rule {
-    offset: number;
-    condition: number;
-    referenceValue: string;
-}
-
-interface Permission {
-    destContract: string;
-    functionSelector: string;
-    valueLimit: bigint;
-    rules: Rule[];
-}
-
-async function getABISVMSessionKeyData(sessionKey: `0x${string}`, permission: Permission): Promise<string> {
-    let sessionKeyData = concat([
-        sessionKey,
-        permission.destContract as `0x${string}`,
-        permission.functionSelector as `0x${string}`,
-        pad(permission.valueLimit.toString() as `0x${string}`, { size: 16 }),
-        pad(toHex(permission.rules.length), { size: 2 }), // this can't be more 2**11 (see below), so uint16 (2 bytes) is enough
-    ]);
-
-    for (let i = 0; i < permission.rules.length; i++) {
-        sessionKeyData = concat([
-            sessionKeyData,
-            pad(toHex(permission.rules[i].offset), { size: 2 }), // offset is uint16, so there can't be more than 2**16/32 args = 2**11
-            pad(toHex(permission.rules[i].condition), { size: 1 }), // uint8
-            permission.rules[i].referenceValue as `0x${string}`,
-        ]) as `0x${string}`;
-    }
-    return sessionKeyData;
-}
