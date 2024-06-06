@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { getIsAppReady } from 'redux/modules/app';
+import { getIsMobile } from 'redux/modules/ui';
 import { RootState } from 'types/ui';
 import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAssetsAsObject } from 'utils/pyth';
 import { buildHref, history } from 'utils/routes';
@@ -44,11 +45,13 @@ const Profile: React.FC = () => {
     const client = useClient();
 
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
+    const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const [isChainedClaimable, setIsChainedClaimable] = useState(false);
     const [isChainedOpen, setIsChainedOpen] = useState(false);
     const [currentPrices, setCurrentPrices] = useState<{ [key: string]: number }>(getSupportedAssetsAsObject());
     const [totalNotifications, setTotalNotifications] = useState(0);
+    const [openPositionsSize, setOpenPositionsSize] = useState(0);
     const [searchAddress, setSearchAddress] = useState<string>('');
     const [searchText, setSearchText] = useState<string>('');
 
@@ -113,9 +116,8 @@ const Profile: React.FC = () => {
                 placeholder={t('profile.search-placeholder')}
                 text={searchText}
                 handleChange={(value) => setSearchText(value)}
-                width="300px"
-                height="28px"
-                iconTop="6px"
+                width={isMobile ? '100%' : '470px'}
+                height={'40px'}
             />
 
             <PositionsWrapper>
@@ -136,7 +138,7 @@ const Profile: React.FC = () => {
                     <>
                         {/* CLAIMABLE */}
                         <TabTitle>{t('profile.accordions.claimable-positions')}</TabTitle>
-                        <TabSection>
+                        <TabSection $isEmpty={totalNotifications === 0}>
                             <UserOpenPositions
                                 showOnlyClaimable
                                 showFilter
@@ -146,11 +148,12 @@ const Profile: React.FC = () => {
                                 searchAddress={searchAddress}
                                 setClaimablePositions={setTotalNotifications}
                                 onChainedSelectedChange={setIsChainedClaimable}
+                                isMobileHorizontal
                             />
                         </TabSection>
                         {/* OPEN */}
                         <TabTitle>{t('profile.accordions.open-positions')}</TabTitle>
-                        <TabSection>
+                        <TabSection $isEmpty={openPositionsSize === 0}>
                             <UserOpenPositions
                                 showOnlyOpen
                                 showFilter
@@ -158,19 +161,22 @@ const Profile: React.FC = () => {
                                 currentPrices={currentPrices}
                                 maxPriceDelayForResolvingSec={ammSpeedMarketsLimitsData?.maxPriceDelayForResolvingSec}
                                 searchAddress={searchAddress}
-                                setClaimablePositions={setTotalNotifications}
+                                setNumberOfPositions={setOpenPositionsSize}
                                 onChainedSelectedChange={setIsChainedOpen}
+                                isMobileHorizontal
                             />
                         </TabSection>
                     </>
                 )}
                 {view === TabItems.HISTORY && (
                     <>
-                        {/* TODO: t('profile.accordions.transaction-history') */}
-                        <TransactionHistory
-                            searchAddress={searchAddress}
-                            searchText={searchAddress ? '' : searchText}
-                        />
+                        <TabTitle>{t('profile.accordions.transaction-history')}</TabTitle>
+                        <TabSection $isEmpty={false /* TODO */}>
+                            <TransactionHistory
+                                searchAddress={searchAddress}
+                                searchText={searchAddress ? '' : searchText}
+                            />
+                        </TabSection>
                     </>
                 )}
             </PositionsWrapper>

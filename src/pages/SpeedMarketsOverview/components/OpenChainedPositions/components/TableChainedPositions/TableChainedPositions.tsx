@@ -5,7 +5,7 @@ import { t } from 'i18next';
 import ChainedMarketPrice from 'pages/SpeedMarkets/components/ChainedMarketPrice';
 import ChainedPosition from 'pages/SpeedMarkets/components/ChainedPosition';
 import ChainedPositionAction from 'pages/SpeedMarkets/components/ChainedPositionAction';
-import { DirectionIcon } from 'pages/SpeedMarkets/components/TablePositions/TablePositions';
+import { DirectionIcon } from 'pages/SpeedMarkets/components/UserOpenPositions/components/TablePositions/TablePositions';
 import React from 'react';
 import { formatCurrencyWithSign } from 'thales-utils';
 import { UserChainedPosition } from 'types/market';

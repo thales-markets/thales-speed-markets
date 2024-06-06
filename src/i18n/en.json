@@ -265,7 +265,9 @@
             "open-chained": "Open chained markets",
             "your-positions": "Your open markets",
             "your-closed-positions": "Your closed positions (last 10)",
-            "no-positions": "Your open markets will be visible here",
+            "no-positions": "Your {{status}} markets will be visible here",
+            "status-open": "open",
+            "status-claimable": "claimable",
             "end-date": "End date",
             "asset": "Asset",
             "direction": "Direction",
@@ -370,7 +372,7 @@
         "rip": "RIP",
         "history-limit": "* Showing only markets with expiry date not older than {{days}} days.",
         "tabs": {
-            "my-positions": "My Positions",
+            "my-positions": "My markets",
             "history": "History"
         },
         "accordions": {

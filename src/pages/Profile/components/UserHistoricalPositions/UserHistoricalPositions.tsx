@@ -5,7 +5,10 @@ import { USD_SIGN } from 'constants/currency';
 import { millisecondsToSeconds } from 'date-fns';
 import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
+import CardPositions from 'pages/SpeedMarkets/components/CardPositions';
 import { CollateralSelectorContainer } from 'pages/SpeedMarkets/components/MyPositionAction/MyPositionAction';
+import TableChainedPositions from 'pages/SpeedMarkets/components/UserOpenPositions/components/TableChainedPositions';
+import TablePositions from 'pages/SpeedMarkets/components/UserOpenPositions/components/TablePositions';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
 import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveSpeedMarketsDataQuery';
@@ -28,11 +31,8 @@ import { getIsMultiCollateralSupported } from 'utils/network';
 import { getPriceId } from 'utils/pyth';
 import { isUserWinner, resolveAllChainedMarkets, resolveAllSpeedPositions } from 'utils/speedAmm';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
-import CardPositions from '../CardPositions/';
-import TableChainedPositions from './components/TableChainedPositions';
-import TablePositions from './components/TablePositions';
 
-type UserOpenPositionsProps = {
+type UserHistoricalPositionsProps = {
     isChained: boolean;
     currentPrices: { [key: string]: number };
     maxPriceDelayForResolvingSec?: number;
@@ -41,13 +41,12 @@ type UserOpenPositionsProps = {
     showOnlyOpen?: boolean; // not matured and without final price => don't show unresolved matured (still open)
     showTabs?: boolean;
     showFilter?: boolean;
-    isMobileHorizontal?: boolean;
     setClaimablePositions?: React.Dispatch<number>;
     setNumberOfPositions?: React.Dispatch<number>;
     onChainedSelectedChange?: React.Dispatch<boolean>;
 };
 
-const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
+const UserHistoricalPositions: React.FC<UserHistoricalPositionsProps> = ({
     isChained,
     currentPrices,
     searchAddress,
@@ -55,7 +54,6 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
     showOnlyOpen,
     showTabs,
     showFilter,
-    isMobileHorizontal,
     setClaimablePositions,
     setNumberOfPositions,
     onChainedSelectedChange,
@@ -244,8 +242,6 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
         !isLoading &&
         (isChainedSelected ? allUserOpenChainedMarketsData.length === 0 : allUserOpenSpeedMarketsData.length === 0);
 
-    const hasSomePositions = allUserOpenChainedMarketsData.length > 0 || allUserOpenSpeedMarketsData.length > 0;
-
     const positions = noPositions
         ? dummyPositions
         : isChainedSelected
@@ -321,9 +317,9 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
     return (
         <Container>
             <Header>
+                <MobileTitle>{t('speed-markets.user-positions.your-positions')}</MobileTitle>
                 {showTabs && (
                     <>
-                        <MobileTitle>{t('speed-markets.user-positions.your-positions')}</MobileTitle>
                         <Tabs>
                             <Tab
                                 $isSelected={!isChainedSelected}
@@ -360,9 +356,9 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
                     </>
                 )}
 
-                {((showFilter && hasSomePositions) || hasClaimableSpeedPositions) && (
-                    <PositionsControl>
-                        {showFilter && hasSomePositions && (
+                {hasClaimableSpeedPositions && (
+                    <FlexDivRow>
+                        {showFilter && (
                             <Filters>
                                 <Filter
                                     $isSelected={!isChainedSelected}
@@ -378,29 +374,27 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
                                 </Filter>
                             </Filters>
                         )}
-                        {hasClaimableSpeedPositions && (
-                            <ButtonWrapper $isChained={isChainedSelected}>
-                                {isMultiCollateralSupported && (
-                                    <CollateralSelectorContainer>
-                                        <ClaimAll>
-                                            {isMobile
-                                                ? t('speed-markets.user-positions.claim-all-in')
-                                                : t('speed-markets.user-positions.claim-all-win-in')}
-                                            :
-                                        </ClaimAll>
-                                        <CollateralSelector
-                                            collateralArray={[getDefaultCollateral(networkId)]}
-                                            selectedItem={0}
-                                            onChangeCollateral={() => {}}
-                                            disabled
-                                            isIconHidden
-                                        />
-                                    </CollateralSelectorContainer>
-                                )}
-                                {getClaimAllButton()}
-                            </ButtonWrapper>
-                        )}
-                    </PositionsControl>
+                        <ButtonWrapper $isChained={isChainedSelected}>
+                            {isMultiCollateralSupported && (
+                                <CollateralSelectorContainer>
+                                    <ClaimAll>
+                                        {isMobile
+                                            ? t('speed-markets.user-positions.claim-all-in')
+                                            : t('speed-markets.user-positions.claim-all-win-in')}
+                                        :
+                                    </ClaimAll>
+                                    <CollateralSelector
+                                        collateralArray={[getDefaultCollateral(networkId)]}
+                                        selectedItem={0}
+                                        onChangeCollateral={() => {}}
+                                        disabled
+                                        isIconHidden
+                                    />
+                                </CollateralSelectorContainer>
+                            )}
+                            {getClaimAllButton()}
+                        </ButtonWrapper>
+                    </FlexDivRow>
                 )}
             </Header>
             <PositionsWrapper $noPositions={noPositions}>
@@ -409,17 +403,13 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
                 ) : isChainedSelected && !noPositions ? (
                     // CHAINED
                     isMobile ? (
-                        <CardPositions
-                            isHorizontal={!!isMobileHorizontal}
-                            positions={positions as UserChainedPosition[]}
-                            isChained
-                        />
+                        <CardPositions isHorizontal={false} positions={positions as UserChainedPosition[]} isChained />
                     ) : (
                         <TableChainedPositions data={positions as UserChainedPosition[]} />
                     )
                 ) : // SINGLE
                 isMobile ? (
-                    <CardPositions isHorizontal={!!isMobileHorizontal} positions={positions as UserPosition[]} />
+                    <CardPositions isHorizontal={false} positions={positions as UserPosition[]} />
                 ) : (
                     <TablePositions data={positions as UserPosition[]} />
                 )}
@@ -568,21 +558,11 @@ const MobileTitle = styled.span`
     }
 `;
 
-const PositionsControl = styled(FlexDivRow)`
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        flex-direction: column;
-        gap: 10px;
-    }
-`;
-
 const PositionsWrapper = styled.div<{ $noPositions?: boolean }>`
     position: relative;
     min-height: 200px;
     width: 100%;
     ${(props) => (props.$noPositions ? 'filter: blur(10px);' : '')}
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        min-height: unset;
-    }
 `;
 
 const ButtonWrapper = styled(FlexDivEnd)<{ $isChained?: boolean }>`
@@ -621,4 +601,4 @@ const NoPositionsText = styled.span`
     min-width: max-content;
 `;
 
-export default UserOpenPositions;
+export default UserHistoricalPositions;

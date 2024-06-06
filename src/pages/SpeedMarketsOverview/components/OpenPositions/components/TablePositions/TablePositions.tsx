@@ -3,7 +3,7 @@ import { USD_SIGN } from 'constants/currency';
 import { t } from 'i18next';
 import MarketPrice from 'pages/SpeedMarkets/components/MarketPrice';
 import MyPositionAction from 'pages/SpeedMarkets/components/MyPositionAction';
-import { DirectionIcon } from 'pages/SpeedMarkets/components/TablePositions/TablePositions';
+import { DirectionIcon } from 'pages/SpeedMarkets/components/UserOpenPositions/components/TablePositions/TablePositions';
 import React from 'react';
 import styled from 'styled-components';
 import { formatCurrencyWithSign } from 'thales-utils';

@@ -22,7 +22,7 @@ import { getColorPerPosition } from 'utils/style';
 import { useChainId } from 'wagmi';
 import ChainedPositionAction from '../ChainedPositionAction';
 import { AssetIcon, Icon, PositionsSymbol } from '../SelectPosition/styled-components';
-import { DirectionIcon } from '../TablePositions/TablePositions';
+import { DirectionIcon } from '../UserOpenPositions/components/TablePositions/TablePositions';
 
 type ChainedPositionProps = {
     position: UserChainedPosition;

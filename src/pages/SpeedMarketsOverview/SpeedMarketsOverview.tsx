@@ -72,6 +72,9 @@ export const LinkContainer = styled.div`
     font-weight: 800;
     color: ${(props) => props.theme.link.textColor.secondary};
     text-transform: uppercase;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        display: none;
+    }
 `;
 
 export const LinkWrapper = styled.span`

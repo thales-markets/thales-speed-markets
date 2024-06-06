@@ -18,7 +18,7 @@ import { useChainId } from 'wagmi';
 import ChainedMarketPrice from '../../../ChainedMarketPrice';
 import ChainedPositionAction from '../../../ChainedPositionAction';
 import SharePosition from '../../../SharePosition';
-import { DirectionIcon } from '../../../TablePositions/TablePositions';
+import { DirectionIcon } from '../../../UserOpenPositions/components/TablePositions/TablePositions';
 
 type CardChainedPositionProps = {
     position: UserChainedPosition;

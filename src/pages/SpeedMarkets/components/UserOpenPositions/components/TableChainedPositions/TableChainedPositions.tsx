@@ -9,8 +9,8 @@ import React from 'react';
 import { formatCurrencyWithSign, localStore } from 'thales-utils';
 import { UserChainedPosition } from 'types/market';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
-import ChainedMarketPrice from '../ChainedMarketPrice';
-import SharePosition from '../SharePosition';
+import ChainedMarketPrice from '../../../ChainedMarketPrice';
+import SharePosition from '../../../SharePosition';
 import {
     AssetIcon,
     AssetName,

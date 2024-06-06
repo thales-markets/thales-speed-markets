@@ -5,7 +5,10 @@ import { FlexDivColumn, FlexDivRow, PAGE_MAX_WIDTH } from 'styles/common';
 export const Container = styled(FlexDivColumn)`
     width: 100%;
     max-width: ${PAGE_MAX_WIDTH};
-    gap: 40px;
+    gap: 30px;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        gap: 15px;
+    }
 `;
 
 export const Header = styled(FlexDivRow)`
@@ -21,9 +24,12 @@ export const Tabs = styled.div`
     display: flex;
     justify-content: center;
     align-items: stretch;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        gap: 40px;
+    }
 `;
 
-export const Tab = styled.p<{
+export const Tab = styled.span<{
     $active?: boolean;
 }>`
     font-weight: 800;
@@ -36,13 +42,13 @@ export const Tab = styled.p<{
     white-space: pre;
     box-shadow: ${(props) => (props.$active ? `0px 2px ${props.theme.borderColor.quaternary};` : '')};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        line-height: 30px;
-        font-size: 13px;
+        font-size: 14px;
+        line-height: 24px;
         padding: 0 20px;
     }
 `;
 
-export const TabTitle = styled.span`
+export const TabTitle = styled.p`
     font-weight: 800;
     font-size: 18px;
     line-height: 100%;
@@ -50,8 +56,11 @@ export const TabTitle = styled.span`
     margin-top: 20px;
 `;
 
-export const TabSection = styled.div`
-    min-height: 390px;
+export const TabSection = styled.div<{ $isEmpty?: boolean }>`
+    ${(props) => (!props.$isEmpty ? 'min-height: 390px;' : '')}
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        min-height: unset;
+    }
 `;
 
 export const Notification = styled.span`
@@ -68,7 +77,8 @@ export const Notification = styled.span`
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         font-size: 13px;
         line-height: 20px;
-        width: 20px;
+        min-width: 20px;
         margin-left: 6px;
+        padding: 0 5px 0 4px;
     }
 `;
