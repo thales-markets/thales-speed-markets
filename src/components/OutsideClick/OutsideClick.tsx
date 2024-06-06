@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import styled from 'styled-components';
 
-const OutsideClickHandler: React.FC<{ children: React.ReactNode; onOutsideClick: React.Dispatch<void> }> = ({
+const OutsideClickHandler: React.FC<{ children: React.ReactNode; onOutsideClick: (e: MouseEvent) => void }> = ({
     children,
     onOutsideClick,
 }) => {
@@ -10,7 +10,7 @@ const OutsideClickHandler: React.FC<{ children: React.ReactNode; onOutsideClick:
     useEffect(() => {
         const handleOutsideClick = (event: any) => {
             if (wrapperRef.current && !(wrapperRef.current as any).contains(event.target)) {
-                onOutsideClick();
+                onOutsideClick(event);
             }
         };
         document.addEventListener('mouseup', handleOutsideClick);

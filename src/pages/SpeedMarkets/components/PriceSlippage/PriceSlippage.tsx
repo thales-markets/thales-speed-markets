@@ -29,7 +29,7 @@ const PriceSlippage: React.FC<{ slippage: number; onChange: React.Dispatch<numbe
                             <SlippageInfo>
                                 {t('speed-markets.slippage-info')}
                                 <Tooltip
-                                    overlay={'TODO'}
+                                    overlay={t('speed-markets.tooltips.slippage')}
                                     customIconStyling={{
                                         fontSize: '13px',
                                         marginTop: '2px',

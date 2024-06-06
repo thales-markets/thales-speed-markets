@@ -24,7 +24,7 @@ const TablePositions: React.FC<TablePositionsProps> = ({ data }) => {
             accessorKey: 'currencyKey',
             cell: (cellProps: any) => {
                 return (
-                    <Wrapper first>
+                    <Wrapper isAlignStart>
                         <AssetIcon
                             className={`currency-icon currency-icon--${cellProps.cell.getValue().toLowerCase()}`}
                         />
@@ -125,9 +125,9 @@ export const Header = styled.p`
     font-weight: 700;
 `;
 
-export const Wrapper = styled.div<{ first?: boolean }>`
+export const Wrapper = styled.div<{ isAlignStart?: boolean }>`
     display: flex;
-    justify-content: ${(props) => (props.first ? 'flex-start' : 'center')};
+    justify-content: ${(props) => (props.isAlignStart ? 'flex-start' : 'center')};
     align-items: center;
     gap: 4px;
     width: 100%;

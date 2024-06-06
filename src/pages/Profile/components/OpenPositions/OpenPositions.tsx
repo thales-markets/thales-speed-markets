@@ -221,6 +221,7 @@ const OpenPositions: React.FC<OpenPositionsProps> = ({ searchAddress, searchText
                         finalPrice: row.finalPrice,
                         isClaimable: row.claimable,
                         isResolved: false,
+                        createdAt: 0,
                     };
 
                     const cells: any = [

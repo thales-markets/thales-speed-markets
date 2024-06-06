@@ -3,7 +3,7 @@ import { USD_SIGN } from 'constants/currency';
 import { secondsToMilliseconds } from 'date-fns';
 import useInterval from 'hooks/useInterval';
 import MyPositionAction from 'pages/SpeedMarkets/components/MyPositionAction';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getSelectedCollateralIndex } from 'redux/modules/wallet';
@@ -16,10 +16,26 @@ import { getCollaterals } from 'utils/currency';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import { getColorPerPosition } from 'utils/style';
 import { useChainId } from 'wagmi';
-import MarketPrice from '../../MarketPrice';
-import SharePosition from '../../SharePosition';
+import MarketPrice from '../../../MarketPrice';
+import SharePosition from '../../../SharePosition';
 
-const CardPosition: React.FC<{ position: UserPosition }> = ({ position }) => {
+type CardPositionProps = {
+    position: UserPosition;
+    isOverview?: boolean;
+    maxPriceDelayForResolvingSec?: number;
+    isAdmin?: boolean;
+    isSubmittingBatch?: boolean;
+    onVisibilityChange?: React.Dispatch<boolean>;
+};
+
+const CardPosition: React.FC<CardPositionProps> = ({
+    position,
+    maxPriceDelayForResolvingSec,
+    isOverview,
+    isAdmin,
+    isSubmittingBatch,
+    onVisibilityChange,
+}) => {
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
 
@@ -42,8 +58,36 @@ const CardPosition: React.FC<{ position: UserPosition }> = ({ position }) => {
         setIsMatured(Date.now() > position.maturityDate);
     }, [position.maturityDate]);
 
+    const cardRef = useRef<HTMLDivElement>(null);
+
+    // check visibility of card element in the viewport
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                onVisibilityChange && onVisibilityChange(entry.isIntersecting);
+            },
+            {
+                root: null, // viewport
+                rootMargin: '0px', // no margin
+                threshold: 0.5, // 50% of target visible
+            }
+        );
+
+        if (cardRef.current) {
+            observer.observe(cardRef.current);
+        }
+
+        // Clean up the observer
+        const cardRefElement = cardRef.current;
+        return () => {
+            if (cardRefElement) {
+                observer.unobserve(cardRefElement);
+            }
+        };
+    }, [onVisibilityChange]);
+
     return (
-        <Container>
+        <Container ref={cardRef}>
             <Info>
                 <InfoColumn>
                     <InfoRow>
@@ -96,10 +140,14 @@ const CardPosition: React.FC<{ position: UserPosition }> = ({ position }) => {
             <Action>
                 <MyPositionAction
                     position={position}
+                    maxPriceDelayForResolvingSec={maxPriceDelayForResolvingSec}
+                    isOverview={isOverview}
+                    isAdmin={isAdmin}
+                    isSubmittingBatch={isSubmittingBatch}
                     isCollateralHidden
                     setIsActionInProgress={setIsActionInProgress}
                 />
-                <SharePosition position={position} />
+                {!isOverview && <SharePosition position={position} />}
             </Action>
         </Container>
     );
@@ -108,6 +156,7 @@ const CardPosition: React.FC<{ position: UserPosition }> = ({ position }) => {
 const Container = styled(FlexDivColumn)`
     justify-content: space-between;
     width: 100%;
+    min-width: 100%;
     min-height: 123px;
     border: 1px solid ${(props) => props.theme.borderColor.quaternary};
     border-radius: 8px;

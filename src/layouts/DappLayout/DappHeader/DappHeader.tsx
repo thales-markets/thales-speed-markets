@@ -4,7 +4,7 @@ import NetworkSwitch from 'components/NetworkSwitch';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import GetStarted from 'pages/AARelatedPages/GetStarted';
 import Withdraw from 'pages/AARelatedPages/Withdraw';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { getIsMobile } from 'redux/modules/ui';
@@ -31,6 +31,8 @@ const DappHeader: React.FC = () => {
     const [openGetStarted, setOpenGetStarted] = useState(false);
     const [openUserInfo, setOpenUserInfo] = useState(false);
     const [openWithdraw, setOpenWithdraw] = useState(false);
+
+    const burgerMenuRef = useRef<HTMLElement>(null);
 
     return (
         <Container>
@@ -89,13 +91,20 @@ const DappHeader: React.FC = () => {
                         {!isMobile && <UserWallet />}
                         <Notifications />
                         <HeaderIcons
+                            ref={burgerMenuRef}
                             onClick={() => setOpenUserInfo(!openUserInfo)}
                             className={`network-icon network-icon--burger`}
                         />
                     </>
                 )}
 
-                {openUserInfo && <UserInfo setUserInfoOpen={setOpenUserInfo} setOpenWithdraw={setOpenWithdraw} />}
+                {openUserInfo && (
+                    <UserInfo
+                        setUserInfoOpen={setOpenUserInfo}
+                        setOpenWithdraw={setOpenWithdraw}
+                        skipOutsideClickOnElement={burgerMenuRef}
+                    />
+                )}
             </RightContainer>
             {openReferralModal && <ReferralModal onClose={() => setOpenReferralModal(false)} />}
             {openGetStarted && <GetStarted isOpen={openGetStarted} onClose={() => setOpenGetStarted(false)} />}

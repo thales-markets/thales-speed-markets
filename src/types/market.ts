@@ -13,7 +13,7 @@ export type UserPosition = {
     finalPrice: number;
     isClaimable: boolean;
     isResolved: boolean;
-    createdAt?: number; // TODO: change to mandatory
+    createdAt: number;
 };
 
 export type UserChainedPosition = {
@@ -83,25 +83,4 @@ export type SpeedMarket = {
     isOpen: boolean;
     isChained: boolean;
     finalPrice?: number;
-};
-
-// TODO: remove
-export type ChainedSpeedMarket = {
-    address: string;
-    timestamp: number;
-    currencyKey: string;
-    sides: (Positions.UP | Positions.DOWN)[];
-    strikePrices: number[];
-    strikeTimes: number[];
-    maturityDate: number;
-    payout: number;
-    paid: number;
-    payoutMultiplier: number;
-    finalPrices: number[];
-    isOpen: boolean;
-    isMatured: boolean;
-    canResolve: boolean;
-    isClaimable: boolean;
-    isUserWinner: boolean;
-    user: string;
 };

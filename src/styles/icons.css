@@ -454,6 +454,10 @@
     content: '\02DC';
 }
 
+.icon--arrow-right:before {
+    content: '\2013';
+}
+
 .icon--info-full:before {
     content: '\20AC';
 }

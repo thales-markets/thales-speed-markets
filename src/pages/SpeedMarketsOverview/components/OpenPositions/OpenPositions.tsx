@@ -6,7 +6,6 @@ import { SPEED_MARKETS_OVERVIEW_SECTIONS as SECTIONS } from 'constants/market';
 import { CONNECTION_TIMEOUT_MS, SUPPORTED_ASSETS } from 'constants/pyth';
 import { millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
 import useInterval from 'hooks/useInterval';
-import CardPositions from 'pages/SpeedMarkets/components/CardPositions';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import useActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useActiveSpeedMarketsDataQuery';
 import useAmmSpeedMarketsLimitsQuery from 'queries/speedMarkets/useAmmSpeedMarketsLimitsQuery';
@@ -16,8 +15,6 @@ import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
 import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
-import styled from 'styled-components';
-import { FlexDivCentered, FlexDivRow } from 'styles/common';
 import { UserPosition } from 'types/market';
 import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
@@ -29,6 +26,16 @@ import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAsse
 import { refetchActiveSpeedMarkets, refetchPythPrice } from 'utils/queryConnector';
 import { isUserWinner, resolveAllSpeedPositions } from 'utils/speedAmm';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
+import CardPositions from '../../../SpeedMarkets/components/CardPositions/';
+import {
+    ButtonWrapper,
+    Container,
+    NoPositions,
+    NoPositionsText,
+    PositionsWrapper,
+    Row,
+    Title,
+} from '../styled-components';
 import TablePositions from './components/TablePositions';
 
 const OpenPositions: React.FC = () => {
@@ -238,7 +245,15 @@ const OpenPositions: React.FC = () => {
                             <SimpleLoader />
                         ) : positions.length > 0 ? (
                             isMobile ? (
-                                <CardPositions positions={positions as UserPosition[]} />
+                                <CardPositions
+                                    isHorizontal
+                                    positions={positions as UserPosition[]}
+                                    maxPriceDelayForResolvingSec={
+                                        ammSpeedMarketsLimitsData?.maxPriceDelayForResolvingSec || 0
+                                    }
+                                    isAdmin={isAdmin}
+                                    isSubmittingBatch={isSubmitting}
+                                />
                             ) : (
                                 <TablePositions
                                     data={positions}
@@ -269,54 +284,5 @@ const OpenPositions: React.FC = () => {
         </Container>
     );
 };
-
-const Container = styled.div`
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    margin-top: 20px;
-`;
-
-const Row = styled(FlexDivRow)`
-    align-items: center;
-    margin-bottom: 10px;
-    :not(:first-child) {
-        margin-top: 40px;
-    }
-`;
-
-const Title = styled.span`
-    font-weight: 700;
-    font-size: 13px;
-    line-height: 100%;
-    margin-left: 20px;
-    text-transform: uppercase;
-    color: ${(props) => props.theme.textColor.primary};
-`;
-
-const PositionsWrapper = styled.div`
-    position: relative;
-    min-height: 200px;
-    width: 100%;
-`;
-
-const ButtonWrapper = styled.div`
-    width: 164px;
-    margin-right: 16px;
-`;
-
-const NoPositions = styled(FlexDivCentered)`
-    min-height: inherit;
-`;
-
-const NoPositionsText = styled.span`
-    text-align: center;
-    font-weight: 600;
-    font-size: 15px;
-    line-height: 100%;
-    color: ${(props) => props.theme.textColor.primary};
-    min-width: max-content;
-    overflow: hidden;
-`;
 
 export default OpenPositions;

@@ -48,6 +48,7 @@ const SpeedMarkets: React.FC = () => {
     const isChainedMarkets = isChainedSupported && queryString.parse(location.search).isChained === 'true';
 
     const [isChained, setIsChained] = useState(isChainedMarkets);
+    const [isChainedLinkSelected, setIsChainedLinkSelected] = useState(isChainedMarkets);
     const [currentPrices, setCurrentPrices] = useState<{ [key: string]: number }>(getSupportedAssetsAsObject());
     const [currencyKey, setCurrencyKey] = useState(SUPPORTED_ASSETS[0]);
     const [positionType, setPositionType] = useState<SelectedPosition>(undefined);
@@ -284,12 +285,20 @@ const SpeedMarkets: React.FC = () => {
                             isChained={isChained}
                             currentPrices={currentPrices}
                             maxPriceDelayForResolvingSec={ammSpeedMarketsLimitsData?.maxPriceDelayForResolvingSec}
+                            onChainedSelectedChange={setIsChainedLinkSelected}
+                            showTabs
                         />
                     )}
                     <OverviewLinkWrapper $isTableAbove={isConnected}>
-                        <SPAAnchor href={buildHref(`${ROUTES.Markets.SpeedMarketsOverview}?isChained=${isChained}`)}>
+                        <SPAAnchor
+                            href={buildHref(
+                                `${ROUTES.Markets.SpeedMarketsOverview}?isChained=${
+                                    isConnected ? isChainedLinkSelected : isChained
+                                }`
+                            )}
+                        >
                             <OverviewLinkText>
-                                {isChained
+                                {(isConnected ? isChainedLinkSelected : isChained)
                                     ? t('speed-markets.overview.navigate-chained')
                                     : t('speed-markets.overview.navigate')}
                             </OverviewLinkText>

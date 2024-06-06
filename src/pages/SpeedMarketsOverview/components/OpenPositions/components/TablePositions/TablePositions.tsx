@@ -2,8 +2,8 @@ import Table from 'components/Table';
 import { USD_SIGN } from 'constants/currency';
 import { t } from 'i18next';
 import MarketPrice from 'pages/SpeedMarkets/components/MarketPrice';
+import MyPositionAction from 'pages/SpeedMarkets/components/MyPositionAction';
 import { DirectionIcon } from 'pages/SpeedMarkets/components/TablePositions/TablePositions';
-import OverviewPositionAction from 'pages/SpeedMarketsOverview/components/OverviewPositionAction';
 import React from 'react';
 import styled from 'styled-components';
 import { formatCurrencyWithSign } from 'thales-utils';
@@ -109,9 +109,10 @@ const TablePositions: React.FC<TablePositionsProps> = ({
             accessorKey: 'action',
             cell: (cellProps: any) => (
                 <Wrapper>
-                    <OverviewPositionAction
+                    <MyPositionAction
                         position={cellProps.row.original}
                         maxPriceDelayForResolvingSec={maxPriceDelayForResolvingSec}
+                        isOverview
                         isAdmin={isAdmin}
                         isSubmittingBatch={isSubmittingBatch}
                     />
@@ -155,10 +156,6 @@ export const Value = styled.span`
 
 export const AssetName = styled(Value)`
     font-weight: 800;
-`;
-
-export const ShareWrapper = styled.div`
-    margin-left: auto;
 `;
 
 export default TablePositions;

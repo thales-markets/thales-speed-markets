@@ -1,6 +1,6 @@
 import type { Wallet, WalletDetailsParams } from '@rainbow-me/rainbowkit';
 import { createConnector } from 'wagmi';
-import { googleIcon, particleIcon, twitterIcon } from './icons';
+import { appleIcon, discordIcon, githubIcon, googleIcon, particleIcon, twitterIcon } from './icons';
 import { particleWagmiWallet } from './particleWagmiWallet';
 
 export const particleWallet = (): Wallet => ({
@@ -54,7 +54,7 @@ export const particleTwitterWallet = (): Wallet => ({
 export const particleGithubWallet = (): Wallet => ({
     id: 'particle_github',
     name: 'Github',
-    iconUrl: async () => twitterIcon,
+    iconUrl: async () => githubIcon,
     iconBackground: '#fff',
     installed: true,
     createConnector: (walletDetails: WalletDetailsParams) =>
@@ -70,7 +70,7 @@ export const particleGithubWallet = (): Wallet => ({
 export const particleDiscordWallet = (): Wallet => ({
     id: 'particle_discord',
     name: 'Discord',
-    iconUrl: async () => twitterIcon,
+    iconUrl: async () => discordIcon,
     iconBackground: '#fff',
     installed: true,
     createConnector: (walletDetails: WalletDetailsParams) =>
@@ -86,7 +86,7 @@ export const particleDiscordWallet = (): Wallet => ({
 export const particleAppleWallet = (): Wallet => ({
     id: 'particle_apple',
     name: 'Apple',
-    iconUrl: async () => twitterIcon,
+    iconUrl: async () => appleIcon,
     iconBackground: '#fff',
     installed: true,
     createConnector: (walletDetails: WalletDetailsParams) =>

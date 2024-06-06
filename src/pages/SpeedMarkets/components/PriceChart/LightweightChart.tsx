@@ -205,6 +205,7 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
                                         br: <br />,
                                     }}
                                     values={{
+                                        liquidityPerAsset: liquidity,
                                         liquidityPerUp,
                                         liquidityPerDown,
                                     }}
