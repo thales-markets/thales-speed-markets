@@ -1,6 +1,6 @@
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import styled from 'styled-components';
-import { FlexDivCentered, FlexDivColumn, FlexDivColumnCentered, FlexDivSpaceBetween, FlexDivRow } from 'styles/common';
+import { FlexDivCentered, FlexDivColumn, FlexDivColumnCentered, FlexDivRow, FlexDivSpaceBetween } from 'styles/common';
 
 export const PositionContainer = styled(FlexDivRow)`
     align-items: center;
@@ -129,14 +129,6 @@ export const Icon = styled.i<{ size?: number; padding?: string; color?: string; 
     color: ${(props) => (props.color ? props.color : 'inherit')};
     ${(props) => (props.padding ? `padding: ${props.padding};` : '')};
     ${(props) => (props.isDisabled ? `opacity: 0.4;` : '')};
-`;
-
-export const AssetIcon = styled(Icon)`
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        font-size: 28px;
-        line-height: 100%;
-        color: ${(props) => props.theme.textColor.primary};
-    }
 `;
 
 export const Bonus = styled.div<{ $isSelected: boolean }>`
