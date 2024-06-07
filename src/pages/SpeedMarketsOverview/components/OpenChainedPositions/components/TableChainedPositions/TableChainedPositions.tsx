@@ -174,7 +174,7 @@ const TableChainedPositions: React.FC<TablePositionsProps> = ({
             data={data}
             columns={columns as any}
             expandedRow={(row) => {
-                return <ChainedPosition position={row.original} isOverview />;
+                return <ChainedPosition position={row.original} />;
             }}
         ></Table>
     );
