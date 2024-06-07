@@ -16,7 +16,7 @@ import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
 import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
 import styled from 'styled-components';
-import { FlexDivCentered, FlexDivColumn, FlexDivEnd, FlexDivRow, FlexDivStart, GradientContainer } from 'styles/common';
+import { FlexDiv, FlexDivCentered, FlexDivColumn, FlexDivEnd, FlexDivStart, GradientContainer } from 'styles/common';
 import { formatCurrencyWithSign } from 'thales-utils';
 import { UserChainedPosition, UserPosition } from 'types/market';
 import { RootState } from 'types/ui';
@@ -42,7 +42,6 @@ type UserOpenPositionsProps = {
     showTabs?: boolean;
     showFilter?: boolean;
     isMobileHorizontal?: boolean;
-    setClaimablePositions?: React.Dispatch<number>;
     setNumberOfPositions?: React.Dispatch<number>;
     onChainedSelectedChange?: React.Dispatch<boolean>;
 };
@@ -56,7 +55,6 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
     showTabs,
     showFilter,
     isMobileHorizontal,
-    setClaimablePositions,
     setNumberOfPositions,
     onChainedSelectedChange,
 }) => {
@@ -265,13 +263,6 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
         onChainedSelectedChange && onChainedSelectedChange(isChained);
     }, [isChained, onChainedSelectedChange]);
 
-    // Update number of claimable positions
-    useEffect(() => {
-        if (setClaimablePositions && showOnlyClaimable) {
-            setClaimablePositions(claimableSpeedPositions.length + claimableChainedPositions.length);
-        }
-    }, [setClaimablePositions, showOnlyClaimable, claimableSpeedPositions.length, claimableChainedPositions.length]);
-
     // Update number of positions
     useEffect(() => {
         if (setNumberOfPositions) {
@@ -362,7 +353,7 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
                 )}
 
                 {((showFilter && hasSomePositions) || hasClaimableSpeedPositions) && (
-                    <PositionsControl>
+                    <PositionsControl $isAlignEnd={!(showFilter && hasSomePositions)}>
                         {showFilter && hasSomePositions && (
                             <Filters>
                                 <Filter
@@ -569,7 +560,8 @@ const MobileTitle = styled.span`
     }
 `;
 
-const PositionsControl = styled(FlexDivRow)`
+const PositionsControl = styled(FlexDiv)<{ $isAlignEnd: boolean }>`
+    justify-content: ${(props) => (props.$isAlignEnd ? 'end' : 'space-between')};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         flex-direction: column;
         gap: 10px;

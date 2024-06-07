@@ -4,6 +4,10 @@ export type AppSliceState = {
     isReady: boolean;
 };
 
+export type UserSliceState = {
+    notifications: { single: number; chained: number };
+};
+
 export type WalletSliceState = {
     selectedCollateralIndex: number;
     isBiconomy?: boolean;
@@ -19,6 +23,7 @@ export type UISliceState = {
 
 export type RootState = {
     app: AppSliceState;
+    user: UserSliceState;
     wallet: WalletSliceState;
     ui: UISliceState;
 };

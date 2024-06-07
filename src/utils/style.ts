@@ -30,6 +30,8 @@ export const getStatusColor = (status: HistoryStatus, theme: ThemeInterface) => 
             return theme.status.won;
         case HistoryStatus.LOSS:
             return theme.status.loss;
+        case HistoryStatus.CLAIMABLE:
+            return theme.textColor.quinary;
         default:
             return theme.textColor.primary;
     }

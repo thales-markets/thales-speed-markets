@@ -7,23 +7,27 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getSelectedCollateralIndex } from 'redux/modules/wallet';
-import styled from 'styled-components';
-import { FlexDivCentered, FlexDivColumn, FlexDivRow, FlexDivSpaceBetween, FlexDivStart } from 'styles/common';
+import styled, { useTheme } from 'styled-components';
+import { FlexDivCentered, FlexDivColumn } from 'styles/common';
 import { formatCurrencyWithSign } from 'thales-utils';
 import { UserChainedPosition } from 'types/market';
-import { RootState } from 'types/ui';
+import { RootState, ThemeInterface } from 'types/ui';
 import { getCollaterals } from 'utils/currency';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
+import { getHistoryStatus } from 'utils/position';
+import { getStatusColor } from 'utils/style';
 import { useChainId } from 'wagmi';
 import ChainedMarketPrice from '../../../ChainedMarketPrice';
 import ChainedPositionAction from '../../../ChainedPositionAction';
 import SharePosition from '../../../SharePosition';
 import { DirectionIcon } from '../../../UserOpenPositions/components/TablePositions/TablePositions';
+import { Action, Info, InfoColumn, InfoRow, Label, Value } from '../CardPosition/CardPosition';
 
 type CardChainedPositionProps = {
     position: UserChainedPosition;
-    isOverview?: boolean;
     maxPriceDelayForResolvingSec?: number;
+    isOverview?: boolean;
+    isHistory?: boolean;
     isAdmin?: boolean;
     isSubmittingBatch?: boolean;
     onVisibilityChange?: React.Dispatch<boolean>;
@@ -33,11 +37,13 @@ const CardChainedPosition: React.FC<CardChainedPositionProps> = ({
     position,
     maxPriceDelayForResolvingSec,
     isOverview,
+    isHistory,
     isAdmin,
     isSubmittingBatch,
     onVisibilityChange,
 }) => {
     const { t } = useTranslation();
+    const theme: ThemeInterface = useTheme();
 
     const networkId = useChainId();
     const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
@@ -94,14 +100,18 @@ const CardChainedPosition: React.FC<CardChainedPositionProps> = ({
 
     const strikeTimeIndex = position.strikeTimes.findIndex((t) => t > Date.now());
     const endTime =
-        resolveIndex !== undefined
+        position.isResolved && position.resolveIndex !== undefined
+            ? position.strikeTimes[position.resolveIndex]
+            : resolveIndex !== undefined
             ? position.strikeTimes[resolveIndex]
             : strikeTimeIndex > -1
             ? position.strikeTimes[strikeTimeIndex]
             : position.maturityDate;
 
+    const historyStatus = isHistory ? getHistoryStatus(position) : undefined;
+
     return (
-        <Container ref={cardRef}>
+        <Container ref={cardRef} $borderColor={historyStatus && getStatusColor(historyStatus, theme)}>
             <Info>
                 <InfoColumn>
                     <InfoRow>
@@ -178,64 +188,35 @@ const CardChainedPosition: React.FC<CardChainedPositionProps> = ({
                 </InfoColumn>
             </Info>
             <Action>
-                <ChainedPositionAction
-                    position={position}
-                    maxPriceDelayForResolvingSec={maxPriceDelayForResolvingSec}
-                    isOverview={isOverview}
-                    isAdmin={isAdmin}
-                    isSubmittingBatch={isSubmittingBatch}
-                    isCollateralHidden
-                    setIsActionInProgress={setIsActionInProgress}
-                />
+                {historyStatus ? (
+                    <Value $alignCenter $hasShare={position.canResolve} $color={getStatusColor(historyStatus, theme)}>
+                        {historyStatus}
+                    </Value>
+                ) : (
+                    <ChainedPositionAction
+                        position={position}
+                        maxPriceDelayForResolvingSec={maxPriceDelayForResolvingSec}
+                        isOverview={isOverview}
+                        isAdmin={isAdmin}
+                        isSubmittingBatch={isSubmittingBatch}
+                        isCollateralHidden
+                        setIsActionInProgress={setIsActionInProgress}
+                    />
+                )}
                 {!isOverview && <SharePosition position={position} isChained />}
             </Action>
         </Container>
     );
 };
 
-const Container = styled(FlexDivColumn)`
+const Container = styled(FlexDivColumn)<{ $borderColor?: string }>`
     justify-content: space-between;
     width: 100%;
     min-width: 100%;
     min-height: 155px;
-    border: 1px solid ${(props) => props.theme.borderColor.quaternary};
+    border: 1px solid ${(props) => (props.$borderColor ? props.$borderColor : props.theme.borderColor.quaternary)};
     border-radius: 8px;
     padding: 14px 10px;
-`;
-
-const Info = styled(FlexDivRow)`
-    height: 100%;
-`;
-
-const InfoColumn = styled(FlexDivColumn)`
-    gap: 6px;
-
-    &:first-child {
-        min-width: 214px;
-    }
-`;
-
-const InfoRow = styled(FlexDivStart)`
-    align-items: center;
-`;
-
-const Action = styled(FlexDivSpaceBetween)``;
-
-const Text = styled.span`
-    color: ${(props) => props.theme.textColor.primary};
-    font-size: 13px;
-    font-weight: 800;
-    line-height: 13px;
-`;
-
-const Label = styled(Text)`
-    color: ${(props) => props.theme.textColor.quinary};
-    font-weight: 500;
-    margin-right: 5px;
-`;
-
-const Value = styled(Text)<{ $color?: string }>`
-    ${(props) => (props.$color ? `color: ${props.$color};` : '')}
 `;
 
 const DirectionsWrapper = styled(FlexDivCentered)`

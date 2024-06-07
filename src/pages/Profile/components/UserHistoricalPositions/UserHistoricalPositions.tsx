@@ -283,8 +283,7 @@ const UserHistoricalPositions: React.FC<UserHistoricalPositionsProps> = ({
                 {isLoading ? (
                     <SimpleLoader />
                 ) : isMobile ? (
-                    // TODO
-                    <CardPositions isHorizontal positions={positions} />
+                    <CardPositions isMixedPositions isHistory isHorizontal positions={positions} />
                 ) : (
                     <TableHistoricalPositions data={positions as UserHistoryPosition[]} />
                 )}
@@ -354,6 +353,9 @@ const Container = styled.div`
 
 const Filters = styled(FlexDivStart)`
     gap: 10px;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        margin-bottom: 13px;
+    }
 `;
 
 const Filter = styled(FlexDivCentered)<{ $isSelected: boolean }>`

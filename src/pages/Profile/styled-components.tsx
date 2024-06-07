@@ -71,8 +71,9 @@ export const TabSectionSubtitle = styled.span`
     text-align: left;
 `;
 
-export const Notification = styled.span`
-    background: ${(props) => props.theme.button.background.secondary};
+export const Notification = styled.span<{ $isSelected: boolean }>`
+    background: ${(props) =>
+        props.$isSelected ? props.theme.button.background.secondary : props.theme.button.background.quaternary};
     border-radius: 30px;
     color: ${(props) => props.theme.button.textColor.secondary};
     margin-left: 8px;

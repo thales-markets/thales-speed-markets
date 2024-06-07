@@ -11,8 +11,9 @@ import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useU
 import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveSpeedMarketsDataQuery';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
+import { setUserNotifications } from 'redux/modules/user';
 import { getIsBiconomy } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
@@ -27,6 +28,7 @@ import { useAccount, useChainId, useClient } from 'wagmi';
 
 const Notifications: React.FC = () => {
     const { t } = useTranslation();
+    const dispatch = useDispatch();
 
     const networkId = useChainId();
     const client = useClient();
@@ -182,6 +184,10 @@ const Notifications: React.FC = () => {
     }, secondsToMilliseconds(30));
 
     const totalNotifications = claimableUserSpeedMarkets.length + claimableChainedUserMarkets.length;
+
+    dispatch(
+        setUserNotifications({ single: claimableUserSpeedMarkets.length, chained: claimableChainedUserMarkets.length })
+    );
 
     const hasNotifications = totalNotifications > 0;
 

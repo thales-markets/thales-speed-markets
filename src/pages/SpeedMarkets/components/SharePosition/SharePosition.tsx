@@ -1,9 +1,14 @@
 import { secondsToMilliseconds } from 'date-fns';
 import useInterval from 'hooks/useInterval';
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { UserChainedPosition, UserPosition } from 'types/market';
+import { ThemeInterface } from 'types/ui';
+import { getHistoryStatus, mapUserPositionToHistory } from 'utils/position';
+import { getStatusColor } from 'utils/style';
 import SharePositionModal from '../SharePositionModal';
+import { UserHistoryPosition } from 'types/profile';
+import { isUserWinner } from 'utils/speedAmm';
 
 const SharePosition: React.FC<{
     position: UserPosition | UserChainedPosition;
@@ -12,6 +17,8 @@ const SharePosition: React.FC<{
     isChained?: boolean;
     onClose?: React.Dispatch<void>;
 }> = ({ position, isDisabled, isOpen, isChained, onClose }) => {
+    const theme: ThemeInterface = useTheme();
+
     const [isMatured, setIsMatured] = useState(Date.now() > position.maturityDate);
     const [openTwitterShareModal, setOpenTwitterShareModal] = useState(isOpen);
 
@@ -35,13 +42,29 @@ const SharePosition: React.FC<{
         }
     }, [isOpen]);
 
-    const displayShare = isChained ? (position as UserChainedPosition).canResolve : position.isClaimable || !isMatured;
+    const displayShare = isChained
+        ? (position as UserChainedPosition).canResolve || (position as UserChainedPosition).isResolved
+        : position.isClaimable ||
+          !isMatured ||
+          isUserWinner(
+              (position as UserPosition).side,
+              (position as UserPosition).strikePrice,
+              (position as UserPosition).finalPrice
+          );
+
+    const historyStatus = position.isResolved
+        ? getHistoryStatus(
+              isChained ? (position as UserHistoryPosition) : mapUserPositionToHistory(position as UserPosition)
+          )
+        : undefined;
+    const iconColor = historyStatus && getStatusColor(historyStatus, theme);
 
     return (
         <>
             {displayShare && (
                 <ShareIcon
                     className="icon icon--share"
+                    $color={iconColor}
                     $disabled={!!isDisabled}
                     onClick={() => !isDisabled && setOpenTwitterShareModal(true)}
                 />
@@ -83,8 +106,8 @@ const SharePosition: React.FC<{
     );
 };
 
-const ShareIcon = styled.i<{ $disabled: boolean }>`
-    color: ${(props) => props.theme.textColor.quinary};
+const ShareIcon = styled.i<{ $color?: string; $disabled: boolean }>`
+    color: ${(props) => (props.$color ? props.$color : props.theme.textColor.quinary)};
     cursor: ${(props) => (props.$disabled ? 'default' : 'pointer')};
     opacity: ${(props) => (props.$disabled ? '0.5' : '1')};
     font-size: 20px;

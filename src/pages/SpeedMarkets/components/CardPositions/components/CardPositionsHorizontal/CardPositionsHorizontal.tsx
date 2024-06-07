@@ -4,11 +4,16 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FlexDivRow } from 'styles/common';
 import { UserChainedPosition, UserPosition } from 'types/market';
+import { UserHistoryPosition } from 'types/profile';
+import { mapUserHistoryToPosition } from 'utils/position';
 
 type CardPositionsHorizontalProps = {
-    positions: (UserPosition | UserChainedPosition)[];
+    positions: (UserPosition | UserChainedPosition | UserHistoryPosition)[];
     isChained?: boolean;
+    isMixedPositions?: boolean; // single and chained
     maxPriceDelayForResolvingSec?: number;
+    isOverview?: boolean;
+    isHistory?: boolean;
     isAdmin?: boolean;
     isSubmittingBatch?: boolean;
 };
@@ -16,7 +21,10 @@ type CardPositionsHorizontalProps = {
 const CardPositionsHorizontal: React.FC<CardPositionsHorizontalProps> = ({
     positions,
     isChained,
+    isMixedPositions,
     maxPriceDelayForResolvingSec,
+    isOverview,
+    isHistory,
     isAdmin,
     isSubmittingBatch,
 }) => {
@@ -34,13 +42,19 @@ const CardPositionsHorizontal: React.FC<CardPositionsHorizontalProps> = ({
         <Container>
             {positions.length > 1 && !isFirstCardVisible && <IconLeft className="icon icon--arrow-right" />}
             <PositionsWrapper>
-                {positions.map((position, index) =>
-                    isChained ? (
+                {positions.map((position, index) => {
+                    const isChainedType =
+                        isMixedPositions && (position as UserChainedPosition).sides
+                            ? (position as UserChainedPosition).sides.length > 1
+                            : false;
+
+                    return isChained || isChainedType ? (
                         <CardChainedPosition
                             key={index}
                             position={position as UserChainedPosition}
                             maxPriceDelayForResolvingSec={maxPriceDelayForResolvingSec}
-                            isOverview
+                            isOverview={isOverview}
+                            isHistory={isHistory}
                             isAdmin={isAdmin}
                             isSubmittingBatch={isSubmittingBatch}
                             onVisibilityChange={(isVisible: boolean) => onVisibilityChange(index, isVisible)}
@@ -48,15 +62,20 @@ const CardPositionsHorizontal: React.FC<CardPositionsHorizontalProps> = ({
                     ) : (
                         <CardPosition
                             key={index}
-                            position={position as UserPosition}
+                            position={
+                                isHistory
+                                    ? mapUserHistoryToPosition(position as UserHistoryPosition)
+                                    : (position as UserPosition)
+                            }
                             maxPriceDelayForResolvingSec={maxPriceDelayForResolvingSec}
-                            isOverview
+                            isOverview={isOverview}
+                            isHistory={isHistory}
                             isAdmin={isAdmin}
                             isSubmittingBatch={isSubmittingBatch}
                             onVisibilityChange={(isVisible: boolean) => onVisibilityChange(index, isVisible)}
                         />
-                    )
-                )}
+                    );
+                })}
             </PositionsWrapper>
             {positions.length > 1 && !isLastCardVisible && <IconRight className="icon icon--arrow-right" />}
         </Container>

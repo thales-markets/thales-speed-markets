@@ -33,6 +33,7 @@ import {
     Tabs,
 } from './styled-components';
 import { MARKET_DURATION_IN_DAYS } from 'constants/market';
+import { getUserNotifications } from 'redux/modules/user';
 
 enum TabItems {
     MY_POSITIONS = 'my-positions',
@@ -48,11 +49,11 @@ const Profile: React.FC = () => {
 
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
+    const userNotifications = useSelector((state: RootState) => getUserNotifications(state));
 
     const [isChainedClaimable, setIsChainedClaimable] = useState(false);
     const [isChainedOpen, setIsChainedOpen] = useState(false);
     const [currentPrices, setCurrentPrices] = useState<{ [key: string]: number }>(getSupportedAssetsAsObject());
-    const [totalNotifications, setTotalNotifications] = useState(0);
     const [positionsSize, setPositionsSize] = useState(0);
     const [searchAddress, setSearchAddress] = useState<string>('');
     const [searchText, setSearchText] = useState<string>('');
@@ -66,7 +67,7 @@ const Profile: React.FC = () => {
     }, [ammSpeedMarketsLimitsQuery]);
 
     const queryParamTab = queryString.parse(location.search).tab as TabItems;
-    const [view, setView] = useState(
+    const [selectedTab, setSelectedTab] = useState(
         Object.values(TabItems).includes(queryParamTab) ? queryParamTab : TabItems.MY_POSITIONS
     );
 
@@ -98,8 +99,10 @@ const Profile: React.FC = () => {
             pathname: location.pathname,
             search: queryString.stringify({ tab }),
         });
-        setView(tab);
+        setSelectedTab(tab);
     };
+
+    const totalNotifications = userNotifications.single + userNotifications.chained;
 
     return (
         <Container>
@@ -126,17 +129,21 @@ const Profile: React.FC = () => {
                 <Tabs>
                     <Tab
                         onClick={() => onTabClickHandler(TabItems.MY_POSITIONS)}
-                        $active={view === TabItems.MY_POSITIONS}
+                        $active={selectedTab === TabItems.MY_POSITIONS}
                     >
                         {t('profile.tabs.my-positions')}
-                        {totalNotifications > 0 && <Notification>{totalNotifications}</Notification>}
+                        {totalNotifications > 0 && (
+                            <Notification $isSelected={selectedTab === TabItems.MY_POSITIONS}>
+                                {totalNotifications}
+                            </Notification>
+                        )}
                     </Tab>
-                    <Tab onClick={() => onTabClickHandler(TabItems.HISTORY)} $active={view === TabItems.HISTORY}>
+                    <Tab onClick={() => onTabClickHandler(TabItems.HISTORY)} $active={selectedTab === TabItems.HISTORY}>
                         {t('profile.tabs.history')}
                     </Tab>
                 </Tabs>
 
-                {view === TabItems.MY_POSITIONS && (
+                {selectedTab === TabItems.MY_POSITIONS && (
                     <>
                         {/* CLAIMABLE */}
                         <TabSectionTitle>{t('profile.accordions.claimable-positions')}</TabSectionTitle>
@@ -148,7 +155,6 @@ const Profile: React.FC = () => {
                                 currentPrices={currentPrices}
                                 maxPriceDelayForResolvingSec={ammSpeedMarketsLimitsData?.maxPriceDelayForResolvingSec}
                                 searchAddress={searchAddress}
-                                setClaimablePositions={setTotalNotifications}
                                 onChainedSelectedChange={setIsChainedClaimable}
                                 isMobileHorizontal
                             />
@@ -170,7 +176,7 @@ const Profile: React.FC = () => {
                         </TabSection>
                     </>
                 )}
-                {view === TabItems.HISTORY && (
+                {selectedTab === TabItems.HISTORY && (
                     <>
                         <TabSectionTitle>
                             {t('profile.accordions.transaction-history')}

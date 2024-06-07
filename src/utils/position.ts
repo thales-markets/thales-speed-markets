@@ -28,6 +28,24 @@ export const mapUserPositionToHistory = (userPosition: UserPosition): UserHistor
     } as UserHistoryPosition;
 };
 
+export const mapUserHistoryToPosition = (userHistory: UserHistoryPosition): UserPosition =>
+    ({
+        user: userHistory.user,
+        market: userHistory.market,
+        currencyKey: userHistory.currencyKey,
+        side: userHistory.sides[0],
+        strikePrice: userHistory.strikePrices[0],
+        maturityDate: userHistory.maturityDate,
+        paid: userHistory.paid,
+        payout: userHistory.payout,
+        currentPrice: userHistory.currentPrice,
+        finalPrice: userHistory.finalPrices[0],
+        isMatured: userHistory.isMatured,
+        isClaimable: userHistory.isClaimable,
+        isResolved: userHistory.isResolved,
+        createdAt: userHistory.createdAt,
+    } as UserPosition);
+
 export const getHistoryStatus = (position: UserHistoryPosition) => {
     let status = HistoryStatus.OPEN;
 

@@ -23,7 +23,7 @@ import { UserChainedPosition } from 'types/market';
 import { UserHistoryPosition } from 'types/profile';
 import { ThemeInterface } from 'types/ui';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
-import { getHistoryStatus } from 'utils/position';
+import { getHistoryStatus, mapUserHistoryToPosition } from 'utils/position';
 import { getStatusColor } from 'utils/style';
 
 const TableHistoricalPositions: React.FC<{ data: UserHistoryPosition[] }> = ({ data }) => {
@@ -195,11 +195,14 @@ const TableHistoricalPositions: React.FC<{ data: UserHistoryPosition[] }> = ({ d
             accessorKey: 'share',
             cell: (cellProps: any) => {
                 const isChained = (cellProps.row.original as UserChainedPosition).strikeTimes.length > 1;
+                const position = isChained
+                    ? (cellProps.row.original as UserChainedPosition)
+                    : mapUserHistoryToPosition(cellProps.row.original as UserHistoryPosition);
 
                 return (
                     <Wrapper>
                         <ShareWrapper>
-                            <SharePosition position={cellProps.row.original} isChained={isChained} />
+                            <SharePosition position={position} isChained={isChained} />
                         </ShareWrapper>
                     </Wrapper>
                 );

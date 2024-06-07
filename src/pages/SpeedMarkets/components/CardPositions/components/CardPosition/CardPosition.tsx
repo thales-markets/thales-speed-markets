@@ -14,15 +14,17 @@ import { UserPosition } from 'types/market';
 import { RootState, ThemeInterface } from 'types/ui';
 import { getCollaterals } from 'utils/currency';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
-import { getColorPerPosition } from 'utils/style';
+import { getColorPerPosition, getStatusColor } from 'utils/style';
 import { useChainId } from 'wagmi';
 import MarketPrice from '../../../MarketPrice';
 import SharePosition from '../../../SharePosition';
+import { getHistoryStatus, mapUserPositionToHistory } from 'utils/position';
 
 type CardPositionProps = {
     position: UserPosition;
-    isOverview?: boolean;
     maxPriceDelayForResolvingSec?: number;
+    isOverview?: boolean;
+    isHistory?: boolean;
     isAdmin?: boolean;
     isSubmittingBatch?: boolean;
     onVisibilityChange?: React.Dispatch<boolean>;
@@ -32,6 +34,7 @@ const CardPosition: React.FC<CardPositionProps> = ({
     position,
     maxPriceDelayForResolvingSec,
     isOverview,
+    isHistory,
     isAdmin,
     isSubmittingBatch,
     onVisibilityChange,
@@ -86,8 +89,10 @@ const CardPosition: React.FC<CardPositionProps> = ({
         };
     }, [onVisibilityChange]);
 
+    const historyStatus = isHistory ? getHistoryStatus(mapUserPositionToHistory(position)) : undefined;
+
     return (
-        <Container ref={cardRef}>
+        <Container ref={cardRef} $borderColor={historyStatus && getStatusColor(historyStatus, theme)}>
             <Info>
                 <InfoColumn>
                     <InfoRow>
@@ -138,36 +143,46 @@ const CardPosition: React.FC<CardPositionProps> = ({
                 </InfoColumn>
             </Info>
             <Action>
-                <MyPositionAction
-                    position={position}
-                    maxPriceDelayForResolvingSec={maxPriceDelayForResolvingSec}
-                    isOverview={isOverview}
-                    isAdmin={isAdmin}
-                    isSubmittingBatch={isSubmittingBatch}
-                    isCollateralHidden
-                    setIsActionInProgress={setIsActionInProgress}
-                />
+                {historyStatus ? (
+                    <Value
+                        $alignCenter
+                        $hasShare={position.isClaimable || !isMatured}
+                        $color={getStatusColor(historyStatus, theme)}
+                    >
+                        {historyStatus}
+                    </Value>
+                ) : (
+                    <MyPositionAction
+                        position={position}
+                        maxPriceDelayForResolvingSec={maxPriceDelayForResolvingSec}
+                        isOverview={isOverview}
+                        isAdmin={isAdmin}
+                        isSubmittingBatch={isSubmittingBatch}
+                        isCollateralHidden
+                        setIsActionInProgress={setIsActionInProgress}
+                    />
+                )}
                 {!isOverview && <SharePosition position={position} />}
             </Action>
         </Container>
     );
 };
 
-const Container = styled(FlexDivColumn)`
+const Container = styled(FlexDivColumn)<{ $borderColor?: string }>`
     justify-content: space-between;
     width: 100%;
     min-width: 100%;
     min-height: 123px;
-    border: 1px solid ${(props) => props.theme.borderColor.quaternary};
+    border: 1px solid ${(props) => (props.$borderColor ? props.$borderColor : props.theme.borderColor.quaternary)};
     border-radius: 8px;
     padding: 14px 10px;
 `;
 
-const Info = styled(FlexDivRow)`
+export const Info = styled(FlexDivRow)`
     height: 100%;
 `;
 
-const InfoColumn = styled(FlexDivColumn)`
+export const InfoColumn = styled(FlexDivColumn)`
     gap: 6px;
 
     &:first-child {
@@ -175,27 +190,31 @@ const InfoColumn = styled(FlexDivColumn)`
     }
 `;
 
-const InfoRow = styled(FlexDivStart)`
+export const InfoRow = styled(FlexDivStart)`
     align-items: center;
 `;
 
-const Action = styled(FlexDivSpaceBetween)``;
+export const Action = styled(FlexDivSpaceBetween)``;
 
-const Text = styled.span`
+export const Text = styled.span`
     color: ${(props) => props.theme.textColor.primary};
     font-size: 13px;
     font-weight: 800;
     line-height: 13px;
 `;
 
-const Label = styled(Text)`
+export const Label = styled(Text)`
     color: ${(props) => props.theme.textColor.quinary};
     font-weight: 500;
     margin-right: 5px;
 `;
 
-const Value = styled(Text)<{ $color?: string }>`
+export const Value = styled(Text)<{ $color?: string; $alignCenter?: boolean; $hasShare?: boolean }>`
     ${(props) => (props.$color ? `color: ${props.$color};` : '')}
+    ${(props) => (props.$alignCenter ? 'width: 100%;;' : '')}
+    ${(props) => (props.$alignCenter ? 'text-align: center;' : '')}
+    ${(props) => (props.$alignCenter ? 'text-align: center;' : '')}
+    ${(props) => (props.$hasShare ? 'padding-left: 20px;' : '')}
 `;
 
 export default CardPosition;

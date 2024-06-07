@@ -319,6 +319,7 @@ const OpenChainedPositions: React.FC = () => {
                                     maxPriceDelayForResolvingSec={
                                         ammSpeedMarketsLimitsData?.maxPriceDelayForResolvingSec || 0
                                     }
+                                    isOverview
                                     isAdmin={isAdmin}
                                     isSubmittingBatch={isSubmitting}
                                 />
