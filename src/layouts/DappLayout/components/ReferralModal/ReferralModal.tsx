@@ -130,7 +130,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
     };
 
     return (
-        <Modal title={t('common.referral.title')} onClose={onClose} shouldCloseOnOverlayClick={true}>
+        <Modal title={t('common.referral.title')} onClose={onClose} shouldCloseOnOverlayClick={true} width="auto">
             <Container>
                 <Info>
                     <Trans i18nKey={'common.referral.info'} components={{ bold: <BoldText /> }} />
@@ -193,6 +193,7 @@ const Info = styled.p`
     line-height: 110%;
     color: ${(props) => props.theme.textColor.primary};
     text-align: justify;
+    margin-top: 20px;
 `;
 
 const Step = styled(FlexDivStart)`
@@ -205,7 +206,7 @@ const Step = styled(FlexDivStart)`
 const StepNumber = styled(FlexDivCentered)`
     width: 36px;
     height: 36px;
-    border: 3px solid ${(props) => props.theme.borderColor.primary};
+    border: 2px solid ${(props) => props.theme.textColor.primary};
     border-radius: 50%;
     color: ${(props) => props.theme.textColor.primary};
     font-weight: 700;
