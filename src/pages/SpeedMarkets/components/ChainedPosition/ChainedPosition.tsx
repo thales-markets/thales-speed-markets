@@ -98,7 +98,7 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({ position }) => {
                 <Text lineHeight="30px">{t('speed-markets.user-positions.direction')}</Text>
                 <Text lineHeight="28px">{t('speed-markets.user-positions.end-time')}</Text>
                 <Text>{t('common.strike-price')}</Text>
-                <Text>{t('profile.final-price')}</Text>
+                <Text>{t('speed-markets.user-positions.final-price')}</Text>
                 <Text>{t('common.status-label')}</Text>
             </PositionInfo>
             <Separator />

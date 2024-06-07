@@ -57,7 +57,9 @@ const ChainedSpeedMarketFlexCard: React.FC<SharePositionData> = ({
                     <DirectionsHeaderLabel width={isMobile ? 94 : 100}>
                         {t('common.strike-price')}
                     </DirectionsHeaderLabel>
-                    <DirectionsHeaderLabel width={isMobile ? 78 : 84}>{t('profile.final-price')}</DirectionsHeaderLabel>
+                    <DirectionsHeaderLabel width={isMobile ? 78 : 84}>
+                        {t('speed-markets.user-positions.final-price')}
+                    </DirectionsHeaderLabel>
                     <DirectionsHeaderLabel width={38}>{t('common.result')}</DirectionsHeaderLabel>
                 </FlexDivEnd>
                 {positions.map((position, index) => {

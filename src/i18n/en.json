@@ -1,12 +1,7 @@
 {
     "common": {
         "thales-markets": "Thales Markets",
-        "read-more": "Read more",
-        "show-less": "Show less",
         "max": "max",
-        "save": "Save",
-        "close": "Close",
-        "no-data": "Do not have any data to show",
         "buy": {
             "label": "Buy",
             "progress-label": "Buying in progress...",
@@ -17,37 +12,21 @@
             "progress-label": "Getting",
             "confirmation-message": "Successfully received {{token}}"
         },
-        "eg-val": "e.g. {{val}}",
-        "select-date": "select date",
         "or": "or",
-        "here": "here",
-        "switch-to-l2": "Switch to L2",
-        "no-data-available": "No data available",
         "enter-amount": "Enter amount",
-        "enter-percentage": "Enter percentage",
-        "enter-address": "Enter address",
         "enter-minutes": "Enter minutes",
         "enter-hours": "Enter hours",
         "search-placeholder": "Search...",
         "progress": "Please wait...",
         "market": "Market",
-        "sort-menu": "Sorting menu",
-        "no-liquidity-tooltip": "<0>We could not fetch a quote from AMM for this position as it's likely out of liquidity. You will still receive your profits if you have winning positions even if the market is out of liquidity. To learn more about the rule for AMM liquidity go <0/ ></0>.",
         "on": "on",
         "in": "in",
-        "starting": "starting",
         "with": "with",
         "above": "Above",
         "below": "Below",
-        "between": "Between",
-        "not-between": "Not between",
-        "and": "and",
         "all": "all",
-        "asset": "Asset",
         "direction": "Direction",
         "strike-price": "Strike price",
-        "end-date": "End date",
-        "balance": "Balance",
         "result": "Result",
         "results": "Results",
         "status-label": "Status",
@@ -81,58 +60,35 @@
             "months-short": "mo"
         },
         "transaction": {
-            "view": "View",
             "successful": "Transaction successful"
-        },
-        "tx-status": {
-            "pending": "Pending"
         },
         "wallet": {
             "connect-your-wallet": "Login",
             "wallet-options": "Wallet options",
             "disclaimer-info": "By Singing Up to Speed Markets  <terms>Terms of Use</terms> and Privacy Policy you acknowledge that you have read and understand the Thales DAO protocol <disclaimer>disclaimer</disclaimer>.",
-            "balance": "Wallet balance",
             "connect-wallet-modal-title": "Sign Up to speed markets",
             "connect-with-wallet": "Connect with wallet",
             "or-connect-with": "Or"
         },
         "errors": {
-            "try-again": "Try again. AMM data is changed.",
             "unknown-error-try-again": "An unknown error occurred after you submitted. Please try again.",
-            "insufficient-balance": "Insufficient balance",
-            "insufficient-staking-balance": "Insufficient staking balance",
             "out-of-liquidity": "Out of liquidity",
-            "insufficient-liquidity": "Insufficient liquidity",
             "enter-amount": "Enter amount",
-            "enter-address": "Enter address",
-            "enter-slippage": "Enter slippage",
-            "invalid-price": "Invalid price",
-            "invalid-address": "Invalid address",
-            "invalid-price-max": "The price cannot be higher than ${{max}}",
             "invalid-amount-max": "The amount cannot be higher than {{max}}",
             "insufficient-balance-wallet": "Please ensure your wallet has sufficient {{currencyKey}}",
-            "invalid-slippage": "Invalid slippage",
-            "max-limit-exceeded": "Amount exceeded the amount available on AMM",
-            "user-rejected-tx": "User rejected transaction",
-            "enter-percentage": "Enter percentage",
-            "invalid-percentage-range": "The percentage must be between {{min}} and {{max}}",
             "something-went-wrong": "Something went wrong!",
             "unexpected": "Please help us about this issue by writing to help-and-questions"
         },
         "enable-wallet-access": {
             "approve": "Approve",
             "approve-progress": "Approving",
-            "approve-label": "Approve {{currencyKey}}",
-            "approve-progress-label": "Approving {{currencyKey}}...",
             "approve-all-label": "Approve all",
             "custom-amount-label": "Approve amount of",
             "approve-swap": "Approve swap to {{currencyKey}}"
         },
         "header": {
-            "refer-earn": "Refer & earn",
             "get-started": "Get started",
-            "notification": { "tooltip": "You have {{count}} claimable position(s)" },
-            "deposit": "Deposit"
+            "notification": { "tooltip": "You have {{count}} claimable position(s)" }
         },
         "footer": {
             "github": "GitHub",
@@ -142,11 +98,6 @@
             "docs": "Documentation",
             "description": "This frontend is hosted decentrally on IPFS (InterPlanetary File System). It serves to visualise the blockchain data and help users interact with the Thales Speed Market contracts that belong to Thales DAO. By doing so it helps users understand the risks of using those smart contracts and what the specific interactions entail. The frontend does not facilitate anything else apart from interacting with those contracts in a visually comprehensive way. In doing so, it is no different than the functionality provided by Etherscan or RPCs (Remote Procedure Calls). The frontend itself does not belong to Thales DAO or any individual. It stores no user data and has no dedicated backend or database. All code is uploaded statically directly to the IPFS. Just as the blockchain does no geo-fencing and no KYC, neither can this frontend do so. However, by interacting with Thales DAO contracts, you commit to have read, understood and accepted Thales DAO’s terms of use and you take full liability in case you have not adhered to those terms."
         },
-        "sidebar": {
-            "speed-markets": "Speed markets",
-            "profile-label": "Profile",
-            "sport-markets-label": "Overtime markets"
-        },
         "pagination": {
             "rows-per-page": "Rows per page:"
         },
@@ -154,7 +105,6 @@
             "title": "Oops! You are on the wrong network!",
             "description": "You have selected the wrong network in your wallet. To continue, please switch to one of the supported networks.",
             "button": {
-                "mainnet": "Switch to Mainnet",
                 "optimism": "Switch to Optimism",
                 "polygon": "Switch to Polygon",
                 "arbitrum": "Switch to Arbitrum",
@@ -167,7 +117,18 @@
             "title": "Refer and earn",
             "info": "As a person sharing your personal Referral Link, you <bold>earn up to 50% of the trading fee</bold> (0.5% of total volume) from each trade the new user you onboarded executes.",
             "choose-page": "Choose page you want to refer",
-            "referral-id": "Create your referral ID"
+            "referral-id": "Create your referral ID",
+            "choose-referral-placeholder": "Enter Referral ID",
+            "copied": "Copied!",
+            "pages": {
+                "speed-market-page": "Speed markets page",
+                "landing-page": "Landing page"
+            },
+            "generate": {
+                "id-exists": "Referral ID already exists",
+                "id-create-success": "Successfully set referral ID",
+                "link-btn": "Generate link"
+            }
         },
         "status": {
             "success": "Success",
@@ -176,21 +137,15 @@
             "error": "Error"
         },
         "banner": {
-            "arb-distribution-message": "ARB distribution has started. Earn ARB tokens by using Thales products. Checkout the details here.",
             "page-link": {
                 "thales-markets": "Looking for markets with longer time frames (days, weeks, or months)?",
                 "try": "Try <bold>{{value}}</bold>"
             }
         },
-        "tooltip": {
-            "open-market": "Go to Market page"
-        },
         "flex-card": {
-            "footer-text": "Novel <bold>On-chain</bold>, <bold>permissionless</bold>, and <bold>non-custodial parimutual</bold> markets",
             "strike-price": "Strike price",
             "strike-date": "Strike date",
             "entry-price": "Entry price",
-            "market-duration": "Market duration",
             "buy-in": "Buy-In",
             "potential-win": "Potential win",
             "share": "Share",
@@ -236,7 +191,6 @@
         "title": "Speed Markets",
         "info": "Choose an <bold>asset</bold>, <bold>direction</bold> and then the <bold>duration</bold> for when to settle your trade. If the price ends in your direction when your time elapses, you win the quoted Potential Profit!",
         "steps": {
-            "choose-asset": "Asset",
             "choose-direction": "Direction",
             "choose-direction-sub": "(You can add up to 6 chained positions for bigger profit)",
             "choose-time": "Duration",
@@ -246,11 +200,9 @@
             "asset-price": "If {{asset}} price is",
             "choose-direction": "choose direction",
             "choose-time": "choose duration",
-            "pick-price": "pick a price",
             "based-amount": "based on amount",
             "you-win": "you win",
             "at-least": "at least",
-            "select-price": "Select price",
             "max-buy": "Max buy"
         },
         "errors": {
@@ -265,7 +217,6 @@
             "open-single": "Open single markets",
             "open-chained": "Open chained markets",
             "your-positions": "Your open markets",
-            "your-closed-positions": "Your closed positions (last 10)",
             "no-positions": "Your {{status}} markets will be visible here",
             "status-open": "open",
             "status-claimable": "claimable",
@@ -275,8 +226,8 @@
             "direction": "Direction",
             "price": "Price",
             "current-price": "Current price",
+            "final-price": "Final price",
             "status": "Status",
-            "size": "Size",
             "paid": "Paid",
             "payout": "Payout",
             "claim-in": "Claim in",
@@ -284,14 +235,12 @@
             "claim-win-progress": "Claiming win",
             "result-in": "Result in",
             "next-result-in": "Next result in",
-            "position-value": "Position value",
             "approve-swap-tooltip": "To get payout in {{currencyKey}}, you need to approve swap from {{defaultCurrency}} to {{currencyKey}}.",
             "claim-all": "Claim all wins",
             "claim-all-progress": "Claiming all wins",
             "claim-all-in": "Claim all in",
             "claim-all-win-in": "Claim all winnings in",
             "confirmation-message": "Positions successfully claimed",
-            "no-closed-positions": "Your closed positions will be visible here",
             "errors": {
                 "price-stale": "Can't resolve market with stale price"
             }
@@ -303,9 +252,7 @@
             "current-price": "Current price as reported by Pyth oracles",
             "liquidity": "Current available liquidity for this Asset: {{liquidityPerAsset}}<br><br>Total available for Buy-In per direction<br>Available for UP: {{liquidityPerUp}}<br>Available for DOWN: {{liquidityPerDown}}",
             "payout-conversion": "Win amount can be slightly different due to conversion rate at execution time",
-            "paid-conversion": "Amount in $ is estimated and can be slightly different due to conversion rate at execution time",
             "final-price-missing": "Oracle price snapshot for this market's timestamp is still being processed. Even if contract input is delayed by the Pyth oracles, the price snapshot will be true to the moment of market expiration",
-            "fee-info": "{{firstPerc}} from {{firstTime}}min up to {{secondTime}}min<br>{{secondPerc}} from {{secondTime}}min up to {{thirdTime}}min<br>{{thirdPerc}} from {{thirdTime}}min up to {{fourthTime}}min<br>{{fourthPerc}} for above or equal {{fourthTime}}min<br>{{maxSkewImpact}} maximum skew impact",
             "bonus-unknown": "This direction offers bonus return. Exact bonus depends on selected Duration.",
             "bonus-info": "Bonus return for {{bonusDirection}} is +{{bonusPerc}}",
             "slippage": "Your trade will revert if the live price changes more than this percentage from your chosen Strike Price during trade execution."
@@ -338,38 +285,14 @@
             "starting-from": "starting from",
             "follows": "follows",
             "between-rounds": "between rounds",
-            "total-pay": "Total to pay {{amount}} + {{fee}} fee (= {{totalAmount}})",
-            "to-pay-with-conversion": "To pay {{amount}} ({{stableAmount}}) + {{fee}} fee",
             "errors": {
                 "choose-directions": "Choose all directions"
             },
             "tooltips": { "liquidity": "Current available liquidity for all Assets" }
         }
     },
-    "referral": {
-        "title": "Referral",
-        "choose-landing": "Choose landing page",
-        "choose-referral": "Choose your Referral ID",
-        "choose-referral-placeholder": "Enter Referral ID",
-        "copied": "Copied!",
-        "pages": {
-            "speed-market-page": "Speed markets page",
-            "landing-page": "Landing page"
-        },
-        "generate": {
-            "id-exists": "Referral ID already exists",
-            "id-create-success": "Successfully set referral ID",
-            "link-btn": "Generate link"
-        }
-    },
     "profile": {
         "title": "Profile",
-        "go-to-market": "Go to market",
-        "strike-price": "Strike price",
-        "final-price": "Final price",
-        "current-price": "Current price",
-        "claimed": "CLAIMED",
-        "rip": "RIP",
         "history-limit": "* Showing only markets with expiry date not older than {{days}} days.",
         "tabs": {
             "my-positions": "My markets",
@@ -380,27 +303,13 @@
             "open-positions": "Open",
             "transaction-history": "Transaction History"
         },
-        "search-placeholder": "Search wallet",
-        "history": {
-            "strike": "Strike",
-            "direction": "Direction",
-            "directions": "Directions",
-            "payout": "Payout",
-            "paid": "Paid",
-            "received": "Received",
-            "expired": "Expired",
-            "expires": "Expires @"
-        }
+        "search-placeholder": "Search wallet"
     },
     "get-started": {
         "title": "Get started on Speed Markets",
         "steps": {
             "action": {
                 "log-in": "Login",
-                "deposit": "Deposit now",
-                "trade": "Trade on Speed Markets",
-                "deposit-crypto": "Deposit crypto",
-                "credit-card": "Credit card buy",
                 "buy-crypto": "FUND WITH CARD",
                 "copy": "Copy"
             },
@@ -419,14 +328,9 @@
         }
     },
     "deposit": {
-        "deposit-crypto": "deposit crypto",
+        "qr-modal-title": "QR Code",
         "select-token": "Select token",
-        "send": "Make sure you double check your withdrawal address and that it supports {{ token }} on {{ network }}!",
-
-        "buy-with": "or",
-        "description": "Don't have crypto wallet? No worries, you can buy any of above mentioned cryptocurrencies with your credit card.",
-        "address-input-label": "Your personal {{ token }} deposit address on {{ network }}",
-        "balance": "Total balance"
+        "send": "Make sure you double check your withdrawal address and that it supports {{ token }} on {{ network }}!"
     },
     "withdraw": {
         "address-input-label": "Your personal {{ token }} withdrawal address on {{ network }}",
@@ -434,22 +338,12 @@
         "heading-withdraw": "Withdraw crypto",
         "paste-address": "Paste your wallet address here",
         "button-label-withdraw": "Withdraw",
-        "confirmation-modal": {
-            "title": "Withdrawal Requested",
-            "correct-address": "Make sure the Address is correct and that it accepts [{{ network }}] [{{ token }}]",
-            "withdrawal-transaction-warning": "Withdraw transactions can not be cancelled",
-            "withdrawal-fee": "Withdrawal fee",
-            "address": "Address",
-            "network": "Network",
-            "confirm": "Confirm"
-        },
         "toast-messages": {
             "pending": "Transaction pending...",
             "error": "Some error occurred while withdrawing funds.",
             "success": "Successfully withdrawal"
         },
         "validation": {
-            "wallet-address": "Wallet address is not valid",
             "amount": "Amount is not valid"
         }
     },
