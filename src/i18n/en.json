@@ -269,7 +269,7 @@
             "no-positions": "Your {{status}} markets will be visible here",
             "status-open": "open",
             "status-claimable": "claimable",
-            "created-time": "Created time",
+            "created": "Created",
             "end-time": "End time",
             "asset": "Asset",
             "direction": "Direction",

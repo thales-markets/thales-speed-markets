@@ -113,7 +113,7 @@ const CardChainedPosition: React.FC<CardChainedPositionProps> = ({
     return (
         <Container ref={cardRef} $borderColor={historyStatus && getStatusColor(historyStatus, theme)}>
             <Info>
-                <InfoColumn>
+                <InfoColumn $isChainedHistory={isHistory}>
                     <InfoRow>
                         <Label>{t('common.market')}:</Label>
                         <Value>
@@ -131,6 +131,12 @@ const CardChainedPosition: React.FC<CardChainedPositionProps> = ({
                             <ChainedMarketPrice position={position} />
                         </Value>
                     </InfoRow>
+                    {isHistory && (
+                        <InfoRow>
+                            <Label>{t('speed-markets.user-positions.created')}:</Label>
+                            <Value>{formatShortDateWithFullTime(position.createdAt)}</Value>
+                        </InfoRow>
+                    )}
                     <InfoRow>
                         <Label>{t('speed-markets.user-positions.end-time')}:</Label>
                         <Value>{formatShortDateWithFullTime(endTime)}</Value>
@@ -163,7 +169,7 @@ const CardChainedPosition: React.FC<CardChainedPositionProps> = ({
                         </DirectionsWrapper>
                     </InfoRow>
                 </InfoColumn>
-                <InfoColumn>
+                <InfoColumn $isChainedHistory={isHistory}>
                     <InfoRow>
                         <Label>{t('speed-markets.user-positions.paid')}:</Label>
                         <Value>{formatCurrencyWithSign(USD_SIGN, position.paid)}</Value>
