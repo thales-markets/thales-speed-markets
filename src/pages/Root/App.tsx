@@ -79,7 +79,6 @@ const App = () => {
                     biconomyPaymasterApiKey: PAYMASTER_API_KEY,
                 });
                 const smartAddress = await smartAccount.getAccountAddress();
-                console.log(smartAddress);
 
                 biconomyConnector.setWallet(smartAccount, smartAddress);
                 dispatch(setIsBiconomy(true));
@@ -203,12 +202,6 @@ const GlobalStyle = createGlobalStyle`
     * {
         font-family: ${(props) => props.theme.fontFamily.primary};
         font-style: normal !important;
-    }
-    *::-webkit-scrollbar-track {
-        background: ${(props) => props.theme.background.secondary};
-    }
-    *::-webkit-scrollbar-thumb {
-        background: ${(props) => props.theme.background.tertiary};
     }
     html {
         scroll-behavior: smooth;

@@ -134,7 +134,7 @@ const StyledToastContainer = styled(ToastContainer)`
             background: ${(props) =>
                 `linear-gradient(88.69deg, ${props.theme.toastMessages.error.background.secondary} 0%, ${props.theme.toastMessages.error.background.tertiary} 96.05%);`};
         }
-        color: ${(props) => props.theme.toastMessages.error.textColor.primary};
+        color: ${(props) => props.theme.toastMessages.success.textColor.primary};
 
         @media (max-width: 600px) {
             width: 100vw;

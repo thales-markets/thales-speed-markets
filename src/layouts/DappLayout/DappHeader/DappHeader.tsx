@@ -102,6 +102,7 @@ const DappHeader: React.FC = () => {
                     <UserInfo
                         setUserInfoOpen={setOpenUserInfo}
                         setOpenWithdraw={setOpenWithdraw}
+                        setOpenReferralModal={setOpenReferralModal}
                         skipOutsideClickOnElement={burgerMenuRef}
                     />
                 )}

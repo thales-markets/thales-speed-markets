@@ -1,6 +1,6 @@
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import styled from 'styled-components';
-import { FlexDivCentered, FlexDivColumn, FlexDivColumnCentered, FlexDivSpaceBetween, FlexDivRow } from 'styles/common';
+import { FlexDivCentered, FlexDivColumn, FlexDivColumnCentered, FlexDivRow, FlexDivSpaceBetween } from 'styles/common';
 
 export const PositionContainer = styled(FlexDivRow)`
     align-items: center;
@@ -37,7 +37,7 @@ export const HeaderSubText = styled(HeaderText)`
 `;
 
 export const ClearAll = styled(FlexDivCentered)<{ isDisabled?: boolean }>`
-    color: ${(props) => props.theme.textColor.tertiary};
+    color: ${(props) => props.theme.error.textColor.primary};
     font-size: 12px;
     font-weight: 700;
     line-height: 150%;
@@ -48,8 +48,8 @@ export const ClearAll = styled(FlexDivCentered)<{ isDisabled?: boolean }>`
 export const IconWrong = styled(FlexDivCentered)`
     width: 16px;
     height: 16px;
-    color: ${(props) => props.theme.textColor.tertiary};
-    border: 2px solid ${(props) => props.theme.textColor.tertiary};
+    color: ${(props) => props.theme.error.textColor.primary};
+    border: 2px solid ${(props) => props.theme.error.textColor.primary};
 
     font-weight: 300;
     border-radius: 50%;
@@ -129,14 +129,6 @@ export const Icon = styled.i<{ size?: number; padding?: string; color?: string; 
     color: ${(props) => (props.color ? props.color : 'inherit')};
     ${(props) => (props.padding ? `padding: ${props.padding};` : '')};
     ${(props) => (props.isDisabled ? `opacity: 0.4;` : '')};
-`;
-
-export const AssetIcon = styled(Icon)`
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        font-size: 28px;
-        line-height: 100%;
-        color: ${(props) => props.theme.textColor.primary};
-    }
 `;
 
 export const Bonus = styled.div<{ $isSelected: boolean }>`

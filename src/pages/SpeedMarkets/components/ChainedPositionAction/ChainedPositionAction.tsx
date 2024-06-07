@@ -445,10 +445,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
         } else {
             return (
                 <ResultsContainer>
-                    <Value
-                        $isUpperCase
-                        color={position.isUserWinner ? theme.textColor.quaternary : theme.error.textColor.primary}
-                    >
+                    <Value $isUpperCase color={position.isUserWinner ? theme.status.won : theme.status.loss}>
                         {position.isUserWinner ? t('common.won') : t('common.loss')}
                     </Value>
                 </ResultsContainer>

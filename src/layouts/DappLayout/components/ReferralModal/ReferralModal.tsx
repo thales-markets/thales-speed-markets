@@ -50,11 +50,11 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
     const referralPageOptions = [
         {
             value: Pages.SpeedMarkets,
-            label: t('referral.pages.speed-market-page'),
+            label: t('common.referral.pages.speed-market-page'),
         },
         {
             value: Pages.LandingPage,
-            label: t('referral.pages.landing-page'),
+            label: t('common.referral.pages.landing-page'),
         },
     ];
 
@@ -101,14 +101,14 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
         });
         if (!response.ok) {
             toast(
-                <ToastMessage id="customId" type="error" message={t('referral.generate.id-exists')} />,
+                <ToastMessage id="customId" type="error" message={t('common.referral.generate.id-exists')} />,
                 getErrorToastOptions('', 'customId')
             );
         } else {
             populateReferralLink(referralPage, referrerID);
             setSavedReferrerID(referrerID);
             toast(
-                <ToastMessage id="customId" type="success" message={t('referral.generate.id-create-success')} />,
+                <ToastMessage id="customId" type="success" message={t('common.referral.generate.id-create-success')} />,
                 getSuccessToastOptions('', 'customId')
             );
         }
@@ -117,7 +117,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
     const copyLink = () => {
         navigator.clipboard.writeText(referralLink);
         toast(
-            <ToastMessage id="customId" type="success" message={t('referral.copied')} />,
+            <ToastMessage id="customId" type="success" message={t('common.referral.copied')} />,
             getSuccessToastOptions('', 'customId')
         );
     };
@@ -130,7 +130,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
     };
 
     return (
-        <Modal title={t('common.referral.title')} onClose={onClose} shouldCloseOnOverlayClick={true}>
+        <Modal title={t('common.referral.title')} onClose={onClose} shouldCloseOnOverlayClick={true} width="auto">
             <Container>
                 <Info>
                     <Trans i18nKey={'common.referral.info'} components={{ bold: <BoldText /> }} />
@@ -158,7 +158,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
                     <TextInput
                         value={referrerID}
                         onChange={(e: any) => setReferrerID(e.target.value)}
-                        placeholder={t('referral.choose-referral-placeholder')}
+                        placeholder={t('common.referral.choose-referral-placeholder')}
                         width="100%"
                         height="38px"
                     />
@@ -169,7 +169,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
                         disabled={isConnected && (!referrerID || savedReferrerID === referrerID)}
                         onClick={isConnected ? generateLinkHandler : openConnectModal}
                     >
-                        {isConnected ? t('referral.generate.link-btn') : t('common.wallet.connect-your-wallet')}
+                        {isConnected ? t('common.referral.generate.link-btn') : t('common.wallet.connect-your-wallet')}
                     </Button>
                 </RowWrapper>
                 <RowWrapper>
@@ -193,6 +193,7 @@ const Info = styled.p`
     line-height: 110%;
     color: ${(props) => props.theme.textColor.primary};
     text-align: justify;
+    margin-top: 20px;
 `;
 
 const Step = styled(FlexDivStart)`
@@ -205,7 +206,7 @@ const Step = styled(FlexDivStart)`
 const StepNumber = styled(FlexDivCentered)`
     width: 36px;
     height: 36px;
-    border: 3px solid ${(props) => props.theme.borderColor.primary};
+    border: 2px solid ${(props) => props.theme.textColor.primary};
     border-radius: 50%;
     color: ${(props) => props.theme.textColor.primary};
     font-weight: 700;

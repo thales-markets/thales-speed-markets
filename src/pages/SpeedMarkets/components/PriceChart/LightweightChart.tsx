@@ -211,7 +211,7 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
                                     }}
                                 />
                             }
-                            customIconStyling={{ color: theme.textColor.quaternary }}
+                            customIconStyling={{ color: theme.price.up }}
                         />
                     </FlexDiv>
                 )}

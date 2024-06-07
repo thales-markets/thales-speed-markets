@@ -202,6 +202,10 @@
     content: '\0025';
 }
 
+.icon--referral:before {
+    content: '\0026';
+}
+
 .icon--pyth:before {
     content: '\002A';
 }

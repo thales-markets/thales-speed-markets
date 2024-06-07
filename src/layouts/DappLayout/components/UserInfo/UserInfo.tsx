@@ -22,10 +22,16 @@ import { ScreenSizeBreakpoint } from 'enums/ui';
 type UserInfoProps = {
     setUserInfoOpen: React.Dispatch<React.SetStateAction<boolean>>;
     setOpenWithdraw: React.Dispatch<React.SetStateAction<boolean>>;
+    setOpenReferralModal: React.Dispatch<React.SetStateAction<boolean>>;
     skipOutsideClickOnElement?: React.RefObject<HTMLElement>;
 };
 
-const UserInfo: React.FC<UserInfoProps> = ({ setUserInfoOpen, setOpenWithdraw, skipOutsideClickOnElement }) => {
+const UserInfo: React.FC<UserInfoProps> = ({
+    setUserInfoOpen,
+    setOpenWithdraw,
+    setOpenReferralModal,
+    skipOutsideClickOnElement,
+}) => {
     const networkId = useChainId();
     const { disconnect } = useDisconnect();
     const { address } = useAccount();
@@ -97,6 +103,15 @@ const UserInfo: React.FC<UserInfoProps> = ({ setUserInfoOpen, setOpenWithdraw, s
                             <Icon className="network-icon network-icon--avatar" />
                             <Label>{t('user-info.trading-profile')}</Label>
                         </SPAAnchor>
+                    </FlexStartCentered>
+                    <FlexStartCentered
+                        onClick={() => {
+                            setOpenReferralModal(true);
+                            setUserInfoOpen(false);
+                        }}
+                    >
+                        <Icon className="icon icon--referral" />
+                        <Label>{t('user-info.referral')}</Label>
                     </FlexStartCentered>
                     <FlexStartCentered>
                         <SPAAnchor href={LINKS.ThalesIo.Docs}>

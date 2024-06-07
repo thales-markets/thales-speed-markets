@@ -113,6 +113,12 @@ const CardPosition: React.FC<CardPositionProps> = ({
                             <MarketPrice position={position} />
                         </Value>
                     </InfoRow>
+                    {isHistory && (
+                        <InfoRow>
+                            <Label>{t('speed-markets.user-positions.created')}:</Label>
+                            <Value>{formatShortDateWithFullTime(position.createdAt)}</Value>
+                        </InfoRow>
+                    )}
                     <InfoRow>
                         <Label>{t('speed-markets.user-positions.end-time')}:</Label>
                         <Value>{formatShortDateWithFullTime(position.maturityDate)}</Value>
@@ -182,8 +188,8 @@ export const Info = styled(FlexDivRow)`
     height: 100%;
 `;
 
-export const InfoColumn = styled(FlexDivColumn)`
-    gap: 6px;
+export const InfoColumn = styled(FlexDivColumn)<{ $isChainedHistory?: boolean }>`
+    gap: ${(props) => (props.$isChainedHistory ? '5px' : '6px')};
 
     &:first-child {
         min-width: 214px;

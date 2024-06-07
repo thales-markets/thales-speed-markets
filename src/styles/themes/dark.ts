@@ -8,20 +8,20 @@ export default {
     background: {
         primary: Colors.BLACK,
         secondary: Colors.GRAY,
-        tertiary: Colors.GRAY_LIGHT,
-        quaternary: Colors.ORANGE,
+        tertiary: '',
+        quaternary: '',
         quinary: Colors.PURPLE,
     },
     textColor: {
         primary: Colors.WHITE,
-        secondary: Colors.GRAY_LIGHT,
-        tertiary: Colors.RED,
+        secondary: '',
+        tertiary: '',
         quaternary: Colors.GREEN,
         quinary: Colors.PURPLE,
     },
     borderColor: {
         primary: Colors.GRAY,
-        secondary: Colors.GRAY_LIGHT,
+        secondary: '',
         tertiary: `linear-gradient(90deg, ${Colors.PURPLE_DARK} 0%, ${Colors.BLUE} 100%)`,
         quaternary: Colors.PURPLE,
         quinary: Colors.GRAY_BLUE,
@@ -37,7 +37,7 @@ export default {
             primary: Colors.WHITE,
             secondary: Colors.BLACK,
             tertiary: Colors.PURPLE,
-            quaternary: Colors.ORANGE,
+            quaternary: '',
         },
         borderColor: {
             primary: `linear-gradient(90deg, ${Colors.PURPLE_DARK} 0%, ${Colors.BLUE} 100%)`,
@@ -89,7 +89,7 @@ export default {
     },
     icon: {
         background: {
-            primary: Colors.WHITE,
+            primary: '',
             secondary: Colors.BLACK,
             tertiary: Colors.PURPLE,
         },
@@ -101,9 +101,6 @@ export default {
         },
     },
     error: {
-        background: {
-            primary: Colors.GRAY_DARK,
-        },
         textColor: {
             primary: Colors.RED,
         },

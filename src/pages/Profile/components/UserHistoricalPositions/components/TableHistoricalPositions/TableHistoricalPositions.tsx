@@ -122,7 +122,7 @@ const TableHistoricalPositions: React.FC<{ data: UserHistoryPosition[] }> = ({ d
             size: 90,
         },
         {
-            header: <Header>{t('speed-markets.user-positions.created-time')}</Header>,
+            header: <Header>{t('speed-markets.user-positions.created')}</Header>,
             accessorKey: 'createdAt',
             cell: (cellProps: any) => (
                 <Wrapper>
