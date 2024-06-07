@@ -34,6 +34,8 @@ import {
 } from './styled-components';
 import { MARKET_DURATION_IN_DAYS } from 'constants/market';
 import { getUserNotifications } from 'redux/modules/user';
+import ProfileHeader from './components/ProfileHeader';
+import TotalBalance from './components/TotalBalance';
 
 enum TabItems {
     MY_POSITIONS = 'my-positions',
@@ -116,7 +118,10 @@ const Profile: React.FC = () => {
                 &nbsp;/&nbsp;{t('profile.title')}
             </LinkContainer>
 
-            <Header>{'TODO: add profile header'}</Header>
+            <Header>
+                <ProfileHeader />
+                <TotalBalance />
+            </Header>
             <SearchInput
                 placeholder={t('profile.search-placeholder')}
                 text={searchText}

@@ -381,6 +381,7 @@
             "transaction-history": "Transaction History"
         },
         "search-placeholder": "Search wallet",
+        "balance": "Total balance",
         "history": {
             "strike": "Strike",
             "direction": "Direction",
