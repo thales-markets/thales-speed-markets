@@ -58,8 +58,6 @@ export const GradientContainer = styled.div<{ width?: number; borderRadius?: str
 
 export const Colors = {
     GRAY: '#2b3139',
-    GRAY_LIGHT: '#848E9C',
-    GRAY_DARK: '#181A20',
     GRAY_BLUE: '#808997',
 
     WHITE: '#FFFFFF',
@@ -79,9 +77,6 @@ export const Colors = {
     RED: '#DE496D',
     RED_LIGHT: '#EC91A7',
     RED_DARK: '#EC0039',
-
-    ORANGE: '#E27A93',
-    ORANGE_DARK: '#FF8800',
 
     YELLOW_DARK: '#9b8327',
 

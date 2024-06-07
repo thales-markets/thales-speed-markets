@@ -321,7 +321,7 @@ const TwitterShare = styled(FlexDivColumnCentered)<{ disabled?: boolean }>`
 const TwitterIcon = styled.i<{ disabled?: boolean; fontSize?: string; padding?: string }>`
     font-size: ${(props) => (props.fontSize ? props.fontSize : '20px')};
     color: ${(props) => props.theme.button.textColor.secondary};
-    cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
+    cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
     opacity: ${(props) => (props.disabled ? '0.4' : '1')};
     margin-right: 10px;
     ${(props) => (props.padding ? `padding: ${props.padding};` : '')}

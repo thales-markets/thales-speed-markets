@@ -10,6 +10,7 @@ import { ScreenSizeBreakpoint } from 'enums/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import { GradientContainer } from 'styles/common';
 import { NetworkId } from 'thales-utils';
 import { SupportedNetwork } from 'types/network';
 import { SUPPORTED_NETWORK_IDS_MAP } from 'utils/network';
@@ -115,7 +116,8 @@ const UnsupportedNetwork: React.FC<UnsupportedNetworkProps> = ({ supportedNetwor
     );
 };
 
-const Container = styled.div`
+const Container = styled(GradientContainer)`
+    width: auto;
     margin: 90px 0;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         margin: 0;
@@ -126,7 +128,6 @@ const Wrapper = styled.div`
     display: flex;
     flex-direction: column;
     background: ${(props) => props.theme.background.primary};
-    border: 1px solid ${(props) => props.theme.borderColor.secondary};
     border-radius: 8px;
     padding: 20px;
     max-width: 600px;

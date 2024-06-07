@@ -256,9 +256,10 @@ const Container = styled.div`
 const StepNumberSection = styled(FlexDivCentered)``;
 
 const StepDescriptionSection = styled(FlexDivColumn)<{ isActive: boolean; isDisabled?: boolean }>`
-    color: ${(props) => (props.isActive ? props.theme.textColor.primary : props.theme.textColor.secondary)};
+    color: ${(props) => props.theme.textColor.primary};
     cursor: ${(props) => (props.isDisabled ? 'not-allowed' : 'pointer')};
     overflow: hidden;
+    ${(props) => (!props.isActive ? 'opacity: 0.5;' : '')}
 `;
 
 const StepTitle = styled.span<{ completed?: boolean }>`

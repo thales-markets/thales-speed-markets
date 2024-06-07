@@ -204,12 +204,6 @@ const GlobalStyle = createGlobalStyle`
         font-family: ${(props) => props.theme.fontFamily.primary};
         font-style: normal !important;
     }
-    *::-webkit-scrollbar-track {
-        background: ${(props) => props.theme.background.secondary};
-    }
-    *::-webkit-scrollbar-thumb {
-        background: ${(props) => props.theme.background.tertiary};
-    }
     html {
         scroll-behavior: smooth;
         scrollbar-color: ${(props) => props.theme.background.quinary} transparent;

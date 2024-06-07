@@ -37,7 +37,7 @@ export const HeaderSubText = styled(HeaderText)`
 `;
 
 export const ClearAll = styled(FlexDivCentered)<{ isDisabled?: boolean }>`
-    color: ${(props) => props.theme.textColor.tertiary};
+    color: ${(props) => props.theme.error.textColor.primary};
     font-size: 12px;
     font-weight: 700;
     line-height: 150%;
@@ -48,8 +48,8 @@ export const ClearAll = styled(FlexDivCentered)<{ isDisabled?: boolean }>`
 export const IconWrong = styled(FlexDivCentered)`
     width: 16px;
     height: 16px;
-    color: ${(props) => props.theme.textColor.tertiary};
-    border: 2px solid ${(props) => props.theme.textColor.tertiary};
+    color: ${(props) => props.theme.error.textColor.primary};
+    border: 2px solid ${(props) => props.theme.error.textColor.primary};
 
     font-weight: 300;
     border-radius: 50%;

@@ -81,9 +81,9 @@ const DropdownContainer = styled.div`
     padding: 20px;
 
     border-radius: 8px;
-    border: 2px solid ${(props) => props.theme.background.secondary};
+    border: 2px solid ${(props) => props.theme.dropDown.background.secondary};
     width: 400px;
-    background: ${(props) => props.theme.background.primary};
+    background: ${(props) => props.theme.dropDown.background.primary};
 `;
 
 const Icon = styled.i`
@@ -103,6 +103,10 @@ const Arrow = styled.i`
 
 const CollateralName = styled.span`
     cursor: pointer;
+
+    &:hover {
+        color: ${(props) => props.theme.dropDown.textColor.secondary};
+    }
 `;
 
 export default CollateralDropdown;
