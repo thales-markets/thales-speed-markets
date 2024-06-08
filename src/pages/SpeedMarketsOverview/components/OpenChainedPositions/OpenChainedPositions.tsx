@@ -44,7 +44,7 @@ const OpenChainedPositions: React.FC = () => {
     const networkId = useChainId();
     const client = useClient();
     const walletClient = useWalletClient();
-    const { isConnected, address: walletAddress } = useAccount();
+    const { address: walletAddress } = useAccount();
 
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
@@ -82,7 +82,7 @@ const OpenChainedPositions: React.FC = () => {
     const activeChainedSpeedMarketsDataQuery = useActiveChainedSpeedMarketsDataQuery(
         { networkId, client },
         {
-            enabled: isAppReady && isConnected && isNetworkSupportedForChained,
+            enabled: isAppReady && isNetworkSupportedForChained,
         }
     );
 
