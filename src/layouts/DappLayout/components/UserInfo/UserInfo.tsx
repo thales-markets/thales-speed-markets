@@ -88,7 +88,7 @@ const UserInfo: React.FC<UserInfoProps> = ({
                 </FlexColumn>
                 <FlexColumn>
                     {isBiconomy && (
-                        <FlexStartCentered
+                        <MenuItem
                             onClick={() => {
                                 setOpenWithdraw(true);
                                 setUserInfoOpen(false);
@@ -96,15 +96,15 @@ const UserInfo: React.FC<UserInfoProps> = ({
                         >
                             <Icon className="network-icon network-icon--withdraw" />
                             <Label>{t('user-info.withdraw')}</Label>
-                        </FlexStartCentered>
+                        </MenuItem>
                     )}
-                    <FlexStartCentered>
+                    <MenuItem>
                         <SPAAnchor onClick={() => setUserInfoOpen(false)} href={buildHref(ROUTES.Markets.Profile)}>
                             <Icon className="network-icon network-icon--avatar" />
                             <Label>{t('user-info.trading-profile')}</Label>
                         </SPAAnchor>
-                    </FlexStartCentered>
-                    <FlexStartCentered
+                    </MenuItem>
+                    <MenuItem
                         onClick={() => {
                             setOpenReferralModal(true);
                             setUserInfoOpen(false);
@@ -112,16 +112,16 @@ const UserInfo: React.FC<UserInfoProps> = ({
                     >
                         <Icon className="icon icon--referral" />
                         <Label>{t('user-info.referral')}</Label>
-                    </FlexStartCentered>
-                    <FlexStartCentered>
+                    </MenuItem>
+                    <MenuItem>
                         <SPAAnchor href={LINKS.ThalesIo.Docs}>
                             <Icon className="network-icon network-icon--docs" />
                             <Label>{t('user-info.docs')}</Label>
                         </SPAAnchor>
-                    </FlexStartCentered>
+                    </MenuItem>
                 </FlexColumn>
                 <FlexColumn>
-                    <FlexStartCentered
+                    <MenuItem
                         onClick={() => {
                             setUserInfoOpen(false);
                             disconnect();
@@ -129,7 +129,7 @@ const UserInfo: React.FC<UserInfoProps> = ({
                     >
                         <Icon className="network-icon network-icon--logout" />
                         <Label>{t('user-info.logout')}</Label>
-                    </FlexStartCentered>
+                    </MenuItem>
                 </FlexColumn>
             </Container>
         </OutsideClick>
@@ -162,9 +162,17 @@ const FlexColumn = styled(FlexDivColumn)`
     }
 `;
 
-const FlexStartCentered = styled(FlexDivStart)`
+const MenuItem = styled(FlexDivStart)`
     align-items: center;
     cursor: pointer;
+
+    &:hover {
+        color: ${(props) => props.theme.link.textColor.primary};
+        i,
+        span {
+            color: ${(props) => props.theme.link.textColor.primary};
+        }
+    }
 `;
 
 const TextLabel = styled.span`
