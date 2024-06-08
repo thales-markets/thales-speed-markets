@@ -133,7 +133,7 @@ const CardPosition: React.FC<CardPositionProps> = ({
                         <Label>{t('speed-markets.user-positions.payout')}:</Label>
                         <Value>{formatCurrencyWithSign(USD_SIGN, position.payout)}</Value>
                     </InfoRow>
-                    {position.isClaimable && !position.isOverview && (
+                    {position.isClaimable && !isOverview && (
                         <InfoRow>
                             <Label>{t('speed-markets.user-positions.claim-in')}:</Label>
                             <CollateralSelector
