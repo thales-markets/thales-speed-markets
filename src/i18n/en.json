@@ -240,7 +240,7 @@
             "claim-all-progress": "Claiming all wins",
             "claim-all-in": "Claim all in",
             "claim-all-win-in": "Claim all winnings in",
-            "confirmation-message": "Positions successfully claimed",
+            "confirmation-message": "Markets successfully claimed",
             "errors": {
                 "price-stale": "Can't resolve market with stale price"
             }
@@ -261,17 +261,17 @@
             "title": "Overview",
             "navigate": "Speed Markets Overview page",
             "navigate-chained": "Chained Speed Markets Overview page",
-            "user-title": "Unresolved user winner positions",
-            "amm-title": "Unresolved AMM winner positions",
-            "unknown-price-title": "Unresolved positions without final price",
-            "open-positions-title": "Active positions",
+            "user-title": "Unresolved user winner markets",
+            "amm-title": "Unresolved AMM winner markets",
+            "unknown-price-title": "Unresolved markets without final price",
+            "open-positions-title": "Active markets",
             "resolve-progress": "Resolving...",
             "resolve": "Resolve",
             "resolve-all": "Resolve all",
-            "confirmation-message": "Positions successfully resolved",
-            "no-resolve-positions": "No positions for this section with price",
+            "confirmation-message": "Markets successfully resolved",
+            "no-resolve-positions": "No markets for this section with price",
             "user": "User",
-            "no-positions": "No positions for this section"
+            "no-positions": "No markets for this section"
         },
         "single": "Single",
         "chained": {

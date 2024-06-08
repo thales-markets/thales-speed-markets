@@ -128,7 +128,7 @@ export function particleWagmiWallet(param: ConnectParam & { socialType: string; 
                 config.emitter.emit('change', { chainId });
             },
             async onDisconnect(_error: any) {
-                console.log(_error);
+                _error && console.log(_error);
                 config.emitter.emit('disconnect');
 
                 const provider = await this.getProvider();
