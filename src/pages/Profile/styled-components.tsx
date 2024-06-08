@@ -1,6 +1,6 @@
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import styled from 'styled-components';
-import { FlexDivColumn, FlexDivRow, PAGE_MAX_WIDTH } from 'styles/common';
+import { FlexDivColumn, PAGE_MAX_WIDTH } from 'styles/common';
 
 export const Container = styled(FlexDivColumn)`
     width: 100%;
@@ -11,9 +11,9 @@ export const Container = styled(FlexDivColumn)`
     }
 `;
 
-export const Header = styled(FlexDivRow)`
+export const Header = styled(FlexDivColumn)`
     width: 100%;
-    color: ${(props) => props.theme.textColor.primary};
+    gap: 20px;
 `;
 
 export const PositionsWrapper = styled(FlexDivColumn)`

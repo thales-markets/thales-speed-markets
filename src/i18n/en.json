@@ -303,7 +303,18 @@
             "open-positions": "Open",
             "transaction-history": "Transaction History"
         },
-        "search-placeholder": "Search wallet"
+        "search-placeholder": "Search wallet",
+        "balance": "Total balance",
+        "history": {
+            "strike": "Strike",
+            "direction": "Direction",
+            "directions": "Directions",
+            "payout": "Payout",
+            "paid": "Paid",
+            "received": "Received",
+            "expired": "Expired",
+            "expires": "Expires @"
+        }
     },
     "get-started": {
         "title": "Get started on Speed Markets",
