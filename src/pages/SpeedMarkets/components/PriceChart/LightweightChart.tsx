@@ -37,7 +37,8 @@ type LightweightChartProps = {
     risksPerAsset?: RiskPerAsset[];
     deltaTimeSec?: number;
     risksPerAssetAndDirection?: RiskPerAssetAndPosition[];
-    showOnlyChart?: boolean;
+    hideChart?: boolean;
+    hideLiquidity?: boolean;
 };
 
 const SpeedMarketsToggleButtons = [
@@ -62,7 +63,8 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
     chainedRisk,
     risksPerAsset,
     risksPerAssetAndDirection,
-    showOnlyChart,
+    hideChart,
+    hideLiquidity,
 }) => {
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
@@ -186,7 +188,7 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
                         }}
                     />
                 </FlexDivRowCentered>
-                {!showOnlyChart && !!liquidity && (
+                {!hideLiquidity && !!liquidity && (
                     <FlexDiv>
                         <span>
                             <Label>{t('common.liquidity')}</Label>
@@ -215,7 +217,7 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
                     </FlexDiv>
                 )}
             </FlexDivSpaceBetween>
-            {showOnlyChart && (
+            {!hideChart && (
                 <>
                     <ChartContainer>
                         {pythQuery.isLoading ? (

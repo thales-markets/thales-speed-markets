@@ -36,15 +36,18 @@ import { SelectedPosition } from './components/SelectPosition/SelectPosition';
 import SelectTime from './components/SelectTime';
 import MobileMenu from 'layouts/DappLayout/components/MobileMenu';
 import Modal from 'components/Modal';
+import { getIsMobile } from 'redux/modules/ui';
 
 const SpeedMarkets: React.FC = () => {
     const { t } = useTranslation();
     const location = useLocation();
 
-    const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const networkId = useChainId();
     const client = useClient();
     const { isConnected } = useAccount();
+
+    const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
+    const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const isChainedSupported = getSupportedNetworksByRoute(ROUTES.Markets.ChainedSpeedMarkets).includes(networkId);
     const isChainedMarkets = isChainedSupported && queryString.parse(location.search).isChained === 'true';
@@ -258,6 +261,7 @@ const SpeedMarkets: React.FC = () => {
                                 risksPerAssetAndDirection={
                                     isChained ? undefined : ammSpeedMarketsLimitsData?.risksPerAssetAndDirection
                                 }
+                                hideChart={isMobile}
                             />
                         </LeftSide>
                         <RightSide>
@@ -331,7 +335,7 @@ const SpeedMarkets: React.FC = () => {
                     risksPerAssetAndDirection={
                         isChained ? undefined : ammSpeedMarketsLimitsData?.risksPerAssetAndDirection
                     }
-                    showOnlyChart
+                    hideLiquidity
                 />
             </Modal>
         </Container>
