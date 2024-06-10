@@ -64,7 +64,6 @@ export default defineConfig(({ mode }) => {
                         lightweightCharts: ['lightweight-charts'],
                         lottie: ['lottie-react'],
                         router: ['react-router-dom'],
-                        pyth: ['@pythnetwork/hermes-client'],
                         reduxToolkit: ['@reduxjs/toolkit'],
                         qrCode: ['react-qr-code'],
                         toastify: ['react-toastify'],
