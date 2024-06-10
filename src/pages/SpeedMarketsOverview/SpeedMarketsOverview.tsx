@@ -1,6 +1,7 @@
 import SPAAnchor from 'components/SPAAnchor';
 import ROUTES from 'constants/routes';
 import { ScreenSizeBreakpoint } from 'enums/ui';
+import MobileMenu from 'layouts/DappLayout/components/MobileMenu';
 import queryString from 'query-string';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -49,6 +50,7 @@ const SpeedMarketsOverview: React.FC = () => {
                 )}
             </Header>
             {isChainedMarkets ? <OpenChainedPositions /> : <OpenPositions />}
+            <MobileMenu />
         </Container>
     );
 };

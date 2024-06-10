@@ -8,6 +8,7 @@ import { ThemeInterface } from 'types/ui';
 import { AreaSeriesComponent } from './components/AreaSerierComponent';
 import { CandlestickComponent } from './components/CandlestickComponent';
 import { UserPositionAreaSeries } from './components/UserSeriesComponent';
+import { ScreenSizeBreakpoint } from 'enums/ui';
 
 type ChartContextProps = {
     children: React.ReactNode;
@@ -138,6 +139,12 @@ const ResetButton = styled.div`
     bottom: -31px;
     i {
         font-size: 16px;
+    }
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        top: -42px;
+        right: 14px;
+        left: unset;
+        bottom: unset;
     }
 `;
 

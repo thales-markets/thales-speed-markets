@@ -7,6 +7,7 @@ import { CONNECTION_TIMEOUT_MS, SUPPORTED_ASSETS } from 'constants/pyth';
 import ROUTES from 'constants/routes';
 import { secondsToMilliseconds } from 'date-fns';
 import useInterval from 'hooks/useInterval';
+import MobileMenu from 'layouts/DappLayout/components/MobileMenu';
 import UserOpenPositions from 'pages/SpeedMarkets/components/UserOpenPositions';
 import { LinkContainer, LinkWrapper, NavigationIcon } from 'pages/SpeedMarketsOverview/SpeedMarketsOverview';
 import useAmmSpeedMarketsLimitsQuery from 'queries/speedMarkets/useAmmSpeedMarketsLimitsQuery';
@@ -204,6 +205,7 @@ const Profile: React.FC = () => {
                     </>
                 )}
             </PositionsWrapper>
+            <MobileMenu />
         </Container>
     );
 };

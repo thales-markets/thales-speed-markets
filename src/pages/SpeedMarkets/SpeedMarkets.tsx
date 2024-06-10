@@ -34,6 +34,8 @@ import SelectBuyin from './components/SelectBuyin';
 import SelectPosition from './components/SelectPosition';
 import { SelectedPosition } from './components/SelectPosition/SelectPosition';
 import SelectTime from './components/SelectTime';
+import MobileMenu from 'layouts/DappLayout/components/MobileMenu';
+import Modal from 'components/Modal';
 
 const SpeedMarkets: React.FC = () => {
     const { t } = useTranslation();
@@ -61,6 +63,7 @@ const SpeedMarkets: React.FC = () => {
         skew: { [Positions.UP]: 0, [Positions.DOWN]: 0 },
     });
     const [hasError, setHasError] = useState(false);
+    const [showChartModal, setShowChartModal] = useState(false);
 
     const ammSpeedMarketsLimitsQuery = useAmmSpeedMarketsLimitsQuery({ networkId, client }, undefined, {
         enabled: isAppReady,
@@ -255,7 +258,7 @@ const SpeedMarkets: React.FC = () => {
                                 risksPerAssetAndDirection={
                                     isChained ? undefined : ammSpeedMarketsLimitsData?.risksPerAssetAndDirection
                                 }
-                            ></LightweightChart>
+                            />
                         </LeftSide>
                         <RightSide>
                             {getStep(TradingSteps.ASSET)}
@@ -305,8 +308,32 @@ const SpeedMarkets: React.FC = () => {
                             <ArrowRight className="icon icon--arrow" />
                         </SPAAnchor>
                     </OverviewLinkWrapper>
+
+                    <MobileMenu onChartClick={() => setShowChartModal(!showChartModal)} />
                 </>
             )}
+            <Modal
+                isOpen={showChartModal}
+                onClose={() => setShowChartModal(false)}
+                title={t('speed-markets.chart-title', { currencyKey })}
+                width="100%"
+            >
+                <LightweightChart
+                    position={isChained ? undefined : positionType}
+                    asset={currencyKey}
+                    selectedPrice={!isChained && positionType !== undefined ? currentPrices[currencyKey] : undefined}
+                    selectedDate={Date.now() + secondsToMilliseconds(deltaTimeSec)}
+                    deltaTimeSec={deltaTimeSec}
+                    explicitCurrentPrice={currentPrices[currencyKey]}
+                    prevExplicitPrice={prevPrice.current}
+                    chainedRisk={isChained ? ammChainedSpeedMarketsLimitsData?.risk : undefined}
+                    risksPerAsset={isChained ? undefined : ammSpeedMarketsLimitsData?.risksPerAsset}
+                    risksPerAssetAndDirection={
+                        isChained ? undefined : ammSpeedMarketsLimitsData?.risksPerAssetAndDirection
+                    }
+                    showOnlyChart
+                />
+            </Modal>
         </Container>
     );
 };

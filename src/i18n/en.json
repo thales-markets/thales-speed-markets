@@ -37,6 +37,8 @@
         "support-contact": "Please contact <anchor>Thales support</anchor>",
         "try-again": "Try again",
         "bonus": "Bonus",
+        "home": "Home",
+        "chart": "Chart",
         "time-remaining": {
             "ended": "ended",
             "years": "years",
@@ -289,7 +291,8 @@
                 "choose-directions": "Choose all directions"
             },
             "tooltips": { "liquidity": "Current available liquidity for all Assets" }
-        }
+        },
+        "chart-title": "{{currencyKey}}/USD chart"
     },
     "profile": {
         "title": "Profile",

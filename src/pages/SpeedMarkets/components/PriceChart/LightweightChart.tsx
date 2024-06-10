@@ -18,12 +18,11 @@ import { RootState, ThemeInterface } from 'types/ui';
 
 import SimpleLoader from 'components/SimpleLoader';
 import { hoursToSeconds, minutesToSeconds, subDays } from 'date-fns';
+import { useTheme } from 'styled-components';
+import { useChainId, useClient } from 'wagmi';
 import { ChartComponent } from './components/Chart/ChartContext';
 import CurrentPrice from './components/CurrentPrice';
 import Toggle from './components/DateToggle';
-import { useChainId, useClient } from 'wagmi';
-import { useTheme } from 'styled-components';
-import { getIsMobile } from 'redux/modules/ui';
 
 const now = new Date();
 
@@ -38,6 +37,7 @@ type LightweightChartProps = {
     risksPerAsset?: RiskPerAsset[];
     deltaTimeSec?: number;
     risksPerAssetAndDirection?: RiskPerAssetAndPosition[];
+    showOnlyChart?: boolean;
 };
 
 const SpeedMarketsToggleButtons = [
@@ -62,6 +62,7 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
     chainedRisk,
     risksPerAsset,
     risksPerAssetAndDirection,
+    showOnlyChart,
 }) => {
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
@@ -69,8 +70,6 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const networkId = useChainId();
     const client = useClient();
-
-    const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const [dateRange, setDateRange] = useState(SpeedMarketsToggleButtons[SPEED_DEFAULT_TOGGLE_BUTTON_INDEX]);
     const [selectedToggleIndex, setToggleIndex] = useState(SPEED_DEFAULT_TOGGLE_BUTTON_INDEX);
@@ -187,7 +186,7 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
                         }}
                     />
                 </FlexDivRowCentered>
-                {!!liquidity && (
+                {!showOnlyChart && !!liquidity && (
                     <FlexDiv>
                         <span>
                             <Label>{t('common.liquidity')}</Label>
@@ -216,7 +215,7 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
                     </FlexDiv>
                 )}
             </FlexDivSpaceBetween>
-            {!isMobile && (
+            {showOnlyChart && (
                 <>
                     <ChartContainer>
                         {pythQuery.isLoading ? (
