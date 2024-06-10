@@ -143,7 +143,7 @@ const SectionLabel = styled.span`
     letter-spacing: 1px;
     text-transform: capitalize;
     color: ${(props) => props.theme.textColor.quinary};
-    margin-bottom: 4px;
+    margin-bottom: 8px;
     white-space: pre;
 `;
 
@@ -175,7 +175,7 @@ const IndividualTokenBalanceWrapper = styled(FlexDiv)`
 `;
 
 const IndividualBalance = styled(FlexDivStart)`
-    gap: 2px;
+    gap: 4px;
 `;
 
 const Token = styled(FlexDiv)`
