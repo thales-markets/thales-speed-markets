@@ -42,7 +42,7 @@ const Wrapper = styled(FlexDivCentered)`
     width: fit-content;
     height: fit-content;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        width: auto;
+        width: 100%;
     }
 `;
 

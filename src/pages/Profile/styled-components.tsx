@@ -21,6 +21,7 @@ export const Header = styled(FlexDivCentered)`
 
 export const PositionsWrapper = styled(FlexDivColumn)`
     width: 100%;
+    gap: 20px;
 `;
 
 export const Tabs = styled.div`
@@ -52,7 +53,7 @@ export const Tab = styled.span<{
 `;
 
 export const TabSection = styled.div<{ $isEmpty?: boolean }>`
-    ${(props) => (!props.$isEmpty ? 'min-height: 390px;' : '')}
+    ${(props) => (!props.$isEmpty ? 'min-height: 393px;' : '')}
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         min-height: unset;
     }
@@ -63,7 +64,6 @@ export const TabSectionTitle = styled.p`
     font-size: 18px;
     line-height: 100%;
     color: ${(props) => props.theme.textColor.primary};
-    margin-top: 20px;
 `;
 
 export const TabSectionSubtitle = styled.span`

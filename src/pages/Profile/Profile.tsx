@@ -2,6 +2,7 @@ import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
 import SPAAnchor from 'components/SPAAnchor';
 import SearchInput from 'components/SearchInput';
 import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
+import { MARKET_DURATION_IN_DAYS } from 'constants/market';
 import { CONNECTION_TIMEOUT_MS, SUPPORTED_ASSETS } from 'constants/pyth';
 import ROUTES from 'constants/routes';
 import { secondsToMilliseconds } from 'date-fns';
@@ -16,10 +17,14 @@ import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
+import { getUserNotifications } from 'redux/modules/user';
+import { FlexDivEnd } from 'styles/common';
 import { RootState } from 'types/ui';
 import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAssetsAsObject } from 'utils/pyth';
 import { buildHref, history } from 'utils/routes';
 import { useChainId, useClient } from 'wagmi';
+import ProfileHeader from './components/ProfileHeader';
+import TotalBalance from './components/TotalBalance';
 import UserHistoricalPositions from './components/UserHistoricalPositions';
 import {
     Container,
@@ -32,10 +37,6 @@ import {
     TabSectionTitle,
     Tabs,
 } from './styled-components';
-import { MARKET_DURATION_IN_DAYS } from 'constants/market';
-import { getUserNotifications } from 'redux/modules/user';
-import ProfileHeader from './components/ProfileHeader';
-import TotalBalance from './components/TotalBalance';
 
 enum TabItems {
     MY_POSITIONS = 'my-positions',
@@ -122,13 +123,6 @@ const Profile: React.FC = () => {
                 <ProfileHeader />
                 <TotalBalance />
             </Header>
-            <SearchInput
-                placeholder={t('profile.search-placeholder')}
-                text={searchText}
-                handleChange={(value) => setSearchText(value)}
-                width={isMobile ? '100%' : '470px'}
-                height={'40px'}
-            />
 
             <PositionsWrapper>
                 <Tabs>
@@ -147,6 +141,16 @@ const Profile: React.FC = () => {
                         {t('profile.tabs.history')}
                     </Tab>
                 </Tabs>
+
+                <FlexDivEnd>
+                    <SearchInput
+                        placeholder={t('profile.search-placeholder')}
+                        text={searchText}
+                        handleChange={(value) => setSearchText(value)}
+                        width={isMobile ? '100%' : '470px'}
+                        height={'40px'}
+                    />
+                </FlexDivEnd>
 
                 {selectedTab === TabItems.MY_POSITIONS && (
                     <>

@@ -43,6 +43,7 @@ const Content = styled(FlexDivCentered)`
     background: ${(props) => props.theme.background.quinary};
     border-radius: 8px;
     padding: 5px;
+    margin-bottom: 20px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         height: 40px;
     }
