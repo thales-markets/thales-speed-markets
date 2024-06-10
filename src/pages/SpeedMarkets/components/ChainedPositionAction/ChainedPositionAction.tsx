@@ -1,4 +1,3 @@
-import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
 import PythInterfaceAbi from '@pythnetwork/pyth-sdk-solidity/abis/IPyth.json';
 import ApprovalModal from 'components/ApprovalModal';
 import Button from 'components/Button';
@@ -14,7 +13,7 @@ import Tooltip from 'components/Tooltip';
 import { USD_SIGN } from 'constants/currency';
 import { ONE_HUNDRED_AND_THREE_PERCENT } from 'constants/market';
 import { ZERO_ADDRESS } from 'constants/network';
-import { CONNECTION_TIMEOUT_MS, PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
+import { PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
 import { differenceInSeconds, millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
 import {
     Container,
@@ -35,7 +34,7 @@ import { UserChainedPosition } from 'types/market';
 import { RootState, ThemeInterface } from 'types/ui';
 import { getCollateral, getCollaterals, getDefaultCollateral } from 'utils/currency';
 import { checkAllowance, getIsMultiCollateralSupported } from 'utils/network';
-import { getPriceId, getPriceServiceEndpoint, priceParser } from 'utils/pyth';
+import { getPriceConnection, getPriceId, priceParser } from 'utils/pyth';
 import {
     refetchActiveSpeedMarkets,
     refetchBalances,
@@ -205,10 +204,6 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
     };
 
     const handleResolve = async () => {
-        const priceConnection = new EvmPriceServiceConnection(getPriceServiceEndpoint(networkId), {
-            timeout: CONNECTION_TIMEOUT_MS,
-        });
-
         setIsSubmitting(true);
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
 
@@ -239,6 +234,8 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                     ]);
                 }
             } else {
+                const priceConnection = getPriceConnection(networkId);
+
                 const pythContract = getContract({
                     abi: PythInterfaceAbi,
                     address: PYTH_CONTRACT_ADDRESS[networkId],
@@ -249,20 +246,26 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 const pythPriceId = getPriceId(networkId, position.currencyKey);
                 const strikeTimesToFetchPrice = position.strikeTimes.slice(0, fetchUntilFinalPriceEndIndex);
                 for (let i = 0; i < strikeTimesToFetchPrice.length; i++) {
-                    promises.push(priceConnection.getVaa(pythPriceId, millisecondsToSeconds(position.strikeTimes[i])));
+                    promises.push(
+                        priceConnection.getPriceUpdatesAtTimestamp(millisecondsToSeconds(position.strikeTimes[i]), [
+                            pythPriceId,
+                        ])
+                    );
                 }
                 const priceFeedUpdateVaas = await Promise.all(promises);
 
                 const priceUpdateDataArray: string[][] = [];
                 promises = [];
                 for (let i = 0; i < strikeTimesToFetchPrice.length; i++) {
-                    const [priceFeedUpdateVaa, publishTime] = priceFeedUpdateVaas[i];
+                    const priceUpdate = priceFeedUpdateVaas[i];
+                    const publishTime = priceUpdate.parsed
+                        ? secondsToMilliseconds(Number(priceUpdate.parsed[0].price.publish_time))
+                        : Number.POSITIVE_INFINITY;
 
                     // check if price feed is not too late
                     if (
                         maxPriceDelayForResolvingSec &&
-                        differenceInSeconds(secondsToMilliseconds(publishTime), position.strikeTimes[i]) >
-                            maxPriceDelayForResolvingSec
+                        differenceInSeconds(publishTime, position.strikeTimes[i]) > maxPriceDelayForResolvingSec
                     ) {
                         await delay(800);
                         toast.update(
@@ -273,7 +276,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                         return;
                     }
 
-                    const priceUpdateData = ['0x' + Buffer.from(priceFeedUpdateVaa, 'base64').toString('hex')];
+                    const priceUpdateData = priceUpdate.binary.data.map((vaa: string) => '0x' + vaa);
                     priceUpdateDataArray.push(priceUpdateData);
                     promises.push(pythContract.read.getUpdateFee([priceUpdateData]));
                 }

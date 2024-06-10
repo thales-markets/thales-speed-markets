@@ -1,8 +1,7 @@
-import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
 import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { SIDE_TO_POSITION_MAP, SPEED_MARKETS_QUOTE } from 'constants/market';
 import { ZERO_ADDRESS } from 'constants/network';
-import { CONNECTION_TIMEOUT_MS, PYTH_CURRENCY_DECIMALS, SUPPORTED_ASSETS } from 'constants/pyth';
+import { PYTH_CURRENCY_DECIMALS, SUPPORTED_ASSETS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
 import { bigNumberFormatter, coinFormatter, parseBytes32String } from 'thales-utils';
@@ -12,7 +11,7 @@ import { ViemContract } from 'types/viem';
 import { getContarctAbi } from 'utils/contracts/abi';
 import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
 import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
-import { getCurrentPrices, getPriceId, getPriceServiceEndpoint } from 'utils/pyth';
+import { getCurrentPrices, getPriceConnection, getPriceId } from 'utils/pyth';
 import { getFeesFromHistory } from 'utils/speedAmm';
 import { getContract } from 'viem';
 
@@ -97,12 +96,7 @@ const useActiveSpeedMarketsDataQuery = (
                 // Fetch current prices
                 let prices: { [key: string]: number } = {};
                 if (openMarkets.length) {
-                    const priceConnection = new EvmPriceServiceConnection(
-                        getPriceServiceEndpoint(queryConfig.networkId),
-                        {
-                            timeout: CONNECTION_TIMEOUT_MS,
-                        }
-                    );
+                    const priceConnection = getPriceConnection(queryConfig.networkId);
                     const priceIds = SUPPORTED_ASSETS.map((asset) => getPriceId(queryConfig.networkId, asset));
                     prices = await getCurrentPrices(priceConnection, queryConfig.networkId, priceIds);
                 }

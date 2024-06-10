@@ -1,4 +1,3 @@
-import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
 import PythInterfaceAbi from '@pythnetwork/pyth-sdk-solidity/abis/IPyth.json';
 import ApprovalModal from 'components/ApprovalModal/ApprovalModal';
 import Button from 'components/Button/Button';
@@ -13,7 +12,7 @@ import {
 import Tooltip from 'components/Tooltip/Tooltip';
 import { USD_SIGN } from 'constants/currency';
 import { ZERO_ADDRESS } from 'constants/network';
-import { CONNECTION_TIMEOUT_MS, PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
+import { PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
 import { differenceInSeconds, millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -37,7 +36,7 @@ import multipleCollateral from 'utils/contracts/multipleCollateralContract';
 import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
 import { getCollateral, getCollaterals, getDefaultCollateral } from 'utils/currency';
 import { checkAllowance, getIsMultiCollateralSupported } from 'utils/network';
-import { getPriceId, getPriceServiceEndpoint, priceParser } from 'utils/pyth';
+import { getPriceConnection, getPriceId, priceParser } from 'utils/pyth';
 import {
     refetchActiveSpeedMarkets,
     refetchBalances,
@@ -192,9 +191,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     };
 
     const handleResolve = async () => {
-        const priceConnection = new EvmPriceServiceConnection(getPriceServiceEndpoint(networkId), {
-            timeout: CONNECTION_TIMEOUT_MS,
-        });
+        const priceConnection = getPriceConnection(networkId);
 
         setIsSubmitting(true);
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
@@ -206,16 +203,19 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                 client: client as Client,
             });
 
-            const [priceFeedUpdateVaa, publishTime] = await priceConnection.getVaa(
-                getPriceId(networkId, position.currencyKey),
-                millisecondsToSeconds(position.maturityDate)
+            const priceFeedUpdate = await priceConnection.getPriceUpdatesAtTimestamp(
+                millisecondsToSeconds(position.maturityDate),
+                [getPriceId(networkId, position.currencyKey)]
             );
+
+            const publishTime = priceFeedUpdate.parsed
+                ? secondsToMilliseconds(priceFeedUpdate.parsed[0].price.publish_time)
+                : Number.POSITIVE_INFINITY;
 
             // check if price feed is not too late
             if (
                 maxPriceDelayForResolvingSec &&
-                differenceInSeconds(secondsToMilliseconds(publishTime), position.maturityDate) >
-                    maxPriceDelayForResolvingSec
+                differenceInSeconds(publishTime, position.maturityDate) > maxPriceDelayForResolvingSec
             ) {
                 await delay(800);
                 toast.update(id, getErrorToastOptions(t('speed-markets.user-positions.errors.price-stale'), id));
@@ -223,7 +223,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                 return;
             }
 
-            const priceUpdateData = ['0x' + Buffer.from(priceFeedUpdateVaa, 'base64').toString('hex')];
+            const priceUpdateData = priceFeedUpdate.binary.data.map((vaa: string) => '0x' + vaa);
             const updateFee = await pythContract.read.getUpdateFee([priceUpdateData]);
 
             const isEth = collateralAddress === ZERO_ADDRESS;
@@ -233,6 +233,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                 address: speedMarketsAMMContract.addresses[networkId],
                 client: walletClient.data as Client,
             }) as ViemContract;
+
             let hash;
             if (isBiconomy) {
                 hash = isDefaultCollateral
@@ -295,9 +296,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     };
 
     const handleOverviewResolve = async () => {
-        const priceConnection = new EvmPriceServiceConnection(getPriceServiceEndpoint(networkId), {
-            timeout: CONNECTION_TIMEOUT_MS,
-        });
+        const priceConnection = getPriceConnection(networkId);
 
         setIsSubmitting(true);
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
@@ -331,16 +330,19 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                     client: client as Client,
                 }) as ViemContract;
 
-                const [priceFeedUpdateVaa, publishTime] = await priceConnection.getVaa(
-                    getPriceId(networkId, position.currencyKey),
-                    millisecondsToSeconds(position.maturityDate)
+                const priceFeedUpdate = await priceConnection.getPriceUpdatesAtTimestamp(
+                    millisecondsToSeconds(position.maturityDate),
+                    [getPriceId(networkId, position.currencyKey)]
                 );
+
+                const publishTime = priceFeedUpdate.parsed
+                    ? secondsToMilliseconds(priceFeedUpdate.parsed[0].price.publish_time)
+                    : Number.POSITIVE_INFINITY;
 
                 // check if price feed is not too late
                 if (
                     maxPriceDelayForResolvingSec &&
-                    differenceInSeconds(secondsToMilliseconds(publishTime), position.maturityDate) >
-                        maxPriceDelayForResolvingSec
+                    differenceInSeconds(publishTime, position.maturityDate) > maxPriceDelayForResolvingSec
                 ) {
                     await delay(800);
                     toast.update(id, getErrorToastOptions(t('speed-markets.user-positions.errors.price-stale'), id));
@@ -348,7 +350,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                     return;
                 }
 
-                const priceUpdateData = ['0x' + Buffer.from(priceFeedUpdateVaa, 'base64').toString('hex')];
+                const priceUpdateData = priceFeedUpdate.binary.data.map((vaa: string) => '0x' + vaa);
                 const updateFee = await pythContract.read.getUpdateFee([priceUpdateData]);
 
                 if (isBiconomy) {

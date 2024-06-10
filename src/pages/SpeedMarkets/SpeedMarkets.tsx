@@ -1,15 +1,16 @@
-import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
 import banner from 'assets/images/speed-markets-banner.png';
+import Modal from 'components/Modal';
 import PageLinkBanner from 'components/PageLinkBanner';
 import SPAAnchor from 'components/SPAAnchor/SPAAnchor';
 import SimpleLoader from 'components/SimpleLoader';
 import { LINKS } from 'constants/links';
-import { CONNECTION_TIMEOUT_MS, SUPPORTED_ASSETS } from 'constants/pyth';
+import { SUPPORTED_ASSETS } from 'constants/pyth';
 import ROUTES from 'constants/routes';
 import { secondsToMilliseconds } from 'date-fns';
 import { Positions, TradingSteps } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import useInterval from 'hooks/useInterval';
+import MobileMenu from 'layouts/DappLayout/components/MobileMenu';
 import LightweightChart from 'pages/SpeedMarkets/components/PriceChart/LightweightChart';
 import UserOpenPositions from 'pages/SpeedMarkets/components/UserOpenPositions';
 import useAmmChainedSpeedMarketsLimitsQuery from 'queries/speedMarkets/useAmmChainedSpeedMarketsLimitsQuery';
@@ -20,12 +21,13 @@ import { Trans, useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { getIsAppReady } from 'redux/modules/app';
+import { getIsMobile } from 'redux/modules/ui';
 import styled from 'styled-components';
 import { BoldText, PAGE_MAX_WIDTH } from 'styles/common';
 import { roundNumberToDecimals } from 'thales-utils';
 import { RootState } from 'types/ui';
 import { getSupportedNetworksByRoute } from 'utils/network';
-import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAssetsAsObject } from 'utils/pyth';
+import { getCurrentPrices, getPriceConnection, getPriceId, getSupportedAssetsAsObject } from 'utils/pyth';
 import { buildHref } from 'utils/routes';
 import { useAccount, useChainId, useClient } from 'wagmi';
 import AmmSpeedTrading from './components/AmmSpeedTrading';
@@ -34,9 +36,6 @@ import SelectBuyin from './components/SelectBuyin';
 import SelectPosition from './components/SelectPosition';
 import { SelectedPosition } from './components/SelectPosition/SelectPosition';
 import SelectTime from './components/SelectTime';
-import MobileMenu from 'layouts/DappLayout/components/MobileMenu';
-import Modal from 'components/Modal';
-import { getIsMobile } from 'redux/modules/ui';
 
 const SpeedMarkets: React.FC = () => {
     const { t } = useTranslation();
@@ -84,9 +83,7 @@ const SpeedMarkets: React.FC = () => {
         return ammChainedSpeedMarketsLimitsQuery.isSuccess ? ammChainedSpeedMarketsLimitsQuery.data : null;
     }, [ammChainedSpeedMarketsLimitsQuery]);
 
-    const priceConnection = useMemo(() => {
-        return new EvmPriceServiceConnection(getPriceServiceEndpoint(networkId), { timeout: CONNECTION_TIMEOUT_MS });
-    }, [networkId]);
+    const priceConnection = useMemo(() => getPriceConnection(networkId), [networkId]);
 
     const prevPrice = useRef(0);
     const fetchCurrentPrices = useCallback(async () => {
