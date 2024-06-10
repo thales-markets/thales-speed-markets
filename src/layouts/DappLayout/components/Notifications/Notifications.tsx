@@ -9,7 +9,7 @@ import useInterval from 'hooks/useInterval';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
 import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveSpeedMarketsDataQuery';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
@@ -183,11 +183,16 @@ const Notifications: React.FC = () => {
         });
     }, secondsToMilliseconds(30));
 
-    const totalNotifications = claimableUserSpeedMarkets.length + claimableChainedUserMarkets.length;
+    useEffect(() => {
+        dispatch(
+            setUserNotifications({
+                single: claimableUserSpeedMarkets.length,
+                chained: claimableChainedUserMarkets.length,
+            })
+        );
+    }, [claimableUserSpeedMarkets.length, claimableChainedUserMarkets.length, dispatch]);
 
-    dispatch(
-        setUserNotifications({ single: claimableUserSpeedMarkets.length, chained: claimableChainedUserMarkets.length })
-    );
+    const totalNotifications = claimableUserSpeedMarkets.length + claimableChainedUserMarkets.length;
 
     const hasNotifications = totalNotifications > 0;
 
