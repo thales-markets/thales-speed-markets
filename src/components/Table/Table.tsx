@@ -253,7 +253,7 @@ const ExpandableRowReact: React.FC<{
             <TableRow
                 style={{ ...tableRowStyles, borderBottom: hidden ? '' : 'none' }}
                 cursorPointer={true}
-                onClick={setHidden.bind(this, !hidden)}
+                onClick={(e) => !(e.target instanceof HTMLButtonElement) && setHidden(!hidden)}
             >
                 {row.getAllCells().map((cell: any, cellIndex: any) => (
                     <TableCell
