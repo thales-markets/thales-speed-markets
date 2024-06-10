@@ -1,7 +1,13 @@
-import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
+import { HermesClient } from '@pythnetwork/hermes-client';
 import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
 import { LINKS } from 'constants/links';
-import { PRICE_ID, PRICE_SERVICE_ENDPOINTS, PYTH_CURRENCY_DECIMALS, SUPPORTED_ASSETS } from 'constants/pyth';
+import {
+    CONNECTION_TIMEOUT_MS,
+    PRICE_ID,
+    PRICE_SERVICE_ENDPOINTS,
+    PYTH_CURRENCY_DECIMALS,
+    SUPPORTED_ASSETS,
+} from 'constants/pyth';
 import { NetworkId, bigNumberFormatter, floorNumberToDecimals } from 'thales-utils';
 import { parseUnits } from 'viem';
 
@@ -11,6 +17,10 @@ export const getPriceServiceEndpoint = (networkId: NetworkId) => {
     } else {
         return PRICE_SERVICE_ENDPOINTS.mainnet;
     }
+};
+
+export const getPriceConnection = (networkId: NetworkId) => {
+    return new HermesClient(getPriceServiceEndpoint(networkId), { timeout: CONNECTION_TIMEOUT_MS });
 };
 
 export const getPriceId = (networkId: NetworkId, currency: typeof CRYPTO_CURRENCY_MAP[number]) => {
@@ -35,23 +45,20 @@ const getCurrencyByPriceId = (networkId: NetworkId, priceId: string) => {
 
 export const getSupportedAssetsAsObject = () => SUPPORTED_ASSETS.reduce((acc, asset) => ({ ...acc, [asset]: 0 }), {});
 
-export const getCurrentPrices = async (
-    connection: EvmPriceServiceConnection,
-    networkId: NetworkId,
-    priceIds: string[]
-) => {
+export const getCurrentPrices = async (connection: HermesClient, networkId: NetworkId, priceIds: string[]) => {
     let currentPrices = getSupportedAssetsAsObject();
 
     try {
-        const priceFeeds = await connection.getLatestPriceFeeds(priceIds);
+        const priceFeeds = await connection.getLatestPriceUpdates(priceIds);
 
-        if (priceFeeds) {
-            currentPrices = priceFeeds.reduce(
+        if (priceFeeds.parsed) {
+            currentPrices = priceFeeds.parsed.reduce(
                 (accumulator, priceFeed) => ({
                     ...accumulator,
-                    [getCurrencyByPriceId(networkId, priceFeed.id)]:
-                        // Get the price if it is not older than 30 seconds from the current time
-                        priceFeed.getPriceNoOlderThan(30)?.getPriceAsNumberUnchecked() || 0,
+                    [getCurrencyByPriceId(networkId, priceFeed.id)]: bigNumberFormatter(
+                        BigInt(priceFeed.price.price),
+                        PYTH_CURRENCY_DECIMALS
+                    ),
                 }),
                 {}
             );

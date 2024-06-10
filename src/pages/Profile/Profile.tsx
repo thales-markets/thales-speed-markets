@@ -1,9 +1,8 @@
-import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
 import SPAAnchor from 'components/SPAAnchor';
 import SearchInput from 'components/SearchInput';
 import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
 import { MARKET_DURATION_IN_DAYS } from 'constants/market';
-import { CONNECTION_TIMEOUT_MS, SUPPORTED_ASSETS } from 'constants/pyth';
+import { SUPPORTED_ASSETS } from 'constants/pyth';
 import ROUTES from 'constants/routes';
 import { secondsToMilliseconds } from 'date-fns';
 import useInterval from 'hooks/useInterval';
@@ -21,7 +20,7 @@ import { getIsMobile } from 'redux/modules/ui';
 import { getUserNotifications } from 'redux/modules/user';
 import { FlexDivEnd } from 'styles/common';
 import { RootState } from 'types/ui';
-import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAssetsAsObject } from 'utils/pyth';
+import { getCurrentPrices, getPriceConnection, getPriceId, getSupportedAssetsAsObject } from 'utils/pyth';
 import { buildHref, history } from 'utils/routes';
 import { useChainId, useClient } from 'wagmi';
 import ProfileHeader from './components/ProfileHeader';
@@ -75,9 +74,7 @@ const Profile: React.FC = () => {
         Object.values(TabItems).includes(queryParamTab) ? queryParamTab : TabItems.MY_POSITIONS
     );
 
-    const priceConnection = useMemo(() => {
-        return new EvmPriceServiceConnection(getPriceServiceEndpoint(networkId), { timeout: CONNECTION_TIMEOUT_MS });
-    }, [networkId]);
+    const priceConnection = useMemo(() => getPriceConnection(networkId), [networkId]);
 
     // Refresh current prices
     useInterval(async () => {

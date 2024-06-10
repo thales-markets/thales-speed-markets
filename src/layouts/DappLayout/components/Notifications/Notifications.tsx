@@ -1,8 +1,7 @@
-import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
 import SPAAnchor from 'components/SPAAnchor/SPAAnchor';
 import Tooltip from 'components/Tooltip';
 import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
-import { CONNECTION_TIMEOUT_MS, SUPPORTED_ASSETS } from 'constants/pyth';
+import { SUPPORTED_ASSETS } from 'constants/pyth';
 import ROUTES from 'constants/routes';
 import { millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
 import useInterval from 'hooks/useInterval';
@@ -21,7 +20,7 @@ import { UserChainedPosition, UserPosition } from 'types/market';
 import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
-import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAssetsAsObject } from 'utils/pyth';
+import { getCurrentPrices, getPriceConnection, getPriceId, getSupportedAssetsAsObject } from 'utils/pyth';
 import { buildHref } from 'utils/routes';
 import { isUserWinner } from 'utils/speedAmm';
 import { useAccount, useChainId, useClient } from 'wagmi';
@@ -168,9 +167,7 @@ const Notifications: React.FC = () => {
         })
         .filter((marketData) => marketData.isClaimable);
 
-    const priceConnection = useMemo(() => {
-        return new EvmPriceServiceConnection(getPriceServiceEndpoint(networkId), { timeout: CONNECTION_TIMEOUT_MS });
-    }, [networkId]);
+    const priceConnection = useMemo(() => getPriceConnection(networkId), [networkId]);
 
     // Refresh current prices
     useInterval(async () => {

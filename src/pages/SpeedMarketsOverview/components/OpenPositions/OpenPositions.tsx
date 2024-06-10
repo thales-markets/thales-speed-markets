@@ -1,9 +1,8 @@
-import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
 import Button from 'components/Button';
 import SimpleLoader from 'components/SimpleLoader/SimpleLoader';
 import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
 import { SPEED_MARKETS_OVERVIEW_SECTIONS as SECTIONS } from 'constants/market';
-import { CONNECTION_TIMEOUT_MS, SUPPORTED_ASSETS } from 'constants/pyth';
+import { SUPPORTED_ASSETS } from 'constants/pyth';
 import { millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
 import useInterval from 'hooks/useInterval';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
@@ -22,7 +21,7 @@ import erc20Contract from 'utils/contracts/collateralContract';
 import multipleCollateral from 'utils/contracts/multipleCollateralContract';
 import { getCollateral } from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
-import { getCurrentPrices, getPriceId, getPriceServiceEndpoint, getSupportedAssetsAsObject } from 'utils/pyth';
+import { getCurrentPrices, getPriceConnection, getPriceId, getSupportedAssetsAsObject } from 'utils/pyth';
 import { refetchActiveSpeedMarkets, refetchPythPrice } from 'utils/queryConnector';
 import { isUserWinner, resolveAllSpeedPositions } from 'utils/speedAmm';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
@@ -136,9 +135,7 @@ const OpenPositions: React.FC = () => {
             activeSpeedMarketsDataQuery.isLoading ||
             pythPricesQueries.some((query) => query.isLoading));
 
-    const priceConnection = useMemo(() => {
-        return new EvmPriceServiceConnection(getPriceServiceEndpoint(networkId), { timeout: CONNECTION_TIMEOUT_MS });
-    }, [networkId]);
+    const priceConnection = useMemo(() => getPriceConnection(networkId), [networkId]);
 
     useInterval(async () => {
         // Check if there are new matured markets from open markets and refresh it

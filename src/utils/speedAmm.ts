@@ -1,4 +1,3 @@
-import * as pythEvmJs from '@pythnetwork/pyth-evm-js';
 import PythInterfaceAbi from '@pythnetwork/pyth-sdk-solidity/abis/IPyth.json';
 import {
     getDefaultToastContent,
@@ -8,7 +7,7 @@ import {
     getSuccessToastOptions,
 } from 'components/ToastMessage/ToastMessage';
 import { ZERO_ADDRESS } from 'constants/network';
-import { CONNECTION_TIMEOUT_MS, PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
+import { PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
 import { millisecondsToSeconds, secondsToMinutes } from 'date-fns';
 import { Positions } from 'enums/market';
 import i18n from 'i18n';
@@ -16,7 +15,7 @@ import { toast } from 'react-toastify';
 import { UserChainedPosition, UserPosition } from 'types/market';
 import { QueryConfig, SupportedNetwork } from 'types/network';
 import { ViemContract } from 'types/viem';
-import { getPriceId, getPriceServiceEndpoint, priceParser } from 'utils/pyth';
+import { getPriceConnection, getPriceId, priceParser } from 'utils/pyth';
 import { refetchActiveSpeedMarkets } from 'utils/queryConnector';
 import { delay } from 'utils/timer';
 import { getContract } from 'viem';
@@ -187,9 +186,7 @@ export const resolveAllSpeedPositions = async (
         return;
     }
 
-    const priceConnection = new pythEvmJs.EvmPriceServiceConnection(getPriceServiceEndpoint(queryConfig.networkId), {
-        timeout: CONNECTION_TIMEOUT_MS,
-    });
+    const priceConnection = getPriceConnection(queryConfig.networkId);
 
     const id = toast.loading(getDefaultToastContent(i18n.t('common.progress')), getLoadingToastOptions());
 
@@ -221,12 +218,12 @@ export const resolveAllSpeedPositions = async (
                 client: queryConfig.client,
             }) as ViemContract;
 
-            const [priceFeedUpdateVaa] = await priceConnection.getVaa(
-                getPriceId(queryConfig.networkId, position.currencyKey),
-                millisecondsToSeconds(position.maturityDate)
+            const priceFeedUpdate = await priceConnection.getPriceUpdatesAtTimestamp(
+                millisecondsToSeconds(position.maturityDate),
+                [getPriceId(queryConfig.networkId, position.currencyKey)]
             );
 
-            const priceUpdateData = ['0x' + Buffer.from(priceFeedUpdateVaa, 'base64').toString('hex')];
+            const priceUpdateData = priceFeedUpdate.binary.data.map((vaa: string) => '0x' + vaa);
             const updateFee = await pythContract.read.getUpdateFee([priceUpdateData]);
 
             marketsToResolve.push(position.market);
@@ -296,9 +293,7 @@ export const resolveAllChainedMarkets = async (
         return;
     }
 
-    const priceConnection = new pythEvmJs.EvmPriceServiceConnection(getPriceServiceEndpoint(queryConfig.networkId), {
-        timeout: CONNECTION_TIMEOUT_MS,
-    });
+    const priceConnection = getPriceConnection(queryConfig.networkId);
 
     const id = toast.loading(getDefaultToastContent(i18n.t('common.progress')), getLoadingToastOptions());
 
@@ -343,15 +338,18 @@ export const resolveAllChainedMarkets = async (
             const pythPriceId = getPriceId(queryConfig.networkId, position.currencyKey);
             const strikeTimesToFetchPrice = position.strikeTimes.slice(0, fetchUntilFinalPriceEndIndexes[index]);
             for (let i = 0; i < strikeTimesToFetchPrice.length; i++) {
-                promises.push(priceConnection.getVaa(pythPriceId, millisecondsToSeconds(position.strikeTimes[i])));
+                promises.push(
+                    priceConnection.getPriceUpdatesAtTimestamp(millisecondsToSeconds(position.strikeTimes[i]), [
+                        pythPriceId,
+                    ])
+                );
             }
             const priceFeedUpdateVaas = await Promise.all(promises);
 
             promises = [];
             const priceUpdateDataPerMarket: string[][] = [];
             for (let i = 0; i < strikeTimesToFetchPrice.length; i++) {
-                const [priceFeedUpdateVaa] = priceFeedUpdateVaas[i];
-                const priceUpdateData = ['0x' + Buffer.from(priceFeedUpdateVaa, 'base64').toString('hex')];
+                const priceUpdateData = priceFeedUpdateVaas[i].binary.data.map((vaa: string) => '0x' + vaa);
                 priceUpdateDataPerMarket.push(priceUpdateData);
                 promises.push(pythContract.read.getUpdateFee([priceUpdateData]));
             }
