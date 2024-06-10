@@ -12,6 +12,7 @@ import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import { useChainId, useAccount } from 'wagmi';
 import { getInfoToastOptions, getErrorToastOptions } from 'components/ToastMessage/ToastMessage';
 import { toast } from 'react-toastify';
+import { ScreenSizeBreakpoint } from 'enums/ui';
 
 const ProfileHeader: React.FC = () => {
     const networkId = useChainId();
@@ -55,13 +56,13 @@ const ProfileHeader: React.FC = () => {
                     <TextLabel>{t('user-info.eoa')} </TextLabel>
                     <Value>{address?.toLowerCase()}</Value>
                 </FlexDivColumn>
+                {isBiconomy && (
+                    <SessionWrapper>
+                        <TextLabel>{t('user-info.session-valid')}: </TextLabel>
+                        <Value>{formatShortDateWithFullTime(Number(validUntil) * 1000)}</Value>
+                    </SessionWrapper>
+                )}
             </FlexColumn>
-            {isBiconomy && (
-                <SessionWrapper>
-                    <TextLabel>{t('user-info.session-valid')}: </TextLabel>
-                    <Value>{formatShortDateWithFullTime(Number(validUntil) * 1000)}</Value>
-                </SessionWrapper>
-            )}
         </Container>
     );
 };
@@ -69,6 +70,10 @@ const ProfileHeader: React.FC = () => {
 const Container = styled(FlexDivSpaceBetween)`
     width: 100%;
     align-items: flex-start;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        flex-direction: column;
+        gap: 10px;
+    }
 `;
 const FlexColumn = styled(FlexDivColumn)`
     gap: 10px;

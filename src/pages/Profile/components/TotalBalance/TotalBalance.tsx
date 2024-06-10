@@ -8,7 +8,7 @@ import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsBiconomy } from 'redux/modules/wallet';
 import styled from 'styled-components';
-import { FlexDiv, FlexDivColumnCentered, GradientContainer } from 'styles/common';
+import { FlexDiv, FlexDivCentered, FlexDivColumnCentered, FlexDivStart, GradientContainer } from 'styles/common';
 import { Coins, formatCurrency, formatCurrencyWithSign } from 'thales-utils';
 import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
@@ -43,21 +43,6 @@ const TotalBalance: React.FC = () => {
     const exchangeRates: Rates | null =
         exchangeRatesQuery.isSuccess && exchangeRatesQuery.data ? exchangeRatesQuery.data : null;
 
-    const totalBalanceValue = useMemo(() => {
-        let total = 0;
-        try {
-            if (exchangeRates && multipleCollateralBalances.data) {
-                getCollaterals(networkId).forEach((token: Coins) => {
-                    total += multipleCollateralBalances.data[token] * (exchangeRates[token] ? exchangeRates[token] : 1);
-                });
-            }
-
-            return total ? total : 'N/A';
-        } catch (e) {
-            return 'N/A';
-        }
-    }, [exchangeRates, multipleCollateralBalances.data, networkId]);
-
     const getUSDForCollateral = useCallback(
         (token: Coins) =>
             (multipleCollateralBalances.data ? multipleCollateralBalances.data[token] : 0) *
@@ -65,12 +50,38 @@ const TotalBalance: React.FC = () => {
         [multipleCollateralBalances, exchangeRates]
     );
 
+    const totalBalanceValue = useMemo(() => {
+        let total = 0;
+        try {
+            if (exchangeRates && multipleCollateralBalances.data) {
+                getCollaterals(networkId).forEach((token: Coins) => {
+                    total += getUSDForCollateral(token);
+                });
+            }
+
+            return total ? total : 'N/A';
+        } catch (e) {
+            return 'N/A';
+        }
+    }, [exchangeRates, multipleCollateralBalances.data, networkId, getUSDForCollateral]);
+
     return (
         <GradientContainer>
             <BalanceWrapper>
                 <TotalBalanceWrapper>
-                    <SectionLabel>{t('profile.balance')}</SectionLabel>
-                    <TotalBalanceSpan>{formatCurrencyWithSign(USD_SIGN, totalBalanceValue)}</TotalBalanceSpan>
+                    <FlexDivColumnCentered>
+                        <SectionLabel>{t('profile.balance')}</SectionLabel>
+                        <TotalBalanceSpan>{formatCurrencyWithSign(USD_SIGN, totalBalanceValue)}</TotalBalanceSpan>
+                    </FlexDivColumnCentered>
+
+                    <ColumnWrapper>
+                        <Button width="120px" fontSize="13px" height="30px">
+                            Deposit
+                        </Button>
+                        <Button width="120px" fontSize="13px" height="30px">
+                            Withdraw
+                        </Button>
+                    </ColumnWrapper>
                 </TotalBalanceWrapper>
 
                 <TokenBalancesWrapper>
@@ -81,28 +92,25 @@ const TotalBalance: React.FC = () => {
                                     <TokenIcon className={`currency-icon currency-icon--${token.toLowerCase()}`} />
                                     <TokenName> {token}</TokenName>
                                 </Token>
-                                <IndividualTokenBalance>
-                                    {multipleCollateralBalances.data
-                                        ? formatCurrency(multipleCollateralBalances.data[token])
-                                        : 0}
-                                </IndividualTokenBalance>
-                                <IndividualTokenBalance>
-                                    {!exchangeRates?.[token] && !isStableCurrency(token as Coins)
-                                        ? '...'
-                                        : ` (${formatCurrencyWithSign(USD_SIGN, getUSDForCollateral(token as Coins))})`}
-                                </IndividualTokenBalance>
+                                <IndividualBalance>
+                                    <IndividualTokenBalance>
+                                        {multipleCollateralBalances.data
+                                            ? formatCurrency(multipleCollateralBalances.data[token])
+                                            : 0}
+                                    </IndividualTokenBalance>
+                                    <IndividualTokenBalance>
+                                        {!exchangeRates?.[token] && !isStableCurrency(token as Coins)
+                                            ? '...'
+                                            : ` (${formatCurrencyWithSign(
+                                                  USD_SIGN,
+                                                  getUSDForCollateral(token as Coins)
+                                              )})`}
+                                    </IndividualTokenBalance>
+                                </IndividualBalance>
                             </IndividualTokenBalanceWrapper>
                         );
                     })}
                 </TokenBalancesWrapper>
-                <ColumnWrapper>
-                    <Button fontSize="13px" height="30px">
-                        Deposit{' '}
-                    </Button>
-                    <Button fontSize="13px" height="30px">
-                        Withdraw{' '}
-                    </Button>
-                </ColumnWrapper>
             </BalanceWrapper>
         </GradientContainer>
     );
@@ -113,16 +121,19 @@ const BalanceWrapper = styled(FlexDiv)`
     padding: 16px 30px;
     border-radius: 8px;
     gap: 20px;
+    flex-direction: column;
 `;
 
-const ColumnWrapper = styled(FlexDivColumnCentered)`
+const ColumnWrapper = styled(FlexDivCentered)`
     gap: 10px;
 `;
 
 const TotalBalanceWrapper = styled(ColumnWrapper)`
     gap: 10px;
     min-width: 190px;
-    border-right: 1px solid ${(props) => props.theme.borderColor.quaternary};
+    border-bottom: 2px solid ${(props) => props.theme.borderColor.quaternary};
+    padding-bottom: 14px;
+    align-items: flex-end;
 `;
 
 const SectionLabel = styled.span`
@@ -132,6 +143,7 @@ const SectionLabel = styled.span`
     letter-spacing: 1px;
     text-transform: capitalize;
     color: ${(props) => props.theme.textColor.quinary};
+    margin-bottom: 4px;
     white-space: pre;
 `;
 
@@ -149,20 +161,26 @@ const TotalBalanceSpan = styled.span`
 const TokenBalancesWrapper = styled(FlexDiv)`
     flex-direction: row;
     flex-wrap: wrap;
-    justify-content: flex-start;
+    justify-content: space-between;
     gap: 10px;
 `;
 
 const IndividualTokenBalanceWrapper = styled(FlexDiv)`
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
-    min-width: 150px;
+    min-width: 200px;
     margin: 0 10px;
+    gap: 20px;
+`;
+
+const IndividualBalance = styled(FlexDivStart)`
+    gap: 2px;
 `;
 
 const Token = styled(FlexDiv)`
     align-items: center;
+    width: 80px;
 `;
 
 const TokenName = styled.span`
