@@ -78,6 +78,8 @@ import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 import PriceSlippage from '../PriceSlippage';
 import { SelectedPosition } from '../SelectPosition/SelectPosition';
 import SharePosition from '../SharePosition';
+import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveSpeedMarketsDataQuery';
+import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
 
 type AmmSpeedTradingProps = {
     isChained: boolean;
@@ -96,6 +98,8 @@ type AmmSpeedTradingProps = {
     resetData: React.Dispatch<void>;
     hasError: boolean;
 };
+
+const DEFAULT_CREATOR_DELAY_TIME_SEC = 12;
 
 const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     isChained,
@@ -138,6 +142,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     const [hasAllowance, setAllowance] = useState(false);
     const [openApprovalModal, setOpenApprovalModal] = useState(false);
     const [openTwitterShareModal, setOpenTwitterShareModal] = useState(false);
+    const [toastId, setToastId] = useState<string | number>('');
 
     const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
 
@@ -217,8 +222,39 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         selectedCollateral,
     ]);
 
-    const isBlastSepolia = networkId === NetworkId.BlastSepolia;
-    const isMintAvailable = isBlastSepolia && collateralBalance < paidAmount;
+    // SINGLE
+    const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
+        { networkId, client },
+        isBiconomy ? biconomyConnector.address : walletAddress || '',
+        {
+            enabled: isAppReady && isConnected && !isChained && isSubmitting,
+        }
+    );
+
+    const userOpenSpeedMarketsData = useMemo(
+        () =>
+            userActiveSpeedMarketsDataQuery.isSuccess && userActiveSpeedMarketsDataQuery.data
+                ? userActiveSpeedMarketsDataQuery.data
+                : [],
+        [userActiveSpeedMarketsDataQuery]
+    );
+
+    // CHAINED
+    const userChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
+        { networkId, client },
+        isBiconomy ? biconomyConnector.address : walletAddress || '',
+        {
+            enabled: isAppReady && isConnected && isChained && isSubmitting,
+        }
+    );
+
+    const userOpenChainedSpeedMarketsData = useMemo(
+        () =>
+            userChainedSpeedMarketsDataQuery.isSuccess && userChainedSpeedMarketsDataQuery.data
+                ? userChainedSpeedMarketsDataQuery.data
+                : [],
+        [userChainedSpeedMarketsDataQuery]
+    );
 
     const exchangeRatesMarketDataQuery = useExchangeRatesQuery(
         { networkId, client },
@@ -397,6 +433,27 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         positionType,
     ]);
 
+    // check if new market is created
+    useEffect(() => {
+        let numOfUserMarketsBefore = 0;
+
+        if (isSubmitting) {
+            numOfUserMarketsBefore = isChained
+                ? userOpenChainedSpeedMarketsData.length
+                : userOpenSpeedMarketsData.length;
+        } else if (toastId !== '') {
+            const numOfUserMarketsAfter = isChained
+                ? userOpenChainedSpeedMarketsData.length
+                : userOpenSpeedMarketsData.length;
+
+            if (numOfUserMarketsAfter - numOfUserMarketsBefore > 0) {
+                toast.update(toastId, getSuccessToastOptions(t(`common.buy.confirmation-message`), toastId));
+            } else {
+                toast.update(toastId, getErrorToastOptions(t('common.errors.buy-failed'), toastId));
+            }
+        }
+    }, [isSubmitting, isChained, userOpenSpeedMarketsData.length, userOpenChainedSpeedMarketsData.length, t, toastId]);
+
     // Check allowance
     useDebouncedEffect(() => {
         if (!collateralAddress) {
@@ -505,6 +562,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
         setIsSubmitting(true);
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
+        setToastId(id);
 
         const speedMarketsAMMContractWithSigner = getContract({
             abi: speedMarketsAMMCreatorContract.abi,
@@ -576,13 +634,14 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             const txReceipt = await waitForTransactionReceipt(client as Client, { hash });
 
             if (txReceipt.status === 'success') {
-                toast.update(id, getSuccessToastOptions(t(`common.buy.confirmation-message`), id));
                 resetData();
                 setPaidAmount(0);
                 setSubmittedStrikePrice(0);
-                setIsSubmitting(false);
 
-                await delay(secondsToMilliseconds(12)); // wait some time for creator to pick up pending markets
+                // wait some time for creator to pick up pending markets (after max delay it will fail for sure)
+                await delay(
+                    secondsToMilliseconds(ammSpeedMarketsLimits?.maxPriceDelaySec || DEFAULT_CREATOR_DELAY_TIME_SEC)
+                );
 
                 refetchUserSpeedMarkets(
                     isChained,
@@ -592,6 +651,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 refetchActiveSpeedMarkets(isChained, networkId);
                 refetchSpeedMarketsLimits(isChained, networkId);
                 refetchBalances((isBiconomy ? biconomyConnector.address : walletAddress) as string, networkId);
+
                 PLAUSIBLE.trackEvent(
                     isChained ? PLAUSIBLE_KEYS.chainedSpeedMarketsBuy : PLAUSIBLE_KEYS.speedMarketsBuy,
                     {
@@ -605,17 +665,18 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             } else {
                 console.log('Transaction status', txReceipt.status);
                 await delay(800);
+                setToastId('');
                 toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
                 setSubmittedStrikePrice(0);
-                setIsSubmitting(false);
             }
         } catch (e) {
             console.log(e);
             await delay(800);
+            setToastId('');
             toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
             setSubmittedStrikePrice(0);
-            setIsSubmitting(false);
         }
+        setIsSubmitting(false);
     };
 
     const handleMint = async () => {
@@ -653,6 +714,9 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         }
         setIsSubmitting(false);
     };
+
+    const isBlastSepolia = networkId === NetworkId.BlastSepolia;
+    const isMintAvailable = isBlastSepolia && collateralBalance < paidAmount;
 
     const getSubmitButton = () => {
         if (!isConnected) {
