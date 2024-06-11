@@ -1,11 +1,13 @@
 import Button from 'components/Button';
 import { USD_SIGN } from 'constants/currency';
+import { ScreenSizeBreakpoint } from 'enums/ui';
 import useExchangeRatesQuery, { Rates } from 'queries/rates/useExchangeRatesQuery';
 import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipleCollateralBalanceQuery';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
+import { getIsMobile } from 'redux/modules/ui';
 import { getIsBiconomy } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDiv, FlexDivCentered, FlexDivColumnCentered, FlexDivStart, GradientContainer } from 'styles/common';
@@ -22,6 +24,7 @@ const TotalBalance: React.FC = () => {
     const client = useClient();
     const { address } = useAccount();
     const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
+    const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const walletAddress = isBiconomy ? biconomyConnector.address : address;
 
@@ -86,10 +89,10 @@ const TotalBalance: React.FC = () => {
                     </FlexDivColumnCentered>
 
                     <ColumnWrapper>
-                        <Button width="120px" fontSize="13px" height="30px">
+                        <Button width={isMobile ? '100px' : '120px'} fontSize="13px" height="30px">
                             Deposit
                         </Button>
-                        <Button width="120px" fontSize="13px" height="30px">
+                        <Button width={isMobile ? '100px' : '120px'} fontSize="13px" height="30px">
                             Withdraw
                         </Button>
                     </ColumnWrapper>
@@ -130,13 +133,19 @@ const BalanceWrapper = styled(FlexDiv)`
     border-radius: 8px;
     gap: 20px;
     flex-direction: column;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        padding: 16px 10px;
+    }
 `;
 
 const ColumnWrapper = styled(FlexDivCentered)`
     gap: 10px;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        gap: 4px;
+    }
 `;
 
-const TotalBalanceWrapper = styled(ColumnWrapper)`
+const TotalBalanceWrapper = styled(FlexDivCentered)`
     gap: 10px;
     min-width: 190px;
     border-bottom: 2px solid ${(props) => props.theme.borderColor.quaternary};
