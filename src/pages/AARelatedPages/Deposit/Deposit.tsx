@@ -27,19 +27,15 @@ import { Coins } from 'thales-utils';
 const Tutorials = [
     {
         name: 'Coinbase',
-        url: '',
+        url: 'https://docs.thales.io/thales-speed-markets/speed-market-deposit-guides/deposit-usdc-from-coinbase',
     },
     {
-        name: 'Robinhood',
-        url: '',
+        name: 'Binance Mobile',
+        url: 'https://docs.thales.io/thales-speed-markets/speed-market-deposit-guides/deposit-from-binance-mobile-app',
     },
     {
-        name: 'ETH',
-        url: '',
-    },
-    {
-        name: "I don't have any crypto",
-        url: '',
+        name: 'Binance Website',
+        url: 'https://docs.thales.io/thales-speed-markets/speed-market-deposit-guides/deposit-from-binance-website',
     },
 ];
 
