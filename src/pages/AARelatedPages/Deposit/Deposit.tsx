@@ -194,10 +194,18 @@ const Wrapper = styled.div`
     flex-direction: column;
     align-items: flex-start;
     gap: 30px;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        gap: 10px;
+    }
 `;
 
 const Container = styled(FlexDiv)`
     gap: 30px;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        width: 100%;
+        flex-direction: column;
+        gap: 10px;
+    }
 `;
 
 const Description = styled.h2`
