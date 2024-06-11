@@ -143,6 +143,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     const [openApprovalModal, setOpenApprovalModal] = useState(false);
     const [openTwitterShareModal, setOpenTwitterShareModal] = useState(false);
     const [toastId, setToastId] = useState<string | number>('');
+    const [numOfUserMarketsBeforeBuy, setNumOfUserMarketsBeforeBuy] = useState(-1); // deafult -1 when buy not started
 
     const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
 
@@ -435,25 +436,33 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
     // check if new market is created
     useEffect(() => {
-        let numOfUserMarketsBefore = 0;
-
-        if (isSubmitting) {
-            numOfUserMarketsBefore = isChained
-                ? userOpenChainedSpeedMarketsData.length
-                : userOpenSpeedMarketsData.length;
-        } else if (toastId !== '') {
+        if (isSubmitting && numOfUserMarketsBeforeBuy === -1) {
+            setNumOfUserMarketsBeforeBuy(
+                isChained ? userOpenChainedSpeedMarketsData.length : userOpenSpeedMarketsData.length
+            );
+        } else if (!isSubmitting && toastId !== '') {
             const numOfUserMarketsAfter = isChained
                 ? userOpenChainedSpeedMarketsData.length
                 : userOpenSpeedMarketsData.length;
 
             // TODO: improve by comparing markets addresses before and after
-            if (numOfUserMarketsAfter - numOfUserMarketsBefore > 0) {
+            if (numOfUserMarketsAfter - numOfUserMarketsBeforeBuy > 0) {
                 toast.update(toastId, getSuccessToastOptions(t(`common.buy.confirmation-message`), toastId));
             } else {
                 toast.update(toastId, getErrorToastOptions(t('common.errors.buy-failed'), toastId));
             }
+            setToastId('');
+            setNumOfUserMarketsBeforeBuy(-1);
         }
-    }, [isSubmitting, isChained, userOpenSpeedMarketsData.length, userOpenChainedSpeedMarketsData.length, t, toastId]);
+    }, [
+        numOfUserMarketsBeforeBuy,
+        isSubmitting,
+        isChained,
+        userOpenSpeedMarketsData.length,
+        userOpenChainedSpeedMarketsData.length,
+        t,
+        toastId,
+    ]);
 
     // Check allowance
     useDebouncedEffect(() => {
@@ -640,9 +649,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 setSubmittedStrikePrice(0);
 
                 // wait some time for creator to pick up pending markets (after max delay it will fail for sure)
-                await delay(
-                    secondsToMilliseconds(ammSpeedMarketsLimits?.maxPriceDelaySec || DEFAULT_CREATOR_DELAY_TIME_SEC)
-                );
+                await delay(secondsToMilliseconds(DEFAULT_CREATOR_DELAY_TIME_SEC));
 
                 refetchUserSpeedMarkets(
                     isChained,
@@ -677,6 +684,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
             setSubmittedStrikePrice(0);
         }
+        await delay(3000); // wait for refetch
         setIsSubmitting(false);
     };
 
