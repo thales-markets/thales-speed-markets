@@ -62,7 +62,7 @@ import {
     isStableCurrency,
 } from 'utils/currency';
 import { checkAllowance, getIsMultiCollateralSupported } from 'utils/network';
-import { getPriceId, getPriceServiceEndpoint, priceParser } from 'utils/pyth';
+import { getPriceConnection, getPriceId, priceParser } from 'utils/pyth';
 import {
     refetchActiveSpeedMarkets,
     refetchBalances,
@@ -513,14 +513,15 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         });
 
         try {
+            const priceConnection = getPriceConnection(networkId);
             const priceId = getPriceId(networkId, currencyKey);
 
-            const latestPriceUpdateResponse = await fetch(`
-                ${getPriceServiceEndpoint(networkId)}/v2/updates/price/latest?ids[]=${priceId.replace('0x', '')}`);
+            const priceFeeds = await priceConnection.getLatestPriceUpdates([priceId]);
 
-            const latestPriceUpdate = JSON.parse(await latestPriceUpdateResponse.text());
+            const pythPrice = priceFeeds.parsed
+                ? bigNumberFormatter(BigInt(priceFeeds.parsed[0].price.price), PYTH_CURRENCY_DECIMALS)
+                : 0;
 
-            const pythPrice = bigNumberFormatter(latestPriceUpdate.parsed[0].price.price, PYTH_CURRENCY_DECIMALS);
             setSubmittedStrikePrice(pythPrice);
 
             const strikePrice = priceParser(pythPrice);
