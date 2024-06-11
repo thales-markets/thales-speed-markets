@@ -24,7 +24,6 @@ import { getCurrentPrices, getPriceConnection, getPriceId, getSupportedAssetsAsO
 import { buildHref, history } from 'utils/routes';
 import { useChainId, useClient } from 'wagmi';
 import ProfileHeader from './components/ProfileHeader';
-import TotalBalance from './components/TotalBalance';
 import UserHistoricalPositions from './components/UserHistoricalPositions';
 import {
     Container,
@@ -37,6 +36,7 @@ import {
     TabSectionTitle,
     Tabs,
 } from './styled-components';
+import TotalBalance from 'components/TotalBalance';
 
 enum TabItems {
     MY_POSITIONS = 'my-positions',

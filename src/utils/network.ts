@@ -104,6 +104,7 @@ export const getSupportedNetworksByRoute = (route: string): NetworkId[] => {
         case ROUTES.Markets.SpeedMarkets:
         case ROUTES.Markets.SpeedMarketsOverview:
         case ROUTES.Markets.Profile:
+        case ROUTES.Deposit:
             return [
                 NetworkId.OptimismMainnet,
                 NetworkId.Arbitrum,

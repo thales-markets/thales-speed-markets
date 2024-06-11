@@ -30,6 +30,7 @@ import { particleWagmiWallet } from 'utils/particleWallet/particleWagmiWallet';
 import { useConnect as useParticleConnect } from '@particle-network/auth-core-modal';
 import { AuthCoreEvent, getLatestAuthType, particleAuth, SocialAuthType } from '@particle-network/auth-core';
 import { isSocialLogin } from 'utils/particleWallet/utils';
+import Deposit from 'pages/AARelatedPages/Deposit';
 
 const App = () => {
     const dispatch = useDispatch();
@@ -171,6 +172,16 @@ const App = () => {
                                 <MainLayout>
                                     <LandingPage />
                                 </MainLayout>
+                            </Suspense>
+                        </Route>
+                    )}
+
+                    {getSupportedNetworksByRoute(ROUTES.Deposit).includes(networkId) && (
+                        <Route exact path={ROUTES.Deposit}>
+                            <Suspense fallback={<Loader />}>
+                                <DappLayout>
+                                    <Deposit />
+                                </DappLayout>
                             </Suspense>
                         </Route>
                     )}

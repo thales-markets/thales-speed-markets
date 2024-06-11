@@ -342,9 +342,12 @@
         }
     },
     "deposit": {
+        "title": "Deposit",
+        "description": "Deposit crypto",
+        "address": "Your Deposit Address",
         "qr-modal-title": "QR Code",
         "select-token": "Select token",
-        "send": "Make sure you double check your withdrawal address and that it supports {{ token }} on {{ network }}!"
+        "send": "Make sure you are depositing only the supported tokens to the address above!"
     },
     "withdraw": {
         "address-input-label": "Your personal {{ token }} withdrawal address on {{ network }}",

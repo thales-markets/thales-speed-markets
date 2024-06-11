@@ -50,6 +50,17 @@ const TotalBalance: React.FC = () => {
         [multipleCollateralBalances, exchangeRates]
     );
 
+    const collateralsDetailsSorted = useMemo(() => {
+        const mappedCollaterals = getCollaterals(networkId).map((collateral, index) => ({
+            name: collateral as Coins,
+            index,
+        }));
+
+        return mappedCollaterals.sort(
+            (collateralA, collateralB) => getUSDForCollateral(collateralB.name) - getUSDForCollateral(collateralA.name)
+        );
+    }, [networkId, getUSDForCollateral]);
+
     const totalBalanceValue = useMemo(() => {
         let total = 0;
         try {
@@ -85,26 +96,23 @@ const TotalBalance: React.FC = () => {
                 </TotalBalanceWrapper>
 
                 <TokenBalancesWrapper>
-                    {getCollaterals(networkId).map((token, index) => {
+                    {collateralsDetailsSorted.map((token, index) => {
                         return (
                             <IndividualTokenBalanceWrapper key={`ind-token-${index}`}>
                                 <Token>
-                                    <TokenIcon className={`currency-icon currency-icon--${token.toLowerCase()}`} />
-                                    <TokenName> {token}</TokenName>
+                                    <TokenIcon className={`currency-icon currency-icon--${token.name.toLowerCase()}`} />
+                                    <TokenName> {token.name}</TokenName>
                                 </Token>
                                 <IndividualBalance>
                                     <IndividualTokenBalance>
                                         {multipleCollateralBalances.data
-                                            ? formatCurrency(multipleCollateralBalances.data[token])
+                                            ? formatCurrency(multipleCollateralBalances.data[token.name])
                                             : 0}
                                     </IndividualTokenBalance>
                                     <IndividualTokenBalance>
-                                        {!exchangeRates?.[token] && !isStableCurrency(token as Coins)
+                                        {!exchangeRates?.[token.name] && !isStableCurrency(token.name)
                                             ? '...'
-                                            : ` (${formatCurrencyWithSign(
-                                                  USD_SIGN,
-                                                  getUSDForCollateral(token as Coins)
-                                              )})`}
+                                            : ` (${formatCurrencyWithSign(USD_SIGN, getUSDForCollateral(token.name))})`}
                                     </IndividualTokenBalance>
                                 </IndividualBalance>
                             </IndividualTokenBalanceWrapper>
