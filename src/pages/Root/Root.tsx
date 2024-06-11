@@ -31,7 +31,7 @@ const rainbowCustomTheme = merge(darkTheme(), {
         accentColorForeground: ThemeMap[theme].button.textColor.secondary,
         modalBackground: ThemeMap[theme].background.primary,
         modalBorder: ThemeMap[theme].borderColor.quaternary,
-        // TOOD: profileAction: ThemeMap[theme].background.quinary,
+        // TODO: profileAction: ThemeMap[theme].background.quinary,
         profileForeground: ThemeMap[theme].background.primary,
         closeButton: ThemeMap[theme].button.textColor.tertiary,
         closeButtonBackground: ThemeMap[theme].button.background.primary,
