@@ -80,7 +80,7 @@ const TotalBalance: React.FC = () => {
     }, [exchangeRates, multipleCollateralBalances.data, networkId, getUSDForCollateral]);
 
     return (
-        <GradientContainer>
+        <GradientContainer borderRadius="15px">
             <BalanceWrapper>
                 <TotalBalanceWrapper>
                     <FlexDivColumnCentered>
@@ -130,7 +130,7 @@ const TotalBalance: React.FC = () => {
 const BalanceWrapper = styled(FlexDiv)`
     background-color: ${(props) => props.theme.background.primary};
     padding: 16px 30px;
-    border-radius: 8px;
+    border-radius: 15px;
     gap: 20px;
     flex-direction: column;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {

@@ -20,6 +20,28 @@ import { getOnRamperUrl } from 'utils/particleWallet/utils';
 import { getInfoToastOptions, getErrorToastOptions } from 'components/ToastMessage/ToastMessage';
 import { toast } from 'react-toastify';
 import TotalBalance from 'components/TotalBalance';
+import { getNetworkNameByNetworkId } from 'utils/network';
+import { getCollaterals } from 'utils/currency';
+import { Coins } from 'thales-utils';
+
+const Tutorials = [
+    {
+        name: 'Coinbase',
+        url: '',
+    },
+    {
+        name: 'Robinhood',
+        url: '',
+    },
+    {
+        name: 'ETH',
+        url: '',
+    },
+    {
+        name: "I don't have any crypto",
+        url: '',
+    },
+];
 
 const Deposit: React.FC = () => {
     const { t } = useTranslation();
@@ -60,6 +82,23 @@ const Deposit: React.FC = () => {
             <Container>
                 <div>
                     <DepositContainer>
+                        <Label>
+                            {t('deposit.tokens', {
+                                network: getNetworkNameByNetworkId(networkId),
+                            })}
+                            <TokensWrapper>
+                                {getCollaterals(networkId).map((token: Coins, index) => {
+                                    return (
+                                        <Token key={index}>
+                                            <TokenIcon
+                                                className={`currency-icon currency-icon--${token.toLowerCase()}`}
+                                            />
+                                            <TokenName>{token}</TokenName>
+                                        </Token>
+                                    );
+                                })}
+                            </TokensWrapper>
+                        </Label>
                         <Label>{t('deposit.address')}</Label>
                         <AddressContainer>
                             <Address>{isBiconomy ? biconomyConnector.address : (walletAddress as string)}</Address>
@@ -104,6 +143,14 @@ const Deposit: React.FC = () => {
                 </div>
                 <div>
                     <TotalBalance />
+                    <TutorialsWrapper>
+                        <TutorialHeader>Tutorials</TutorialHeader>
+                        {Tutorials.map((tutorial, index) => (
+                            <SPAAnchor href={tutorial.url} key={index}>
+                                <TutorialLink>{tutorial.name}</TutorialLink>
+                            </SPAAnchor>
+                        ))}
+                    </TutorialsWrapper>
                 </div>
             </Container>
 
@@ -281,4 +328,65 @@ const WarningMessage = styled.span`
     letter-spacing: -0.5px;
     border-radius: 5px;
     margin-top: 10px;
+`;
+
+const TutorialsWrapper = styled.div`
+    margin-top: 10px;
+    padding: 20px 25px;
+    width: 100%;
+    border-radius: 15px;
+    gap: 14px;
+    background: ${(props) => props.theme.background.quinary};
+    color: ${(props) => props.theme.background.primary};
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+`;
+
+const TutorialHeader = styled.span`
+    color: ${(props) => props.theme.background.primary};
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: capitalize;
+    margin-bottom: 8px;
+`;
+
+const TutorialLink = styled.span`
+    color: ${(props) => props.theme.background.primary};
+    font-size: 12px;
+    font-weight: 800;
+    text-decoration-line: underline;
+    text-transform: capitalize;
+`;
+
+const TokensWrapper = styled(FlexDiv)`
+    gap: 10px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+`;
+
+const Token = styled.span`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: ${(props) => props.theme.background.quinary};
+    color: ${(props) => props.theme.background.primary};
+    width: 110px;
+    height: 40px;
+`;
+
+const TokenName = styled.span`
+    font-weight: 800;
+    font-size: 14px;
+    color: ${(props) => props.theme.background.primary};
+`;
+
+const TokenIcon = styled.i`
+    font-size: 20px;
+    margin-right: 5px;
+    color: ${(props) => props.theme.background.primary};
+    font-weight: 100;
+    text-transform: none;
 `;

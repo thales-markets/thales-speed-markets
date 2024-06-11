@@ -345,6 +345,7 @@
         "title": "Deposit",
         "description": "Deposit crypto",
         "address": "Your Deposit Address",
+        "tokens": "Following {{ network }} tokens can be deposited:",
         "qr-modal-title": "QR Code",
         "select-token": "Select token",
         "send": "Make sure you are depositing only the supported tokens to the address above!"
