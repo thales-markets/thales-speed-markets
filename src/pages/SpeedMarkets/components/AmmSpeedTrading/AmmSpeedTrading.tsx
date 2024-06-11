@@ -446,6 +446,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 ? userOpenChainedSpeedMarketsData.length
                 : userOpenSpeedMarketsData.length;
 
+            // TODO: improve by comparing markets addresses before and after
             if (numOfUserMarketsAfter - numOfUserMarketsBefore > 0) {
                 toast.update(toastId, getSuccessToastOptions(t(`common.buy.confirmation-message`), toastId));
             } else {
