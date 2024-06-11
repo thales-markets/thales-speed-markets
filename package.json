@@ -11,7 +11,7 @@
         "@reduxjs/toolkit": "^1.5.0",
         "@tanstack/react-query": "^5.25.0",
         "@tanstack/react-table": "^8.17.3",
-        "@zodios/core": "^10.9.6",
+        "@zodios/core": "file:src/zodios",
         "buffer": "^6.0.3",
         "date-fns": "^2.19.0",
         "history": "^4.10.1",

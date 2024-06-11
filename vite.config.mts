@@ -1,11 +1,11 @@
 import react from '@vitejs/plugin-react';
-import { ConfigEnv, PluginOption, defineConfig, Plugin, loadEnv } from 'vite';
+import fs from 'fs';
+import path from 'path';
+import { ConfigEnv, Plugin, PluginOption, defineConfig, loadEnv } from 'vite';
 import checker from 'vite-plugin-checker';
 import eslint from 'vite-plugin-eslint';
 import svgr from 'vite-plugin-svgr';
 import tsconfigPaths from 'vite-tsconfig-paths';
-import path from 'path';
-import fs from 'fs';
 
 const particleWasmPlugin: Plugin | undefined = {
     name: 'particle-wasm',
@@ -64,6 +64,7 @@ export default defineConfig(({ mode }) => {
                         lightweightCharts: ['lightweight-charts'],
                         lottie: ['lottie-react'],
                         router: ['react-router-dom'],
+                        pyth: ['@pythnetwork/hermes-client'],
                         reduxToolkit: ['@reduxjs/toolkit'],
                         qrCode: ['react-qr-code'],
                         toastify: ['react-toastify'],
