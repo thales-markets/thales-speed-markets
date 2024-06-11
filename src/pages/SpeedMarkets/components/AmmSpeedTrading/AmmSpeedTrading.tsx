@@ -453,6 +453,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             }
             setToastId('');
             setNumOfUserMarketsBeforeBuy(-1);
+            setSubmittedStrikePrice(0);
         }
     }, [
         numOfUserMarketsBeforeBuy,
@@ -646,7 +647,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             if (txReceipt.status === 'success') {
                 resetData();
                 setPaidAmount(0);
-                setSubmittedStrikePrice(0);
 
                 // wait some time for creator to pick up pending markets (after max delay it will fail for sure)
                 await delay(secondsToMilliseconds(DEFAULT_CREATOR_DELAY_TIME_SEC));
