@@ -66,11 +66,17 @@ const TableHistoricalPositions: React.FC<{ data: UserHistoryPosition[] }> = ({ d
                         {isChained ? (
                             cellProps.cell.getValue().map((cellValue: any, index: number) => {
                                 const hasFinalPrice = position.finalPrices[index];
-                                const isPositionLost = !position.isClaimable && index === position.resolveIndex;
-                                const isPositionIrrelevant =
-                                    !position.isClaimable &&
-                                    position.resolveIndex !== undefined &&
-                                    index > position.resolveIndex;
+
+                                const isPositionLost =
+                                    index === position.resolveIndex &&
+                                    (position.isResolved ? !position.isUserWinner : !position.isClaimable);
+
+                                const isPositionIrrelevant = position.isResolved
+                                    ? index > (position.resolveIndex || 0)
+                                    : !position.isClaimable &&
+                                      position.resolveIndex !== undefined &&
+                                      index > position.resolveIndex;
+
                                 const isEmptyIcon = !hasFinalPrice || isPositionLost || isPositionIrrelevant;
                                 const isUp = (cellValue.toUpperCase() as Positions) === Positions.UP;
 
