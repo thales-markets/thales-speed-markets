@@ -138,9 +138,9 @@ const Deposit: React.FC = () => {
                     </DepositContainer>
                 </div>
                 <div>
-                    <TotalBalance />
+                    <TotalBalance hideDepositButton />
                     <TutorialsWrapper>
-                        <TutorialHeader>Tutorials</TutorialHeader>
+                        <TutorialHeader>{t('deposit.tutorials')}</TutorialHeader>
                         {Tutorials.map((tutorial, index) => (
                             <SPAAnchor href={tutorial.url} key={index}>
                                 <TutorialLink>{tutorial.name}</TutorialLink>

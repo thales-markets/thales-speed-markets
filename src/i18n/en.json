@@ -317,7 +317,9 @@
             "received": "Received",
             "expired": "Expired",
             "expires": "Expires @"
-        }
+        },
+        "deposit": "Deposit",
+        "withdraw": "Withdraw"
     },
     "get-started": {
         "title": "Get started on Speed Markets",
@@ -348,7 +350,8 @@
         "tokens": "Following {{ network }} tokens can be deposited:",
         "qr-modal-title": "QR Code",
         "select-token": "Select token",
-        "send": "Make sure you are depositing only the supported tokens to the address above!"
+        "send": "Make sure you are depositing only the supported tokens to the address above!",
+        "tutorials": "Tutorials"
     },
     "withdraw": {
         "address-input-label": "Your personal {{ token }} withdrawal address on {{ network }}",

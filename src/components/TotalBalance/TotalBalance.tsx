@@ -1,9 +1,11 @@
 import Button from 'components/Button';
 import { USD_SIGN } from 'constants/currency';
+import ROUTES from 'constants/routes';
 import { ScreenSizeBreakpoint } from 'enums/ui';
+import Withdraw from 'pages/AARelatedPages/Withdraw';
 import useExchangeRatesQuery, { Rates } from 'queries/rates/useExchangeRatesQuery';
 import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipleCollateralBalanceQuery';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
@@ -15,9 +17,14 @@ import { Coins, formatCurrency, formatCurrencyWithSign } from 'thales-utils';
 import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
 import { getCollaterals, isStableCurrency } from 'utils/currency';
+import { navigateTo } from 'utils/routes';
 import { useAccount, useChainId, useClient } from 'wagmi';
 
-const TotalBalance: React.FC = () => {
+type TotalBalanceProps = {
+    hideDepositButton?: boolean;
+};
+
+const TotalBalance: React.FC<TotalBalanceProps> = ({ hideDepositButton }) => {
     const { t } = useTranslation();
 
     const networkId = useChainId();
@@ -27,6 +34,8 @@ const TotalBalance: React.FC = () => {
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const walletAddress = isBiconomy ? biconomyConnector.address : address;
+
+    const [openWithdraw, setOpenWithdraw] = useState(false);
 
     const multipleCollateralBalances = useMultipleCollateralBalanceQuery(
         walletAddress as any,
@@ -80,50 +89,75 @@ const TotalBalance: React.FC = () => {
     }, [exchangeRates, multipleCollateralBalances.data, networkId, getUSDForCollateral]);
 
     return (
-        <GradientContainer borderRadius="15px">
-            <BalanceWrapper>
-                <TotalBalanceWrapper>
-                    <FlexDivColumnCentered>
-                        <SectionLabel>{t('profile.balance')}</SectionLabel>
-                        <TotalBalanceSpan>{formatCurrencyWithSign(USD_SIGN, totalBalanceValue)}</TotalBalanceSpan>
-                    </FlexDivColumnCentered>
+        <>
+            <GradientContainer borderRadius="15px">
+                <BalanceWrapper>
+                    <TotalBalanceWrapper>
+                        <FlexDivColumnCentered>
+                            <SectionLabel>{t('profile.balance')}</SectionLabel>
+                            <TotalBalanceSpan>{formatCurrencyWithSign(USD_SIGN, totalBalanceValue)}</TotalBalanceSpan>
+                        </FlexDivColumnCentered>
 
-                    <ColumnWrapper>
-                        <Button width={isMobile ? '100px' : '120px'} fontSize="13px" height="30px">
-                            Deposit
-                        </Button>
-                        <Button width={isMobile ? '100px' : '120px'} fontSize="13px" height="30px">
-                            Withdraw
-                        </Button>
-                    </ColumnWrapper>
-                </TotalBalanceWrapper>
+                        <ColumnWrapper>
+                            {!hideDepositButton && (
+                                <Button
+                                    width={isMobile ? '100px' : '120px'}
+                                    onClick={() => {
+                                        navigateTo(ROUTES.Deposit);
+                                    }}
+                                    fontSize="13px"
+                                    height="30px"
+                                >
+                                    {t('profile.deposit')}
+                                </Button>
+                            )}
 
-                <TokenBalancesWrapper>
-                    {collateralsDetailsSorted.map((token, index) => {
-                        return (
-                            <IndividualTokenBalanceWrapper key={`ind-token-${index}`}>
-                                <Token>
-                                    <TokenIcon className={`currency-icon currency-icon--${token.name.toLowerCase()}`} />
-                                    <TokenName> {token.name}</TokenName>
-                                </Token>
-                                <IndividualBalance>
-                                    <IndividualTokenBalance>
-                                        {multipleCollateralBalances.data
-                                            ? formatCurrency(multipleCollateralBalances.data[token.name])
-                                            : 0}
-                                    </IndividualTokenBalance>
-                                    <IndividualTokenBalance>
-                                        {!exchangeRates?.[token.name] && !isStableCurrency(token.name)
-                                            ? '...'
-                                            : ` (${formatCurrencyWithSign(USD_SIGN, getUSDForCollateral(token.name))})`}
-                                    </IndividualTokenBalance>
-                                </IndividualBalance>
-                            </IndividualTokenBalanceWrapper>
-                        );
-                    })}
-                </TokenBalancesWrapper>
-            </BalanceWrapper>
-        </GradientContainer>
+                            <Button
+                                onClick={() => {
+                                    setOpenWithdraw(true);
+                                }}
+                                width={isMobile ? '100px' : '120px'}
+                                fontSize="13px"
+                                height="30px"
+                            >
+                                {t('profile.withdraw')}
+                            </Button>
+                        </ColumnWrapper>
+                    </TotalBalanceWrapper>
+
+                    <TokenBalancesWrapper>
+                        {collateralsDetailsSorted.map((token, index) => {
+                            return (
+                                <IndividualTokenBalanceWrapper key={`ind-token-${index}`}>
+                                    <Token>
+                                        <TokenIcon
+                                            className={`currency-icon currency-icon--${token.name.toLowerCase()}`}
+                                        />
+                                        <TokenName> {token.name}</TokenName>
+                                    </Token>
+                                    <IndividualBalance>
+                                        <IndividualTokenBalance>
+                                            {multipleCollateralBalances.data
+                                                ? formatCurrency(multipleCollateralBalances.data[token.name])
+                                                : 0}
+                                        </IndividualTokenBalance>
+                                        <IndividualTokenBalance>
+                                            {!exchangeRates?.[token.name] && !isStableCurrency(token.name)
+                                                ? '...'
+                                                : ` (${formatCurrencyWithSign(
+                                                      USD_SIGN,
+                                                      getUSDForCollateral(token.name)
+                                                  )})`}
+                                        </IndividualTokenBalance>
+                                    </IndividualBalance>
+                                </IndividualTokenBalanceWrapper>
+                            );
+                        })}
+                    </TokenBalancesWrapper>
+                </BalanceWrapper>
+            </GradientContainer>
+            {openWithdraw && <Withdraw isOpen={openWithdraw} onClose={() => setOpenWithdraw(false)} />}
+        </>
     );
 };
 
