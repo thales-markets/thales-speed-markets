@@ -87,7 +87,6 @@ export default defineConfig(({ mode }) => {
                         redux: ['react-redux'],
                         select: ['react-select'],
                         webgl: ['react-unity-webgl'],
-                        typescript: ['typescript'],
                         cookie: ['universal-cookie'],
                         wagmi: ['wagmi'],
                         vitals: ['web-vitals'],
