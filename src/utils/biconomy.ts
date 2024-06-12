@@ -21,6 +21,7 @@ import chainedSpeedMarketsAMMContract from './contracts/chainedSpeedMarketsAMMCo
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 import { checkAllowance } from './network';
 import multipleCollateral from './contracts/multipleCollateralContract';
+import { addMonths } from 'date-fns';
 
 export const executeBiconomyTransactionWithConfirmation = async (
     collateral: string,
@@ -250,11 +251,11 @@ const getCreateSessionTxs = async (networkId: SupportedNetwork, collateralAddres
 
         const dateAfter = new Date();
         const dateUntil = new Date();
-        dateUntil.setHours(dateAfter.getHours() + 1);
+        const sixMonths = addMonths(Number(dateUntil), 6);
 
         const sessionTxData = await sessionModule.createSessionData([
             {
-                validUntil: Math.floor(dateUntil.getTime() / 1000),
+                validUntil: Math.floor(sixMonths.getTime() / 1000),
                 validAfter: Math.floor(dateAfter.getTime() / 1000),
                 sessionValidationModule: import.meta.env['VITE_APP_SVM_ADDRESS_' + networkId],
                 sessionPublicKey: sessionKeyEOA.address as `0x${string}`,
@@ -291,7 +292,7 @@ const getCreateSessionTxs = async (networkId: SupportedNetwork, collateralAddres
         window.localStorage.setItem(LOCAL_STORAGE_KEYS.SESSION_P_KEY[networkId], privateKey);
         window.localStorage.setItem(
             LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId],
-            Math.floor(dateUntil.getTime() / 1000).toString()
+            Math.floor(sixMonths.getTime() / 1000).toString()
         );
 
         // get client to check allowance
