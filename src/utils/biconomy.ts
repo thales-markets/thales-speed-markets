@@ -132,14 +132,14 @@ export const executeBiconomyTransaction = async (
                 const { wait } = await biconomyConnector.wallet.sendTransaction(
                     transactionArray,
                     isEth
-                        ? {
+                        ? {}
+                        : {
                               paymasterServiceData: {
                                   mode: PaymasterMode.ERC20,
                                   preferredToken: collateral,
                                   maxApproval: true,
                               },
                           }
-                        : {}
                 );
 
                 const {
