@@ -10,7 +10,11 @@ import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import { useChainId, useAccount } from 'wagmi';
-import { getInfoToastOptions, getErrorToastOptions } from 'components/ToastMessage/ToastMessage';
+import {
+    getInfoToastOptions,
+    getErrorToastOptions,
+    getLoadingToastOptions,
+} from 'components/ToastMessage/ToastMessage';
 import { toast } from 'react-toastify';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 
@@ -22,12 +26,12 @@ const ProfileHeader: React.FC = () => {
     const validUntil = window.localStorage.getItem(LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId]);
 
     const handleCopy = () => {
-        const id = toast.loading(t('user-info.copying-address'));
+        const id = toast.loading(t('user-info.copying-address'), getLoadingToastOptions());
         try {
             navigator.clipboard.writeText(biconomyConnector.address);
-            toast.update(id, getInfoToastOptions(t('user-info.copied'), ''));
+            toast.update(id, getInfoToastOptions(t('user-info.copied'), id));
         } catch (e) {
-            toast.update(id, getErrorToastOptions('Error', ''));
+            toast.update(id, getErrorToastOptions('Error', id));
         }
     };
 

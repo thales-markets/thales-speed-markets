@@ -1,7 +1,8 @@
 import {
+    getDeafultToastOptions,
     getErrorToastOptions,
+    getLoadingToastOptions,
     getSuccessToastOptions,
-    toastBasicProperties,
 } from 'components/ToastMessage/ToastMessage';
 import { LINKS } from 'constants/links';
 import { ScreenSizeBreakpoint } from 'enums/ui';
@@ -149,44 +150,47 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
                                   toast.update(
                                       toastIdParam,
                                       getSuccessToastOptions(
+                                          '',
+                                          toastIdParam,
+                                          {
+                                              autoClose: MOBILE_TWITTER_TOAST_AUTO_CLOSE,
+                                          },
                                           <a onClick={() => window.open(twitterLinkWithStatusMessage)}>
                                               {t('common.flex-card.click-open-twitter')}
-                                          </a>,
-                                          toastIdParam,
-                                          { autoClose: MOBILE_TWITTER_TOAST_AUTO_CLOSE }
+                                          </a>
                                       )
                                   );
                               }, IOS_DOWNLOAD_DELAY)
                             : toast.update(
                                   toastIdParam,
                                   getSuccessToastOptions(
+                                      '',
+                                      toastIdParam,
+                                      { autoClose: MOBILE_TWITTER_TOAST_AUTO_CLOSE },
                                       <a onClick={() => window.open(twitterLinkWithStatusMessage)}>
                                           {t('common.flex-card.click-open-twitter')}
-                                      </a>,
-                                      toastIdParam,
-                                      { autoClose: MOBILE_TWITTER_TOAST_AUTO_CLOSE }
+                                      </a>
                                   )
                               )
                         : toast.update(
                               toastIdParam,
                               getSuccessToastOptions(
+                                  '',
+                                  toastIdParam,
+                                  undefined,
                                   <>
-                                      {!useDownloadImage && (
-                                          <>
-                                              {t('common.flex-card.image-in-clipboard')}
-                                              <br />
-                                          </>
-                                      )}
-                                      {t('common.flex-card.open-twitter')}
-                                  </>,
-                                  toastIdParam
+                                      {!useDownloadImage &&
+                                          `${t('common.flex-card.image-in-clipboard')} ${t(
+                                              'common.flex-card.open-twitter'
+                                          )}`}
+                                  </>
                               )
                           );
 
                     if (!isMobile) {
                         setTimeout(() => {
                             window.open(twitterLinkWithStatusMessage);
-                        }, toastBasicProperties.autoClose);
+                        }, getDeafultToastOptions().autoClose);
                     }
                     onClose();
                 } catch (e) {
@@ -206,10 +210,11 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
         if (!isLoading) {
             if (isMetamaskBrowser) {
                 // Metamask dosn't support image download neither clipboard.write
-                toast.error(t('market.toast-message.metamask-not-supported'), toastBasicProperties);
+                toast.error(t('market.toast-message.metamask-not-supported'), getDeafultToastOptions());
             } else {
                 const id = toast.loading(
-                    useDownloadImage ? t('common.flex-card.download-image') : t('common.flex-card.save-image')
+                    useDownloadImage ? t('common.flex-card.download-image') : t('common.flex-card.save-image'),
+                    getLoadingToastOptions()
                 );
                 setToastId(id);
                 setIsLoading(true);

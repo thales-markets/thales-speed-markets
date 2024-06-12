@@ -24,7 +24,6 @@ export default {
         secondary: '',
         tertiary: `linear-gradient(90deg, ${Colors.PURPLE_DARK} 0%, ${Colors.BLUE} 100%)`,
         quaternary: Colors.PURPLE,
-        quinary: Colors.GRAY_BLUE,
     },
     button: {
         background: {
