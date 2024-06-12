@@ -1,88 +1,135 @@
 import Button from 'components/Button';
-import ROUTES from 'constants/routes';
+import ConnectWalletModal from 'components/ConnectWalletModal';
+import NetworkSwitch from 'components/NetworkSwitch';
 import { ScreenSizeBreakpoint } from 'enums/ui';
-import React, { useState } from 'react';
+import GetStarted from 'pages/AARelatedPages/GetStarted';
+import Withdraw from 'pages/AARelatedPages/Withdraw';
+import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { getIsMobile } from 'redux/modules/ui';
+import { getWalletConnectModalVisibility, setWalletConnectModalVisibility } from 'redux/modules/wallet';
 import styled from 'styled-components';
+import { FlexDivRow, FlexDivRowCentered, PAGE_MAX_WIDTH } from 'styles/common';
 import { RootState } from 'types/ui';
-import { getIsMobile } from '../../../redux/modules/ui';
-import { FlexDivRow, FlexDivRowCentered } from '../../../styles/common';
+import { useAccount } from 'wagmi';
 import Logo from '../components/Logo';
 import Notifications from '../components/Notifications';
 import ReferralModal from '../components/ReferralModal';
+import UserInfo from '../components/UserInfo';
 import UserWallet from '../components/UserWallet';
 
 const DappHeader: React.FC = () => {
     const { t } = useTranslation();
 
+    const dispatch = useDispatch();
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
+    const connectWalletModalVisibility = useSelector((state: RootState) => getWalletConnectModalVisibility(state));
+    const { isConnected } = useAccount();
 
     const [openReferralModal, setOpenReferralModal] = useState(false);
+    const [openGetStarted, setOpenGetStarted] = useState(false);
+    const [openUserInfo, setOpenUserInfo] = useState(false);
+    const [openWithdraw, setOpenWithdraw] = useState(false);
+
+    const burgerMenuRef = useRef<HTMLElement>(null);
 
     return (
-        <Container $maxWidth={getMaxWidth()}>
+        <Container>
             <LeftContainer>
                 <FlexDivRow>
-                    {isMobile && <Icon className="sidebar-icon icon--nav-menu" onClick={sidebarMenuClickHandler} />}
                     <Logo />
-                    <Button
-                        width="117px"
-                        height="21px"
-                        padding="0 15px"
-                        margin="0 0 0 15px"
-                        fontSize="13px"
-                        onClick={() => setOpenReferralModal(true)}
-                    >
-                        {t('common.header.refer-earn')}
-                    </Button>
+                    {!isMobile && (
+                        <Button
+                            width="140px"
+                            height="30px"
+                            margin="auto 0"
+                            fontSize="12px"
+                            onClick={() => setOpenGetStarted(true)}
+                        >
+                            {t('common.header.get-started')}
+                        </Button>
+                    )}
                 </FlexDivRow>
-                {isMobile && <Notifications />}
             </LeftContainer>
             <RightContainer>
-                <UserWallet />
-                {!isMobile && <Notifications />}
+                {!isConnected && (
+                    <Button
+                        width="140px"
+                        height="30px"
+                        fontSize="12px"
+                        margin={isMobile ? '10px' : '0px'}
+                        fontWeight={800}
+                        onClick={() =>
+                            dispatch(
+                                setWalletConnectModalVisibility({
+                                    visibility: true,
+                                })
+                            )
+                        }
+                    >
+                        <LoginIcon className={`network-icon network-icon--login`} />
+                        {t('common.wallet.connect-your-wallet')}
+                    </Button>
+                )}
+                {isMobile && isConnected && (
+                    <Button
+                        width="140px"
+                        height="30px"
+                        margin="10px"
+                        fontSize="12px"
+                        onClick={() => setOpenGetStarted(true)}
+                    >
+                        {t('common.header.get-started')}
+                    </Button>
+                )}
+
+                <NetworkSwitch />
+
+                {isConnected && (
+                    <>
+                        {!isMobile && <UserWallet />}
+                        <Notifications />
+                        <HeaderIcons
+                            ref={burgerMenuRef}
+                            onClick={() => setOpenUserInfo(!openUserInfo)}
+                            className={`network-icon network-icon--burger`}
+                        />
+                    </>
+                )}
+
+                {openUserInfo && (
+                    <UserInfo
+                        setUserInfoOpen={setOpenUserInfo}
+                        setOpenWithdraw={setOpenWithdraw}
+                        setOpenReferralModal={setOpenReferralModal}
+                        skipOutsideClickOnElement={burgerMenuRef}
+                    />
+                )}
             </RightContainer>
             {openReferralModal && <ReferralModal onClose={() => setOpenReferralModal(false)} />}
+            {openGetStarted && <GetStarted isOpen={openGetStarted} onClose={() => setOpenGetStarted(false)} />}
+            {openWithdraw && <Withdraw isOpen={openWithdraw} onClose={() => setOpenWithdraw(false)} />}
+
+            <ConnectWalletModal
+                isOpen={connectWalletModalVisibility}
+                onClose={() => {
+                    dispatch(
+                        setWalletConnectModalVisibility({
+                            visibility: !connectWalletModalVisibility,
+                        })
+                    );
+                }}
+            />
         </Container>
     );
 };
 
-const sidebarMenuClickHandler = () => {
-    const root = document.getElementById('root');
-    const content = document.getElementById('main-content');
-    const sidebar = document.getElementById('sidebar');
-    if (root?.classList.contains('collapse')) {
-        sidebar?.classList.remove('collapse');
-        content?.classList.remove('collapse');
-        root?.classList.remove('collapse');
-    } else {
-        root?.classList.add('collapse');
-        content?.classList.add('collapse');
-        sidebar?.classList.add('collapse');
-    }
-};
-
-const getMaxWidth = () => {
-    if (location.pathname === ROUTES.Markets.Profile) {
-        return '974px';
-    }
-    if ([ROUTES.Markets.SpeedMarkets, ROUTES.Home].includes(location.pathname)) {
-        return '1080px';
-    }
-    return '1440px';
-};
-
-const Container = styled(FlexDivRowCentered)<{ $maxWidth: string }>`
+const Container = styled(FlexDivRowCentered)`
     width: 100%;
-    max-width: ${(props) => props.$maxWidth};
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 25px;
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        flex-direction: column;
-        margin-bottom: 10px;
-    }
+    max-width: ${PAGE_MAX_WIDTH};
+    margin: 30px auto 16px auto;
+    max-height: 40px;
 `;
 
 const LeftContainer = styled(FlexDivRowCentered)`
@@ -93,14 +140,26 @@ const LeftContainer = styled(FlexDivRowCentered)`
 `;
 
 const RightContainer = styled(FlexDivRowCentered)`
-    @media (max-width: 500px) {
+    position: relative;
+    gap: 10px;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         width: 100%;
+        justify-content: flex-end;
+        gap: 0;
     }
 `;
 
-const Icon = styled.i`
-    margin-right: 13px;
+const HeaderIcons = styled.i`
     font-size: 26px;
+    color: ${(props) => props.theme.button.textColor.tertiary};
+    margin-left: 10px;
+    cursor: pointer;
+`;
+
+const LoginIcon = styled.i`
+    font-size: 18px;
+    position: relative;
+    left: -10px;
 `;
 
 export default DappHeader;

@@ -4,8 +4,17 @@ export type AppSliceState = {
     isReady: boolean;
 };
 
+export type UserSliceState = {
+    notifications: { single: number; chained: number };
+};
+
 export type WalletSliceState = {
     selectedCollateralIndex: number;
+    isBiconomy?: boolean;
+    walletConnectModal: {
+        visibility: boolean;
+        origin?: 'sign-up' | 'sign-in' | undefined;
+    };
 };
 
 export type UISliceState = {
@@ -14,6 +23,7 @@ export type UISliceState = {
 
 export type RootState = {
     app: AppSliceState;
+    user: UserSliceState;
     wallet: WalletSliceState;
     ui: UISliceState;
 };

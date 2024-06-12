@@ -24,14 +24,13 @@ export const CONNECTION_TIMEOUT_MS = 15000;
 // You can find at https://docs.pyth.network/price-feeds/contract-addresses/evm
 export const PYTH_CONTRACT_ADDRESS = {
     [NetworkId.OptimismMainnet]: '0xff1a0f4744e8582DF1aE09D5611b887B6a12925C' as Address,
-    [NetworkId.PolygonMainnet]: '0xff1a0f4744e8582DF1aE09D5611b887B6a12925C' as Address,
-    [NetworkId.OptimismGoerli]: '0xDd24F84d36BF92C65F92307595335bdFab5Bbd21' as Address,
-    [NetworkId.OptimismSepolia]: '0x0708325268dF9F66270F1401206434524814508b' as Address,
     [NetworkId.Arbitrum]: '0xff1a0f4744e8582DF1aE09D5611b887B6a12925C' as Address,
     [NetworkId.Base]: '0x8250f4aF4B972684F7b336503E2D6dFeDeB1487a' as Address,
+    [NetworkId.PolygonMainnet]: '0xff1a0f4744e8582DF1aE09D5611b887B6a12925C' as Address,
     [NetworkId.ZkSync]: '0xf087c864AEccFb6A2Bf1Af6A0382B0d0f6c5D834' as Address,
     [NetworkId.ZkSyncSepolia]: '0x056f829183Ec806A78c26C98961678c24faB71af' as Address,
     [NetworkId.BlastSepolia]: '0xA2aa501b19aff244D90cc15a4Cf739D2725B5729' as Address,
+    [NetworkId.OptimismSepolia]: '0x0708325268dF9F66270F1401206434524814508b' as Address,
 };
 
 export const PYTH_CURRENCY_DECIMALS = 8;

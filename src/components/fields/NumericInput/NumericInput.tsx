@@ -6,6 +6,7 @@ import { FieldContainer, FieldLabel, Input } from '../common';
 
 type NumericInputProps = {
     value: string | number;
+    min?: number;
     label?: string;
     placeholder?: string;
     disabled?: boolean;
@@ -17,6 +18,8 @@ type NumericInputProps = {
     onMaxButton?: any;
     inputPadding?: string;
     margin?: string;
+    width?: string;
+    height?: string;
 };
 
 const INVALID_CHARS = ['-', '+', 'e'];
@@ -24,6 +27,7 @@ const DEFAULT_TOKEN_DECIMALS = 18;
 
 const NumericInput: React.FC<NumericInputProps> = ({
     value,
+    min,
     label,
     placeholder,
     disabled,
@@ -35,6 +39,8 @@ const NumericInput: React.FC<NumericInputProps> = ({
     onMaxButton,
     inputPadding,
     margin,
+    width,
+    height,
 }) => {
     const { t } = useTranslation();
 
@@ -48,12 +54,15 @@ const NumericInput: React.FC<NumericInputProps> = ({
                 trimmedValue = value.substring(0, value.length - 1);
             }
         }
+        if (min && Number(value) < Number(min)) {
+            trimmedValue = min.toString();
+        }
 
         onChange(e, trimmedValue.replace(/,/g, '.').replace(/[e+-]/gi, ''));
     };
 
     return (
-        <FieldContainer margin={margin}>
+        <FieldContainer width={width} margin={margin}>
             {label && <FieldLabel>{label}</FieldLabel>}
             <StyledInput
                 value={value}
@@ -67,11 +76,13 @@ const NumericInput: React.FC<NumericInputProps> = ({
                         e.preventDefault();
                     }
                 }}
-                min="0"
+                min={min}
+                step={min}
                 title=""
                 padding={inputPadding}
+                height={height}
             />
-            <RightContainer>
+            <RightContainer hasLabel={!!label}>
                 {onMaxButton && (
                     <MaxButton disabled={disabled} onClick={onMaxButton}>
                         {t('common.max')}
@@ -104,17 +115,18 @@ const StyledInput = styled(Input)<{ padding?: string }>`
     padding: ${(props) => props.padding || '5px 120px 5px 10px'};
 `;
 
-const RightContainer = styled(FlexDivCentered)`
+const RightContainer = styled(FlexDivCentered)<{ hasLabel?: boolean }>`
     position: absolute;
     right: 0;
-    bottom: 6px;
+    top: ${(props) => (props.hasLabel ? 'calc(50% + 10px)' : '50%')}; // 10px half of label height and margin
+    bottom: 50%;
 `;
 
 const CurrencyLabel = styled.label<{ $hasSeparator?: boolean }>`
-    border-left: ${(props) => (props.$hasSeparator ? `2px solid ${props.theme.input.borderColor.primary}` : 'none')};
+    border-left: ${(props) => (props.$hasSeparator ? `2px solid ${props.theme.textColor.primary}` : 'none')};
     font-weight: bold;
     font-size: 13px;
-    line-height: 20px;
+    line-height: 26px;
     color: ${(props) => props.theme.input.textColor.primary};
     padding-left: 8px;
     padding-right: 12px;
@@ -126,15 +138,18 @@ const CurrencyLabel = styled.label<{ $hasSeparator?: boolean }>`
 `;
 
 const MaxButton = styled.button`
-    background: transparent;
+    background: ${(props) => props.theme.button.borderColor.secondary};
+    border-radius: 17px;
     border: none;
+    width: 50px;
+    height: 20px;
     font-weight: 700;
     font-size: 13px;
-    line-height: 20px;
-    color: ${(props) => props.theme.button.textColor.quaternary};
-    text-transform: uppercase;
+    line-height: normal;
+    color: ${(props) => props.theme.button.textColor.secondary};
+    text-transform: capitalize;
     cursor: pointer;
-    padding-right: 8px;
+    margin-right: 4px;
     &:disabled {
         opacity: 0.4;
         cursor: default;
@@ -158,7 +173,7 @@ const ValidationText = styled.span`
 `;
 
 const CurrencyComponentContainer = styled(FlexDivCentered)<{ $hasSeparator?: boolean }>`
-    ${(props) => (props.$hasSeparator ? `border-left: 2px solid ${props.theme.input.borderColor.primary};` : '')}
+    ${(props) => (props.$hasSeparator ? `border-left: 2px solid ${props.theme.textColor.primary};` : '')}
     line-height: 15px;
     padding-right: 2px;
     &.disabled {

@@ -1,27 +1,28 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { SIDE_TO_POSITION_MAP } from 'constants/market';
 import { ZERO_ADDRESS } from 'constants/network';
-import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
+import { PYTH_CURRENCY_DECIMALS, SUPPORTED_ASSETS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { secondsToMilliseconds } from 'date-fns';
 import { bigNumberFormatter, coinFormatter, parseBytes32String, roundNumberToDecimals } from 'thales-utils';
-import { ChainedSpeedMarket } from 'types/market';
+import { UserChainedPosition } from 'types/market';
 import { QueryConfig } from 'types/network';
 import { ViemContract } from 'types/viem';
 import { getContarctAbi } from 'utils/contracts/abi';
 import chainedSpeedMarketsAMMContract from 'utils/contracts/chainedSpeedMarketsAMMContract';
 import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
+import { getCurrentPrices, getPriceConnection, getPriceId } from 'utils/pyth';
 import { getContract } from 'viem';
 
 const useActiveChainedSpeedMarketsDataQuery = (
     queryConfig: QueryConfig,
     options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
-    return useQuery<ChainedSpeedMarket[]>({
+    return useQuery<UserChainedPosition[]>({
         ...options,
         queryKey: QUERY_KEYS.Markets.ActiveChainedSpeedMarkets(queryConfig.networkId),
         queryFn: async () => {
-            const chainedSpeedMarketsData: ChainedSpeedMarket[] = [];
+            const chainedSpeedMarketsData: UserChainedPosition[] = [];
 
             try {
                 const speedMarketsDataContractLocal = getContract({
@@ -52,9 +53,18 @@ const useActiveChainedSpeedMarketsDataQuery = (
                     market: activeMarketsAddresses[index],
                 }));
 
+                // Fetch current prices
+                let prices: { [key: string]: number } = {};
+                if (activeMarkets.length) {
+                    const priceConnection = getPriceConnection(queryConfig.networkId);
+                    const priceIds = SUPPORTED_ASSETS.map((asset) => getPriceId(queryConfig.networkId, asset));
+                    prices = await getCurrentPrices(priceConnection, queryConfig.networkId, priceIds);
+                }
+
                 for (let i = 0; i < activeMarkets.length; i++) {
                     const marketData = activeMarkets[i];
 
+                    const currencyKey = parseBytes32String(marketData.asset);
                     const sides = marketData.directions.map((direction: number) => SIDE_TO_POSITION_MAP[direction]);
                     const maturityDate = secondsToMilliseconds(Number(marketData.strikeTime));
                     const strikeTimes = Array(sides.length)
@@ -73,24 +83,25 @@ const useActiveChainedSpeedMarketsDataQuery = (
                         8
                     );
 
-                    const chainedData: ChainedSpeedMarket = {
-                        address: marketData.market,
-                        timestamp: secondsToMilliseconds(Number(marketData.createdAt)),
-                        currencyKey: parseBytes32String(marketData.asset),
+                    const chainedData: UserChainedPosition = {
+                        user: marketData.user,
+                        market: marketData.market,
+                        currencyKey,
                         sides,
                         strikePrices,
                         strikeTimes,
                         maturityDate,
-                        payout: payout,
                         paid: buyinAmount * (1 + fee),
+                        payout: payout,
                         payoutMultiplier: bigNumberFormatter(marketData.payoutMultiplier),
+                        currentPrice: prices[currencyKey],
                         finalPrices: Array(sides.length).fill(0),
-                        isOpen: true,
-                        isMatured: maturityDate < Date.now(),
                         canResolve: false,
-                        claimable: false,
+                        isMatured: maturityDate < Date.now(),
+                        isClaimable: false,
                         isUserWinner: false,
-                        user: marketData.user,
+                        isResolved: false,
+                        createdAt: secondsToMilliseconds(Number(marketData.createdAt)),
                     };
 
                     chainedSpeedMarketsData.push(chainedData);

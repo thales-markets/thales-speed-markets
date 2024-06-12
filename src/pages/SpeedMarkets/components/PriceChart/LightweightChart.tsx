@@ -14,14 +14,15 @@ import styled from 'styled-components';
 import { FlexDiv, FlexDivRowCentered, FlexDivSpaceBetween } from 'styles/common';
 import { formatCurrencyWithSign } from 'thales-utils';
 import { Risk, RiskPerAsset, RiskPerAssetAndPosition } from 'types/market';
-import { RootState } from 'types/ui';
+import { RootState, ThemeInterface } from 'types/ui';
 
 import SimpleLoader from 'components/SimpleLoader';
 import { hoursToSeconds, minutesToSeconds, subDays } from 'date-fns';
+import { useTheme } from 'styled-components';
+import { useChainId, useClient } from 'wagmi';
 import { ChartComponent } from './components/Chart/ChartContext';
 import CurrentPrice from './components/CurrentPrice';
 import Toggle from './components/DateToggle';
-import { useChainId, useClient } from 'wagmi';
 
 const now = new Date();
 
@@ -30,13 +31,14 @@ type LightweightChartProps = {
     position: Positions | undefined;
     selectedPrice?: number;
     selectedDate?: number;
-    selectedRightPrice?: number;
     explicitCurrentPrice?: number;
     prevExplicitPrice?: number;
     chainedRisk?: Risk;
     risksPerAsset?: RiskPerAsset[];
     deltaTimeSec?: number;
     risksPerAssetAndDirection?: RiskPerAssetAndPosition[];
+    hideChart?: boolean;
+    hideLiquidity?: boolean;
 };
 
 const SpeedMarketsToggleButtons = [
@@ -53,7 +55,6 @@ const SPEED_DEFAULT_TOGGLE_BUTTON_INDEX = 0;
 const LightweightChart: React.FC<LightweightChartProps> = ({
     asset,
     selectedPrice,
-    selectedRightPrice,
     position,
     selectedDate,
     explicitCurrentPrice,
@@ -62,8 +63,11 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
     chainedRisk,
     risksPerAsset,
     risksPerAssetAndDirection,
+    hideChart,
+    hideLiquidity,
 }) => {
     const { t } = useTranslation();
+    const theme: ThemeInterface = useTheme();
 
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const networkId = useChainId();
@@ -169,23 +173,27 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
         ? formatCurrencyWithSign(USD_SIGN, riskPerDirectionDown.max - riskPerDirectionDown.current)
         : 0;
 
+    const isPriceUp = (explicitCurrentPrice || 0) > (prevExplicitPrice || 0);
+
     return (
         <Wrapper>
             <FlexDivSpaceBetween>
                 <FlexDivRowCentered>
-                    <CurrentPrice
-                        asset={asset}
-                        currentPrice={currentPrice}
-                        isPriceUp={(explicitCurrentPrice || 0) > (prevExplicitPrice || 0)}
-                    />
+                    <CurrentPrice asset={asset} currentPrice={currentPrice} isPriceUp={isPriceUp} />
                     <TooltipInfo
                         overlay={t('speed-markets.tooltips.current-price')}
-                        customIconStyling={{ marginTop: '1px' }}
+                        customIconStyling={{
+                            color: isPriceUp ? theme.price.up : theme.price.down,
+                            marginLeft: '6px',
+                        }}
                     />
                 </FlexDivRowCentered>
-                {!!liquidity && (
+                {!hideLiquidity && !!liquidity && (
                     <FlexDiv>
-                        <Value>{`${t('common.liquidity')} ${liquidity}`}</Value>
+                        <span>
+                            <Label>{t('common.liquidity')}</Label>
+                            <Value margin="0 0 0 4px">{liquidity}</Value>
+                        </span>
                         <TooltipInfo
                             overlay={
                                 <Trans
@@ -198,42 +206,46 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
                                         br: <br />,
                                     }}
                                     values={{
+                                        liquidityPerAsset: liquidity,
                                         liquidityPerUp,
                                         liquidityPerDown,
                                     }}
                                 />
                             }
-                            customIconStyling={{ marginTop: '1px' }}
+                            customIconStyling={{ color: theme.price.up }}
                         />
                     </FlexDiv>
                 )}
             </FlexDivSpaceBetween>
-            <ChartContainer>
-                {pythQuery.isLoading ? (
-                    <SimpleLoader />
-                ) : (
-                    <ChartComponent
-                        resolution={dateRange.resolution}
-                        data={candleData}
-                        position={position}
-                        asset={asset}
-                        selectedPrice={selectedPrice}
-                        selectedRightPrice={selectedRightPrice}
-                        selectedDate={selectedDate}
-                    />
-                )}
-            </ChartContainer>
+            {!hideChart && (
+                <>
+                    <ChartContainer>
+                        {pythQuery.isLoading ? (
+                            <SimpleLoader />
+                        ) : (
+                            <ChartComponent
+                                resolution={dateRange.resolution}
+                                data={candleData}
+                                position={position}
+                                asset={asset}
+                                selectedPrice={selectedPrice}
+                                selectedDate={selectedDate}
+                            />
+                        )}
+                    </ChartContainer>
 
-            <Toggle
-                options={SpeedMarketsToggleButtons}
-                selectedIndex={selectedToggleIndex}
-                onChange={handleDateRangeChange}
-            />
-            <PythIconWrap>
-                <a target="_blank" rel="noreferrer" href={LINKS.Pyth.Benchmarks}>
-                    <i className="icon icon--pyth" />
-                </a>
-            </PythIconWrap>
+                    <Toggle
+                        options={SpeedMarketsToggleButtons}
+                        selectedIndex={selectedToggleIndex}
+                        onChange={handleDateRangeChange}
+                    />
+                    <PythIconWrap>
+                        <a target="_blank" rel="noreferrer" href={LINKS.Pyth.Benchmarks}>
+                            <i className="icon icon--pyth" />
+                        </a>
+                    </PythIconWrap>
+                </>
+            )}
         </Wrapper>
     );
 };
@@ -243,17 +255,14 @@ const Wrapper = styled.div`
     width: 100%;
     height: 100%;
     margin-top: 15px;
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        height: 352px;
-    }
 `;
 
 const ChartContainer = styled.div`
-    height: 284px;
+    height: 291px;
     margin-top: 15px;
 `;
 
-const Value = styled.span<{ margin?: string }>`
+const Label = styled.span<{ margin?: string }>`
     font-weight: 400;
     font-size: 18px;
     line-height: 100%;
@@ -267,6 +276,10 @@ const Value = styled.span<{ margin?: string }>`
     }
 `;
 
+const Value = styled(Label)`
+    color: ${(props) => props.theme.textColor.quaternary};
+`;
+
 const PythIconWrap = styled.div`
     position: absolute;
     height: 20px;
@@ -276,7 +289,7 @@ const PythIconWrap = styled.div`
     i {
         font-size: 40px;
         line-height: 10px;
-        color: ${(props) => props.theme.textColor.primary};
+        color: ${(props) => props.theme.textColor.quinary};
     }
 `;
 

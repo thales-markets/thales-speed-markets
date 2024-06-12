@@ -1,4 +1,5 @@
 import Button from 'components/Button';
+import { ScreenSizeBreakpoint } from 'enums/ui';
 import React from 'react';
 import styled, { useTheme } from 'styled-components';
 import { ThemeInterface } from 'types/ui';
@@ -21,17 +22,19 @@ const Toggle: React.FC<ToggleProps> = ({ options, onChange, selectedIndex }) => 
             {options.map(({ label, resolution }, index) => (
                 <Button
                     key={resolution}
-                    width="35px"
-                    height="31px"
-                    textColor={theme.button.textColor.tertiary}
-                    backgroundColor={
-                        index === selectedIndex ? theme.button.background.tertiary : theme.button.background.secondary
+                    width="50px"
+                    height="30px"
+                    textColor={
+                        index === selectedIndex ? theme.button.textColor.secondary : theme.button.textColor.tertiary
                     }
-                    borderColor={theme.button.borderColor.tertiary}
+                    backgroundColor={
+                        index === selectedIndex ? theme.button.background.secondary : theme.button.background.primary
+                    }
+                    borderColor={theme.button.borderColor.secondary}
                     fontSize="13px"
-                    padding="0"
+                    borderWidth="1px"
+                    borderRadius="8px"
                     additionalStyles={{
-                        borderRadius: '8px',
                         transition: 'all 0.2s ease-in-out',
                         textTransform: 'none',
                     }}
@@ -48,7 +51,10 @@ const Wrapper = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 12px;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        gap: 8px;
+    }
 `;
 
 export default Toggle;

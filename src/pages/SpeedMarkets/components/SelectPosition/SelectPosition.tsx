@@ -1,29 +1,29 @@
 import Tooltip from 'components/Tooltip';
 import { Positions } from 'enums/market';
+import queryString from 'query-string';
 import React from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { FlexDivColumnCentered } from 'styles/common';
-import { formatPercentage, roundNumberToDecimals } from 'thales-utils';
-import { AmmChainedSpeedMarketsLimits } from 'types/market';
+import { useTheme } from 'styled-components';
+import { FlexDivColumnCentered, FlexDivSpaceBetween } from 'styles/common';
+import { formatPercentage } from 'thales-utils';
+import { ThemeInterface } from 'types/ui';
+import { history } from 'utils/routes';
 import {
-    Chain,
-    ChainedHeader,
     ChainedPositions,
     ClearAll,
-    Container,
+    Header,
+    HeaderSubText,
+    HeaderText,
     Icon,
     IconWrong,
-    LabelDown,
-    LabelUp,
-    PositionSymbolDown,
-    PositionSymbolUp,
+    PlusMinusIcon,
+    PositionContainer,
     PositionWrapper,
+    PositionWrapperChained,
     PositionsContainer,
+    PositionsSymbol,
     PositionsWrapper,
-    Roi,
-    Separator,
-    Skew,
-    TooltipWrapper,
+    Bonus,
 } from './styled-components';
 
 export type SelectedPosition = Positions.UP | Positions.DOWN | undefined;
@@ -32,174 +32,224 @@ type SelectPositionProps = {
     selected: SelectedPosition[];
     onChange: React.Dispatch<SelectedPosition>;
     onChainedChange: React.Dispatch<SelectedPosition[]>;
-    ammChainedSpeedMarketsLimits: AmmChainedSpeedMarketsLimits | null;
-    skew: { [Positions.UP]: number; [Positions.DOWN]: number };
+    setIsChained: React.Dispatch<React.SetStateAction<boolean>>;
+    resetData: React.Dispatch<void>;
+    profitAndSkewPerPosition: {
+        profit: { [Positions.UP]: number; [Positions.DOWN]: number };
+        skew: { [Positions.UP]: number; [Positions.DOWN]: number };
+    };
 };
 
 const SelectPosition: React.FC<SelectPositionProps> = ({
     selected,
     onChange,
     onChainedChange,
-    ammChainedSpeedMarketsLimits,
-    skew,
+    setIsChained,
+    resetData,
+    profitAndSkewPerPosition,
 }) => {
     const { t } = useTranslation();
+    const theme: ThemeInterface = useTheme();
 
-    const payoutMultiplier =
-        ammChainedSpeedMarketsLimits?.payoutMultipliers[
-            selected.length - ammChainedSpeedMarketsLimits.minChainedMarkets
-        ];
-    const roi = payoutMultiplier ? roundNumberToDecimals(payoutMultiplier ** selected.length) : 0;
+    /*
+     * Calculate ROI bonus as:
+     * ROI on UP = 60%
+     * ROI on DOWN = 70%
+     * ROI Bonus = (70 - 60) / 60 = 16.67%
+     */
+    const profit = profitAndSkewPerPosition.profit;
+    const skew = profitAndSkewPerPosition.skew;
+    const bonusPercentage = {
+        [Positions.UP]:
+            profit[Positions.UP] > profit[Positions.DOWN]
+                ? (profit[Positions.UP] - profit[Positions.DOWN]) / (profit[Positions.DOWN] - 1)
+                : 0,
+        [Positions.DOWN]:
+            profit[Positions.DOWN] > profit[Positions.UP]
+                ? (profit[Positions.DOWN] - profit[Positions.UP]) / (profit[Positions.UP] - 1)
+                : 0,
+    };
 
-    const discount = skew[Positions.UP] > 0 ? skew[Positions.UP] / 2 : skew[Positions.DOWN] / 2;
+    const onPlusMinusIconHandle = (isChained: boolean) => {
+        setIsChained(isChained);
+        resetData();
+        history.push({
+            pathname: location.pathname,
+            search: queryString.stringify({
+                isChained: isChained,
+            }),
+        });
+    };
 
-    const isClearAllDisabled =
-        selected.length === ammChainedSpeedMarketsLimits?.minChainedMarkets && selected.every((p) => p === undefined);
+    const onClearAllHandle = () => {
+        setIsChained(false);
+        resetData();
+        history.push({
+            pathname: location.pathname,
+            search: queryString.stringify({
+                isChained: false,
+            }),
+        });
+    };
+
+    const getBonusTooltip = (isBonusUnknown: boolean, direction: Positions, bonus: string) => (
+        <Tooltip
+            overlay={
+                <Trans
+                    i18nKey={
+                        isBonusUnknown ? 'speed-markets.tooltips.bonus-unknown' : 'speed-markets.tooltips.bonus-info'
+                    }
+                    components={{
+                        br: <br />,
+                    }}
+                    values={{ bonusDirection: direction, bonusPerc: bonus }}
+                />
+            }
+            customIconStyling={{ fontSize: '11px', color: theme.textColor.quaternary }}
+        />
+    );
 
     return (
-        <Container>
-            {selected.length === 1 ? (
-                // Single
-                <>
-                    <PositionWrapper onClick={() => onChange(selected[0] === Positions.UP ? undefined : Positions.UP)}>
-                        <LabelUp $isSelected={selected[0] !== undefined ? selected[0] === Positions.UP : undefined}>
-                            {Positions.UP}
-                        </LabelUp>
-                        <PositionSymbolUp
-                            $isSelected={selected[0] !== undefined ? selected[0] === Positions.UP : undefined}
-                        >
-                            <Icon className="icon icon--caret-up" />
-                            {discount > 0 && (
-                                <Skew $isDiscount={skew[Positions.UP] > 0 ? false : discount > 0 ? true : undefined}>
-                                    {skew[Positions.UP] > 0 ? '-' : discount > 0 ? '+' : ''}
-                                    {formatPercentage(skew[Positions.UP] || discount)}
-                                </Skew>
-                            )}
-                        </PositionSymbolUp>
-                    </PositionWrapper>
-                    <Separator>
-                        {discount > 0 && (
-                            <TooltipWrapper>
-                                <Tooltip
-                                    overlay={
-                                        <Trans
-                                            i18nKey="speed-markets.tooltips.skew-info"
-                                            components={{
-                                                br: <br />,
-                                            }}
-                                            values={{
-                                                skewDirection: skew[Positions.DOWN] > 0 ? Positions.DOWN : Positions.UP,
-                                                skewPerc: formatPercentage(
-                                                    skew[Positions.UP] > 0 ? skew[Positions.UP] : skew[Positions.DOWN]
-                                                ),
-                                                discountDirection:
-                                                    skew[Positions.DOWN] > 0 ? Positions.UP : Positions.DOWN,
-                                                discountPerc: formatPercentage(discount),
-                                            }}
-                                        />
-                                    }
-                                    customIconStyling={{ marginLeft: '0' }}
-                                />
-                            </TooltipWrapper>
-                        )}
-                    </Separator>
-                    <PositionWrapper
-                        onClick={() => onChange(selected[0] === Positions.DOWN ? undefined : Positions.DOWN)}
-                    >
-                        <PositionSymbolDown
-                            $isSelected={selected[0] !== undefined ? selected[0] === Positions.DOWN : undefined}
-                        >
-                            <Icon className="icon icon--caret-down" />
-                            {discount > 0 && (
-                                <Skew $isDiscount={skew[Positions.DOWN] > 0 ? false : discount > 0 ? true : undefined}>
-                                    {skew[Positions.DOWN] > 0 ? '-' : discount > 0 ? '+' : ''}
-                                    {formatPercentage(skew[Positions.DOWN] || discount)}
-                                </Skew>
-                            )}
-                        </PositionSymbolDown>
-                        <LabelDown $isSelected={selected[0] !== undefined ? selected[0] === Positions.DOWN : undefined}>
-                            {Positions.DOWN}
-                        </LabelDown>
-                    </PositionWrapper>
-                </>
-            ) : (
-                // Chained
-                <FlexDivColumnCentered>
-                    <ChainedHeader>
-                        <Roi>{t('speed-markets.chained.roi', { value: roi })}x</Roi>
-                        <ClearAll
-                            isDisabled={isClearAllDisabled}
-                            onClick={() =>
-                                !isClearAllDisabled &&
-                                onChainedChange(Array(ammChainedSpeedMarketsLimits?.minChainedMarkets).fill(undefined))
-                            }
-                        >
+        <div>
+            <Header>
+                <FlexDivSpaceBetween>
+                    <HeaderText> {t('speed-markets.steps.choose-direction')}</HeaderText>
+                    {selected.length > 1 && (
+                        <ClearAll onClick={onClearAllHandle}>
                             {t('speed-markets.chained.clear-all')}
                             <IconWrong className="icon icon--wrong" />
                         </ClearAll>
-                    </ChainedHeader>
-                    <ChainedPositions>
-                        {selected.map((position, index) => {
-                            const isUpSelected = position !== undefined ? position === Positions.UP : undefined;
-                            const isDownSelected = position !== undefined ? position === Positions.DOWN : undefined;
-                            return (
-                                <PositionsContainer key={index}>
-                                    {index !== 0 && (
-                                        <Chain isSelectedUp={isUpSelected}>
-                                            <Icon className="icon icon--chain" />
-                                        </Chain>
+                    )}
+                </FlexDivSpaceBetween>
+
+                <HeaderSubText> {t('speed-markets.steps.choose-direction-sub')}</HeaderSubText>
+            </Header>
+            <PositionContainer>
+                {selected.length === 1 ? (
+                    // Single
+                    <>
+                        <PositionWrapper
+                            $isSelected={selected[0] === Positions.UP}
+                            onClick={() => onChange(selected[0] === Positions.UP ? undefined : Positions.UP)}
+                        >
+                            <Icon className="icon icon--caret-up" />
+                            {Positions.UP}
+
+                            {(bonusPercentage[Positions.UP] > 0 || skew[Positions.DOWN] > 0) && (
+                                <Bonus $isSelected={selected[0] === Positions.UP}>
+                                    {bonusPercentage[Positions.UP]
+                                        ? `+${formatPercentage(bonusPercentage[Positions.UP])}`
+                                        : t('common.bonus')}
+                                    {getBonusTooltip(
+                                        bonusPercentage[Positions.UP] === 0,
+                                        Positions.UP,
+                                        formatPercentage(bonusPercentage[Positions.UP])
                                     )}
-                                    <PositionsWrapper>
-                                        <PositionWrapper
-                                            isColumn
-                                            onClick={() =>
-                                                onChainedChange(
-                                                    selected.map((pos, i) =>
-                                                        i === index
-                                                            ? pos === Positions.UP
-                                                                ? undefined
-                                                                : Positions.UP
-                                                            : pos
-                                                    )
-                                                )
-                                            }
-                                        >
-                                            <LabelUp isColumn $isSelected={isUpSelected}>
-                                                {Positions.UP}
-                                            </LabelUp>
-                                            <PositionSymbolUp $isSelected={isUpSelected}>
-                                                <Icon className="icon icon--caret-up" />
-                                            </PositionSymbolUp>
-                                        </PositionWrapper>
-                                        <PositionWrapper
-                                            isColumn
-                                            onClick={() =>
-                                                onChainedChange(
-                                                    selected.map((pos, i) =>
-                                                        i === index
-                                                            ? pos === Positions.DOWN
-                                                                ? undefined
-                                                                : Positions.DOWN
-                                                            : pos
-                                                    )
-                                                )
-                                            }
-                                        >
-                                            <PositionSymbolDown $isSelected={isDownSelected}>
-                                                <Icon className="icon icon--caret-down" />
-                                            </PositionSymbolDown>
-                                            <LabelDown $isColumn $isSelected={isDownSelected}>
-                                                {Positions.DOWN}
-                                            </LabelDown>
-                                        </PositionWrapper>
-                                    </PositionsWrapper>
-                                </PositionsContainer>
-                            );
-                        })}
-                    </ChainedPositions>
-                </FlexDivColumnCentered>
-            )}
-        </Container>
+                                </Bonus>
+                            )}
+                        </PositionWrapper>
+
+                        <PositionWrapper
+                            onClick={() => onChange(selected[0] === Positions.DOWN ? undefined : Positions.DOWN)}
+                            $isSelected={selected[0] === Positions.DOWN}
+                        >
+                            <Icon className="icon icon--caret-down" />
+                            {Positions.DOWN}
+
+                            {(bonusPercentage[Positions.DOWN] > 0 || skew[Positions.UP] > 0) && (
+                                <Bonus $isSelected={selected[0] === Positions.DOWN}>
+                                    {bonusPercentage[Positions.DOWN]
+                                        ? `+${formatPercentage(bonusPercentage[Positions.DOWN])}`
+                                        : t('common.bonus')}
+                                    {getBonusTooltip(
+                                        bonusPercentage[Positions.DOWN] === 0,
+                                        Positions.DOWN,
+                                        formatPercentage(bonusPercentage[Positions.DOWN])
+                                    )}
+                                </Bonus>
+                            )}
+                        </PositionWrapper>
+                        <PlusMinusIcon
+                            className="network-icon network-icon--plus"
+                            onClick={() => onPlusMinusIconHandle(true)}
+                        />
+                    </>
+                ) : (
+                    // Chained
+                    <FlexDivColumnCentered>
+                        <FlexDivSpaceBetween>
+                            <PlusMinusIcon
+                                className="network-icon network-icon--minus"
+                                onClick={() => {
+                                    if (selected.length === 2) {
+                                        onPlusMinusIconHandle(false);
+                                    } else {
+                                        onChainedChange(selected.slice(0, selected.length - 1));
+                                    }
+                                }}
+                            />
+                            <ChainedPositions>
+                                {selected.map((position, index) => {
+                                    const isUpSelected = position !== undefined ? position === Positions.UP : undefined;
+                                    const isDownSelected =
+                                        position !== undefined ? position === Positions.DOWN : undefined;
+                                    return (
+                                        <PositionsContainer key={index}>
+                                            <PositionsWrapper>
+                                                <PositionWrapperChained
+                                                    $isSelected={isUpSelected}
+                                                    onClick={() =>
+                                                        onChainedChange(
+                                                            selected.map((pos, i) =>
+                                                                i === index
+                                                                    ? pos === Positions.UP
+                                                                        ? undefined
+                                                                        : Positions.UP
+                                                                    : pos
+                                                            )
+                                                        )
+                                                    }
+                                                >
+                                                    <PositionsSymbol $isSelected={isUpSelected}>
+                                                        <Icon className="icon icon--caret-up" />
+                                                    </PositionsSymbol>
+                                                </PositionWrapperChained>
+                                                <PositionWrapperChained
+                                                    $isSelected={isDownSelected}
+                                                    onClick={() =>
+                                                        onChainedChange(
+                                                            selected.map((pos, i) =>
+                                                                i === index
+                                                                    ? pos === Positions.DOWN
+                                                                        ? undefined
+                                                                        : Positions.DOWN
+                                                                    : pos
+                                                            )
+                                                        )
+                                                    }
+                                                >
+                                                    <PositionsSymbol $isSelected={isDownSelected}>
+                                                        <Icon className="icon icon--caret-down" />
+                                                    </PositionsSymbol>
+                                                </PositionWrapperChained>
+                                            </PositionsWrapper>
+                                        </PositionsContainer>
+                                    );
+                                })}
+                            </ChainedPositions>
+                            {selected.length !== 6 && (
+                                <PlusMinusIcon
+                                    className="network-icon network-icon--plus"
+                                    onClick={() => {
+                                        onChainedChange([...selected, undefined]);
+                                    }}
+                                />
+                            )}
+                        </FlexDivSpaceBetween>
+                    </FlexDivColumnCentered>
+                )}
+            </PositionContainer>
+        </div>
     );
 };
 

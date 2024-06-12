@@ -1,4 +1,3 @@
-import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
 import PythInterfaceAbi from '@pythnetwork/pyth-sdk-solidity/abis/IPyth.json';
 import ApprovalModal from 'components/ApprovalModal';
 import Button from 'components/Button';
@@ -14,30 +13,28 @@ import Tooltip from 'components/Tooltip';
 import { USD_SIGN } from 'constants/currency';
 import { ONE_HUNDRED_AND_THREE_PERCENT } from 'constants/market';
 import { ZERO_ADDRESS } from 'constants/network';
-import { CONNECTION_TIMEOUT_MS, PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
+import { PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
 import { differenceInSeconds, millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
 import {
-    CollateralSelectorContainer,
-    InLabel,
+    Container,
     Label,
     ResultsContainer,
+    TimeIcon,
     Value,
     getDefaultButtonProps,
-} from 'pages/Profile/components/MyPositionAction/MyPositionAction';
+} from 'pages/SpeedMarkets/components/MyPositionAction/MyPositionAction';
 import { CSSProperties, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { getIsMobile } from 'redux/modules/ui';
-import { getSelectedCollateralIndex } from 'redux/modules/wallet';
+import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
 import { useTheme } from 'styled-components';
-import { FlexDivCentered } from 'styles/common';
 import { coinParser, formatCurrencyWithSign, roundNumberToDecimals } from 'thales-utils';
-import { ChainedSpeedMarket } from 'types/market';
+import { UserChainedPosition } from 'types/market';
 import { RootState, ThemeInterface } from 'types/ui';
 import { getCollateral, getCollaterals, getDefaultCollateral } from 'utils/currency';
 import { checkAllowance, getIsMultiCollateralSupported } from 'utils/network';
-import { getPriceId, getPriceServiceEndpoint, priceParser } from 'utils/pyth';
+import { getPriceConnection, getPriceId, priceParser } from 'utils/pyth';
 import {
     refetchActiveSpeedMarkets,
     refetchBalances,
@@ -45,8 +42,11 @@ import {
     refetchUserSpeedMarkets,
 } from 'utils/queryConnector';
 
+import { getIsMobile } from 'redux/modules/ui';
 import { SupportedNetwork } from 'types/network';
 import { ViemContract } from 'types/viem';
+import { executeBiconomyTransaction } from 'utils/biconomy';
+import biconomyConnector from 'utils/biconomyWallet';
 import chainedSpeedMarketsAMMContract from 'utils/contracts/chainedSpeedMarketsAMMContract';
 import erc20Contract from 'utils/contracts/collateralContract';
 import multipleCollateral from 'utils/contracts/multipleCollateralContract';
@@ -57,13 +57,13 @@ import { waitForTransactionReceipt } from 'viem/actions';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 
 type ChainedPositionActionProps = {
-    position: ChainedSpeedMarket;
+    position: UserChainedPosition;
     maxPriceDelayForResolvingSec?: number;
     isOverview?: boolean;
     isAdmin?: boolean;
     isSubmittingBatch?: boolean;
-    isProfileAction?: boolean;
-    isMultipleContainerRows?: boolean;
+    isCollateralHidden?: boolean;
+    setIsActionInProgress?: React.Dispatch<boolean>;
 };
 
 const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
@@ -72,8 +72,8 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
     isOverview,
     isAdmin,
     isSubmittingBatch,
-    isProfileAction,
-    isMultipleContainerRows,
+    isCollateralHidden,
+    setIsActionInProgress,
 }) => {
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
@@ -81,8 +81,10 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
     const networkId = useChainId() as SupportedNetwork;
     const client = useClient();
     const walletClient = useWalletClient();
-    const { isConnected, address } = useAccount();
+    const { isConnected, address: walletAddress } = useAccount();
+
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
+    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
     const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
 
     const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
@@ -106,7 +108,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
     }, [isSubmittingBatch]);
 
     useEffect(() => {
-        if (!position.claimable || isDefaultCollateral || isOverview) {
+        if (!position.isClaimable || isDefaultCollateral || isOverview) {
             return;
         }
 
@@ -124,7 +126,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 const allowance = await checkAllowance(
                     parsedAmount,
                     erc20Instance,
-                    address as string,
+                    (isBiconomy ? biconomyConnector.address : walletAddress) as string,
                     addressToApprove
                 );
                 setAllowance(allowance);
@@ -137,10 +139,11 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
         }
     }, [
         position.payout,
-        position.isOpen,
-        position.claimable,
+        position.isResolved,
+        position.isClaimable,
         networkId,
-        address,
+        walletAddress,
+        isBiconomy,
         isConnected,
         hasAllowance,
         isAllowing,
@@ -149,6 +152,13 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
         selectedCollateral,
         client,
     ]);
+
+    // Update action in progress status
+    useEffect(() => {
+        if (setIsActionInProgress) {
+            setIsActionInProgress(isAllowing || isSubmitting);
+        }
+    }, [isAllowing, isSubmitting, setIsActionInProgress]);
 
     const handleAllowance = async (approveAmount: bigint) => {
         const erc20Instance = getContract({
@@ -161,8 +171,16 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
         try {
             setIsAllowing(true);
+            let hash;
+            if (isBiconomy) {
+                hash = await executeBiconomyTransaction(networkId, collateralAddress, erc20Instance, 'approve', [
+                    addressToApprove,
+                    approveAmount,
+                ]);
+            } else {
+                hash = await erc20Instance.write.approve([addressToApprove, approveAmount]);
+            }
 
-            const hash = await erc20Instance.write.approve([addressToApprove, approveAmount]);
             setOpenApprovalModal(false);
             const txReceipt = await waitForTransactionReceipt(client as Client, {
                 hash,
@@ -186,10 +204,6 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
     };
 
     const handleResolve = async () => {
-        const priceConnection = new EvmPriceServiceConnection(getPriceServiceEndpoint(networkId), {
-            timeout: CONNECTION_TIMEOUT_MS,
-        });
-
         setIsSubmitting(true);
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
 
@@ -205,12 +219,23 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 const manualFinalPrices: number[] = position.finalPrices
                     .slice(0, fetchUntilFinalPriceEndIndex)
                     .map((finalPrice) => Number(priceParser(finalPrice)));
-
-                hash = await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarketManually([
-                    position.address,
-                    manualFinalPrices,
-                ]);
+                if (isBiconomy) {
+                    hash = executeBiconomyTransaction(
+                        networkId,
+                        collateralAddress,
+                        chainedSpeedMarketsAMMContractWithSigner,
+                        'resolveMarketManually',
+                        [position.market, manualFinalPrices]
+                    );
+                } else {
+                    hash = await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarketManually([
+                        position.market,
+                        manualFinalPrices,
+                    ]);
+                }
             } else {
+                const priceConnection = getPriceConnection(networkId);
+
                 const pythContract = getContract({
                     abi: PythInterfaceAbi,
                     address: PYTH_CONTRACT_ADDRESS[networkId],
@@ -221,20 +246,26 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 const pythPriceId = getPriceId(networkId, position.currencyKey);
                 const strikeTimesToFetchPrice = position.strikeTimes.slice(0, fetchUntilFinalPriceEndIndex);
                 for (let i = 0; i < strikeTimesToFetchPrice.length; i++) {
-                    promises.push(priceConnection.getVaa(pythPriceId, millisecondsToSeconds(position.strikeTimes[i])));
+                    promises.push(
+                        priceConnection.getPriceUpdatesAtTimestamp(millisecondsToSeconds(position.strikeTimes[i]), [
+                            pythPriceId,
+                        ])
+                    );
                 }
                 const priceFeedUpdateVaas = await Promise.all(promises);
 
                 const priceUpdateDataArray: string[][] = [];
                 promises = [];
                 for (let i = 0; i < strikeTimesToFetchPrice.length; i++) {
-                    const [priceFeedUpdateVaa, publishTime] = priceFeedUpdateVaas[i];
+                    const priceUpdate = priceFeedUpdateVaas[i];
+                    const publishTime = priceUpdate.parsed
+                        ? secondsToMilliseconds(Number(priceUpdate.parsed[0].price.publish_time))
+                        : Number.POSITIVE_INFINITY;
 
                     // check if price feed is not too late
                     if (
                         maxPriceDelayForResolvingSec &&
-                        differenceInSeconds(secondsToMilliseconds(publishTime), position.strikeTimes[i]) >
-                            maxPriceDelayForResolvingSec
+                        differenceInSeconds(publishTime, position.strikeTimes[i]) > maxPriceDelayForResolvingSec
                     ) {
                         await delay(800);
                         toast.update(
@@ -245,7 +276,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                         return;
                     }
 
-                    const priceUpdateData = ['0x' + Buffer.from(priceFeedUpdateVaa, 'base64').toString('hex')];
+                    const priceUpdateData = priceUpdate.binary.data.map((vaa: string) => '0x' + vaa);
                     priceUpdateDataArray.push(priceUpdateData);
                     promises.push(pythContract.read.getUpdateFee([priceUpdateData]));
                 }
@@ -255,17 +286,39 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
 
                 const isEth = collateralAddress === ZERO_ADDRESS;
 
-                hash = isDefaultCollateral
-                    ? await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarket(
-                          [position.address, priceUpdateDataArray],
-                          {
-                              value: totalUpdateFee,
-                          }
-                      )
-                    : await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarketWithOfframp(
-                          [position.address, priceUpdateDataArray, collateralAddress, isEth],
-                          { value: totalUpdateFee }
-                      );
+                if (isBiconomy) {
+                    if (isDefaultCollateral) {
+                        hash = await executeBiconomyTransaction(
+                            networkId,
+                            collateralAddress,
+                            chainedSpeedMarketsAMMContractWithSigner,
+                            'resolveMarket',
+                            [position.market, priceUpdateDataArray],
+                            totalUpdateFee
+                        );
+                    } else {
+                        hash = await executeBiconomyTransaction(
+                            networkId,
+                            collateralAddress,
+                            chainedSpeedMarketsAMMContractWithSigner,
+                            'resolveMarketWithOfframp',
+                            [position.market, priceUpdateDataArray, collateralAddress, isEth],
+                            totalUpdateFee
+                        );
+                    }
+                } else {
+                    hash = isDefaultCollateral
+                        ? await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarket(
+                              [position.market, priceUpdateDataArray],
+                              {
+                                  value: totalUpdateFee,
+                              }
+                          )
+                        : await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarketWithOfframp(
+                              [position.market, priceUpdateDataArray, collateralAddress, isEth],
+                              { value: totalUpdateFee }
+                          );
+                }
             }
 
             const txReceipt = await waitForTransactionReceipt(client as Client, {
@@ -277,9 +330,17 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 if (isOverview) {
                     refetchActiveSpeedMarkets(true, networkId);
                 } else {
-                    refetchUserSpeedMarkets(true, networkId, address ?? '');
-                    refetchUserResolvedSpeedMarkets(true, networkId, address ?? '');
-                    refetchBalances(address as string, networkId);
+                    refetchUserSpeedMarkets(
+                        true,
+                        networkId,
+                        (isBiconomy ? biconomyConnector.address : walletAddress) as string
+                    );
+                    refetchUserResolvedSpeedMarkets(
+                        true,
+                        networkId,
+                        (isBiconomy ? biconomyConnector.address : walletAddress) as string
+                    );
+                    refetchBalances((isBiconomy ? biconomyConnector.address : walletAddress) as string, networkId);
                 }
             } else {
                 console.log('Transaction status', txReceipt.status);
@@ -296,7 +357,6 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
 
     const getResolveButton = () => {
         const additionalButtonStyle: CSSProperties = {
-            minWidth: isOverview || isProfileAction ? '180px' : '152px',
             lineHeight: '100%',
             border: 'none',
         };
@@ -304,9 +364,9 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
         return (
             <Button
                 {...getDefaultButtonProps(isMobile)}
+                minWidth={isOverview && !isMobile ? '150px' : getDefaultButtonProps(isMobile).minWidth}
                 disabled={isSubmitting || (isOverview && !position.canResolve)}
                 additionalStyles={additionalButtonStyle}
-                backgroundColor={!isOverview ? theme.button.textColor.quaternary : undefined}
                 onClick={() =>
                     hasAllowance || isDefaultCollateral || isOverview ? handleResolve() : setOpenApprovalModal(true)
                 }
@@ -324,7 +384,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                                   ? `${t('common.admin')} ${t('speed-markets.overview.resolve')}`
                                   : t('speed-markets.overview.resolve')
                               : t('speed-markets.user-positions.claim-win')
-                      } ${formatCurrencyWithSign(USD_SIGN, position.payout, 2)}`
+                      }${isOverview ? '' : ' ' + formatCurrencyWithSign(USD_SIGN, position.payout, 2)}`
                     : isAllowing
                     ? `${t('common.enable-wallet-access.approve-progress')} ${defaultCollateral}...`
                     : t('common.enable-wallet-access.approve-swap', {
@@ -335,9 +395,9 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
         );
     };
 
-    const getButton = () => {
-        if (position.isOpen) {
-            if (position.claimable) {
+    const getActionStatus = () => {
+        if (!position.isResolved) {
+            if (position.isClaimable) {
                 return hasAllowance || isDefaultCollateral ? (
                     getResolveButton()
                 ) : (
@@ -350,33 +410,45 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                         <div>{getResolveButton()}</div>
                     </Tooltip>
                 );
-            } else if (position.canResolve) {
+            } else if (position.resolveIndex !== undefined) {
                 return isOverview ? (
                     getResolveButton()
                 ) : (
                     <ResultsContainer>
-                        <Label>{t('common.result')}</Label>
-                        <Value $isUpperCase color={theme.error.textColor.primary}>
-                            {t('common.loss')}
-                        </Value>
+                        <TimeRemaining
+                            end={position.strikeTimes[position.resolveIndex]}
+                            showFullCounter
+                            showSecondsCounter
+                        >
+                            <TimeIcon className="icon icon--time" />
+                            <Label>{t('common.results')}</Label>
+                        </TimeRemaining>
                     </ResultsContainer>
                 );
             } else {
-                return (
-                    <ResultsContainer $minWidth="180px">
-                        <Label>{t('speed-markets.user-positions.results')}</Label>
-                        <TimeRemaining fontSize={13} end={position.maturityDate} showFullCounter showSecondsCounter />
+                const firstHigherTimeIndex = position.strikeTimes.findIndex((t) => t > Date.now());
+                const strikeTimeIndex =
+                    firstHigherTimeIndex > -1 ? firstHigherTimeIndex : position.strikeTimes.length - 1;
+
+                return isOverview ? (
+                    getResolveButton()
+                ) : (
+                    <ResultsContainer>
+                        <TimeRemaining end={position.strikeTimes[strikeTimeIndex]} showFullCounter showSecondsCounter>
+                            <Label>
+                                <TimeIcon className="icon icon--time" />
+                                {Date.now() > position.maturityDate
+                                    ? t('common.results')
+                                    : t('speed-markets.user-positions.next-result-in')}
+                            </Label>
+                        </TimeRemaining>
                     </ResultsContainer>
                 );
             }
         } else {
             return (
                 <ResultsContainer>
-                    <Label>{t('common.result')}</Label>
-                    <Value
-                        $isUpperCase
-                        color={position.isUserWinner ? theme.textColor.quaternary : theme.error.textColor.primary}
-                    >
+                    <Value $isUpperCase color={position.isUserWinner ? theme.status.won : theme.status.loss}>
                         {position.isUserWinner ? t('common.won') : t('common.loss')}
                     </Value>
                 </ResultsContainer>
@@ -386,26 +458,22 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
 
     return (
         <>
-            <FlexDivCentered>
-                {getButton()}
-                {!isOverview && isMultiCollateralSupported && position.claimable && (
-                    <CollateralSelectorContainer>
-                        <InLabel color={theme.button.textColor.quaternary}>{t('common.in')}</InLabel>
-                        <CollateralSelector
-                            collateralArray={getCollaterals(networkId)}
-                            selectedItem={selectedCollateralIndex}
-                            onChangeCollateral={() => {}}
-                            disabled={isSubmitting || isAllowing}
-                            additionalStyles={{
-                                position: isProfileAction || !isMultipleContainerRows ? undefined : 'relative',
-                                margin: '0 0 0 7px',
-                                color: theme.button.textColor.quaternary,
-                            }}
-                            isDropDownAbove={isMobile && !isProfileAction}
-                        />
-                    </CollateralSelectorContainer>
+            <Container
+                $isFullWidth={!position.isClaimable || !!isOverview}
+                $alignCenter={!position.isClaimable && !isOverview && position.canResolve}
+            >
+                {!isOverview && !isCollateralHidden && isMultiCollateralSupported && position.isClaimable && (
+                    <CollateralSelector
+                        collateralArray={getCollaterals(networkId)}
+                        selectedItem={selectedCollateralIndex}
+                        onChangeCollateral={() => {}}
+                        disabled={isSubmitting || isAllowing}
+                        isIconHidden
+                        additionalStyles={{ margin: '0 12px 0 0' }}
+                    />
                 )}
-            </FlexDivCentered>
+                {getActionStatus()}
+            </Container>
             {openApprovalModal && (
                 <ApprovalModal
                     // add three percent to approval amount to take into account price changes

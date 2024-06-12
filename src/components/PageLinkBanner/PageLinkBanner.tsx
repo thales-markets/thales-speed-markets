@@ -40,25 +40,27 @@ const PageLinkBanner: React.FC<PageLinkBannerProps> = ({ link }) => {
 const Content = styled(FlexDivCentered)`
     position: relative;
     height: 30px;
-    background: ${(props) => props.theme.borderColor.tertiary};
+    background: ${(props) => props.theme.background.quinary};
     border-radius: 8px;
     padding: 5px;
+    margin-bottom: 20px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         height: 40px;
     }
 `;
 
 const Text = styled.span<{ $noWrap?: boolean }>`
-    color: ${(props) => props.theme.button.textColor.primary};
+    color: ${(props) => props.theme.button.textColor.secondary};
     text-align: center;
+    font-family: ${(props) => props.theme.fontFamily.secondary};
     font-size: 13px;
-    font-weight: 400;
+    font-weight: 800;
     line-height: 100%;
     ${(props) => (props.$noWrap ? 'white-space: nowrap;' : '')}
 `;
 
 const BoldText = styled(Text)`
-    font-weight: 600;
+    font-weight: 900;
 `;
 
 const arrowRightStyle: CSSProperties = {

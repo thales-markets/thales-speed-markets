@@ -1,93 +1,141 @@
 import SPAAnchor from 'components/SPAAnchor/SPAAnchor';
 import Tooltip from 'components/Tooltip';
+import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
+import { SUPPORTED_ASSETS } from 'constants/pyth';
 import ROUTES from 'constants/routes';
-import { millisecondsToSeconds } from 'date-fns';
+import { millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
+import useInterval from 'hooks/useInterval';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
 import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveSpeedMarketsDataQuery';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
+import { setUserNotifications } from 'redux/modules/user';
+import { getIsBiconomy } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
+import { UserChainedPosition, UserPosition } from 'types/market';
 import { RootState } from 'types/ui';
+import biconomyConnector from 'utils/biconomyWallet';
 import { isOnlySpeedMarketsSupported } from 'utils/network';
-import { getPriceId } from 'utils/pyth';
+import { getCurrentPrices, getPriceConnection, getPriceId, getSupportedAssetsAsObject } from 'utils/pyth';
 import { buildHref } from 'utils/routes';
 import { isUserWinner } from 'utils/speedAmm';
 import { useAccount, useChainId, useClient } from 'wagmi';
 
 const Notifications: React.FC = () => {
     const { t } = useTranslation();
+    const dispatch = useDispatch();
+
     const networkId = useChainId();
     const client = useClient();
+    const { address: walletAddress, isConnected } = useAccount();
+
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const { isConnected, address } = useAccount();
+    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
 
-    const isNetworkSupported = !isOnlySpeedMarketsSupported(networkId);
+    const [currentPrices, setCurrentPrices] = useState<{ [key: string]: number }>(getSupportedAssetsAsObject());
 
+    const isNetworkSupportedForChained = !isOnlySpeedMarketsSupported(networkId);
+
+    // SINGLE
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
         { networkId, client },
-        address as string,
+        isBiconomy ? biconomyConnector.address : walletAddress || '',
         {
             enabled: isAppReady && isConnected,
         }
     );
-    const speedMarketsNotifications = useMemo(() => {
-        if (userActiveSpeedMarketsDataQuery.isSuccess && userActiveSpeedMarketsDataQuery.data) {
-            return userActiveSpeedMarketsDataQuery.data.filter((marketData) => marketData.claimable).length;
-        }
-        return 0;
-    }, [userActiveSpeedMarketsDataQuery]);
 
-    const userActiveChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
-        { networkId, client },
-        address as string,
-        {
-            enabled: isAppReady && isConnected && isNetworkSupported,
-        }
-    );
-    const userActiveChainedSpeedMarketsData = useMemo(
+    const userOpenSpeedMarketsData = useMemo(
         () =>
-            userActiveChainedSpeedMarketsDataQuery.isSuccess && userActiveChainedSpeedMarketsDataQuery.data
-                ? userActiveChainedSpeedMarketsDataQuery.data
+            userActiveSpeedMarketsDataQuery.isSuccess && userActiveSpeedMarketsDataQuery.data
+                ? userActiveSpeedMarketsDataQuery.data
                 : [],
-        [userActiveChainedSpeedMarketsDataQuery]
+        [userActiveSpeedMarketsDataQuery]
     );
 
-    // Prepare active chained speed markets that become matured to fetch Pyth prices
-    const maturedChainedMarkets = userActiveChainedSpeedMarketsData
-        .filter((marketData) => marketData.isMatured)
-        .map((marketData) => {
-            const strikeTimes = marketData.strikeTimes.map((strikeTime) => millisecondsToSeconds(strikeTime));
+    const activeSpeedMatured = userOpenSpeedMarketsData.filter((marketData) => marketData.maturityDate < Date.now());
+
+    const priceRequests = activeSpeedMatured.map((marketData) => ({
+        priceId: getPriceId(networkId, marketData.currencyKey),
+        publishTime: millisecondsToSeconds(marketData.maturityDate),
+    }));
+    const pythPricesQueries = usePythPriceQueries(networkId, priceRequests, {
+        enabled: priceRequests.length > 0,
+    });
+
+    // set final prices and claimable status
+    const claimableUserSpeedMarkets: UserPosition[] = activeSpeedMatured
+        .map((marketData, index) => {
+            const finalPrice = pythPricesQueries[index].data || 0;
+            const isClaimable = !!isUserWinner(marketData.side, marketData.strikePrice, finalPrice);
             return {
                 ...marketData,
-                strikeTimes,
+                finalPrice,
+                isClaimable,
+            };
+        })
+        .filter((marketData) => marketData.isClaimable);
+
+    // CHAINED
+    const userChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
+        { networkId, client },
+        isBiconomy ? biconomyConnector.address : walletAddress || '',
+        {
+            enabled: isAppReady && isConnected && isNetworkSupportedForChained,
+        }
+    );
+
+    const userOpenChainedSpeedMarketsData = useMemo(
+        () =>
+            userChainedSpeedMarketsDataQuery.isSuccess && userChainedSpeedMarketsDataQuery.data
+                ? userChainedSpeedMarketsDataQuery.data
+                : [],
+        [userChainedSpeedMarketsDataQuery]
+    );
+
+    // Prepare chained speed markets that are partially matured to fetch Pyth prices
+    const partiallyMaturedChainedMarkets = userOpenChainedSpeedMarketsData
+        .filter((marketData) => marketData.strikeTimes.some((strikeTime) => strikeTime < Date.now()))
+        .map((marketData) => {
+            return {
+                ...marketData,
                 pythPriceId: getPriceId(networkId, marketData.currencyKey),
             };
         });
 
-    const priceRequests = maturedChainedMarkets
+    const chainedPriceRequests = partiallyMaturedChainedMarkets
         .map((data) =>
-            data.strikeTimes.map((strikeTime) => ({
-                priceId: data.pythPriceId,
-                publishTime: strikeTime,
-                market: data.address,
-            }))
+            data.strikeTimes
+                .filter(
+                    (strikeTime, i) => strikeTime < Date.now() && i <= (data.resolveIndex || data.strikeTimes.length)
+                )
+                .map((strikeTime) => ({
+                    priceId: data.pythPriceId,
+                    publishTime: millisecondsToSeconds(strikeTime),
+                    market: data.market,
+                }))
         )
         .flat();
-    const pythPricesQueries = usePythPriceQueries(networkId, priceRequests, { enabled: priceRequests.length > 0 });
-    const pythPricesWithMarket = priceRequests.map((request, i) => ({
+    const chainedPythPricesQueries = usePythPriceQueries(networkId, chainedPriceRequests, {
+        enabled: chainedPriceRequests.length > 0,
+    });
+    const chainedPythPricesWithMarket = chainedPriceRequests.map((request, i) => ({
         market: request.market,
-        price: pythPricesQueries[i]?.data || 0,
+        price: chainedPythPricesQueries[i].data || 0,
     }));
 
-    // Based on Pyth prices determine if chained position is claimable
-    const chainedSpeedMarketsNotifications = maturedChainedMarkets
+    // Based on Pyth prices set finalPrices, strikePrices, canResolve, isMatured, isClaimable, isUserWinner
+    const claimableChainedUserMarkets: UserChainedPosition[] = partiallyMaturedChainedMarkets
         .map((marketData) => {
+            const currentPrice = currentPrices[marketData.currencyKey];
             const finalPrices = marketData.strikeTimes.map(
-                (_, i) => pythPricesWithMarket.filter((pythPrice) => pythPrice.market === marketData.address)[i].price
+                (_, i) =>
+                    chainedPythPricesWithMarket.filter((pythPrice) => pythPrice.market === marketData.market)[i]
+                        ?.price || 0
             );
             const strikePrices = marketData.strikePrices.map((strikePrice, i) =>
                 i > 0 ? finalPrices[i - 1] : strikePrice
@@ -95,13 +143,53 @@ const Notifications: React.FC = () => {
             const userWonStatuses = marketData.sides.map((side, i) =>
                 isUserWinner(side, strikePrices[i], finalPrices[i])
             );
-            const claimable = userWonStatuses.every((status) => status);
+            const canResolve =
+                userWonStatuses.some((status) => status === false) ||
+                userWonStatuses.every((status) => status !== undefined);
 
-            return { ...marketData, finalPrices, claimable };
+            const lossIndex = userWonStatuses.findIndex((status) => status === false);
+            const resolveIndex = canResolve ? (lossIndex > -1 ? lossIndex : marketData.sides.length - 1) : undefined;
+
+            const isClaimable = userWonStatuses.every((status) => status);
+            const isMatured = marketData.maturityDate < Date.now();
+
+            return {
+                ...marketData,
+                strikePrices,
+                currentPrice,
+                finalPrices,
+                canResolve,
+                resolveIndex,
+                isMatured,
+                isClaimable,
+                isUserWinner: isClaimable,
+            };
         })
-        .filter((marketData) => marketData.claimable).length;
+        .filter((marketData) => marketData.isClaimable);
 
-    const totalNotifications = speedMarketsNotifications + chainedSpeedMarketsNotifications;
+    const priceConnection = useMemo(() => getPriceConnection(networkId), [networkId]);
+
+    // Refresh current prices
+    useInterval(async () => {
+        const priceIds = SUPPORTED_ASSETS.map((asset) => getPriceId(networkId, asset));
+        const prices: typeof currentPrices = await getCurrentPrices(priceConnection, networkId, priceIds);
+        setCurrentPrices({
+            ...currentPrices,
+            [CRYPTO_CURRENCY_MAP.BTC]: prices[CRYPTO_CURRENCY_MAP.BTC],
+            [CRYPTO_CURRENCY_MAP.ETH]: prices[CRYPTO_CURRENCY_MAP.ETH],
+        });
+    }, secondsToMilliseconds(30));
+
+    useEffect(() => {
+        dispatch(
+            setUserNotifications({
+                single: claimableUserSpeedMarkets.length,
+                chained: claimableChainedUserMarkets.length,
+            })
+        );
+    }, [claimableUserSpeedMarkets.length, claimableChainedUserMarkets.length, dispatch]);
+
+    const totalNotifications = claimableUserSpeedMarkets.length + claimableChainedUserMarkets.length;
 
     const hasNotifications = totalNotifications > 0;
 
@@ -116,7 +204,7 @@ const Notifications: React.FC = () => {
                         </Wrapper>
                     </Tooltip>
                 ) : (
-                    <Icon className={`icon icon--user-avatar`} />
+                    <Icon className={`network-icon network-icon--avatar`} />
                 )}
             </Container>
         </SPAAnchor>
@@ -134,7 +222,7 @@ const Wrapper = styled(FlexDivCentered)`
     width: 42px;
     height: inherit;
     gap: 2px;
-    background: ${(props) => props.theme.background.quaternary};
+    background: ${(props) => props.theme.button.background.secondary};
     border-radius: 24px;
 `;
 
@@ -146,13 +234,28 @@ const Number = styled.span`
 
 const Bell = styled.i`
     color: ${(props) => props.theme.background.primary};
-    font-size: 13px;
+    font-size: 18px;
     animation: shake 1s linear infinite;
+
+    @keyframes shake {
+        0% {
+            transform: rotate(0deg);
+        }
+        25% {
+            transform: rotate(10deg);
+        }
+        50% {
+            transform: rotate(0deg);
+        }
+        75% {
+            transform: rotate(-10deg);
+        }
+    }
 `;
 
 const Icon = styled.i`
-    font-size: 22px;
-    color: ${(props) => props.theme.textColor.primary};
+    font-size: 26px;
+    color: ${(props) => props.theme.textColor.quinary};
 `;
 
 export default Notifications;

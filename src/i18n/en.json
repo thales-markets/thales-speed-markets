@@ -1,53 +1,34 @@
 {
     "common": {
         "thales-markets": "Thales Markets",
-        "read-more": "Read more",
-        "show-less": "Show less",
         "max": "max",
-        "save": "Save",
-        "close": "Close",
-        "no-data": "Do not have any data to show",
         "buy": {
             "label": "Buy",
             "progress-label": "Buying in progress...",
-            "confirmation-message": "Successfully bought"
+            "confirmation-message": "Successfully bought - market created"
         },
         "mint": {
             "label": "Get",
             "progress-label": "Getting",
             "confirmation-message": "Successfully received {{token}}"
         },
-        "eg-val": "e.g. {{val}}",
-        "select-date": "select date",
         "or": "or",
-        "here": "here",
-        "switch-to-l2": "Switch to L2",
-        "no-data-available": "No data available",
         "enter-amount": "Enter amount",
-        "enter-percentage": "Enter percentage",
-        "enter-address": "Enter address",
         "enter-minutes": "Enter minutes",
         "enter-hours": "Enter hours",
         "search-placeholder": "Search...",
         "progress": "Please wait...",
         "market": "Market",
-        "sort-menu": "Sorting menu",
-        "no-liquidity-tooltip": "<0>We could not fetch a quote from AMM for this position as it's likely out of liquidity. You will still receive your profits if you have winning positions even if the market is out of liquidity. To learn more about the rule for AMM liquidity go <0/ ></0>.",
         "on": "on",
         "in": "in",
-        "starting": "starting",
         "with": "with",
         "above": "Above",
         "below": "Below",
-        "between": "Between",
-        "not-between": "Not between",
-        "and": "and",
-        "asset": "Asset",
+        "all": "all",
         "direction": "Direction",
         "strike-price": "Strike price",
-        "end-date": "End date",
-        "balance": "Balance",
         "result": "Result",
+        "results": "Results",
         "status-label": "Status",
         "won": "Won",
         "loss": "Loss",
@@ -55,6 +36,9 @@
         "liquidity": "Liquidity",
         "support-contact": "Please contact <anchor>Thales support</anchor>",
         "try-again": "Try again",
+        "bonus": "Bonus",
+        "home": "Home",
+        "chart": "Chart",
         "time-remaining": {
             "ended": "ended",
             "years": "years",
@@ -78,62 +62,44 @@
             "months-short": "mo"
         },
         "transaction": {
-            "view": "View",
             "successful": "Transaction successful"
         },
-        "tx-status": {
-            "pending": "Pending"
-        },
         "wallet": {
-            "connect-your-wallet": "Connect wallet",
-            "wallet-options": "Wallet options",
-            "disclaimer-info": "By connecting a wallet you agree to Thales DAO <terms>Terms of Use</terms> and Privacy Policy and acknowledge that you have read and understand the Thales DAO protocol <disclaimer>disclaimer</disclaimer>",
-            "balance": "Wallet balance"
+            "connect-your-wallet": "Login",
+            "disclaimer-info": "By Singing Up to Speed Markets  <terms>Terms of Use</terms> and Privacy Policy you acknowledge that you have read and understand the Thales DAO protocol <disclaimer>disclaimer</disclaimer>.",
+            "connect-wallet-modal-title": "Sign Up to speed markets",
+            "connect-with-wallet": "Connect with wallet",
+            "or-connect-with": "Or",
+            "copy-address": "Copy address"
         },
         "errors": {
-            "try-again": "Try again. AMM data is changed.",
             "unknown-error-try-again": "An unknown error occurred after you submitted. Please try again.",
-            "insufficient-balance": "Insufficient balance",
-            "insufficient-staking-balance": "Insufficient staking balance",
             "out-of-liquidity": "Out of liquidity",
-            "insufficient-liquidity": "Insufficient liquidity",
             "enter-amount": "Enter amount",
-            "enter-address": "Enter address",
-            "enter-slippage": "Enter slippage",
-            "invalid-price": "Invalid price",
-            "invalid-address": "Invalid address",
-            "invalid-price-max": "The price cannot be higher than ${{max}}",
             "invalid-amount-max": "The amount cannot be higher than {{max}}",
             "insufficient-balance-wallet": "Please ensure your wallet has sufficient {{currencyKey}}",
-            "invalid-slippage": "Invalid slippage",
-            "max-limit-exceeded": "Amount exceeded the amount available on AMM",
-            "user-rejected-tx": "User rejected transaction",
-            "enter-percentage": "Enter percentage",
-            "invalid-percentage-range": "The percentage must be between {{min}} and {{max}}",
-            "something-went-wrong": "Something went wrong!"
+            "something-went-wrong": "Something went wrong!",
+            "unexpected": "Please help us about this issue by writing to help-and-questions",
+            "buy-failed": "Failed to create market"
         },
         "enable-wallet-access": {
             "approve": "Approve",
             "approve-progress": "Approving",
-            "approve-label": "Approve {{currencyKey}}",
-            "approve-progress-label": "Approving {{currencyKey}}...",
             "approve-all-label": "Approve all",
             "custom-amount-label": "Approve amount of",
             "approve-swap": "Approve swap to {{currencyKey}}"
         },
         "header": {
-            "refer-earn": "Refer & earn",
+            "get-started": "Get started",
             "notification": { "tooltip": "You have {{count}} claimable position(s)" }
         },
         "footer": {
-            "discover": "Discover",
-            "about": "About",
-            "resources": "Resources"
-        },
-        "sidebar": {
-            "speed-markets": "Speed markets",
-            "profile-label": "Profile",
-            "sport-markets-label": "Overtime markets"
+            "github": "GitHub",
+            "discord": "Discord",
+            "medium": "Medium",
+            "twitter": "X",
+            "docs": "Documentation",
+            "description": "This frontend is hosted decentrally on IPFS (InterPlanetary File System). It serves to visualise the blockchain data and help users interact with the Thales Speed Market contracts that belong to Thales DAO. By doing so it helps users understand the risks of using those smart contracts and what the specific interactions entail. The frontend does not facilitate anything else apart from interacting with those contracts in a visually comprehensive way. In doing so, it is no different than the functionality provided by Etherscan or RPCs (Remote Procedure Calls). The frontend itself does not belong to Thales DAO or any individual. It stores no user data and has no dedicated backend or database. All code is uploaded statically directly to the IPFS. Just as the blockchain does no geo-fencing and no KYC, neither can this frontend do so. However, by interacting with Thales DAO contracts, you commit to have read, understood and accepted Thales DAO’s terms of use and you take full liability in case you have not adhered to those terms."
         },
         "pagination": {
             "rows-per-page": "Rows per page:"
@@ -142,7 +108,6 @@
             "title": "Oops! You are on the wrong network!",
             "description": "You have selected the wrong network in your wallet. To continue, please switch to one of the supported networks.",
             "button": {
-                "mainnet": "Switch to Mainnet",
                 "optimism": "Switch to Optimism",
                 "polygon": "Switch to Polygon",
                 "arbitrum": "Switch to Arbitrum",
@@ -155,7 +120,18 @@
             "title": "Refer and earn",
             "info": "As a person sharing your personal Referral Link, you <bold>earn up to 50% of the trading fee</bold> (0.5% of total volume) from each trade the new user you onboarded executes.",
             "choose-page": "Choose page you want to refer",
-            "referral-id": "Create your referral ID"
+            "referral-id": "Create your referral ID",
+            "choose-referral-placeholder": "Enter Referral ID",
+            "copied": "Copied!",
+            "pages": {
+                "speed-market-page": "Speed markets page",
+                "landing-page": "Landing page"
+            },
+            "generate": {
+                "id-exists": "Referral ID already exists",
+                "id-create-success": "Successfully set referral ID",
+                "link-btn": "Generate link"
+            }
         },
         "status": {
             "success": "Success",
@@ -164,21 +140,15 @@
             "error": "Error"
         },
         "banner": {
-            "arb-distribution-message": "ARB distribution has started. Earn ARB tokens by using Thales products. Checkout the details here.",
             "page-link": {
                 "thales-markets": "Looking for markets with longer time frames (days, weeks, or months)?",
                 "try": "Try <bold>{{value}}</bold>"
             }
         },
-        "tooltip": {
-            "open-market": "Go to Market page"
-        },
         "flex-card": {
-            "footer-text": "Novel <bold>On-chain</bold>, <bold>permissionless</bold>, and <bold>non-custodial parimutual</bold> markets",
             "strike-price": "Strike price",
             "strike-date": "Strike date",
             "entry-price": "Entry price",
-            "market-duration": "Market duration",
             "buy-in": "Buy-In",
             "potential-win": "Potential win",
             "share": "Share",
@@ -192,24 +162,50 @@
             "image-in-clipboard": "Image is in clipboard!"
         }
     },
+    "landing": {
+        "header": {
+            "about": "About",
+            "community": "Community",
+            "devs": "For developers",
+            "thales": "Thales protocol",
+            "dapp": "Open dapp"
+        },
+        "title": "Trade Faster,<br>Win Bigger<br>and Have Fun With Speed Markets!!",
+        "title-desc": "<bold>Speed Markets</bold> allow users to purchase short timeframe UP or DOWN positions around the current price of ETH and BTC.",
+        "trade-now": "Trade now",
+        "content": {
+            "title-1": "Accelerate your fun with Speed Markets",
+            "text-1": "In <bold>Speed Markets</bold>, traders predict the immediate direction of ETH or BTC price movement from the current price in an all-or-nothing fashion!<br><br><bold>Speed Market</bold> duration can be chosen from as short as 5 minutes to as long as 24 hours!",
+            "title-2": "Exponential payout with Chained Speed Markets!",
+            "text-2": "Elevate Your Risk/Reward with <bold>Chained Speed Markets</bold>.<br><br><bold>Chained Speed Markets</bold> allow sequential predictions in a single flow for explosive leveraged payouts of up to 47x, enhancing trading dynamics and potential gains.<br><br><bold>Chained Speed Markets</bold> enable you to craft a sequence of 2 to 6 consecutive price predictions, each with a fixed Strike Time, and with an increasing payout multiplier for each added market.<br><br>Within <bold>Chained Speed Markets</bold>, you can now choose time frames between chains as short as 2 minutes, in addition to the existing options of 5 and 10 minutes.",
+            "title-3": "Trade using any major crypto asset!",
+            "text-3": "Positions can be purchased using many forms of collateral, with the minimum amount of each adjusted to be equal to 5 USDC. The following forms of collateral are accepted for trading:",
+            "title-4": "Instant winnings accessibility",
+            "text-4": "Our <bold>automated permissionless smart contracts</bold> allow you to claim your winnings to your wallet as soon as your position ends. No person can stop you from trading and no person can stop you from winning!",
+            "title-5": "Curious about the accuracy of prices?",
+            "text-5": "<bold>Pyth Benchmark oracles</bold> provide presteen accurate historical price information accessible by anyone, that helps traders verify trades quickly.<br><br>Pyth price data are pulled every second and are used by 300+ projects on 50+ blockchains with top of the line security and track record!",
+            "text-6": "Within the underlying <bold>Thales Protocol's Speed Markets</bold> architecture, solvency is not just a possibility—it's a guarantee. All your trades are 100% collateralized at all times from the moment you open them.<br><br>This essential assurance fosters a <bold>seamless and secure trading journey</bold> for all participants, instilling confidence and reliability in each transaction.",
+            "title-7": "Easy onboarding",
+            "text-7": "No <bold>sign-up is required</bold>, meaning anyone with a Web3 wallet can participate. Additionally, you can enjoy <bold>Speed Markets</bold> with a seamless Social Login onboarding (Google, Twitter, Discord, Github, Apple, etc.), a user-friendly <bold>Deposit/Withdrawal</bold> mechanism, and a cutting edge Credit Card on-ramp aggregator enabled.<br><br>With a full implementation of Account Abstraction, all your transactions are confirmed with a single click without worrying about gas or external wallet interactions! Pay gas with buy-in collateral or even have gas paid by the platform via various gas sponsorship campaigns!"
+        },
+        "powered-by": "Powered by"
+    },
     "speed-markets": {
         "title": "Speed Markets",
-        "info": "Choose an <bold>asset</bold> and the <bold>time</bold> you think will be <bold>above or below</bold> the current price. If you are correct you will <bold>double your buy-in</bold>!",
+        "info": "Choose an <bold>asset</bold>, <bold>direction</bold> and then the <bold>duration</bold> for when to settle your trade. If the price ends in your direction when your time elapses, you win the quoted Potential Profit!",
         "steps": {
-            "choose-asset": "Asset",
             "choose-direction": "Direction",
-            "choose-time": "Time",
-            "enter-buyin": "Amount"
+            "choose-direction-sub": "(You can add up to 6 chained positions for bigger profit)",
+            "choose-time": "Duration",
+            "enter-buyin": "Trade size"
         },
         "amm-trading": {
             "asset-price": "If {{asset}} price is",
             "choose-direction": "choose direction",
-            "choose-time": "choose time",
-            "pick-price": "pick a price",
+            "choose-time": "choose duration",
             "based-amount": "based on amount",
             "you-win": "you win",
             "at-least": "at least",
-            "select-price": "Select price",
             "max-buy": "Max buy"
         },
         "errors": {
@@ -217,122 +213,102 @@
             "max-buyin": "The maximum buy-in is {{maxAmount}}",
             "min-time": "The minimum time is {{minTime}} {{timeUnit}}",
             "max-time": "The maximum time is {{maxTime}} {{timeUnit}}",
-            "min-maturity-date": "The time has to be at least {{minTime}} {{timeUnit}} in the future",
             "out-of-liquidity-direction": "Out of liquidity for direction",
-            "insufficient-balance-fee": "Not enough {{currencyKey}} in wallet for {{fee}} fee",
             "insufficient-balance-wallet": "Get {{currencyKey}} below"
         },
         "user-positions": {
-            "your-positions": "Your open positions",
-            "your-closed-positions": "Your closed positions (last 10)",
-            "no-positions": "Your open positions will be visible here",
-            "end-date": "End date",
-            "size": "Size",
+            "open-single": "Open single markets",
+            "open-chained": "Open chained markets",
+            "your-positions": "Your open markets",
+            "no-positions": "Your {{status}} markets will be visible here",
+            "status-open": "open",
+            "status-claimable": "claimable",
+            "created": "Created",
+            "end-time": "End time",
+            "asset": "Asset",
+            "direction": "Direction",
+            "price": "Price",
+            "current-price": "Current price",
+            "final-price": "Final price",
+            "status": "Status",
             "paid": "Paid",
+            "payout": "Payout",
+            "claim-in": "Claim in",
             "claim-win": "Claim win",
             "claim-win-progress": "Claiming win",
-            "results": "Results in",
-            "position-value": "Position value",
+            "result-in": "Result in",
+            "next-result-in": "Next result in",
             "approve-swap-tooltip": "To get payout in {{currencyKey}}, you need to approve swap from {{defaultCurrency}} to {{currencyKey}}.",
             "claim-all": "Claim all wins",
             "claim-all-progress": "Claiming all wins",
-            "end-time": "End time",
-            "confirmation-message": "Positions successfully claimed",
-            "no-closed-positions": "Your closed positions will be visible here",
+            "claim-all-in": "Claim all in",
+            "claim-all-win-in": "Claim all winnings in",
+            "confirmation-message": "Markets successfully claimed",
             "errors": {
                 "price-stale": "Can't resolve market with stale price"
             }
         },
-        "buy-info": "You have max {{value}}s to confirm tx after clicking on Buy",
-        "total-pay": "Total to pay {{amount}} + {{fee}} fee<tooltip/> (= {{totalAmount}})",
-        "fee-info": "Fee varies per direction liquidity and timeframe, longer timeframes have higher payouts",
-        "to-pay-with-conversion": "To pay {{amount}} ({{stableAmount}}) + {{fee}} fee<tooltip/>",
-        "total-pay-with-conversion": "Total {{amount}} ({{stableAmount}})",
+        "profit": "Potential profit",
+        "slippage": "slippage",
+        "slippage-info": "Slippage tollerance",
         "tooltips": {
-            "buyin-fees": "Excluding fees",
             "current-price": "Current price as reported by Pyth oracles",
-            "liquidity": "Current available liquidity for this Asset<br><br>Open Liquidity for UP {{liquidityPerUp}}<br>Open Liquidity for DOWN {{liquidityPerDown}}",
+            "liquidity": "Current available liquidity for this Asset: {{liquidityPerAsset}}<br><br>Total available for Buy-In per direction<br>Available for UP: {{liquidityPerUp}}<br>Available for DOWN: {{liquidityPerDown}}",
             "payout-conversion": "Win amount can be slightly different due to conversion rate at execution time",
-            "paid-conversion": "Amount in $ is estimated and can be slightly different due to conversion rate at execution time",
             "final-price-missing": "Oracle price snapshot for this market's timestamp is still being processed. Even if contract input is delayed by the Pyth oracles, the price snapshot will be true to the moment of market expiration",
-            "fee-info": "{{firstPerc}} from {{firstTime}}min up to {{secondTime}}min<br>{{secondPerc}} from {{secondTime}}min up to {{thirdTime}}min<br>{{thirdPerc}} from {{thirdTime}}min up to {{fourthTime}}min<br>{{fourthPerc}} for above or equal {{fourthTime}}min<br>{{maxSkewImpact}} maximum skew impact",
-            "skew-info": "Reduced return for {{skewDirection}} is -{{skewPerc}}<br>Bonus return for {{discountDirection}} is +{{discountPerc}}",
-            "skew-slippage": "Skew slippage is maximum 1%"
+            "bonus-unknown": "This direction offers bonus return. Exact bonus depends on selected Duration.",
+            "bonus-info": "Bonus return for {{bonusDirection}} is +{{bonusPerc}}",
+            "slippage": "Your trade will revert if the live price changes more than this percentage from your chosen Strike Price during trade execution."
         },
         "overview": {
             "title": "Overview",
             "navigate": "Speed Markets Overview page",
             "navigate-chained": "Chained Speed Markets Overview page",
-            "user-title": "Unresolved user winner positions",
-            "amm-title": "Unresolved AMM winner positions",
-            "unknown-price-title": "Unresolved positions without final price",
-            "open-positions-title": "Active positions",
+            "user-title": "Unresolved user winner markets",
+            "amm-title": "Unresolved AMM winner markets",
+            "unknown-price-title": "Unresolved markets without final price",
+            "open-positions-title": "Active markets",
             "resolve-progress": "Resolving...",
             "resolve": "Resolve",
             "resolve-all": "Resolve all",
-            "confirmation-message": "Positions successfully resolved",
-            "no-resolve-positions": "No positions for this section with price",
+            "confirmation-message": "Markets successfully resolved",
+            "no-resolve-positions": "No markets for this section with price",
             "user": "User",
-            "no-positions": "No positions for this section"
+            "no-positions": "No markets for this section"
         },
         "single": "Single",
         "chained": {
             "label": "Chained",
             "name": "Chained Speed Markets",
             "info": "Create a custom chain of {{minMarkets}} - {{maxMarkets}} Speed Markets for a maximum potential return of ~ <bold>{{maxRoi}}x</bold>!",
-            "add-directions": "Click + to add directions",
+            "directions": "Directions",
             "roi": "ROI: {{value}}",
             "clear-all": "Clear all",
             "asset-price": "If {{asset}} price sequence",
             "starting-from": "starting from",
             "follows": "follows",
             "between-rounds": "between rounds",
-            "total-pay": "Total to pay {{amount}} + {{fee}} fee (= {{totalAmount}})",
-            "to-pay-with-conversion": "To pay {{amount}} ({{stableAmount}}) + {{fee}} fee",
             "errors": {
                 "choose-directions": "Choose all directions"
             },
             "tooltips": { "liquidity": "Current available liquidity for all Assets" }
-        }
-    },
-    "referral": {
-        "title": "Referral",
-        "choose-landing": "Choose landing page",
-        "choose-referral": "Choose your Referral ID",
-        "choose-referral-placeholder": "Enter Referral ID",
-        "copied": "Copied!",
-        "pages": {
-            "speed-market-page": "Speed markets page",
-            "landing-page": "Landing page"
         },
-        "generate": {
-            "id-exists": "Referral ID already exists",
-            "id-create-success": "Successfully set referral ID",
-            "link-btn": "Generate link"
-        }
+        "chart-title": "{{currencyKey}}/USD chart"
     },
     "profile": {
-        "title": "Trading Profile",
-        "go-to-market": "Go to market",
-        "strike-price": "Strike price",
-        "final-price": "Final price",
-        "current-price": "Current price",
-        "current-price-tooltip": "This is a Speed Market position that uses Pyth oracles for querying the current price",
-        "claimed": "CLAIMED",
-        "rip": "RIP",
-        "winnings-are-forfeit": "* Winnings not claimed within {{days}} days of a market being resolved are forfeit.",
+        "title": "Profile",
         "history-limit": "* Showing only markets with expiry date not older than {{days}} days.",
         "tabs": {
-            "my-positions": "My Positions",
+            "my-positions": "My markets",
             "history": "History"
         },
         "accordions": {
-            "claimable-positions": "Claimable Positions",
-            "open-positions": "Open Positions",
-            "position-history": "Position History",
+            "claimable-positions": "Claimable",
+            "open-positions": "Open",
             "transaction-history": "Transaction History"
         },
         "search-placeholder": "Search wallet",
+        "balance": "Total balance",
         "history": {
             "strike": "Strike",
             "direction": "Direction",
@@ -343,11 +319,68 @@
             "expired": "Expired",
             "expires": "Expires @"
         },
-        "stats": {
-            "trades-col": "Trades",
-            "volume-col": "Volume",
-            "netprofit-col": "Net Profit",
-            "gain-col": "Gain"
+        "deposit": "Deposit",
+        "withdraw": "Withdraw"
+    },
+    "get-started": {
+        "title": "Get started on Speed Markets",
+        "steps": {
+            "action": {
+                "log-in": "Login",
+                "buy-crypto": "FUND WITH CARD",
+                "copy": "Copy"
+            },
+            "title": {
+                "sign-up": "Sign up",
+                "logged-in": "Logged in",
+                "deposit": "Deposit funds",
+                "trade": "Speed Markets"
+            },
+            "description": {
+                "sign-up": "Log In to Speed Markets via social login or via connecting your wallet.",
+                "logged-in": "You have successfully created your Speed Markets Smart Account on the blockchain and are logged in.",
+                "deposit": "Deposit funds in your Speed Markets smart account by sending USDT and/or USDC to the address below. If you don't have USDT or USDC, you can also directly deposit them via Credit Card using the FUND WITH CARD button.",
+                "trade": "You are all set! You have funds in your account and you can now start trading on Speed Markets!"
+            }
         }
+    },
+    "deposit": {
+        "title": "Deposit",
+        "description": "Deposit crypto",
+        "address": "Your Deposit Address",
+        "tokens": "Following {{ network }} tokens can be deposited:",
+        "qr-modal-title": "QR Code",
+        "select-token": "Select token",
+        "send": "Make sure you are depositing only the supported tokens to the address above!",
+        "tutorials": "Tutorials"
+    },
+    "withdraw": {
+        "address-input-label": "Your personal {{ token }} withdrawal address on {{ network }}",
+        "amount": "Amount",
+        "heading-withdraw": "Withdraw crypto",
+        "paste-address": "Paste your wallet address here",
+        "button-label-withdraw": "Withdraw",
+        "toast-messages": {
+            "pending": "Transaction pending...",
+            "error": "Some error occurred while withdrawing funds.",
+            "success": "Successfully withdrawal"
+        },
+        "validation": {
+            "amount": "Amount is not valid"
+        }
+    },
+    "user-info": {
+        "eoa": "EOA Address",
+        "smart-account": "Smart Account Address",
+        "deposit-address": "Deposit Address",
+        "eoa-address-tooltip": "Your EOA address that controls the smart account",
+        "copied": "Address copied",
+        "copying-address": "Copying Address",
+        "docs": "Docs and Tutorials",
+        "withdraw": "Withdraw",
+        "referral": "Referral",
+        "trading-profile": "Trading Profile",
+        "logout": "Logout",
+        "session-valid": "Session valid until"
     }
 }

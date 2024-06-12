@@ -14,13 +14,20 @@ import {
 import { RPC_LIST } from 'constants/network';
 import { NetworkId } from 'thales-utils';
 import { isMobile } from 'utils/device';
+import {
+    particleAppleWallet,
+    particleDiscordWallet,
+    particleGithubWallet,
+    particleGoogleWallet,
+    particleTwitterWallet,
+    particleWallet,
+} from 'utils/particleWallet';
 import { createConfig, fallback, http } from 'wagmi';
 import {
     arbitrum,
     base,
     blastSepolia,
     optimism,
-    optimismGoerli,
     optimismSepolia,
     polygon,
     zkSync,
@@ -39,25 +46,28 @@ const wallets = [
     imTokenWallet,
 ];
 
+const socialWallets = [
+    particleWallet,
+    particleGoogleWallet,
+    particleTwitterWallet,
+    particleGithubWallet,
+    particleAppleWallet,
+    particleDiscordWallet,
+];
+
 !isMobile() && wallets.push(injectedWallet);
 
 export const wagmiConfig = createConfig({
-    chains: [
-        optimism,
-        arbitrum,
-        base,
-        polygon,
-        zkSync,
-        zkSyncSepoliaTestnet,
-        blastSepolia,
-        optimismSepolia,
-        optimismGoerli,
-    ],
+    chains: [optimism, arbitrum, base, polygon, zkSync, zkSyncSepoliaTestnet, blastSepolia, optimismSepolia],
     connectors: connectorsForWallets(
         [
             {
-                groupName: 'Recommended',
+                groupName: 'Wallets',
                 wallets,
+            },
+            {
+                groupName: 'Social Login',
+                wallets: socialWallets,
             },
         ],
         {
@@ -85,8 +95,7 @@ export const wagmiConfig = createConfig({
         [zkSync.id]: http(),
         [zkSyncSepoliaTestnet.id]: http(),
         [blastSepolia.id]: http(),
-        [optimismSepolia.id]: http(),
-        [optimismGoerli.id]: http(),
+        [optimismSepolia.id]: fallback([http(RPC_LIST.INFURA[NetworkId.OptimismSepolia]), http()]),
     },
 });
 

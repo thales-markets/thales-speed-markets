@@ -1,58 +1,114 @@
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import styled from 'styled-components';
-import { FlexDivCentered, FlexDivColumnCentered, FlexDivRowCentered, FlexDivSpaceBetween } from 'styles/common';
+import { FlexDivCentered, FlexDivColumn, FlexDivColumnCentered, FlexDivRow, FlexDivSpaceBetween } from 'styles/common';
 
-export const Container = styled(FlexDivCentered)``;
-
-export const ChainedHeader = styled(FlexDivRowCentered)``;
-
-export const Roi = styled.span`
-    color: ${(props) => props.theme.textColor.primary};
-    font-size: 18px;
-    font-weight: 600;
-    line-height: 20px;
+export const PositionContainer = styled(FlexDivRow)`
+    align-items: center;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        width: 100%;
+        justify-content: center;
+        gap: 10px;
+    }
 `;
-export const ClearAll = styled(FlexDivCentered)<{ isDisabled?: boolean }>`
-    color: ${(props) => props.theme.textColor.tertiary};
+
+export const PlusMinusIcon = styled.i`
+    font-size: 28px;
+    color: ${(props) => props.theme.button.textColor.tertiary};
+    cursor: pointer;
+`;
+
+export const Header = styled(FlexDivColumn)`
+    margin-bottom: 12px;
+`;
+
+export const HeaderText = styled.span`
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 18px;
+    text-transform: uppercase;
+    color: ${(props) => props.theme.textColor.quinary};
+`;
+
+export const HeaderSubText = styled(HeaderText)`
+    font-weight: 400;
     font-size: 13px;
-    font-weight: 500;
-    line-height: 13px;
-    text-transform: capitalize;
+    letter-spacing: 0.13px;
+    text-transform: none;
+`;
+
+export const ClearAll = styled(FlexDivCentered)<{ isDisabled?: boolean }>`
+    color: ${(props) => props.theme.error.textColor.primary};
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 150%;
     cursor: ${(props) => (props.isDisabled ? 'default' : 'pointer')};
     opacity: ${(props) => (props.isDisabled ? '0.5' : '1')};
 `;
 
 export const IconWrong = styled(FlexDivCentered)`
-    width: 21px;
-    height: 21px;
-    color: ${(props) => props.theme.textColor.tertiary};
-    border: 2px solid ${(props) => props.theme.textColor.tertiary};
+    width: 16px;
+    height: 16px;
+    color: ${(props) => props.theme.error.textColor.primary};
+    border: 2px solid ${(props) => props.theme.error.textColor.primary};
+
+    font-weight: 300;
     border-radius: 50%;
-    font-size: 13px;
-    line-height: 13px;
+    font-size: 8px;
     margin-left: 5px;
 `;
 
 export const ChainedPositions = styled(FlexDivCentered)`
-    padding-top: 5px;
+    gap: 8px;
 `;
 
 export const PositionsContainer = styled(FlexDivSpaceBetween)`
     position: relative;
-    height: 124px;
 `;
 
 export const PositionsWrapper = styled(FlexDivColumnCentered)`
-    width: 52px;
+    width: 43px;
     gap: 10px;
+`;
+
+export const PositionWrapper = styled(FlexDivCentered)<{ $isSelected?: boolean }>`
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 15px;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 100%;
+    text-transform: uppercase;
+    padding-left: 15px;
+    min-width: 145px;
+    height: 40px;
+    border-radius: 8px;
+    border: 2px solid ${(props) => props.theme.button.borderColor.secondary};
+    background: ${(props) =>
+        props.$isSelected ? props.theme.button.background.secondary : props.theme.button.background.primary};
+    color: ${(props) =>
+        props.$isSelected ? props.theme.button.textColor.secondary : props.theme.button.textColor.tertiary};
+    cursor: pointer;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        width: 44px;
+        width: 100%;
     }
 `;
 
-export const PositionWrapper = styled(FlexDivCentered)<{ isColumn?: boolean }>`
+export const PositionWrapperChained = styled(FlexDivCentered)<{ $isSelected?: boolean }>`
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    height: 40px;
+    border-radius: 8px;
+    ${(props) => (props.$isSelected ? '' : `border: 2px solid ${props.theme.button.borderColor.secondary};`)}
+    background: ${(props) =>
+        props.$isSelected ? props.theme.button.background.secondary : props.theme.button.background.primary};
+    color: ${(props) =>
+        props.$isSelected ? props.theme.button.textColor.secondary : props.theme.button.textColor.tertiary};
     cursor: pointer;
-    ${(props) => (props.isColumn ? 'flex-direction: column;' : '')}
 `;
 
 const PositionSymbol = styled(FlexDivCentered)<{ size?: number }>`
@@ -60,128 +116,32 @@ const PositionSymbol = styled(FlexDivCentered)<{ size?: number }>`
     width: ${(props) => (props.size ? props.size : '36')}px;
     height: ${(props) => (props.size ? props.size : '36')}px;
     border-radius: 50%;
+    color: ${(props) => props.theme.textColor.quinary};
 `;
 
-export const PositionSymbolUp = styled(PositionSymbol)<{ $isSelected?: boolean }>`
-    border: 3px solid
-        ${(props) =>
-            props.$isSelected === undefined
-                ? props.theme.borderColor.primary
-                : props.$isSelected
-                ? props.theme.positionColor.up
-                : props.theme.borderColor.primary};
-    color: ${(props) =>
-        props.$isSelected === undefined || props.$isSelected
-            ? props.theme.positionColor.up
-            : props.theme.borderColor.primary};
+export const PositionsSymbol = styled(PositionSymbol)<{ $isSelected?: boolean }>`
+    color: ${(props) => (props.$isSelected ? props.theme.background.primary : props.theme.textColor.quinary)};
 `;
 
-export const PositionSymbolDown = styled(PositionSymbol)<{ $isSelected?: boolean }>`
-    border: 3px solid
-        ${(props) =>
-            props.$isSelected === undefined
-                ? props.theme.borderColor.primary
-                : props.$isSelected
-                ? props.theme.positionColor.down
-                : props.theme.borderColor.primary};
-    color: ${(props) =>
-        props.$isSelected === undefined || props.$isSelected
-            ? props.theme.positionColor.down
-            : props.theme.borderColor.primary};
-`;
-
-export const Icon = styled.i<{ size?: number; padding?: string; color?: string }>`
+export const Icon = styled.i<{ size?: number; padding?: string; color?: string; isDisabled?: boolean }>`
     font-size: ${(props) => (props.size ? props.size : '18')}px;
     line-height: 100%;
     color: ${(props) => (props.color ? props.color : 'inherit')};
     ${(props) => (props.padding ? `padding: ${props.padding};` : '')};
+    ${(props) => (props.isDisabled ? `opacity: 0.4;` : '')};
 `;
 
-export const AssetIcon = styled(Icon)`
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        font-size: 28px;
-        line-height: 100%;
-        color: ${(props) => props.theme.textColor.primary};
-    }
-`;
-
-const Label = styled.span`
-    font-size: 18px;
-    font-weight: 700;
-    line-height: 100%;
-    text-transform: capitalize;
-`;
-
-export const LabelUp = styled(Label)<{ $isSelected?: boolean; isColumn?: boolean }>`
-    color: ${(props) =>
-        props.$isSelected === undefined
-            ? props.theme.textColor.primary
-            : props.$isSelected
-            ? props.theme.positionColor.up
-            : props.theme.borderColor.primary};
-    ${(props) => (props.isColumn ? 'margin-bottom: 2px;' : 'margin-right: 7px;')}
-`;
-
-export const LabelDown = styled(Label)<{ $isSelected?: boolean; $isColumn?: boolean }>`
-    color: ${(props) =>
-        props.$isSelected === undefined
-            ? props.theme.textColor.primary
-            : props.$isSelected
-            ? props.theme.positionColor.down
-            : props.theme.borderColor.primary};
-    ${(props) => (props.$isColumn ? 'margin-top: 2px;' : 'margin-left: 7px;')}
-`;
-
-export const Separator = styled.div`
-    position: relative;
-    background: ${(props) => props.theme.borderColor.primary};
-    width: 3px;
-    height: 36px;
-    border-radius: 6px;
-    margin: 0 14px;
-`;
-
-export const Skew = styled.div<{ $isDiscount?: boolean }>`
+export const Bonus = styled.div<{ $isSelected: boolean }>`
     position: absolute;
-    ${(props) => (!props.$isDiscount ? 'bottom: -21px;' : '')}
-    color: ${(props) =>
-        props.$isDiscount === undefined
-            ? props.theme.textColor.secondary
-            : props.$isDiscount
-            ? props.theme.textColor.quaternary
-            : props.theme.textColor.tertiary};
+    top: -10px;
+    right: 5px;
+    padding: 0 8px;
+    background-color: ${(props) => props.theme.background.primary};
+    border: 1px solid
+        ${(props) => (props.$isSelected ? props.theme.borderColor.quaternary : props.theme.background.primary)};
+    border-radius: 8px;
+    color: ${(props) => props.theme.textColor.quaternary};
     font-size: 13px;
     font-weight: 700;
     white-space: nowrap;
-
-    ${(props) =>
-        props.$isDiscount
-            ? `
-                top: -10px;
-                right: -30px;
-                background: ${props.theme.background.primary};
-                bottom: 0;
-                height: 17px;
-                padding: 2px;
-                border-radius: 50%;
-    `
-            : ''}
-
-}
-`;
-
-export const TooltipWrapper = styled.div`
-    position: absolute;
-    bottom: -19px;
-    right: -6px;
-`;
-
-export const Chain = styled(FlexDivCentered)<{ isSelectedUp?: boolean }>`
-    width: 16px;
-    color: ${(props) =>
-        props.isSelectedUp === undefined
-            ? props.theme.textColor.primary
-            : props.isSelectedUp
-            ? props.theme.positionColor.up
-            : props.theme.positionColor.down};
 `;

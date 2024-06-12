@@ -1,12 +1,13 @@
-import React, { ReactText } from 'react';
+import { secondsToMilliseconds } from 'date-fns';
+import React, { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ToastOptions, ToastPosition, TypeOptions, toast } from 'react-toastify';
 import styled from 'styled-components';
 import { FlexDivColumn, FlexDivRowCentered } from 'styles/common';
 
-type ToastMessageProps = { id?: ReactText; type: TypeOptions; message: string };
+type ToastMessageProps = { id?: string | number; type: TypeOptions; message: string; custom?: ReactNode };
 
-const ToastMessage: React.FC<ToastMessageProps> = ({ id, type, message }) => {
+const ToastMessage: React.FC<ToastMessageProps> = ({ id, type, message, custom }) => {
     const { t } = useTranslation();
 
     const isDefaultType = type === 'default';
@@ -17,7 +18,7 @@ const ToastMessage: React.FC<ToastMessageProps> = ({ id, type, message }) => {
             {!isDefaultType && <Icon className={`icon icon--${type}`} />}
             <FlexDivColumn>
                 {title && <Title>{title}</Title>}
-                <Message isLargeFont={!title}>{message}</Message>
+                {custom ? <>{custom}</> : <Message isLargeFont={!title}>{message}</Message>}
             </FlexDivColumn>
             {id !== undefined && <CloseIcon className="icon icon--x-sign" onClick={() => toast.dismiss(id)} />}
         </Container>
@@ -31,19 +32,22 @@ const Container = styled(FlexDivRowCentered)<{ hasTitle: boolean }>`
 
 const Icon = styled.i`
     color: ${(props) => props.theme.toastMessages.error.textColor.primary};
-    font-size: 28px;
+    font-size: 34px;
+    font-weight: 800;
     margin-right: 12px;
 `;
 
 const Title = styled.span`
-    font-weight: 700;
-    font-size: 16px;
-    line-height: 22px;
+    font-family: ${(props) => props.theme.fontFamily.secondary};
+    font-weight: 800;
+    font-size: 18px;
+    line-height: 24px;
     text-transform: uppercase;
 `;
 
 const Message = styled.span<{ isLargeFont?: boolean }>`
-    font-weight: 400;
+    font-family: ${(props) => props.theme.fontFamily.secondary};
+    font-weight: 500;
     font-size: ${(props) => (props.isLargeFont ? '18px' : '13px')};
     @media (max-width: 600px) {
         line-height: ${(props) => (props.isLargeFont ? '18px' : '13px')};
@@ -60,9 +64,9 @@ const CloseIcon = styled.i`
     color: ${(props) => props.theme.toastMessages.error.textColor.primary};
 `;
 
-export const toastBasicProperties = {
+const toastBasicProperties = {
     position: 'top-right' as ToastPosition,
-    autoClose: 7000, // 7s
+    autoClose: secondsToMilliseconds(7),
     hideProgressBar: false,
     closeOnClick: false,
     pauseOnHover: true,
@@ -71,17 +75,22 @@ export const toastBasicProperties = {
     closeButton: false,
 };
 
-export const getSuccessToastOptions = (message: string | React.ReactNode, id: ReactText, options?: ToastOptions) => {
+export const getSuccessToastOptions = (
+    message: string,
+    id: string | number,
+    options?: ToastOptions,
+    customElement?: ReactNode
+) => {
     return {
         ...{ ...toastBasicProperties, ...options },
         toastId: id,
         className: 'success',
         progressClassName: 'success',
-        render: typeof message === 'string' ? <ToastMessage id={id} type={'success'} message={message} /> : message, // not relevant on ToastOptions, only on UpdateOptions
+        render: <ToastMessage id={id} type={'success'} message={message} custom={customElement} />, // not relevant on ToastOptions, only on UpdateOptions
     };
 };
 
-export const getInfoToastOptions = (message: string, id: ReactText) => {
+export const getInfoToastOptions = (message: string, id: string | number) => {
     return {
         ...toastBasicProperties,
         toastId: id,
@@ -91,17 +100,7 @@ export const getInfoToastOptions = (message: string, id: ReactText) => {
     };
 };
 
-export const getWarningToastOptions = (message: string, id: ReactText) => {
-    return {
-        ...toastBasicProperties,
-        toastId: id,
-        className: 'warning',
-        progressClassName: 'warning',
-        render: <ToastMessage id={id} type={'warning'} message={message} />, // not relevant on ToastOptions, only on UpdateOptions
-    };
-};
-
-export const getErrorToastOptions = (message: string, id: ReactText) => {
+export const getErrorToastOptions = (message: string, id: string | number) => {
     return {
         ...toastBasicProperties,
         toastId: id,
@@ -116,6 +115,12 @@ export const getLoadingToastOptions = () => {
         ...toastBasicProperties,
         isLoading: true,
         className: 'info',
+    };
+};
+
+export const getDeafultToastOptions = () => {
+    return {
+        ...toastBasicProperties,
     };
 };
 

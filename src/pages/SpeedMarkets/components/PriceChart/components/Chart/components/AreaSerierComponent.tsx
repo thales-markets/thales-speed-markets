@@ -3,7 +3,8 @@ import { millisecondsToSeconds } from 'date-fns';
 import { Positions } from 'enums/market';
 import { ISeriesApi } from 'lightweight-charts';
 import { useContext, useEffect, useState } from 'react';
-import { Colors } from 'styles/common';
+import { useTheme } from 'styled-components';
+import { ThemeInterface } from 'types/ui';
 import { timeToLocal } from 'utils/formatters/date';
 
 export const AreaSeriesComponent: React.FC<{
@@ -11,12 +12,11 @@ export const AreaSeriesComponent: React.FC<{
     data: any;
     position?: Positions;
     selectedPrice?: number;
-    selectedRightPrice?: number;
     selectedDate?: number;
-}> = ({ data, position, selectedPrice, selectedDate, asset, selectedRightPrice }) => {
+}> = ({ data, position, selectedPrice, selectedDate, asset }) => {
+    const theme: ThemeInterface = useTheme();
     const chart = useContext(ChartContext);
     const [series, setSeries] = useState<ISeriesApi<'Area'> | undefined>();
-    const [rangeSeries, setRangeSeries] = useState<ISeriesApi<'Area'> | undefined>();
     const [dataSeries, setDataSeries] = useState<any>([]);
 
     useEffect(() => {
@@ -26,27 +26,14 @@ export const AreaSeriesComponent: React.FC<{
             setSeries(undefined);
         }
 
-        if (rangeSeries) {
-            rangeSeries.setMarkers([]);
-            chart?.removeSeries(rangeSeries);
-            setRangeSeries(undefined);
-        }
-
         const localSeries = chart?.addAreaSeries({
             crosshairMarkerVisible: false,
-            lineColor: Colors.BLUE_MIDNIGHT_LIGHT,
-            lineWidth: 1,
-            lastValueVisible: false,
-        });
-        const localRangeSeries = chart?.addAreaSeries({
-            crosshairMarkerVisible: false,
-            lineColor: Colors.BLUE_MIDNIGHT_LIGHT,
+            lineColor: theme.chart.priceLine,
             lineWidth: 1,
             lastValueVisible: false,
         });
 
         setSeries(localSeries);
-        setRangeSeries(localRangeSeries);
 
         // eslint-disable-next-line
     }, []);
@@ -87,7 +74,7 @@ export const AreaSeriesComponent: React.FC<{
         } else {
             setDataSeries([]);
         }
-    }, [selectedPrice, selectedDate, position, data, asset, selectedRightPrice]);
+    }, [selectedPrice, selectedDate, position, data, asset]);
 
     useEffect(() => {
         if (series) {
@@ -105,14 +92,14 @@ export const AreaSeriesComponent: React.FC<{
                         time: dataInLocalTime[dataSeries.length - 1].time,
                         position: 'inBar',
                         size: 1,
-                        color: position === Positions.DOWN ? Colors.RED : Colors.GREEN,
+                        color: position === Positions.DOWN ? theme.chart.candleDown : theme.chart.candleUp,
                         shape: 'circle',
                     },
                 ]);
                 if (position === Positions.UP || position === Positions.DOWN) {
                     series.applyOptions({
-                        topColor: position === Positions.UP ? Colors.GREEN_DARK_END : Colors.RED_START,
-                        bottomColor: position === Positions.UP ? Colors.GREEN_DARK_START : Colors.RED_END,
+                        topColor: position === Positions.UP ? theme.chart.area.end : theme.chart.area.start,
+                        bottomColor: position === Positions.UP ? theme.chart.area.start : theme.chart.area.end,
                         invertFilledArea: position === Positions.UP,
                     });
                 }
@@ -121,7 +108,7 @@ export const AreaSeriesComponent: React.FC<{
             }
         }
         // eslint-disable-next-line
-    }, [series, dataSeries, rangeSeries]);
+    }, [series, dataSeries]);
 
     return <></>;
 };

@@ -1,24 +1,32 @@
 import React, { useRef, useEffect } from 'react';
+import styled from 'styled-components';
 
-const OutsideClickHandler: React.FC<any> = ({ children, onOutsideClick }) => {
+const OutsideClickHandler: React.FC<{ children: React.ReactNode; onOutsideClick: (e: MouseEvent) => void }> = ({
+    children,
+    onOutsideClick,
+}) => {
     const wrapperRef = useRef(null);
 
     useEffect(() => {
         const handleOutsideClick = (event: any) => {
             if (wrapperRef.current && !(wrapperRef.current as any).contains(event.target)) {
-                onOutsideClick();
+                onOutsideClick(event);
             }
         };
-        document.addEventListener('mousedown', handleOutsideClick);
-        document.addEventListener('touchstart', handleOutsideClick);
+        document.addEventListener('mouseup', handleOutsideClick);
+        document.addEventListener('touchend', handleOutsideClick);
 
         return () => {
-            document.removeEventListener('mousedown', handleOutsideClick);
-            document.removeEventListener('touchstart', handleOutsideClick);
+            document.removeEventListener('mouseup', handleOutsideClick);
+            document.removeEventListener('touchend', handleOutsideClick);
         };
     }, [onOutsideClick]);
 
-    return <div ref={wrapperRef}>{children}</div>;
+    return <Wrapper ref={wrapperRef}>{children}</Wrapper>;
 };
+
+const Wrapper = styled.div`
+    display: contents;
+`;
 
 export default OutsideClickHandler;

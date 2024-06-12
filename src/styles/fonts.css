@@ -2,3 +2,21 @@
     font-family: 'Fira Sans';
     src: local('Fira Sans'), url(../assets/fonts/FiraSans/FiraSans-Regular.ttf) format('truetype');
 }
+@font-face {
+    font-family: 'SocialIcons';
+    src: local('SocialIcons'), url(../assets/fonts/SocialLogin/SocialIcons.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: 'Montserrat';
+    src: local('Montserrat'), url(../assets/fonts/Montserrat/Montserrat-VariableFont_wght.ttf) format('truetype');
+    font-weight: 100 900;
+    font-stretch: 25% 150%;
+}
+
+@font-face {
+    font-family: 'Karla';
+    src: local('Karla'), url(../assets/fonts/Karla/Karla-VariableFont_wght.ttf) format('truetype');
+    font-weight: 200 800;
+    font-stretch: 25% 150%;
+}

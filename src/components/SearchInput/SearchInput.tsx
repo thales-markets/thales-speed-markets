@@ -1,8 +1,12 @@
 import TextInput from 'components/fields/TextInput';
+import { ScreenSizeBreakpoint } from 'enums/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
+import { getIsMobile } from 'redux/modules/ui';
 import styled from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
+import { RootState } from 'types/ui';
 
 type SearchInputProps = {
     placeholder?: string;
@@ -10,11 +14,12 @@ type SearchInputProps = {
     handleChange: (event: any) => void;
     width?: string;
     height?: string;
-    iconTop?: string;
 };
 
-const SearchInput: React.FC<SearchInputProps> = ({ placeholder, text, handleChange, width, height, iconTop }) => {
+const SearchInput: React.FC<SearchInputProps> = ({ placeholder, text, handleChange, width, height }) => {
     const { t } = useTranslation();
+
+    const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     return (
         <Wrapper>
@@ -25,24 +30,30 @@ const SearchInput: React.FC<SearchInputProps> = ({ placeholder, text, handleChan
                 width={width}
                 height={height}
                 margin={'0px'}
-                inputPadding={'5px 30px 5px 10px;'}
+                inputPadding={isMobile ? '5px 10px 5px 35px' : '5px 10px 5px 60px'}
             />
-            <Icon className="icon icon--search" iconTop={iconTop} />
+            <Icon className="icon icon--search" />
         </Wrapper>
     );
 };
 
 const Wrapper = styled(FlexDivCentered)`
     position: relative;
+    width: fit-content;
     height: fit-content;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        width: 100%;
+    }
 `;
 
-const Icon = styled.i<{ iconTop?: string }>`
-    font-size: 15px;
-    color: ${(props) => props.theme.borderColor.secondary};
+const Icon = styled.i`
     position: absolute;
-    right: 8px;
-    top: ${(props) => props.iconTop || '8px'};
+    left: 18px;
+    font-size: 22px;
+    color: ${(props) => props.theme.icon.textColor.tertiary};
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        left: 8px;
+    }
 `;
 
 export default SearchInput;

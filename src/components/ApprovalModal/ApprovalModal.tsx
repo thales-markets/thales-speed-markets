@@ -64,6 +64,7 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({ defaultAmount, tokenSymbo
             title={t('common.enable-wallet-access.approve', { currencyKey: tokenSymbol })}
             onClose={onClose}
             shouldCloseOnOverlayClick={false}
+            width="auto"
         >
             <Container>
                 <CheckboxContainer>
@@ -110,7 +111,6 @@ const TextContainer = styled(FlexDivCentered)`
 `;
 
 const Text = styled.span`
-    font-style: normal;
     font-size: 15px;
     line-height: 18px;
     text-transform: uppercase;

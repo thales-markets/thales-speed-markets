@@ -3,14 +3,22 @@ import ROUTES from 'constants/routes';
 import useGetReffererIdQuery from 'queries/referral/useGetReffererIdQuery';
 import React from 'react';
 import QRCode from 'react-qr-code';
+import { useSelector } from 'react-redux';
+import { getIsBiconomy } from 'redux/modules/wallet';
 import styled from 'styled-components';
+import { RootState } from 'types/ui';
+import biconomyConnector from 'utils/biconomyWallet';
 import { buildReferrerLink } from 'utils/routes';
 import { useAccount } from 'wagmi';
 
 const SpeedMarketsFooter: React.FC = () => {
-    const { address } = useAccount();
+    const { address: walletAddress, isConnected } = useAccount();
+    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
 
-    const reffererIDQuery = useGetReffererIdQuery(address || '', { enabled: !!address });
+    const reffererIDQuery = useGetReffererIdQuery(
+        ((isBiconomy ? biconomyConnector.address : walletAddress) as string) || '',
+        { enabled: isConnected }
+    );
     const reffererID = reffererIDQuery.isSuccess && reffererIDQuery.data ? reffererIDQuery.data : '';
 
     return (

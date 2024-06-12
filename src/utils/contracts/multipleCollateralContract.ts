@@ -2,7 +2,7 @@ import { TBD_ADDRESS, ZERO_ADDRESS } from 'constants/network';
 import { NetworkId } from 'thales-utils';
 import { Address } from 'viem';
 
-const sUSDABI = [
+const SUSD_ABI = [
     {
         inputs: [{ internalType: 'address', name: '_owner', type: 'address' }],
         payable: false,
@@ -261,7 +261,7 @@ const sUSDABI = [
     },
 ];
 
-const DAIABI = [
+const DAI_ABI = [
     { inputs: [], stateMutability: 'nonpayable', type: 'constructor' },
     {
         anonymous: false,
@@ -500,6 +500,160 @@ const DAIABI = [
         name: 'wards',
         outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
         stateMutability: 'view',
+        type: 'function',
+    },
+];
+
+const WETH_ABI = [
+    {
+        anonymous: false,
+        inputs: [
+            { indexed: true, internalType: 'address', name: 'src', type: 'address' },
+            { indexed: true, internalType: 'address', name: 'guy', type: 'address' },
+            { indexed: false, internalType: 'uint256', name: 'wad', type: 'uint256' },
+        ],
+        name: 'Approval',
+        type: 'event',
+    },
+    {
+        anonymous: false,
+        inputs: [
+            { indexed: true, internalType: 'address', name: 'dst', type: 'address' },
+            { indexed: false, internalType: 'uint256', name: 'wad', type: 'uint256' },
+        ],
+        name: 'Deposit',
+        type: 'event',
+    },
+    {
+        anonymous: false,
+        inputs: [
+            { indexed: true, internalType: 'address', name: 'src', type: 'address' },
+            { indexed: true, internalType: 'address', name: 'dst', type: 'address' },
+            { indexed: false, internalType: 'uint256', name: 'wad', type: 'uint256' },
+        ],
+        name: 'Transfer',
+        type: 'event',
+    },
+    {
+        anonymous: false,
+        inputs: [
+            { indexed: true, internalType: 'address', name: 'src', type: 'address' },
+            { indexed: false, internalType: 'uint256', name: 'wad', type: 'uint256' },
+        ],
+        name: 'Withdrawal',
+        type: 'event',
+    },
+    { payable: true, stateMutability: 'payable', type: 'fallback' },
+    {
+        constant: true,
+        inputs: [
+            { internalType: 'address', name: '', type: 'address' },
+            { internalType: 'address', name: '', type: 'address' },
+        ],
+        name: 'allowance',
+        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+        payable: false,
+        stateMutability: 'view',
+        type: 'function',
+    },
+    {
+        constant: false,
+        inputs: [
+            { internalType: 'address', name: 'guy', type: 'address' },
+            { internalType: 'uint256', name: 'wad', type: 'uint256' },
+        ],
+        name: 'approve',
+        outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+        payable: false,
+        stateMutability: 'nonpayable',
+        type: 'function',
+    },
+    {
+        constant: true,
+        inputs: [{ internalType: 'address', name: '', type: 'address' }],
+        name: 'balanceOf',
+        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+        payable: false,
+        stateMutability: 'view',
+        type: 'function',
+    },
+    {
+        constant: true,
+        inputs: [],
+        name: 'decimals',
+        outputs: [{ internalType: 'uint8', name: '', type: 'uint8' }],
+        payable: false,
+        stateMutability: 'view',
+        type: 'function',
+    },
+    {
+        constant: false,
+        inputs: [],
+        name: 'deposit',
+        outputs: [],
+        payable: true,
+        stateMutability: 'payable',
+        type: 'function',
+    },
+    {
+        constant: true,
+        inputs: [],
+        name: 'name',
+        outputs: [{ internalType: 'string', name: '', type: 'string' }],
+        payable: false,
+        stateMutability: 'view',
+        type: 'function',
+    },
+    {
+        constant: true,
+        inputs: [],
+        name: 'symbol',
+        outputs: [{ internalType: 'string', name: '', type: 'string' }],
+        payable: false,
+        stateMutability: 'view',
+        type: 'function',
+    },
+    {
+        constant: true,
+        inputs: [],
+        name: 'totalSupply',
+        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+        payable: false,
+        stateMutability: 'view',
+        type: 'function',
+    },
+    {
+        constant: false,
+        inputs: [
+            { internalType: 'address', name: 'dst', type: 'address' },
+            { internalType: 'uint256', name: 'wad', type: 'uint256' },
+        ],
+        name: 'transfer',
+        outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+        payable: false,
+        stateMutability: 'nonpayable',
+        type: 'function',
+    },
+    {
+        constant: false,
+        inputs: [
+            { internalType: 'address', name: 'src', type: 'address' },
+            { internalType: 'address', name: 'dst', type: 'address' },
+            { internalType: 'uint256', name: 'wad', type: 'uint256' },
+        ],
+        name: 'transferFrom',
+        outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+        payable: false,
+        stateMutability: 'nonpayable',
+        type: 'function',
+    },
+    {
+        constant: false,
+        inputs: [{ internalType: 'uint256', name: 'wad', type: 'uint256' }],
+        name: 'withdraw',
+        outputs: [],
+        payable: false,
+        stateMutability: 'nonpayable',
         type: 'function',
     },
 ];
@@ -1107,8 +1261,7 @@ const multipleCollateral = {
     sUSD: {
         addresses: {
             [NetworkId.OptimismMainnet]: '0x8c6f28f2F1A3C87F0f938b96d27520d9751ec8d9' as Address, // sUSD
-            [NetworkId.OptimismGoerli]: '0xE1ceaa829525a08C1d39A5CEBe4b42aF58d77198' as Address, // exoticSUSD
-            [NetworkId.OptimismSepolia]: TBD_ADDRESS,
+            [NetworkId.OptimismSepolia]: '0xc4fa91b895fb66e8aafff9791f1018c2053db71f' as Address, // exoticSUSD
             [NetworkId.PolygonMainnet]: TBD_ADDRESS,
             [NetworkId.Arbitrum]: TBD_ADDRESS,
             [NetworkId.Base]: TBD_ADDRESS,
@@ -1116,13 +1269,12 @@ const multipleCollateral = {
             [NetworkId.ZkSyncSepolia]: '0xCa032EdCFfC65Fc5FAea69624700d61318D6f6e8' as Address, // exoticSUSD
             [NetworkId.BlastSepolia]: '0x0E350351d27F950c92280c6B76ee49f0a64275fe' as Address, // exoticSUSD
         },
-        abi: sUSDABI,
+        abi: SUSD_ABI,
     },
     DAI: {
         addresses: {
             [NetworkId.OptimismMainnet]: '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1' as Address,
-            [NetworkId.OptimismGoerli]: TBD_ADDRESS,
-            [NetworkId.OptimismSepolia]: TBD_ADDRESS,
+            [NetworkId.OptimismSepolia]: '0x0091f4e75a03C11cB9be8E3717219005eb780D89' as Address,
             [NetworkId.PolygonMainnet]: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063' as Address,
             [NetworkId.Arbitrum]: '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1' as Address,
             [NetworkId.Base]: TBD_ADDRESS,
@@ -1130,12 +1282,11 @@ const multipleCollateral = {
             [NetworkId.ZkSyncSepolia]: TBD_ADDRESS,
             [NetworkId.BlastSepolia]: TBD_ADDRESS,
         },
-        abi: DAIABI,
+        abi: DAI_ABI,
     },
     USDCe: {
         addresses: {
             [NetworkId.OptimismMainnet]: TBD_ADDRESS,
-            [NetworkId.OptimismGoerli]: TBD_ADDRESS,
             [NetworkId.OptimismSepolia]: TBD_ADDRESS,
             [NetworkId.PolygonMainnet]: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174' as Address,
             [NetworkId.Arbitrum]: '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8' as Address,
@@ -1149,7 +1300,6 @@ const multipleCollateral = {
     USDbC: {
         addresses: {
             [NetworkId.OptimismMainnet]: TBD_ADDRESS,
-            [NetworkId.OptimismGoerli]: TBD_ADDRESS,
             [NetworkId.OptimismSepolia]: TBD_ADDRESS,
             [NetworkId.PolygonMainnet]: TBD_ADDRESS,
             [NetworkId.Arbitrum]: TBD_ADDRESS,
@@ -1163,7 +1313,6 @@ const multipleCollateral = {
     USDC: {
         addresses: {
             [NetworkId.OptimismMainnet]: '0x7F5c764cBc14f9669B88837ca1490cCa17c31607' as Address,
-            [NetworkId.OptimismGoerli]: TBD_ADDRESS,
             [NetworkId.OptimismSepolia]: TBD_ADDRESS,
             [NetworkId.PolygonMainnet]: TBD_ADDRESS,
             [NetworkId.Arbitrum]: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831' as Address,
@@ -1177,7 +1326,6 @@ const multipleCollateral = {
     USDT: {
         addresses: {
             [NetworkId.OptimismMainnet]: '0x94b008aA00579c1307B0EF2c499aD98a8ce58e58' as Address,
-            [NetworkId.OptimismGoerli]: TBD_ADDRESS,
             [NetworkId.OptimismSepolia]: TBD_ADDRESS,
             [NetworkId.PolygonMainnet]: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f' as Address,
             [NetworkId.Arbitrum]: '0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9' as Address,
@@ -1191,7 +1339,6 @@ const multipleCollateral = {
     OP: {
         addresses: {
             [NetworkId.OptimismMainnet]: '0x4200000000000000000000000000000000000042' as Address,
-            [NetworkId.OptimismGoerli]: TBD_ADDRESS,
             [NetworkId.OptimismSepolia]: TBD_ADDRESS,
             [NetworkId.PolygonMainnet]: TBD_ADDRESS,
             [NetworkId.Arbitrum]: TBD_ADDRESS,
@@ -1205,7 +1352,6 @@ const multipleCollateral = {
     ARB: {
         addresses: {
             [NetworkId.OptimismMainnet]: TBD_ADDRESS,
-            [NetworkId.OptimismGoerli]: TBD_ADDRESS,
             [NetworkId.OptimismSepolia]: TBD_ADDRESS,
             [NetworkId.PolygonMainnet]: TBD_ADDRESS,
             [NetworkId.Arbitrum]: '0x912CE59144191C1204E64559FE8253a0e49E6548' as Address,
@@ -1219,7 +1365,6 @@ const multipleCollateral = {
     WETH: {
         addresses: {
             [NetworkId.OptimismMainnet]: '0x4200000000000000000000000000000000000006' as Address,
-            [NetworkId.OptimismGoerli]: TBD_ADDRESS,
             [NetworkId.OptimismSepolia]: TBD_ADDRESS,
             [NetworkId.PolygonMainnet]: TBD_ADDRESS,
             [NetworkId.Arbitrum]: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1' as Address,
@@ -1228,12 +1373,11 @@ const multipleCollateral = {
             [NetworkId.ZkSyncSepolia]: TBD_ADDRESS,
             [NetworkId.BlastSepolia]: TBD_ADDRESS,
         },
-        abi,
+        abi: WETH_ABI,
     },
     ETH: {
         addresses: {
             [NetworkId.OptimismMainnet]: ZERO_ADDRESS,
-            [NetworkId.OptimismGoerli]: ZERO_ADDRESS,
             [NetworkId.OptimismSepolia]: ZERO_ADDRESS,
             [NetworkId.PolygonMainnet]: ZERO_ADDRESS,
             [NetworkId.Arbitrum]: ZERO_ADDRESS,
@@ -1241,20 +1385,6 @@ const multipleCollateral = {
             [NetworkId.ZkSync]: ZERO_ADDRESS,
             [NetworkId.ZkSyncSepolia]: ZERO_ADDRESS,
             [NetworkId.BlastSepolia]: ZERO_ADDRESS,
-        },
-        abi,
-    },
-    BUSD: {
-        addresses: {
-            [NetworkId.OptimismMainnet]: TBD_ADDRESS,
-            [NetworkId.OptimismGoerli]: TBD_ADDRESS,
-            [NetworkId.OptimismSepolia]: TBD_ADDRESS,
-            [NetworkId.PolygonMainnet]: TBD_ADDRESS,
-            [NetworkId.Arbitrum]: TBD_ADDRESS,
-            [NetworkId.Base]: TBD_ADDRESS,
-            [NetworkId.ZkSync]: TBD_ADDRESS,
-            [NetworkId.ZkSyncSepolia]: TBD_ADDRESS,
-            [NetworkId.BlastSepolia]: TBD_ADDRESS,
         },
         abi,
     },

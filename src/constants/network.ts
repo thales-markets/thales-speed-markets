@@ -8,7 +8,6 @@ export const TBD_ADDRESS = '0xTBD' as Address;
 export const SUPPORTED_NETWORKS: Record<SupportedNetwork, string> = {
     [NetworkId.OptimismMainnet]: 'OPTIMISTIC',
     [NetworkId.PolygonMainnet]: 'POLYGON-MAINNET',
-    [NetworkId.OptimismGoerli]: 'GOERLI-OPTIMISM',
     [NetworkId.OptimismSepolia]: 'SEPOLIA-OPTIMISM',
     [NetworkId.Arbitrum]: 'ARBITRUM-ONE',
     [NetworkId.Base]: 'BASE',
@@ -17,29 +16,7 @@ export const SUPPORTED_NETWORKS: Record<SupportedNetwork, string> = {
     [NetworkId.BlastSepolia]: 'BLAST-SEPOLIA',
 };
 
-const SUPPORTED_NETWORKS_NAMES: Record<SupportedNetwork, string> = {
-    [NetworkId.OptimismMainnet]: 'OPTIMISM MAINNET',
-    [NetworkId.PolygonMainnet]: 'POLYGON',
-    [NetworkId.OptimismGoerli]: 'OPTIMISM GOERLI',
-    [NetworkId.OptimismSepolia]: 'OPTIMISM SEPOLIA',
-    [NetworkId.Arbitrum]: 'ARBITRUM ONE',
-    [NetworkId.Base]: 'BASE',
-    [NetworkId.ZkSync]: 'ZKSYNC',
-    [NetworkId.ZkSyncSepolia]: 'ZKSYNC SEPOLIA',
-    [NetworkId.BlastSepolia]: 'BLAST SEPOLIA',
-};
-
-export const TEST_NETWORKS = [
-    NetworkId.OptimismGoerli,
-    NetworkId.OptimismSepolia,
-    NetworkId.ZkSyncSepolia,
-    NetworkId.BlastSepolia,
-];
-
-export const DEFAULT_NETWORK: { name: string; networkId: SupportedNetwork } = {
-    name: SUPPORTED_NETWORKS_NAMES[NetworkId.OptimismMainnet],
-    networkId: NetworkId.OptimismMainnet,
-};
+export const TEST_NETWORKS = [NetworkId.OptimismSepolia, NetworkId.ZkSyncSepolia, NetworkId.BlastSepolia];
 
 export const SUPPORTED_NETWORKS_PARAMS: Record<number, NetworkParams> = {
     [NetworkId.OptimismMainnet]: {
@@ -99,25 +76,26 @@ export const SUPPORTED_NETWORKS_PARAMS: Record<number, NetworkParams> = {
     },
 };
 
+const INFURA_PROJECT_ID = import.meta.env.VITE_APP_INFURA_PROJECT_ID;
+const CHAINNODE_PROJECT_ID = import.meta.env.VITE_APP_CHAINNODE_PROJECT_ID;
+const ANKR_PROJECT_ID = import.meta.env.VITE_APP_ANKR_PROJECT_ID;
+
 export const RPC_LIST = {
     INFURA: {
-        [NetworkId.OptimismMainnet]:
-            'https://optimism-mainnet.infura.io/v3/' + import.meta.env.VITE_APP_INFURA_PROJECT_ID,
-        [NetworkId.Arbitrum]: 'https://arbitrum-mainnet.infura.io/v3/' + import.meta.env.VITE_APP_INFURA_PROJECT_ID,
-        [NetworkId.PolygonMainnet]:
-            'https://polygon-mainnet.infura.io/v3/' + import.meta.env.VITE_APP_INFURA_PROJECT_ID,
+        [NetworkId.OptimismMainnet]: `https://optimism-mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
+        [NetworkId.Arbitrum]: `https://arbitrum-mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
+        [NetworkId.PolygonMainnet]: `https://polygon-mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
+        [NetworkId.OptimismSepolia]: `https://optimism-sepolia.infura.io/v3/${INFURA_PROJECT_ID}`,
     },
     CHAINNODE: {
-        [NetworkId.OptimismMainnet]:
-            'https://optimism-mainnet.chainnodes.org/' + import.meta.env.VITE_APP_CHAINNODE_PROJECT_ID,
-        [NetworkId.Arbitrum]: 'https://arbitrum-one.chainnodes.org/' + import.meta.env.VITE_APP_CHAINNODE_PROJECT_ID,
-        [NetworkId.PolygonMainnet]:
-            'https://polygon-mainnet.chainnodes.org/' + import.meta.env.VITE_APP_CHAINNODE_PROJECT_ID,
-        [NetworkId.Base]: 'https://base-mainnet.chainnodes.org/' + import.meta.env.VITE_APP_CHAINNODE_PROJECT_ID,
+        [NetworkId.OptimismMainnet]: `https://optimism-mainnet.chainnodes.org/${CHAINNODE_PROJECT_ID}`,
+        [NetworkId.Arbitrum]: `https://arbitrum-one.chainnodes.org/${CHAINNODE_PROJECT_ID}`,
+        [NetworkId.PolygonMainnet]: `https://polygon-mainnet.chainnodes.org/${CHAINNODE_PROJECT_ID}`,
+        [NetworkId.Base]: `https://base-mainnet.chainnodes.org/${CHAINNODE_PROJECT_ID}`,
     },
     ANKR: {
-        [NetworkId.OptimismMainnet]: 'https://rpc.ankr.com/optimism/' + import.meta.env.VITE_APP_ANKR_PROJECT_ID,
-        [NetworkId.Arbitrum]: 'https://rpc.ankr.com/arbitrum/' + import.meta.env.VITE_APP_ANKR_PROJECT_ID,
-        [NetworkId.Base]: 'https://rpc.ankr.com/base/' + import.meta.env.VITE_APP_ANKR_PROJECT_ID,
+        [NetworkId.OptimismMainnet]: `https://rpc.ankr.com/optimism/${ANKR_PROJECT_ID}`,
+        [NetworkId.Arbitrum]: `https://rpc.ankr.com/arbitrum/${ANKR_PROJECT_ID}`,
+        [NetworkId.Base]: `https://rpc.ankr.com/base/${ANKR_PROJECT_ID}`,
     },
 };

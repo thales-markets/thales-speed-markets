@@ -1,7 +1,8 @@
 import {
+    getDeafultToastOptions,
     getErrorToastOptions,
+    getLoadingToastOptions,
     getSuccessToastOptions,
-    toastBasicProperties,
 } from 'components/ToastMessage/ToastMessage';
 import { LINKS } from 'constants/links';
 import { ScreenSizeBreakpoint } from 'enums/ui';
@@ -137,7 +138,7 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
                     }
 
                     const twitterLinkWithStatusMessage =
-                        LINKS.TwitterTweetStatus +
+                        LINKS.Twitter.TwitterTweetStatus +
                         TWITTER_MESSAGE_CHECKOUT +
                         (isChainedMarkets ? LINKS.Markets.ChainedSpeed : LINKS.Markets.Speed) +
                         (useDownloadImage ? TWITTER_MESSAGE_UPLOAD : TWITTER_MESSAGE_PASTE);
@@ -149,44 +150,47 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
                                   toast.update(
                                       toastIdParam,
                                       getSuccessToastOptions(
+                                          '',
+                                          toastIdParam,
+                                          {
+                                              autoClose: MOBILE_TWITTER_TOAST_AUTO_CLOSE,
+                                          },
                                           <a onClick={() => window.open(twitterLinkWithStatusMessage)}>
                                               {t('common.flex-card.click-open-twitter')}
-                                          </a>,
-                                          toastIdParam,
-                                          { autoClose: MOBILE_TWITTER_TOAST_AUTO_CLOSE }
+                                          </a>
                                       )
                                   );
                               }, IOS_DOWNLOAD_DELAY)
                             : toast.update(
                                   toastIdParam,
                                   getSuccessToastOptions(
+                                      '',
+                                      toastIdParam,
+                                      { autoClose: MOBILE_TWITTER_TOAST_AUTO_CLOSE },
                                       <a onClick={() => window.open(twitterLinkWithStatusMessage)}>
                                           {t('common.flex-card.click-open-twitter')}
-                                      </a>,
-                                      toastIdParam,
-                                      { autoClose: MOBILE_TWITTER_TOAST_AUTO_CLOSE }
+                                      </a>
                                   )
                               )
                         : toast.update(
                               toastIdParam,
                               getSuccessToastOptions(
+                                  '',
+                                  toastIdParam,
+                                  undefined,
                                   <>
-                                      {!useDownloadImage && (
-                                          <>
-                                              {t('common.flex-card.image-in-clipboard')}
-                                              <br />
-                                          </>
-                                      )}
-                                      {t('common.flex-card.open-twitter')}
-                                  </>,
-                                  toastIdParam
+                                      {!useDownloadImage &&
+                                          `${t('common.flex-card.image-in-clipboard')} ${t(
+                                              'common.flex-card.open-twitter'
+                                          )}`}
+                                  </>
                               )
                           );
 
                     if (!isMobile) {
                         setTimeout(() => {
                             window.open(twitterLinkWithStatusMessage);
-                        }, toastBasicProperties.autoClose);
+                        }, getDeafultToastOptions().autoClose);
                     }
                     onClose();
                 } catch (e) {
@@ -206,10 +210,11 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
         if (!isLoading) {
             if (isMetamaskBrowser) {
                 // Metamask dosn't support image download neither clipboard.write
-                toast.error(t('market.toast-message.metamask-not-supported'), toastBasicProperties);
+                toast.error(t('market.toast-message.metamask-not-supported'), getDeafultToastOptions());
             } else {
                 const id = toast.loading(
-                    useDownloadImage ? t('common.flex-card.download-image') : t('common.flex-card.save-image')
+                    useDownloadImage ? t('common.flex-card.download-image') : t('common.flex-card.save-image'),
+                    getLoadingToastOptions()
                 );
                 setToastId(id);
                 setIsLoading(true);
@@ -293,7 +298,7 @@ const CloseIcon = styled.i`
     right: -20px;
     font-size: 20px;
     cursor: pointer;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.quinary};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         top: 10px;
         right: 10px;
@@ -313,15 +318,15 @@ const TwitterShare = styled(FlexDivColumnCentered)<{ disabled?: boolean }>`
     width: 100%;
     height: 55px;
     border-radius: 15px;
-    background: ${(props) => props.theme.button.background.primary};
+    background: ${(props) => props.theme.button.background.secondary};
     cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
     opacity: ${(props) => (props.disabled ? '0.4' : '1')};
 `;
 
 const TwitterIcon = styled.i<{ disabled?: boolean; fontSize?: string; padding?: string }>`
     font-size: ${(props) => (props.fontSize ? props.fontSize : '20px')};
-    color: ${(props) => props.theme.button.textColor.primary};
-    cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
+    color: ${(props) => props.theme.button.textColor.secondary};
+    cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
     opacity: ${(props) => (props.disabled ? '0.4' : '1')};
     margin-right: 10px;
     ${(props) => (props.padding ? `padding: ${props.padding};` : '')}
@@ -332,7 +337,7 @@ const TwitterShareLabel = styled.span`
     font-size: 18px;
     line-height: 25px;
     text-transform: uppercase;
-    color: ${(props) => props.theme.button.textColor.primary};
+    color: ${(props) => props.theme.button.textColor.secondary};
 `;
 
 export default React.memo(SharePositionModal);

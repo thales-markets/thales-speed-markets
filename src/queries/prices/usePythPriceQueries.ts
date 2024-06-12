@@ -1,10 +1,9 @@
-import { EvmPriceServiceConnection } from '@pythnetwork/pyth-evm-js';
-import { UseQueryOptions, useQueries } from '@tanstack/react-query';
-import { CONNECTION_TIMEOUT_MS } from 'constants/pyth';
+import { UseQueryOptions, UseQueryResult, useQueries } from '@tanstack/react-query';
+import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds } from 'date-fns';
-import { NetworkId } from 'thales-utils';
-import { getBenchmarksPriceFeeds, getPriceServiceEndpoint } from 'utils/pyth';
+import { NetworkId, bigNumberFormatter } from 'thales-utils';
+import { getBenchmarksPriceFeeds, getPriceConnection } from 'utils/pyth';
 
 type PriceRequest = {
     priceId: string;
@@ -15,16 +14,18 @@ const usePythPriceQueries = (
     networkId: NetworkId,
     priceRequests: PriceRequest[],
     options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
-) => {
+): UseQueryResult<number>[] => {
     const fetchPythPrice = async (priceRequest: PriceRequest) => {
-        const priceConnection = new EvmPriceServiceConnection(getPriceServiceEndpoint(networkId), {
-            timeout: CONNECTION_TIMEOUT_MS,
-        });
+        const priceConnection = getPriceConnection(networkId);
 
         let price = 0;
         try {
-            const priceFeed = await priceConnection.getPriceFeed(priceRequest.priceId, priceRequest.publishTime);
-            price = priceFeed.getPriceUnchecked().getPriceAsNumberUnchecked();
+            const priceFeed = await priceConnection.getPriceUpdatesAtTimestamp(priceRequest.publishTime, [
+                priceRequest.priceId,
+            ]);
+            price = priceFeed.parsed
+                ? bigNumberFormatter(BigInt(priceFeed.parsed[0].price.price), PYTH_CURRENCY_DECIMALS)
+                : 0;
         } catch (e) {
             console.log('Pyth price feed error', e);
             const unavailablePrice: PriceRequest = {

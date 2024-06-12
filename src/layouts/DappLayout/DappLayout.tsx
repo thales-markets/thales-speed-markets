@@ -6,6 +6,7 @@ import { useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import styled, { useTheme } from 'styled-components';
+import { PAGE_MAX_WIDTH } from 'styles/common';
 import { isAndroid, isMetamask } from 'thales-utils';
 import { ThemeInterface } from 'types/ui';
 import { isMobile } from 'utils/device';
@@ -13,7 +14,6 @@ import { setReferralWallet } from 'utils/referral';
 import { ScreenSizeBreakpoint } from '../../enums/ui';
 import DappFooter from './DappFooter';
 import DappHeader from './DappHeader';
-import DappSidebar from './DappSidebar';
 
 type DappLayoutProps = {
     children: React.ReactNode;
@@ -64,7 +64,6 @@ const DappLayout: React.FC<DappLayoutProps> = ({ children }) => {
     return (
         <Background id="main-content">
             <Wrapper>
-                <DappSidebar />
                 <DappHeader />
                 {children}
                 <DappFooter />
@@ -97,21 +96,18 @@ const Wrapper = styled.div`
     justify-content: flex-start;
     align-items: center;
     width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 30px 20px 0px 92px;
+    max-width: ${PAGE_MAX_WIDTH};
+    min-height: 100vh;
+    margin: 0 auto;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         padding: 10px 10px 0 10px;
-        padding-bottom: 50px !important;
     }
-    max-width: 1440px;
-    min-height: 100vh;
 `;
 
 const StyledToastContainer = styled(ToastContainer)`
     &&&.Toastify__toast-container {
         z-index: 30000;
-        width: 330px;
+        width: auto;
         @media (max-width: 600px) {
             top: 0;
             padding: 0;
@@ -121,29 +117,24 @@ const StyledToastContainer = styled(ToastContainer)`
         }
     }
     .Toastify__toast {
-        width: 322px;
-        height: 68px;
+        width: 384px;
+        height: 70px;
         cursor: default;
-        border-radius: 15px;
+        border-radius: 8px;
 
         &.success {
             background: ${(props) =>
-                `linear-gradient(90deg, ${props.theme.toastMessages.success.background.secondary} -1.48%, ${props.theme.toastMessages.success.background.tertiary} 102.44%)`};
+                `linear-gradient(271deg, ${props.theme.toastMessages.success.background.secondary} 0.53%, ${props.theme.toastMessages.success.background.tertiary} 45.66%, ${props.theme.toastMessages.success.background.quaternary} 100.81%);`};
         }
         &.info {
             background: ${(props) =>
-                `linear-gradient(90deg, ${props.theme.toastMessages.info.background.secondary} -1.48%, ${props.theme.toastMessages.info.background.tertiary} 102.44%)`};
-        }
-        &.warning {
-            background: ${(props) =>
-                `linear-gradient(90deg, ${props.theme.toastMessages.warning.background.secondary} -1.48%, ${props.theme.toastMessages.warning.background.tertiary} 102.44%)`};
+                `linear-gradient(90deg, ${props.theme.toastMessages.info.background.secondary} 39.57%, ${props.theme.toastMessages.info.background.tertiary} 100.88%);`};
         }
         &.error {
             background: ${(props) =>
-                `linear-gradient(90deg, ${props.theme.toastMessages.error.background.secondary} -1.48%, ${props.theme.toastMessages.error.background.tertiary} 102.44%)`};
+                `linear-gradient(88.69deg, ${props.theme.toastMessages.error.background.secondary} 0%, ${props.theme.toastMessages.error.background.tertiary} 96.05%);`};
         }
-
-        color: ${(props) => props.theme.toastMessages.error.textColor.primary};
+        color: ${(props) => props.theme.toastMessages.success.textColor.primary};
 
         @media (max-width: 600px) {
             width: 100vw;
@@ -151,7 +142,7 @@ const StyledToastContainer = styled(ToastContainer)`
         }
     }
     .Toastify__progress-bar {
-        height: 8px;
+        height: 10px;
         background: inherit;
 
         &.success {
@@ -160,20 +151,17 @@ const StyledToastContainer = styled(ToastContainer)`
         &.info {
             background: ${(props) => props.theme.toastMessages.info.background.primary};
         }
-        &.warning {
-            background: ${(props) => props.theme.toastMessages.warning.background.primary};
-        }
         &.error {
             background: ${(props) => props.theme.toastMessages.error.background.primary};
         }
     }
     .Toastify__toast-icon {
-        width: 28px;
+        width: 34px;
         margin-inline-end: 12px;
     }
     .Toastify__spinner {
-        width: 28px;
-        height: 28px;
+        width: 34px;
+        height: 34px;
         border-right-color: ${(props) => props.theme.toastMessages.info.background.primary};
     }
 `;

@@ -57,7 +57,9 @@ const ChainedSpeedMarketFlexCard: React.FC<SharePositionData> = ({
                     <DirectionsHeaderLabel width={isMobile ? 94 : 100}>
                         {t('common.strike-price')}
                     </DirectionsHeaderLabel>
-                    <DirectionsHeaderLabel width={isMobile ? 78 : 84}>{t('profile.final-price')}</DirectionsHeaderLabel>
+                    <DirectionsHeaderLabel width={isMobile ? 78 : 84}>
+                        {t('speed-markets.user-positions.final-price')}
+                    </DirectionsHeaderLabel>
                     <DirectionsHeaderLabel width={38}>{t('common.result')}</DirectionsHeaderLabel>
                 </FlexDivEnd>
                 {positions.map((position, index) => {
@@ -68,13 +70,9 @@ const ChainedSpeedMarketFlexCard: React.FC<SharePositionData> = ({
                             </Text>
                             <FlexDivCentered>
                                 {position === Positions.UP ? (
-                                    <Icon size={20} color={theme.positionColor.up} className="icon icon--caret-up" />
+                                    <Icon size={20} color={theme.price.up} className="icon icon--caret-up" />
                                 ) : (
-                                    <Icon
-                                        size={20}
-                                        color={theme.positionColor.down}
-                                        className="icon icon--caret-down"
-                                    />
+                                    <Icon size={20} color={theme.price.down} className="icon icon--caret-down" />
                                 )}
                                 <Text width={50} $isBold padding="0 0 0 5px">
                                     {position}

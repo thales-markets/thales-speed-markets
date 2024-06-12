@@ -8,6 +8,7 @@ import { ThemeInterface } from 'types/ui';
 import { AreaSeriesComponent } from './components/AreaSerierComponent';
 import { CandlestickComponent } from './components/CandlestickComponent';
 import { UserPositionAreaSeries } from './components/UserSeriesComponent';
+import { ScreenSizeBreakpoint } from 'enums/ui';
 
 type ChartContextProps = {
     children: React.ReactNode;
@@ -19,7 +20,6 @@ type ChartProps = {
     position: Positions | undefined;
     asset: string;
     selectedPrice?: number;
-    selectedRightPrice?: number;
     selectedDate?: number;
     resolution?: string;
 };
@@ -33,7 +33,6 @@ export const ChartComponent: React.FC<ChartProps> = ({
     position,
     asset,
     selectedPrice,
-    selectedRightPrice,
     selectedDate,
     resolution,
 }) => {
@@ -46,7 +45,8 @@ export const ChartComponent: React.FC<ChartProps> = ({
         const chart = createChart(chartContainerRef.current ?? '', {
             layout: {
                 background: { type: ColorType.Solid, color: theme.background.primary },
-                textColor: theme.textColor.secondary,
+                textColor: theme.chart.labels,
+                fontFamily: theme.fontFamily.primary,
             },
             height: 285,
             grid: {
@@ -60,10 +60,10 @@ export const ChartComponent: React.FC<ChartProps> = ({
                 },
             },
             timeScale: {
-                rightOffset: 1,
+                rightOffset: 3,
                 timeVisible: true,
                 fixLeftEdge: true,
-                barSpacing: 7.5,
+                barSpacing: 10,
             },
         });
         setChart(chart);
@@ -88,7 +88,6 @@ export const ChartComponent: React.FC<ChartProps> = ({
                             data={data}
                             position={position}
                             selectedPrice={selectedPrice}
-                            selectedRightPrice={selectedRightPrice}
                             selectedDate={selectedDate}
                         />
 
@@ -98,15 +97,15 @@ export const ChartComponent: React.FC<ChartProps> = ({
             </Chart>
             <ResetButton>
                 <Button
-                    width="35px"
-                    height="31px"
+                    width="50px"
+                    height="30px"
                     textColor={theme.button.textColor.tertiary}
-                    backgroundColor={theme.button.background.secondary}
-                    borderColor={theme.button.borderColor.tertiary}
+                    backgroundColor={theme.button.background.primary}
+                    borderColor={theme.button.borderColor.secondary}
                     fontSize="13px"
-                    padding="0"
+                    borderWidth="1px"
+                    borderRadius="8px"
                     additionalStyles={{
-                        borderRadius: '8px',
                         transition: 'all 0.2s ease-in-out',
                         textTransform: 'none',
                     }}
@@ -119,7 +118,7 @@ export const ChartComponent: React.FC<ChartProps> = ({
                         });
                     }}
                 >
-                    <i className="icon icon--reload" />
+                    <ReloadIcon className="icon icon--reload" />
                 </Button>
             </ResetButton>
         </ChartContainer>
@@ -127,9 +126,11 @@ export const ChartComponent: React.FC<ChartProps> = ({
 };
 
 const ChartContainer = styled.div`
-    height: 284px;
+    height: 291px;
     position: relative;
 `;
+
+const Chart = styled.div``;
 
 const ResetButton = styled.div`
     position: absolute;
@@ -139,6 +140,14 @@ const ResetButton = styled.div`
     i {
         font-size: 16px;
     }
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        top: -42px;
+        right: 14px;
+        left: unset;
+        bottom: unset;
+    }
 `;
 
-const Chart = styled.div``;
+const ReloadIcon = styled.i`
+    color: ${(props) => props.theme.icon.textColor.tertiary};
+`;

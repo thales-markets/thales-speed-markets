@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './i18n';
 import Root from './pages/Root';
 import store from './redux/store';
 import reportWebVitals from './reportWebVitals';
@@ -8,9 +7,8 @@ import './styles/currencies.css';
 import './styles/fonts.css';
 import './styles/icons.css';
 import './styles/main.css';
-import './styles/overrides.css';
-import './styles/sidebar-icons.css';
-import './styles/thales-icons.css';
+import './styles/social-icons.css';
+import './styles/network-icons.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(

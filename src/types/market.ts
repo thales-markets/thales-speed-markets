@@ -1,44 +1,41 @@
 import { Positions } from 'enums/market';
 
-export type MarketInfo = {
-    currencyKey: string;
-    address: string;
-    liquidity: number;
-    price: number;
-    roi: number;
-    strikePrice: number;
-    discount: number;
-    positionType: Positions;
-    url?: string;
-};
-
-export type UserOpenPositions = {
-    positionAddress: string;
-    currencyKey: string;
-    strikePrice: number;
-    payout: number;
-    maturityDate: number;
+export type UserPosition = {
+    user: string;
     market: string;
-    side: Positions;
-    paid: number;
-    value: number;
-    claimable?: boolean;
-    finalPrice?: number;
-    currentPrice?: number;
-    user?: string;
-};
-
-export type UserClosedPositions = {
     currencyKey: string;
-    strikePrice: number;
-    payout: number;
-    maturityDate: number;
-    market: string;
     side: Positions;
+    strikePrice: number;
+    maturityDate: number;
     paid: number;
-    value: number;
+    payout: number;
+    currentPrice: number;
     finalPrice: number;
+    isClaimable: boolean;
+    isResolved: boolean;
+    createdAt: number;
+};
+
+export type UserChainedPosition = {
+    user: string;
+    market: string;
+    currencyKey: string;
+    sides: Positions[];
+    strikePrices: number[];
+    strikeTimes: number[];
+    maturityDate: number;
+    paid: number;
+    payout: number;
+    payoutMultiplier: number;
+    currentPrice: number;
+    finalPrices: number[];
+    canResolve: boolean;
+    resolveIndex?: number;
+    isMatured: boolean;
+    isClaimable: boolean;
     isUserWinner: boolean;
+    isResolved: boolean;
+    createdAt: number;
 };
 
 export type Risk = { current: number; max: number };
@@ -74,35 +71,4 @@ export type AmmChainedSpeedMarketsLimits = {
     payoutMultipliers: number[];
     maxPriceDelayForResolvingSec: number;
     whitelistedAddress: boolean;
-};
-
-export type SpeedMarket = {
-    address: string;
-    timestamp: number;
-    currencyKey: string;
-    strikePrice: number;
-    maturityDate: number;
-    isOpen: boolean;
-    isChained: boolean;
-    finalPrice?: number;
-};
-
-export type ChainedSpeedMarket = {
-    address: string;
-    timestamp: number;
-    currencyKey: string;
-    sides: (Positions.UP | Positions.DOWN)[];
-    strikePrices: number[];
-    strikeTimes: number[];
-    maturityDate: number;
-    payout: number;
-    paid: number;
-    payoutMultiplier: number;
-    finalPrices: number[];
-    isOpen: boolean;
-    isMatured: boolean;
-    canResolve: boolean;
-    claimable: boolean;
-    isUserWinner: boolean;
-    user: string;
 };

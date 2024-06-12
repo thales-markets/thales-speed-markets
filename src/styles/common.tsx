@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+export const PAGE_MAX_WIDTH = '1150px';
+
 export const FlexDiv = styled.div`
     display: flex;
     outline: none !important;
@@ -43,47 +45,45 @@ export const FlexDivColumnCentered = styled(FlexDivColumn)`
 export const BoldText = styled.span`
     font-weight: 700;
 `;
+export const ExtraBoldText = styled.span`
+    font-weight: 800;
+`;
 
-// TODO: Update color names
+export const GradientContainer = styled.div<{ width?: number; borderRadius?: string }>`
+    padding: 2px;
+    background: ${(props) => props.theme.borderColor.tertiary};
+    border-radius: ${(props) => props.borderRadius ?? '8px'};
+    width: ${(props) => (props.width ? `${props.width}px` : '100%')};
+`;
+
 export const Colors = {
     GRAY: '#2b3139',
-    GRAY_LIGHT: '#848E9C',
-    GRAY_DARK: '#181A20',
     GRAY_BLUE: '#808997',
 
     WHITE: '#FFFFFF',
 
-    GREEN: '#03DAC5',
-    GREEN_LIGHT: '#B0FFE7',
-    GREEN_DARK: '#1D976C',
-    GREEN_DARK_START: 'rgb(76, 211, 163, 0.4)',
-    GREEN_DARK_END: 'rgb(76, 211, 163, 0)',
-
-    GREEN_IN_START: 'rgb(76, 211, 163, 0.5)',
-    GREEN_IN_END: 'rgb(43, 49, 57, 0)',
+    GREEN: '#8AF6A8',
+    GREEN_LIGHT: '#7DDD97',
+    GREEN_DARK: '#00994B',
+    GREEN_DARKER: '#00A069',
 
     BLACK: '#000000',
-    BLACK_LIGHT: '#121212',
 
-    BLUE: '#5B86E5',
-    BLUE_LIGHT: '#36D1DC',
-    BLUE_DARK: '#1043B4',
-    BLUE_MIDNIGHT: '#052040',
-    BLUE_MIDNIGHT_LIGHT: '#1b314f',
-    BLUE_SKY: '#91bced',
+    BLUE: '#169CD2',
+    BLUE_LIGHT: '#00EEE8',
+    BLUE_DARK: '#06B2E3',
+    BLUE_DEEP_SKY: '#1D7DC0',
 
     RED: '#DE496D',
-    RED_LIGHT: '#E29587',
-    RED_DARK: '#D66D75',
-    RED_START: 'rgb(109, 18, 40, 0.4)',
-    RED_END: 'rgb(222, 73, 109, 0)',
+    RED_LIGHT: '#EC91A7',
+    RED_DARK: '#EC0039',
 
-    ORANGE: '#F7B91A',
-    ORANGE_LIGHT: '#FFB866',
-    ORANGE_DARK: '#FF8800',
-
-    YELLOW: '#FFCC00',
     YELLOW_DARK: '#9b8327',
 
-    PURPLE: '#BF7EFF',
+    PURPLE: '#C294F5',
+    PURPLE_HALF: '#C294f580', // 50%
+    PURPLE_START: '#C294F566', // 40%
+    PURPLE_END: '#C294F500', // 0%
+    PURPLE_DARK: '#A764B7',
+    PURPLE_DARK_2: '#681483',
 };

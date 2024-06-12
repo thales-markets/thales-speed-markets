@@ -2,80 +2,104 @@ import { Colors } from '../common';
 
 export default {
     fontFamily: {
-        primary: "'Fira Sans' !important",
+        primary: "'Karla' !important",
+        secondary: "'Montserrat' !important",
     },
     background: {
-        primary: Colors.GRAY_DARK,
+        primary: Colors.BLACK,
         secondary: Colors.GRAY,
-        tertiary: Colors.GRAY_LIGHT,
-        quaternary: Colors.GREEN,
+        tertiary: '',
+        quaternary: '',
+        quinary: Colors.PURPLE,
     },
     textColor: {
         primary: Colors.WHITE,
-        secondary: Colors.GRAY_LIGHT,
-        tertiary: Colors.RED,
+        secondary: '',
+        tertiary: '',
         quaternary: Colors.GREEN,
+        quinary: Colors.PURPLE,
     },
     borderColor: {
         primary: Colors.GRAY,
-        secondary: Colors.GRAY_LIGHT,
-        tertiary: Colors.ORANGE,
-        quaternary: Colors.GREEN,
+        secondary: '',
+        tertiary: `linear-gradient(90deg, ${Colors.PURPLE_DARK} 0%, ${Colors.BLUE} 100%)`,
+        quaternary: Colors.PURPLE,
     },
     button: {
         background: {
-            primary: Colors.GREEN,
-            secondary: Colors.GRAY_DARK,
-            tertiary: Colors.GRAY,
-            quaternary: Colors.GRAY_LIGHT,
+            primary: Colors.BLACK,
+            secondary: Colors.PURPLE,
+            tertiary: Colors.BLUE,
+            quaternary: Colors.WHITE,
         },
         textColor: {
-            primary: Colors.GRAY_DARK,
-            secondary: Colors.WHITE,
-            tertiary: Colors.GRAY_LIGHT,
-            quaternary: Colors.ORANGE,
+            primary: Colors.WHITE,
+            secondary: Colors.BLACK,
+            tertiary: Colors.PURPLE,
+            quaternary: '',
         },
         borderColor: {
-            primary: Colors.GREEN,
-            secondary: Colors.GRAY_LIGHT,
-            tertiary: Colors.GRAY,
-            quaternary: Colors.GRAY_DARK,
+            primary: `linear-gradient(90deg, ${Colors.PURPLE_DARK} 0%, ${Colors.BLUE} 100%)`,
+            secondary: Colors.PURPLE,
+            tertiary: '',
         },
     },
     input: {
         background: {
-            primary: Colors.GRAY_DARK,
+            primary: Colors.BLACK,
             selection: {
                 primary: Colors.WHITE,
             },
         },
         textColor: {
             primary: Colors.WHITE,
-            secondary: Colors.GRAY_LIGHT,
-            tertiary: Colors.GRAY,
+            secondary: Colors.PURPLE,
+            tertiary: Colors.BLACK,
             quaternary: Colors.RED,
         },
         borderColor: {
-            primary: Colors.GRAY_LIGHT,
-            secondary: Colors.GRAY,
+            primary: Colors.PURPLE,
             focus: {
-                primary: Colors.GREEN,
+                primary: Colors.PURPLE,
             },
             error: {
                 primary: Colors.RED,
             },
         },
+        placeholderColor: {
+            primary: Colors.PURPLE_HALF,
+        },
+    },
+    dropDown: {
+        background: {
+            primary: Colors.BLACK,
+            secondary: Colors.PURPLE,
+        },
+        textColor: {
+            primary: Colors.WHITE,
+            secondary: Colors.PURPLE,
+        },
     },
     link: {
         textColor: {
-            primary: Colors.GREEN,
+            primary: Colors.PURPLE,
             secondary: Colors.WHITE,
         },
     },
+    icon: {
+        background: {
+            primary: '',
+            secondary: Colors.BLACK,
+            tertiary: Colors.PURPLE,
+        },
+        textColor: {
+            primary: `linear-gradient(180deg, ${Colors.PURPLE_DARK_2} 0%, ${Colors.BLUE_DEEP_SKY} 100%)`,
+            secondary: Colors.BLACK,
+            tertiary: Colors.PURPLE,
+            quaternary: Colors.WHITE,
+        },
+    },
     error: {
-        background: {
-            primary: Colors.GRAY_DARK,
-        },
         textColor: {
             primary: Colors.RED,
         },
@@ -83,71 +107,21 @@ export default {
             primary: Colors.RED,
         },
     },
-    warning: {
-        background: {
-            primary: Colors.GRAY_DARK,
-            secondary: Colors.GRAY,
-        },
-        textColor: {
-            primary: Colors.ORANGE,
-            secondary: Colors.ORANGE_DARK,
-        },
-        borderColor: {
-            primary: Colors.ORANGE,
-        },
+    status: {
+        won: Colors.GREEN,
+        loss: Colors.RED,
     },
-    info: {
-        background: {
-            primary: Colors.GRAY_DARK,
-        },
-        textColor: {
-            primary: Colors.BLUE,
-            secondary: Colors.BLUE_DARK,
-        },
-        borderColor: {
-            primary: Colors.BLUE,
-        },
-    },
-    table: {
-        textColor: {
-            primary: Colors.WHITE,
-            secondary: Colors.GRAY_DARK,
-            tertiary: Colors.ORANGE,
-            quaternary: Colors.GREEN,
-        },
-    },
-    positionColor: {
+    price: {
         up: Colors.GREEN,
         down: Colors.RED,
-        in: Colors.GREEN_LIGHT,
-        out: Colors.PURPLE,
-    },
-    tradeTypeColor: {
-        buy: Colors.GREEN,
-        sell: Colors.RED,
-    },
-    landingPage: {
-        background: {
-            primary: Colors.BLUE_MIDNIGHT,
-            secondary: Colors.BLUE_MIDNIGHT_LIGHT,
-        },
-        textColor: {
-            primary: Colors.WHITE,
-            secondary: Colors.BLUE_SKY,
-        },
-    },
-    tokenPage: {
-        border: {
-            primary: Colors.GRAY,
-            secondary: Colors.PURPLE,
-        },
     },
     toastMessages: {
         success: {
             background: {
                 primary: Colors.GREEN,
-                secondary: Colors.GREEN_LIGHT,
+                secondary: Colors.GREEN_DARKER,
                 tertiary: Colors.GREEN_DARK,
+                quaternary: Colors.GREEN_LIGHT,
             },
             textColor: {
                 primary: Colors.BLACK,
@@ -155,19 +129,9 @@ export default {
         },
         info: {
             background: {
-                primary: Colors.BLUE_DARK,
+                primary: Colors.BLUE,
                 secondary: Colors.BLUE_LIGHT,
-                tertiary: Colors.BLUE,
-            },
-            textColor: {
-                primary: Colors.BLACK,
-            },
-        },
-        warning: {
-            background: {
-                primary: Colors.ORANGE,
-                secondary: Colors.ORANGE_LIGHT,
-                tertiary: Colors.ORANGE_DARK,
+                tertiary: Colors.BLUE_DARK,
             },
             textColor: {
                 primary: Colors.BLACK,
@@ -189,5 +153,16 @@ export default {
         up: Colors.GREEN,
         resolved: Colors.YELLOW_DARK,
         text: Colors.GRAY_BLUE,
+    },
+    chart: {
+        candleUp: Colors.GREEN,
+        candleDown: Colors.RED,
+        labels: Colors.GRAY_BLUE,
+        priceLine: Colors.PURPLE,
+        multiPositions: Colors.PURPLE,
+        area: {
+            start: Colors.PURPLE_START,
+            end: Colors.PURPLE_END,
+        },
     },
 };

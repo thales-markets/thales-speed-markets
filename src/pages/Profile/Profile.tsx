@@ -1,151 +1,91 @@
+import SPAAnchor from 'components/SPAAnchor';
 import SearchInput from 'components/SearchInput';
-import { USD_SIGN } from 'constants/currency';
-import { millisecondsToSeconds } from 'date-fns';
-import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
-import useProfileDataQuery from 'queries/profile/useProfileDataQuery';
-import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
-import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveSpeedMarketsDataQuery';
+import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
+import { MARKET_DURATION_IN_DAYS } from 'constants/market';
+import { SUPPORTED_ASSETS } from 'constants/pyth';
+import ROUTES from 'constants/routes';
+import { secondsToMilliseconds } from 'date-fns';
+import useInterval from 'hooks/useInterval';
+import MobileMenu from 'layouts/DappLayout/components/MobileMenu';
+import UserOpenPositions from 'pages/SpeedMarkets/components/UserOpenPositions';
+import { LinkContainer, LinkWrapper, NavigationIcon } from 'pages/SpeedMarketsOverview/SpeedMarketsOverview';
+import useAmmSpeedMarketsLimitsQuery from 'queries/speedMarkets/useAmmSpeedMarketsLimitsQuery';
 import queryString from 'query-string';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { getIsAppReady } from 'redux/modules/app';
-import { useTheme } from 'styled-components';
-import { formatCurrencyWithSign, formatPercentage } from 'thales-utils';
-import { UserProfileData } from 'types/profile';
-import { RootState, ThemeInterface } from 'types/ui';
-import { getPriceId } from 'utils/pyth';
-import { history } from 'utils/routes';
-import { isUserWinner } from 'utils/speedAmm';
-import { useAccount, useChainId, useClient } from 'wagmi';
-import { MARKET_DURATION_IN_DAYS } from '../../constants/market';
-import ClaimablePositions from './components/ClaimablePositions';
-import OpenPositions from './components/OpenPositions';
-import PositionHistory from './components/PositionHistory';
-import ProfileSection from './components/ProfileSection';
-import TransactionHistory from './components/TransactionHistory';
+import { getIsMobile } from 'redux/modules/ui';
+import { getUserNotifications } from 'redux/modules/user';
+import { FlexDivEnd } from 'styles/common';
+import { RootState } from 'types/ui';
+import { getCurrentPrices, getPriceConnection, getPriceId, getSupportedAssetsAsObject } from 'utils/pyth';
+import { buildHref, history } from 'utils/routes';
+import { useChainId, useClient } from 'wagmi';
+import ProfileHeader from './components/ProfileHeader';
+import UserHistoricalPositions from './components/UserHistoricalPositions';
 import {
     Container,
     Header,
-    MainContainer,
-    Nav,
-    NavItem,
     Notification,
-    StatsContainer,
-    StatsItem,
-    StatsLabel,
-    StatsValue,
-    Title,
+    PositionsWrapper,
+    Tab,
+    TabSection,
+    TabSectionSubtitle,
+    TabSectionTitle,
+    Tabs,
 } from './styled-components';
+import TotalBalance from 'components/TotalBalance';
 
-enum NavItems {
-    MyPositions = 'my-positions',
-    History = 'history',
+enum TabItems {
+    MY_POSITIONS = 'my-positions',
+    HISTORY = 'history',
 }
 
 const Profile: React.FC = () => {
     const { t } = useTranslation();
     const location = useLocation();
-    const theme: ThemeInterface = useTheme();
 
     const networkId = useChainId();
     const client = useClient();
-    const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const { address, isConnected } = useAccount();
 
+    const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
+    const isMobile = useSelector((state: RootState) => getIsMobile(state));
+    const userNotifications = useSelector((state: RootState) => getUserNotifications(state));
+
+    const [isChainedClaimable, setIsChainedClaimable] = useState(false);
+    const [isChainedOpen, setIsChainedOpen] = useState(false);
+    const [currentPrices, setCurrentPrices] = useState<{ [key: string]: number }>(getSupportedAssetsAsObject());
+    const [positionsSize, setPositionsSize] = useState(0);
     const [searchAddress, setSearchAddress] = useState<string>('');
     const [searchText, setSearchText] = useState<string>('');
 
-    const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
-        { networkId, client },
-        searchAddress || (address as string),
-        {
-            enabled: isAppReady && isConnected,
-        }
-    );
-    const speedMarketsNotifications =
-        userActiveSpeedMarketsDataQuery.isSuccess && userActiveSpeedMarketsDataQuery.data
-            ? userActiveSpeedMarketsDataQuery.data.filter((marketData) => marketData.claimable).length
-            : 0;
-
-    const userActiveChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
-        { networkId, client },
-        searchAddress || (address as string),
-        {
-            enabled: isAppReady && isConnected,
-        }
-    );
-    const userActiveChainedSpeedMarketsData =
-        userActiveChainedSpeedMarketsDataQuery.isSuccess && userActiveChainedSpeedMarketsDataQuery.data
-            ? userActiveChainedSpeedMarketsDataQuery.data
-            : [];
-
-    // Prepare active chained speed markets that become matured to fetch Pyth prices
-    const maturedChainedMarkets = userActiveChainedSpeedMarketsData
-        .filter((marketData) => marketData.isMatured)
-        .map((marketData) => {
-            const strikeTimes = marketData.strikeTimes.map((strikeTime) => millisecondsToSeconds(strikeTime));
-            return {
-                ...marketData,
-                strikeTimes,
-                pythPriceId: getPriceId(networkId, marketData.currencyKey),
-            };
-        });
-
-    const priceRequests = maturedChainedMarkets
-        .map((data) =>
-            data.strikeTimes.map((strikeTime) => ({
-                priceId: data.pythPriceId,
-                publishTime: strikeTime,
-                market: data.address,
-            }))
-        )
-        .flat();
-    const pythPricesQueries = usePythPriceQueries(networkId, priceRequests, { enabled: priceRequests.length > 0 });
-    const pythPricesWithMarket = priceRequests.map((request, i) => ({
-        market: request.market,
-        price: pythPricesQueries[i]?.data || 0,
-    }));
-
-    // Based on Pyth prices determine if chained position is claimable
-    const chainedSpeedMarketsNotifications = maturedChainedMarkets
-        .map((marketData) => {
-            const finalPrices = marketData.strikeTimes.map(
-                (_, i) => pythPricesWithMarket.filter((pythPrice) => pythPrice.market === marketData.address)[i].price
-            );
-            const strikePrices = marketData.strikePrices.map((strikePrice, i) =>
-                i > 0 ? finalPrices[i - 1] : strikePrice
-            );
-            const userWonStatuses = marketData.sides.map((side, i) =>
-                isUserWinner(side, strikePrices[i], finalPrices[i])
-            );
-            const claimable = userWonStatuses.every((status) => status);
-
-            return { ...marketData, finalPrices, claimable };
-        })
-        .filter((marketData) => marketData.claimable).length;
-
-    const totalNotifications = speedMarketsNotifications + chainedSpeedMarketsNotifications;
-
-    const userProfileDataQuery = useProfileDataQuery({ networkId, client }, searchAddress || (address as string), {
-        enabled: isAppReady && isConnected,
+    const ammSpeedMarketsLimitsQuery = useAmmSpeedMarketsLimitsQuery({ networkId, client }, undefined, {
+        enabled: isAppReady,
     });
-    const profileData: UserProfileData =
-        userProfileDataQuery.isSuccess && userProfileDataQuery.data
-            ? userProfileDataQuery.data
-            : {
-                  profit: 0,
-                  volume: 0,
-                  numberOfTrades: 0,
-                  gain: 0,
-                  investment: 0,
-              };
 
-    const queryParamTab = queryString.parse(location.search).tab as NavItems;
-    const [view, setView] = useState(
-        Object.values(NavItems).includes(queryParamTab) ? queryParamTab : NavItems.MyPositions
+    const ammSpeedMarketsLimitsData = useMemo(() => {
+        return ammSpeedMarketsLimitsQuery.isSuccess ? ammSpeedMarketsLimitsQuery.data : null;
+    }, [ammSpeedMarketsLimitsQuery]);
+
+    const queryParamTab = queryString.parse(location.search).tab as TabItems;
+    const [selectedTab, setSelectedTab] = useState(
+        Object.values(TabItems).includes(queryParamTab) ? queryParamTab : TabItems.MY_POSITIONS
     );
+
+    const priceConnection = useMemo(() => getPriceConnection(networkId), [networkId]);
+
+    // Refresh current prices
+    useInterval(async () => {
+        const priceIds = SUPPORTED_ASSETS.map((asset) => getPriceId(networkId, asset));
+        const prices: typeof currentPrices = await getCurrentPrices(priceConnection, networkId, priceIds);
+        setCurrentPrices({
+            ...currentPrices,
+            [CRYPTO_CURRENCY_MAP.BTC]: prices[CRYPTO_CURRENCY_MAP.BTC],
+            [CRYPTO_CURRENCY_MAP.ETH]: prices[CRYPTO_CURRENCY_MAP.ETH],
+        });
+    }, secondsToMilliseconds(10));
 
     useEffect(() => {
         if (searchText.startsWith('0x') && searchText?.length == 42) {
@@ -155,135 +95,115 @@ const Profile: React.FC = () => {
         }
     }, [searchText]);
 
-    const onTabClickHandler = (tab: NavItems) => {
+    const onTabClickHandler = (tab: TabItems) => {
         history.push({
             pathname: location.pathname,
             search: queryString.stringify({ tab }),
         });
-        setView(tab);
+        setSelectedTab(tab);
     };
 
+    const totalNotifications = userNotifications.single + userNotifications.chained;
+
     return (
-        <>
-            <Container>
-                <Header>
-                    <Title>{t('profile.title')}</Title>
+        <Container>
+            <LinkContainer>
+                <SPAAnchor href={`${buildHref(ROUTES.Markets.SpeedMarkets)}`}>
+                    <LinkWrapper>
+                        <NavigationIcon isLeft className={`icon icon--left`} />
+                        {t('speed-markets.title')}
+                    </LinkWrapper>
+                </SPAAnchor>
+                &nbsp;/&nbsp;{t('profile.title')}
+            </LinkContainer>
+
+            <Header>
+                <ProfileHeader />
+                <TotalBalance />
+            </Header>
+
+            <PositionsWrapper>
+                <Tabs>
+                    <Tab
+                        onClick={() => onTabClickHandler(TabItems.MY_POSITIONS)}
+                        $active={selectedTab === TabItems.MY_POSITIONS}
+                    >
+                        {t('profile.tabs.my-positions')}
+                        {totalNotifications > 0 && (
+                            <Notification $isSelected={selectedTab === TabItems.MY_POSITIONS}>
+                                {totalNotifications}
+                            </Notification>
+                        )}
+                    </Tab>
+                    <Tab onClick={() => onTabClickHandler(TabItems.HISTORY)} $active={selectedTab === TabItems.HISTORY}>
+                        {t('profile.tabs.history')}
+                    </Tab>
+                </Tabs>
+
+                <FlexDivEnd>
                     <SearchInput
                         placeholder={t('profile.search-placeholder')}
                         text={searchText}
                         handleChange={(value) => setSearchText(value)}
-                        width="300px"
-                        height="28px"
-                        iconTop="6px"
+                        width={isMobile ? '100%' : '470px'}
+                        height={'40px'}
                     />
-                </Header>
-                <MainContainer>
-                    <StatsContainer>
-                        <StatsItem>
-                            <StatsLabel>{t('profile.stats.netprofit-col')}:</StatsLabel>
-                            <StatsValue
-                                color={
-                                    profileData.profit > 0
-                                        ? theme.textColor.quaternary
-                                        : profileData.profit < 0
-                                        ? theme.textColor.tertiary
-                                        : theme.textColor.primary
-                                }
-                            >
-                                {userProfileDataQuery.isLoading
-                                    ? '-'
-                                    : formatCurrencyWithSign(USD_SIGN, profileData.profit, 2)}
-                            </StatsValue>
-                        </StatsItem>
-                        <StatsItem>
-                            <StatsLabel>{t('profile.stats.gain-col')}:</StatsLabel>
-                            <StatsValue
-                                color={
-                                    profileData.gain > 0
-                                        ? theme.textColor.quaternary
-                                        : profileData.gain < 0
-                                        ? theme.textColor.tertiary
-                                        : theme.textColor.primary
-                                }
-                            >
-                                {userProfileDataQuery.isLoading ? '-' : formatPercentage(profileData.gain)}
-                            </StatsValue>
-                        </StatsItem>
-                        <StatsItem>
-                            <StatsLabel>{t('profile.stats.trades-col')}:</StatsLabel>
-                            <StatsValue>{userProfileDataQuery.isLoading ? '-' : profileData.numberOfTrades}</StatsValue>
-                        </StatsItem>
-                        <StatsItem>
-                            <StatsLabel>{t('profile.stats.volume-col')}:</StatsLabel>
-                            <StatsValue>
-                                {userProfileDataQuery.isLoading
-                                    ? '-'
-                                    : formatCurrencyWithSign(USD_SIGN, profileData.volume, 2)}
-                            </StatsValue>
-                        </StatsItem>
-                    </StatsContainer>
-                    <Nav>
-                        <NavItem
-                            onClick={() => onTabClickHandler(NavItems.MyPositions)}
-                            $active={view === NavItems.MyPositions}
-                        >
-                            {t('profile.tabs.my-positions')}
-                            {totalNotifications > 0 && <Notification>{totalNotifications}</Notification>}
-                        </NavItem>
-                        <NavItem
-                            onClick={() => onTabClickHandler(NavItems.History)}
-                            $active={view === NavItems.History}
-                        >
-                            {t('profile.tabs.history')}
-                        </NavItem>
-                    </Nav>
+                </FlexDivEnd>
+
+                {selectedTab === TabItems.MY_POSITIONS && (
                     <>
-                        {view === NavItems.MyPositions && (
-                            <>
-                                <ProfileSection
-                                    title={t('profile.accordions.claimable-positions')}
-                                    subtitle={t('profile.winnings-are-forfeit', { days: MARKET_DURATION_IN_DAYS })}
-                                    mobileMaxHeight="360px"
-                                >
-                                    <ClaimablePositions
-                                        searchAddress={searchAddress}
-                                        searchText={searchAddress ? '' : searchText}
-                                    />
-                                </ProfileSection>
-                                <ProfileSection title={t('profile.accordions.open-positions')} mobileMaxHeight="360px">
-                                    <OpenPositions
-                                        searchAddress={searchAddress}
-                                        searchText={searchAddress ? '' : searchText}
-                                    />
-                                </ProfileSection>
-                            </>
-                        )}
-                        {view === NavItems.History && (
-                            <>
-                                <ProfileSection
-                                    title={t('profile.accordions.transaction-history')}
-                                    subtitle={t('profile.history-limit', { days: MARKET_DURATION_IN_DAYS })}
-                                >
-                                    <TransactionHistory
-                                        searchAddress={searchAddress}
-                                        searchText={searchAddress ? '' : searchText}
-                                    />
-                                </ProfileSection>
-                                <ProfileSection
-                                    title={t('profile.accordions.position-history')}
-                                    subtitle={t('profile.history-limit', { days: MARKET_DURATION_IN_DAYS })}
-                                >
-                                    <PositionHistory
-                                        searchAddress={searchAddress}
-                                        searchText={searchAddress ? '' : searchText}
-                                    />
-                                </ProfileSection>
-                            </>
-                        )}
+                        {/* CLAIMABLE */}
+                        <TabSectionTitle>{t('profile.accordions.claimable-positions')}</TabSectionTitle>
+                        <TabSection $isEmpty={totalNotifications === 0}>
+                            <UserOpenPositions
+                                showOnlyClaimable
+                                showFilter
+                                isChained={isChainedClaimable}
+                                currentPrices={currentPrices}
+                                maxPriceDelayForResolvingSec={ammSpeedMarketsLimitsData?.maxPriceDelayForResolvingSec}
+                                searchAddress={searchAddress}
+                                onChainedSelectedChange={setIsChainedClaimable}
+                                isMobileHorizontal
+                            />
+                        </TabSection>
+                        {/* OPEN */}
+                        <TabSectionTitle>{t('profile.accordions.open-positions')}</TabSectionTitle>
+                        <TabSection $isEmpty={positionsSize === 0}>
+                            <UserOpenPositions
+                                showOnlyOpen
+                                showFilter
+                                isChained={isChainedOpen}
+                                currentPrices={currentPrices}
+                                maxPriceDelayForResolvingSec={ammSpeedMarketsLimitsData?.maxPriceDelayForResolvingSec}
+                                searchAddress={searchAddress}
+                                setNumberOfPositions={setPositionsSize}
+                                onChainedSelectedChange={setIsChainedOpen}
+                                isMobileHorizontal
+                            />
+                        </TabSection>
                     </>
-                </MainContainer>
-            </Container>
-        </>
+                )}
+                {selectedTab === TabItems.HISTORY && (
+                    <>
+                        <TabSectionTitle>
+                            {t('profile.accordions.transaction-history')}
+                            <br />
+                            <TabSectionSubtitle>
+                                {t('profile.history-limit', { days: MARKET_DURATION_IN_DAYS })}
+                            </TabSectionSubtitle>
+                        </TabSectionTitle>
+                        <TabSection $isEmpty={positionsSize === 0}>
+                            <UserHistoricalPositions
+                                currentPrices={currentPrices}
+                                searchAddress={searchAddress}
+                                setNumberOfPositions={setPositionsSize}
+                            />
+                        </TabSection>
+                    </>
+                )}
+            </PositionsWrapper>
+            <MobileMenu />
+        </Container>
     );
 };
 

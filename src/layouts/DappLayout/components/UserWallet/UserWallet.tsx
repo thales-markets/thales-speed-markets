@@ -1,48 +1,70 @@
-import { useAccountModal, useConnectModal } from '@rainbow-me/rainbowkit';
-import NetworkSwitch from 'components/NetworkSwitch';
+import { getUserInfo } from '@particle-network/auth-core';
+import {
+    getErrorToastOptions,
+    getInfoToastOptions,
+    getLoadingToastOptions,
+} from 'components/ToastMessage/ToastMessage';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+import { getIsBiconomy } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { truncateAddress } from 'thales-utils';
-import UserCollaterals from '../UserCollaterals';
+import { RootState } from 'types/ui';
 import { useAccount } from 'wagmi';
+import UserCollaterals from '../UserCollaterals';
 
 const TRUNCATE_ADDRESS_NUMBER_OF_CHARS = 5;
 
 const UserWallet: React.FC = () => {
     const { t } = useTranslation();
-    const { openConnectModal } = useConnectModal();
-    const { openAccountModal } = useAccountModal();
 
-    const { isConnected, address } = useAccount();
+    const { address: walletAddress } = useAccount();
+    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
 
     const [walletText, setWalletText] = useState('');
+
+    const handleCopy = () => {
+        const id = toast.loading(t('user-info.copying-address'), getLoadingToastOptions());
+        try {
+            navigator.clipboard.writeText(walletAddress as string);
+            toast.update(id, getInfoToastOptions(t('user-info.copied'), id));
+        } catch (e) {
+            toast.update(id, getErrorToastOptions('Error', id));
+        }
+    };
 
     return (
         <Container>
             <Wrapper>
-                <UserCollaterals />
                 <WalletContainer
-                    $connected={isConnected}
+                    $isAddress={!isBiconomy}
                     onClick={() => {
-                        isConnected ? openAccountModal?.() : openConnectModal?.();
+                        !isBiconomy && handleCopy();
                     }}
-                    onMouseOver={() => setWalletText(t('common.wallet.wallet-options'))}
-                    onMouseLeave={() => setWalletText('')}
+                    onMouseOver={() => !isBiconomy && setWalletText(t('common.wallet.copy-address'))}
+                    onMouseLeave={() => !isBiconomy && setWalletText('')}
                 >
-                    {address
-                        ? walletText ||
-                          truncateAddress(address, TRUNCATE_ADDRESS_NUMBER_OF_CHARS, TRUNCATE_ADDRESS_NUMBER_OF_CHARS)
-                        : t('common.wallet.connect-your-wallet')}
+                    <WalletText $isAddress={!isBiconomy}>
+                        {walletText ||
+                            (isBiconomy
+                                ? getUserInfo()?.name
+                                : truncateAddress(
+                                      walletAddress as string,
+                                      TRUNCATE_ADDRESS_NUMBER_OF_CHARS,
+                                      TRUNCATE_ADDRESS_NUMBER_OF_CHARS
+                                  ))}
+                    </WalletText>
                 </WalletContainer>
-                <NetworkSwitch />
+                <Separator />
+                <UserCollaterals />
             </Wrapper>
         </Container>
     );
 };
 
 const Container = styled.div`
-    width: 408px;
     z-index: 10000;
     @media (max-width: 500px) {
         width: 100%;
@@ -53,33 +75,44 @@ const Wrapper = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 1px solid ${(props) => props.theme.borderColor.secondary};
-    border-radius: 8px;
-    @media (max-width: 500px) {
-        height: 26px;
-    }
+    border: 2px solid ${(props) => props.theme.borderColor.quaternary};
+    border-radius: 20px;
+    height: 30px;
 `;
 
-const WalletContainer = styled.div<{ $connected: boolean }>`
-    width: 100%;
+const WalletContainer = styled.div<{ $isAddress: boolean }>`
+    width: 120px;
+    height: 100%;
     min-width: 120px;
-    cursor: ${(props) => (props.$connected ? 'text' : 'pointer')};
-    padding: 4px 13px;
+    cursor: ${(props) => (props.$isAddress ? 'pointer' : 'text')};
     display: flex;
     justify-content: center;
     align-items: center;
-    cursor: pointer;
-    border-left: 2px solid ${(props) => props.theme.borderColor.secondary};
-    border-right: 2px solid ${(props) => props.theme.borderColor.secondary};
-    color: ${(props) => props.theme.textColor.primary};
-    font-weight: normal;
-    font-size: 13px;
-    text-align: center;
+    padding: 0 10px;
+
     @media (max-width: 500px) {
         min-width: fit-content;
-        max-width: ${(props) => (props.$connected ? '100px' : '120px')};
+        max-width: 100px;
         padding: 4px 7px;
     }
+`;
+
+const WalletText = styled.span<{ $isAddress: boolean }>`
+    color: ${(props) => props.theme.textColor.quinary};
+    font-family: ${(props) => props.theme.fontFamily.secondary};
+    font-weight: 700;
+    font-size: 12px;
+    ${(props) => (props.$isAddress ? 'text-transform: lowercase;' : '')};
+    text-align: center;
+    ${(props) => (!props.$isAddress ? 'overflow: hidden;' : '')};
+    ${(props) => (!props.$isAddress ? 'white-space: nowrap;' : '')};
+    ${(props) => (!props.$isAddress ? 'text-overflow: ellipsis;' : '')};
+`;
+
+const Separator = styled.div`
+    width: 4px;
+    height: 12px;
+    background: ${(props) => props.theme.borderColor.quaternary};
 `;
 
 export default UserWallet;

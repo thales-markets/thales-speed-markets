@@ -1,15 +1,14 @@
+import OutsideClickHandler from 'components/OutsideClick';
 import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipleCollateralBalanceQuery';
-import React, { useEffect, useMemo, useState } from 'react';
-import OutsideClickHandler from 'components/OutsideClick/OutsideClick';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
-import { getSelectedCollateralIndex, setSelectedCollateralIndex } from 'redux/modules/wallet';
+import { getSelectedCollateralIndex, getIsBiconomy, setSelectedCollateralIndex } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivRow } from 'styles/common';
 import { Coins, formatCurrencyWithKey } from 'thales-utils';
 import { RootState } from 'types/ui';
 import {
-    getAssetIcon,
     getCoinBalance,
     getCollateral,
     getCollateralIndexForNetwork,
@@ -19,20 +18,22 @@ import {
 } from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
 import { useAccount, useChainId, useClient } from 'wagmi';
+import biconomyConnector from 'utils/biconomyWallet';
 
 const UserCollaterals: React.FC = () => {
     const dispatch = useDispatch();
     const networkId = useChainId();
     const client = useClient();
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const { isConnected, address } = useAccount();
+    const { isConnected, address: walletAddress } = useAccount();
+    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
     const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
     const userSelectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const multipleCollateralBalances = useMultipleCollateralBalanceQuery(
-        address as string,
+        (isBiconomy ? biconomyConnector.address : walletAddress) as string,
         { networkId, client },
         {
             enabled: isAppReady && isConnected,
@@ -54,7 +55,8 @@ const UserCollaterals: React.FC = () => {
     );
 
     const currentCollateral = getCollateral(networkId, userSelectedCollateralIndex);
-    const currentCollateralBalance = collateralsWithBalance.find((col) => col.name === currentCollateral)?.balance || 0;
+    const currentCollateralBalance: number =
+        collateralsWithBalance.find((col) => col.name === currentCollateral)?.balance || 0;
     const currentCollateralWithBalance = { name: currentCollateral, balance: currentCollateralBalance };
 
     const defaultCollateral =
@@ -71,10 +73,15 @@ const UserCollaterals: React.FC = () => {
                 : currentCollateralWithBalance
             : currentCollateralWithBalance;
 
+    const [prevCollateral, setPrevCollateral] = useState<Coins | null>(null);
     const [collateral, setCollateral] = useState(defaultCollateral);
 
+    const isMounted = useRef(false);
+    // auto select collateral which is above threshold
     useEffect(() => {
+        // check collateral balance only on first render or when balance is changed for the same collateral
         if (
+            (!isMounted.current || prevCollateral === collateral.name) &&
             isMultiCollateralSupported &&
             multipleCollateralBalances?.data &&
             currentCollateralBalance <= getMinBalanceThreshold(currentCollateral)
@@ -91,6 +98,8 @@ const UserCollaterals: React.FC = () => {
                 setCollateral(positiveCollateral);
                 dispatch(setSelectedCollateralIndex(getCollateralIndexForNetwork(networkId, positiveCollateral.name)));
             }
+        } else {
+            isMounted.current = true;
         }
     }, [
         multipleCollateralBalances.data,
@@ -100,6 +109,8 @@ const UserCollaterals: React.FC = () => {
         collateralsWithBalance,
         currentCollateral,
         currentCollateralBalance,
+        prevCollateral,
+        collateral.name,
     ]);
 
     useEffect(() => {
@@ -112,17 +123,18 @@ const UserCollaterals: React.FC = () => {
         const selectedCollateral =
             collateralsWithBalance.find((el) => el.name === getCollateral(networkId, userSelectedCollateralIndex)) ||
             collateralsWithBalance[0];
-        setCollateral(selectedCollateral);
+
+        setCollateral((prevCol) => {
+            if (prevCol.name !== selectedCollateral.name) {
+                setPrevCollateral(prevCol.name);
+            }
+            return selectedCollateral;
+        });
     }, [userSelectedCollateralIndex, networkId, collateralsWithBalance]);
 
-    const onCollateralClickHandler = (coinType: Coins) => {
-        dispatch(setSelectedCollateralIndex(getCollateralIndexForNetwork(networkId, coinType)));
+    const onCollateralClickHandler = (coin: Coins) => {
+        dispatch(setSelectedCollateralIndex(getCollateralIndexForNetwork(networkId, coin)));
         setIsDropdownOpen(false);
-    };
-
-    const assetIcon = (type: string) => {
-        const AssetIconElement = getAssetIcon(type as Coins);
-        return <AssetIconElement style={AssetIconStyle} />;
     };
 
     return (
@@ -138,10 +150,8 @@ const UserCollaterals: React.FC = () => {
                                 : onCollateralClickHandler(collateral.name))
                         }
                     >
-                        {assetIcon(collateral.name)}
-                        <BalanceTextWrapper>
-                            <BalanceText>{formatCurrencyWithKey(collateral.name, collateral.balance, 2)}</BalanceText>
-                        </BalanceTextWrapper>
+                        <BalanceText>{formatCurrencyWithKey(collateral.name, collateral.balance, 2)}</BalanceText>
+
                         {isConnected && isMultiCollateralSupported && (
                             <Icon className={isDropdownOpen ? `icon icon--caret-up` : `icon icon--caret-down`} />
                         )}
@@ -154,10 +164,9 @@ const UserCollaterals: React.FC = () => {
                                     $clickable={isConnected}
                                     onClick={() => onCollateralClickHandler(coin.name)}
                                 >
-                                    {assetIcon(coin.name)}
-                                    <BalanceTextWrapper>
-                                        <BalanceText>{formatCurrencyWithKey(coin.name, coin.balance)}</BalanceText>
-                                    </BalanceTextWrapper>
+                                    <AssetIcon className={`currency-icon currency-icon--${coin.name.toLowerCase()}`} />
+
+                                    <AssetName>{formatCurrencyWithKey(coin.name, coin.balance)}</AssetName>
                                 </BalanceWrapper>
                             ))}
                         </Dropdown>
@@ -170,12 +179,14 @@ const UserCollaterals: React.FC = () => {
 
 const Container = styled.div`
     width: 100%;
+    height: 100%;
 `;
 
 const Wrapper = styled(FlexDivRow)`
-    position: relative;
     display: flex;
-    width: 150px;
+    position: relative;
+    height: 100%;
+
     @media (max-width: 500px) {
         min-width: 124px;
         width: 100%;
@@ -185,12 +196,11 @@ const Wrapper = styled(FlexDivRow)`
 const SwapWrapper = styled.div<{ $clickable: boolean }>`
     display: flex;
     align-items: center;
-    width: 100%;
+    justify-content: center;
+    gap: 8px;
+    width: 120px;
+    height: 100%;
     cursor: ${(props) => (props.$clickable ? 'pointer' : 'default')};
-    padding: 4px 13px;
-    @media (max-width: 500px) {
-        padding: 4px 7px;
-    }
 `;
 
 const Dropdown = styled.div`
@@ -198,18 +208,43 @@ const Dropdown = styled.div`
     flex-direction: column;
     position: absolute;
     top: 30px;
-    right: 0;
-    background-color: ${(props) => props.theme.background.secondary};
+    right: -2px;
     border-radius: 8px;
-    width: 150px;
+    border: 2px solid ${(props) => props.theme.dropDown.background.secondary};
+    background: ${(props) => props.theme.dropDown.background.primary};
+    width: 180px;
     padding: 5px;
     text-align: center;
     z-index: 101;
-    gap: 5px;
     @media (max-width: 500px) {
         min-width: 124px;
         width: 100%;
     }
+`;
+
+const Icon = styled.i`
+    font-size: 10px;
+    color: ${(props) => props.theme.textColor.quinary};
+`;
+
+const AssetIcon = styled.i`
+    font-size: 25px;
+    line-height: 100%;
+    margin-right: 10px;
+    background: ${(props) => props.theme.dropDown.background.primary};
+    color: ${(props) => props.theme.dropDown.textColor.primary};
+    border-radius: 50%;
+`;
+
+const BalanceText = styled.span`
+    color: ${(props) => props.theme.textColor.quinary};
+    font-family: ${(props) => props.theme.fontFamily.secondary};
+    font-weight: 700;
+    font-size: 12px;
+`;
+
+const AssetName = styled(BalanceText)`
+    color: ${(props) => props.theme.textColor.primary};
 `;
 
 const BalanceWrapper = styled.div<{ $clickable: boolean }>`
@@ -222,25 +257,10 @@ const BalanceWrapper = styled.div<{ $clickable: boolean }>`
     border-radius: 8px;
     &:hover {
         background: ${(props) => props.theme.background.primary};
+        ${AssetIcon}, ${AssetName} {
+            color: ${(props) => props.theme.dropDown.textColor.secondary};
+        }
     }
-`;
-
-const BalanceTextWrapper = styled.div`
-    text-align: center;
-    margin: auto;
-`;
-
-const BalanceText = styled.span`
-    font-size: 13px;
-    color: ${(props) => props.theme.textColor.primary};
-`;
-
-const AssetIconStyle = { width: '16px', height: '16px', marginRight: '5px' };
-
-const Icon = styled.i`
-    margin-left: auto;
-    font-size: 10px;
-    color: ${(props) => props.theme.textColor.primary};
 `;
 
 export default UserCollaterals;

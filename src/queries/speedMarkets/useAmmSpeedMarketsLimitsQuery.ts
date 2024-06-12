@@ -1,6 +1,10 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
-import { SIDE_TO_POSITION_MAP } from 'constants/market';
+import {
+    MAX_BUYIN_COLLATERAL_CONVERSION_BUFFER_PERCENTAGE,
+    MIN_BUYIN_COLLATERAL_CONVERSION_BUFFER_PERCENTAGE,
+    SIDE_TO_POSITION_MAP,
+} from 'constants/market';
 import { ZERO_ADDRESS } from 'constants/network';
 import QUERY_KEYS from 'constants/queryKeys';
 import { bigNumberFormatter, coinFormatter } from 'thales-utils';
@@ -10,8 +14,6 @@ import { ViemContract } from 'types/viem';
 import { getContarctAbi } from 'utils/contracts/abi';
 import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
 import { getContract, stringToHex } from 'viem';
-
-const MAX_BUYIN_COLLATERAL_CONVERSION_BUFFER = 10;
 
 const useAmmSpeedMarketsLimitsQuery = (
     queryConfig: QueryConfig,
@@ -67,12 +69,12 @@ const useAmmSpeedMarketsLimitsQuery = (
                     ]),
                 ]);
 
-                ammSpeedMarketsLimits.minBuyinAmount = Math.ceil(
-                    coinFormatter(ammParams.minBuyinAmount, queryConfig.networkId)
-                );
+                ammSpeedMarketsLimits.minBuyinAmount =
+                    coinFormatter(ammParams.minBuyinAmount, queryConfig.networkId) /
+                    (1 - MIN_BUYIN_COLLATERAL_CONVERSION_BUFFER_PERCENTAGE);
                 ammSpeedMarketsLimits.maxBuyinAmount =
-                    coinFormatter(ammParams.maxBuyinAmount, queryConfig.networkId) -
-                    MAX_BUYIN_COLLATERAL_CONVERSION_BUFFER;
+                    coinFormatter(ammParams.maxBuyinAmount, queryConfig.networkId) /
+                    (1 + MAX_BUYIN_COLLATERAL_CONVERSION_BUFFER_PERCENTAGE);
                 ammSpeedMarketsLimits.minimalTimeToMaturity = Number(ammParams.minimalTimeToMaturity);
                 ammSpeedMarketsLimits.maximalTimeToMaturity = Number(ammParams.maximalTimeToMaturity);
                 ammSpeedMarketsLimits.maxPriceDelaySec = Number(ammParams.maximumPriceDelay);

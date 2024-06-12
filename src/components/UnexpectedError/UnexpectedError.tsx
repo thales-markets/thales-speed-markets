@@ -22,7 +22,7 @@ const UnexpectedError: React.FC<{ theme: ThemeInterface }> = ({ theme }) => {
     if (crate) {
         if (isMobile()) {
             // notify user with a message
-            crate.notify('Please help us about this issue by writing to Thales/help-and-questions');
+            crate.notify(t('common.errors.unexpected'));
             setTimeout(() => {
                 // change channel to Help and Questions
                 crate.navigate(DISCORD_HELP_CHANNEL_ID);
@@ -60,10 +60,12 @@ const UnexpectedError: React.FC<{ theme: ThemeInterface }> = ({ theme }) => {
             <FlexDivCentered>
                 <Button
                     onClick={tryAgainHandler}
+                    minWidth="130px"
                     margin="10px 0 0 0"
                     backgroundColor={theme.button.background.primary}
-                    borderColor={theme.button.background.primary}
+                    borderColor={theme.button.borderColor.primary}
                     textColor={theme.button.textColor.primary}
+                    fontFamily={theme.fontFamily.secondary}
                 >
                     {t('common.try-again')}
                 </Button>
@@ -81,8 +83,11 @@ const Container = styled(FlexDivColumnCentered)<{ theme: ThemeInterface }>`
     a {
         color: ${(props) => props.theme.link.textColor.primary};
     }
-    button {
-        font-family: ${(props) => props.theme.fontFamily.primary};
+    button:hover {
+        color: ${(props) => props.theme.button.textColor.tertiary};
+    }
+    div:has(> button:hover) {
+        background: ${(props) => props.theme.button.textColor.tertiary};
     }
 `;
 

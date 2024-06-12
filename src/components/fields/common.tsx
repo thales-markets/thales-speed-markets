@@ -19,31 +19,33 @@ export const FieldLabel = styled.label`
 `;
 
 export const Input = styled.input<{ fontSize?: string; width?: string; height?: string }>`
-    background: ${(props) => props.theme.input.background.primary};
-    border: 1px solid ${(props) => props.theme.input.borderColor.primary};
-    box-sizing: border-box;
     mix-blend-mode: normal;
-    border-radius: 8px;
-    height: ${(props) => props.height || '34px'};
+    box-sizing: border-box;
+
+    height: ${(props) => props.height || '40px'};
     width: ${(props) => props.width || '100%'};
     padding: 5px 10px;
+    border: 2px solid ${(props) => props.theme.input.borderColor.primary};
+    border-radius: 8px;
     outline: 0;
-    font-style: normal;
+    background: ${(props) => props.theme.input.background.primary};
+    color: ${(props) => props.theme.input.textColor.secondary};
     font-weight: normal;
     font-size: ${(props) => props.fontSize || '15px'};
     line-height: 18px;
-    color: ${(props) => props.theme.input.textColor.primary};
     text-overflow: ellipsis;
     overflow: hidden;
+
     &::placeholder {
-        color: ${(props) => props.theme.input.textColor.secondary};
+        color: ${(props) => props.theme.input.placeholderColor.primary};
     }
     &::selection {
         color: ${(props) => props.theme.input.textColor.tertiary};
         background: ${(props) => props.theme.input.background.selection.primary};
     }
     &:focus {
-        border: 1px solid ${(props) => props.theme.input.borderColor.focus.primary};
+        color: ${(props) => props.theme.input.textColor.secondary};
+        border: 2px solid ${(props) => props.theme.input.borderColor.focus.primary};
         box-sizing: border-box;
     }
     &:disabled {
@@ -51,6 +53,6 @@ export const Input = styled.input<{ fontSize?: string; width?: string; height?: 
         cursor: default;
     }
     &.error {
-        border: 1px solid ${(props) => props.theme.input.borderColor.error.primary};
+        border: 2px solid ${(props) => props.theme.input.borderColor.error.primary};
     }
 `;

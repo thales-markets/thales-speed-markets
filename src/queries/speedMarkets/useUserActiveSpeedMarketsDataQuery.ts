@@ -1,20 +1,16 @@
-import { EvmPriceServiceConnection, PriceFeed } from '@pythnetwork/pyth-evm-js';
 import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { SIDE_TO_POSITION_MAP, SPEED_MARKETS_QUOTE } from 'constants/market';
-import { ZERO_ADDRESS } from 'constants/network';
-import { CONNECTION_TIMEOUT_MS, PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
+import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
-import { reject } from 'lodash';
 import { bigNumberFormatter, coinFormatter, parseBytes32String } from 'thales-utils';
-import { UserOpenPositions } from 'types/market';
+import { UserPosition } from 'types/market';
 import { QueryConfig } from 'types/network';
 import { ViemContract } from 'types/viem';
 import { getContarctAbi } from 'utils/contracts/abi';
 import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
 import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
-import { getBenchmarksPriceFeeds, getPriceId, getPriceServiceEndpoint } from 'utils/pyth';
-import { getFeesFromHistory, isUserWinner } from 'utils/speedAmm';
+import { getFeesFromHistory } from 'utils/speedAmm';
 import { getContract } from 'viem';
 
 const useUserActiveSpeedMarketsDataQuery = (
@@ -22,10 +18,10 @@ const useUserActiveSpeedMarketsDataQuery = (
     walletAddress: string,
     options?: Omit<UseQueryOptions<any>, 'queryKey' | 'queryFn'>
 ) => {
-    return useQuery<UserOpenPositions[]>({
+    return useQuery<UserPosition[]>({
         queryKey: QUERY_KEYS.User.SpeedMarkets(queryConfig.networkId, walletAddress),
         queryFn: async () => {
-            const userSpeedMarketsData: UserOpenPositions[] = [];
+            const userSpeedMarketsData: UserPosition[] = [];
 
             try {
                 const speedMarketsDataContractLocal = getContract({
@@ -39,10 +35,6 @@ const useUserActiveSpeedMarketsDataQuery = (
                     address: speedMarketsAMMContract.addresses[queryConfig.networkId],
                     client: queryConfig.client,
                 }) as ViemContract;
-
-                const priceConnection = new EvmPriceServiceConnection(getPriceServiceEndpoint(queryConfig.networkId), {
-                    timeout: CONNECTION_TIMEOUT_MS,
-                });
 
                 const ammParams = await speedMarketsDataContractLocal.read.getSpeedMarketsAMMParameters([
                     walletAddress,
@@ -61,60 +53,10 @@ const useUserActiveSpeedMarketsDataQuery = (
                     market: activeMarkets[index],
                 }));
 
-                const unavailablePrices: { priceId: string; publishTime: number }[] = [];
-
-                // Fetch prices for all active matured markets, but not resolved (not in matured on contract)
-                const pricePromises = userActiveMarkets.map((market: any) => {
-                    const isMarketMatured = secondsToMilliseconds(Number(market.strikeTime)) < Date.now();
-                    if (isMarketMatured) {
-                        const priceId = getPriceId(queryConfig.networkId, parseBytes32String(market.asset));
-                        return priceConnection.getPriceFeed(priceId, Number(market.strikeTime)).catch((e) => {
-                            console.log('Pyth price feed error', e);
-                            unavailablePrices.push({
-                                priceId: priceId.replace('0x', ''),
-                                publishTime: Number(market.strikeTime),
-                            });
-                        });
-                    } else {
-                        return reject(`Price still unknown as this is for future time: ${market.strikeTime}`);
-                    }
-                });
-                const priceFeeds = await Promise.allSettled(pricePromises);
-
-                // Secondary API for fetching prices using Pyth benchmarks in case that primary fails
-                const benchmarksPriceFeeds = await getBenchmarksPriceFeeds(unavailablePrices);
-
                 for (let i = 0; i < userActiveMarkets.length; i++) {
                     const marketData = userActiveMarkets[i];
                     const side = SIDE_TO_POSITION_MAP[marketData.direction];
                     const payout = coinFormatter(marketData.buyinAmount, queryConfig.networkId) * SPEED_MARKETS_QUOTE;
-
-                    let isClaimable = false;
-                    let finalPrice = 0;
-                    const isMarketMatured = secondsToMilliseconds(Number(marketData.strikeTime)) < Date.now();
-                    if (isMarketMatured) {
-                        const priceFeed: PromiseSettledResult<PriceFeed> = priceFeeds[i];
-                        if (priceFeed.status === 'fulfilled' && priceFeed.value) {
-                            finalPrice = priceFeed.value.getPriceUnchecked().getPriceAsNumberUnchecked();
-                        } else {
-                            const benchmarksPriceId = getPriceId(
-                                queryConfig.networkId,
-                                parseBytes32String(marketData.asset)
-                            ).replace('0x', '');
-                            finalPrice =
-                                benchmarksPriceFeeds.find(
-                                    (benchmarksPrice) =>
-                                        benchmarksPrice.priceId === benchmarksPriceId &&
-                                        benchmarksPrice.publishTime === Number(marketData.strikeTime)
-                                )?.price || 0;
-                        }
-
-                        isClaimable = !!isUserWinner(
-                            side,
-                            bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS),
-                            finalPrice
-                        );
-                    }
 
                     const maturityDate = secondsToMilliseconds(Number(marketData.strikeTime));
                     const createdAt =
@@ -131,18 +73,20 @@ const useUserActiveSpeedMarketsDataQuery = (
                             : getFeesFromHistory(createdAt).safeBoxImpact;
                     const fees = lpFee + safeBoxImpact;
 
-                    const userData: UserOpenPositions = {
-                        positionAddress: ZERO_ADDRESS,
-                        currencyKey: parseBytes32String(marketData.asset),
-                        strikePrice: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS),
-                        payout: payout,
-                        maturityDate,
+                    const userData: UserPosition = {
+                        user: marketData.user,
                         market: marketData.market,
+                        currencyKey: parseBytes32String(marketData.asset),
                         side,
+                        strikePrice: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS),
+                        maturityDate,
                         paid: coinFormatter(marketData.buyinAmount, queryConfig.networkId) * (1 + fees),
-                        value: payout,
-                        claimable: isClaimable,
-                        finalPrice: finalPrice,
+                        payout: payout,
+                        currentPrice: 0,
+                        finalPrice: 0,
+                        isClaimable: false,
+                        isResolved: false,
+                        createdAt,
                     };
 
                     userSpeedMarketsData.push(userData);
