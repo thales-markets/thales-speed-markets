@@ -156,6 +156,7 @@ const Container = styled.div`
     z-index: 1000;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         top: 48px;
+        padding: 14px 6px;
     }
 `;
 
@@ -193,6 +194,7 @@ const TextLabel = styled.span`
 const Value = styled(TextLabel)`
     color: ${(props) => props.theme.textColor.primary};
     font-weight: 400;
+    white-space: pre;
 `;
 
 const Icon = styled.i`
