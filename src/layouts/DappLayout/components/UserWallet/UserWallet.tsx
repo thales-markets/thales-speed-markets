@@ -57,6 +57,7 @@ const UserWallet: React.FC = () => {
                                   ))}
                     </WalletText>
                 </WalletContainer>
+                <Separator />
                 <UserCollaterals />
             </Wrapper>
         </Container>
@@ -81,12 +82,12 @@ const Wrapper = styled.div`
 
 const WalletContainer = styled.div<{ $isAddress: boolean }>`
     width: 120px;
+    height: 100%;
     min-width: 120px;
     cursor: ${(props) => (props.$isAddress ? 'pointer' : 'text')};
     display: flex;
     justify-content: center;
     align-items: center;
-    border-right: 2px solid ${(props) => props.theme.borderColor.quaternary}};
     padding: 0 10px;
 
     @media (max-width: 500px) {
@@ -106,6 +107,12 @@ const WalletText = styled.span<{ $isAddress: boolean }>`
     ${(props) => (!props.$isAddress ? 'overflow: hidden;' : '')};
     ${(props) => (!props.$isAddress ? 'white-space: nowrap;' : '')};
     ${(props) => (!props.$isAddress ? 'text-overflow: ellipsis;' : '')};
+`;
+
+const Separator = styled.div`
+    width: 4px;
+    height: 12px;
+    background: ${(props) => props.theme.borderColor.quaternary};
 `;
 
 export default UserWallet;

@@ -179,11 +179,13 @@ const UserCollaterals: React.FC = () => {
 
 const Container = styled.div`
     width: 100%;
+    height: 100%;
 `;
 
 const Wrapper = styled(FlexDivRow)`
-    position: relative;
     display: flex;
+    position: relative;
+    height: 100%;
 
     @media (max-width: 500px) {
         min-width: 124px;
@@ -196,9 +198,8 @@ const SwapWrapper = styled.div<{ $clickable: boolean }>`
     align-items: center;
     justify-content: center;
     gap: 8px;
-    width: 100%;
     width: 120px;
-    height: 12px;
+    height: 100%;
     cursor: ${(props) => (props.$clickable ? 'pointer' : 'default')};
 `;
 
