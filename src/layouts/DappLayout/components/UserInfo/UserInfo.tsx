@@ -57,7 +57,7 @@ const UserInfo: React.FC<UserInfoProps> = ({
         >
             <Container>
                 <FlexColumn>
-                    {isBiconomy && (
+                    {isBiconomy ? (
                         <>
                             <FlexDivRowCentered>
                                 <FlexDivColumn>
@@ -66,19 +66,20 @@ const UserInfo: React.FC<UserInfoProps> = ({
                                 </FlexDivColumn>
                             </FlexDivRowCentered>
                             <FlexDivColumn>
-                                <TextLabel>{t('user-info.smart-account')} </TextLabel>
+                                <TextLabel>{t('user-info.deposit-address')} </TextLabel>
                                 <Value>
                                     {biconomyConnector.address.toLowerCase()}
                                     <CopyIcon onClick={handleCopy} className="network-icon network-icon--copy" />
                                 </Value>
                             </FlexDivColumn>
                         </>
+                    ) : (
+                        <FlexDivColumn>
+                            <TextLabel>{t('user-info.eoa')} </TextLabel>
+                            <Value>{address?.toLowerCase()}</Value>
+                        </FlexDivColumn>
                     )}
 
-                    <FlexDivColumn>
-                        <TextLabel>{t('user-info.eoa')} </TextLabel>
-                        <Value>{address?.toLowerCase()}</Value>
-                    </FlexDivColumn>
                     {isBiconomy && (
                         <SessionWrapper>
                             <TextLabel>{t('user-info.session-valid')} </TextLabel>
