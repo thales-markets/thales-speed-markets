@@ -372,6 +372,8 @@
     "user-info": {
         "eoa": "EOA Address",
         "smart-account": "Smart Account Address",
+        "deposit-address": "Deposit Address",
+        "eoa-address-tooltip": "Your EOA address that controls the smart account",
         "copied": "Address copied",
         "copying-address": "Copying Address",
         "docs": "Docs and Tutorials",

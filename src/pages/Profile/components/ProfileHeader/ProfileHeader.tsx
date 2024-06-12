@@ -17,6 +17,7 @@ import {
 } from 'components/ToastMessage/ToastMessage';
 import { toast } from 'react-toastify';
 import { ScreenSizeBreakpoint } from 'enums/ui';
+import Tooltip from 'components/Tooltip';
 
 const ProfileHeader: React.FC = () => {
     const networkId = useChainId();
@@ -46,20 +47,23 @@ const ProfileHeader: React.FC = () => {
                                 <Value>{getUserInfo()?.google_email}</Value>
                             </FlexDivColumn>
                         </FlexDivRowCentered>
-                        <FlexDivColumn>
-                            <TextLabel>{t('user-info.smart-account')} </TextLabel>
-                            <Value>
-                                {biconomyConnector.address.toLowerCase()}
-                                <CopyIcon onClick={handleCopy} className="network-icon network-icon--copy" />
-                            </Value>
-                        </FlexDivColumn>
+                        <Tooltip overlay={t('user-info.deposit-address')}>
+                            <FlexDivColumn>
+                                <TextLabel>{t('user-info.smart-account')} </TextLabel>
+                                <Value>
+                                    {biconomyConnector.address.toLowerCase()}
+                                    <CopyIcon onClick={handleCopy} className="network-icon network-icon--copy" />
+                                </Value>
+                            </FlexDivColumn>
+                        </Tooltip>
                     </>
                 )}
-
-                <FlexDivColumn>
-                    <TextLabel>{t('user-info.eoa')} </TextLabel>
-                    <Value>{address?.toLowerCase()}</Value>
-                </FlexDivColumn>
+                <Tooltip overlay={t('user-info.eoa-address-tooltip')}>
+                    <FlexDivColumn>
+                        <TextLabel>{t('user-info.eoa')} </TextLabel>
+                        <Value>{address?.toLowerCase()}</Value>
+                    </FlexDivColumn>
+                </Tooltip>
                 {isBiconomy && (
                     <SessionWrapper>
                         <TextLabel>{t('user-info.session-valid')}: </TextLabel>
