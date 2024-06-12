@@ -166,6 +166,7 @@ const BalanceWrapper = styled(FlexDiv)`
     padding: 16px 30px;
     border-radius: 15px;
     gap: 20px;
+    height: 100%;
     flex-direction: column;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         padding: 16px 10px;

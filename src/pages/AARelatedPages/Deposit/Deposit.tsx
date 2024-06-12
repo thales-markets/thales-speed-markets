@@ -76,7 +76,7 @@ const Deposit: React.FC = () => {
             </LinkContainer>
             <Description>{t('deposit.description')}</Description>
             <Container>
-                <div>
+                <SidesWrapper>
                     <DepositContainer>
                         <Label>
                             {t('deposit.tokens', {
@@ -136,8 +136,8 @@ const Deposit: React.FC = () => {
                             </Button>
                         </OnRampWrapper>
                     </DepositContainer>
-                </div>
-                <div>
+                </SidesWrapper>
+                <SidesWrapper>
                     <TotalBalance hideDepositButton />
                     <TutorialsWrapper>
                         <TutorialHeader>{t('deposit.tutorials')}</TutorialHeader>
@@ -147,7 +147,7 @@ const Deposit: React.FC = () => {
                             </SPAAnchor>
                         ))}
                     </TutorialsWrapper>
-                </div>
+                </SidesWrapper>
             </Container>
 
             {showQRModal && (
@@ -196,6 +196,7 @@ const Wrapper = styled.div`
 `;
 
 const Container = styled(FlexDiv)`
+    width: 100%;
     gap: 30px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         width: 100%;
@@ -393,4 +394,8 @@ const TokenIcon = styled.i`
     color: ${(props) => props.theme.background.primary};
     font-weight: 100;
     text-transform: none;
+`;
+
+const SidesWrapper = styled.div`
+    width: 100%;
 `;

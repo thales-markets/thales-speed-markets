@@ -35,7 +35,7 @@ const ProfileHeader: React.FC = () => {
     return (
         <Container>
             <FlexColumn>
-                {isBiconomy && (
+                {isBiconomy ? (
                     <>
                         <FlexDivRowCentered>
                             <FlexDivColumn>
@@ -52,19 +52,22 @@ const ProfileHeader: React.FC = () => {
                                 </Value>
                             </FlexDivColumn>
                         </Tooltip>
+                        <Tooltip overlay={t('user-info.eoa-address-tooltip')}>
+                            <FlexDivColumn>
+                                <TextLabel>{t('user-info.eoa')} </TextLabel>
+                                <Value>{address?.toLowerCase()}</Value>
+                            </FlexDivColumn>
+                        </Tooltip>
+                        <SessionWrapper>
+                            <TextLabel>{t('user-info.session-valid')}: </TextLabel>
+                            <Value>{formatShortDateWithFullTime(Number(validUntil) * 1000)}</Value>
+                        </SessionWrapper>
                     </>
-                )}
-                <Tooltip overlay={t('user-info.eoa-address-tooltip')}>
+                ) : (
                     <FlexDivColumn>
-                        <TextLabel>{t('user-info.eoa')} </TextLabel>
+                        <TextLabel>{t('user-info.deposit-address')} </TextLabel>
                         <Value>{address?.toLowerCase()}</Value>
                     </FlexDivColumn>
-                </Tooltip>
-                {isBiconomy && (
-                    <SessionWrapper>
-                        <TextLabel>{t('user-info.session-valid')}: </TextLabel>
-                        <Value>{formatShortDateWithFullTime(Number(validUntil) * 1000)}</Value>
-                    </SessionWrapper>
                 )}
             </FlexColumn>
         </Container>
@@ -74,7 +77,9 @@ const ProfileHeader: React.FC = () => {
 const Container = styled(FlexDivSpaceBetween)`
     width: 100%;
     align-items: flex-start;
+    padding-top: 18px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        padding-top: 0;
         flex-direction: column;
         gap: 10px;
     }

@@ -75,7 +75,7 @@ const UserInfo: React.FC<UserInfoProps> = ({
                         </>
                     ) : (
                         <FlexDivColumn>
-                            <TextLabel>{t('user-info.eoa')} </TextLabel>
+                            <TextLabel>{t('user-info.deposit-address')} </TextLabel>
                             <Value>{address?.toLowerCase()}</Value>
                         </FlexDivColumn>
                     )}

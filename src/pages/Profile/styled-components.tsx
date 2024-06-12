@@ -1,6 +1,6 @@
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import styled from 'styled-components';
-import { FlexDivCentered, FlexDivColumn, PAGE_MAX_WIDTH } from 'styles/common';
+import { FlexDiv, FlexDivColumn, PAGE_MAX_WIDTH } from 'styles/common';
 
 export const Container = styled(FlexDivColumn)`
     width: 100%;
@@ -11,7 +11,7 @@ export const Container = styled(FlexDivColumn)`
     }
 `;
 
-export const Header = styled(FlexDivCentered)`
+export const Header = styled(FlexDiv)`
     width: 100%;
     gap: 20px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {

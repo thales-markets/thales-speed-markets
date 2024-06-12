@@ -1,3 +1,4 @@
+import { ScreenSizeBreakpoint } from 'enums/ui';
 import styled from 'styled-components';
 import { FlexDiv } from 'styles/common';
 
@@ -11,7 +12,8 @@ export const Wrapper = styled(FlexDiv)`
     background-color: ${(props) => props.theme.background.primary};
     border-radius: 15px;
     padding: 25px 40px 10px;
-    @media (max-width: 600px) {
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        padding: 25px 0;
         margin-top: 20px;
         flex-wrap: wrap-reverse;
     }
