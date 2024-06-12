@@ -614,7 +614,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             const skewImpactParam = positionType ? parseUnits(skewImpact[positionType].toString(), 18) : undefined;
 
             // contract doesn't support ETH so convert it to WETH when ETH is selected
-            if (isEth) {
+            if (isEth && !isBiconomy) {
                 const wethContractWithSigner = getContract({
                     abi: multipleCollateral.WETH.abi,
                     address: multipleCollateral.WETH.addresses[networkId],
@@ -639,7 +639,8 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 collateralAddressParam,
                 referral as string,
                 skewImpactParam as any,
-                isBiconomy
+                isBiconomy,
+                isEth
             );
 
             const txReceipt = await waitForTransactionReceipt(client as Client, { hash });

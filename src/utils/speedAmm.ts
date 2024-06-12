@@ -37,7 +37,8 @@ export const getTransactionForSpeedAMM = async (
     collateralAddress: string,
     referral: string | null,
     skewImpact?: bigint,
-    isBiconomy?: boolean
+    isBiconomy?: boolean,
+    isEth?: boolean
 ) => {
     let txHash;
     const isChained = sides.length > 1;
@@ -62,7 +63,10 @@ export const getTransactionForSpeedAMM = async (
                         buyInAmount,
                         referral || ZERO_ADDRESS,
                     ],
-                ]
+                ],
+                undefined,
+                isEth,
+                buyInAmount
             );
         } else {
             txHash = await creatorContractWithSigner.write.addPendingChainedSpeedMarket([
@@ -100,7 +104,10 @@ export const getTransactionForSpeedAMM = async (
                         referral || ZERO_ADDRESS,
                         skewImpact,
                     ],
-                ]
+                ],
+                undefined,
+                isEth,
+                buyInAmount
             );
         } else {
             txHash = await creatorContractWithSigner.write.addPendingSpeedMarket([

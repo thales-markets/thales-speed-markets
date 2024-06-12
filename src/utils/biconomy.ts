@@ -3,6 +3,7 @@ import biconomyConnector from './biconomyWallet';
 import { SupportedNetwork } from 'types/network';
 import { ViemContract } from 'types/viem';
 import {
+    Client,
     createPublicClient,
     createWalletClient,
     encodeFunctionData,
@@ -19,6 +20,7 @@ import erc20Contract from './contracts/collateralContract';
 import chainedSpeedMarketsAMMContract from './contracts/chainedSpeedMarketsAMMContract';
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 import { checkAllowance } from './network';
+import multipleCollateral from './contracts/multipleCollateralContract';
 
 export const executeBiconomyTransactionWithConfirmation = async (
     collateral: string,
@@ -64,7 +66,9 @@ export const executeBiconomyTransaction = async (
     contract: ViemContract | undefined,
     methodName: string,
     data?: ReadonlyArray<any>,
-    value?: any
+    value?: any,
+    isEth?: boolean,
+    buyInAmountParam?: bigint
 ): Promise<any | undefined> => {
     if (biconomyConnector.wallet && contract) {
         console.log('networkID: ', networkId);
@@ -96,15 +100,46 @@ export const executeBiconomyTransaction = async (
                     biconomyConnector.wallet.biconomySmartAccountConfig.chainId,
                     collateral
                 );
+                if (isEth) {
+                    // swap eth to weth
+                    const client = createPublicClient({
+                        chain: networkId as any,
+                        transport: http(biconomyConnector.wallet?.rpcProvider.transport.url),
+                    });
+
+                    const wethContractWithSigner = getContract({
+                        abi: multipleCollateral.WETH.abi,
+                        address: multipleCollateral.WETH.addresses[networkId],
+                        client: client as Client,
+                    });
+
+                    const encodedCallWrapEth = encodeFunctionData({
+                        abi: wethContractWithSigner.abi,
+                        functionName: 'deposit',
+                        args: [],
+                    });
+
+                    const wrapEthTx = {
+                        to: wethContractWithSigner.address,
+                        data: encodedCallWrapEth,
+                        value: buyInAmountParam,
+                    };
+                    transactionArray.push(wrapEthTx);
+                }
                 transactionArray.push(transaction);
 
-                const { wait } = await biconomyConnector.wallet.sendTransaction(transactionArray, {
-                    paymasterServiceData: {
-                        mode: PaymasterMode.ERC20,
-                        preferredToken: collateral,
-                        maxApproval: true,
-                    },
-                });
+                const { wait } = await biconomyConnector.wallet.sendTransaction(
+                    transactionArray,
+                    isEth
+                        ? {
+                              paymasterServiceData: {
+                                  mode: PaymasterMode.ERC20,
+                                  preferredToken: collateral,
+                                  maxApproval: true,
+                              },
+                          }
+                        : {}
+                );
 
                 const {
                     receipt: { transactionHash },
@@ -131,16 +166,54 @@ export const executeBiconomyTransaction = async (
         } else {
             try {
                 const sessionSigner = await getSessionSigner(networkId);
-                const { wait } = await biconomyConnector.wallet.sendTransaction(transaction, {
-                    paymasterServiceData: {
-                        mode: PaymasterMode.ERC20,
-                        preferredToken: collateral,
-                    },
-                    params: {
-                        sessionSigner: sessionSigner,
-                        sessionValidationModule: import.meta.env['VITE_APP_SVM_ADDRESS_' + networkId],
-                    },
-                });
+                const transactionArray = [];
+                if (isEth) {
+                    // swap eth to weth
+                    const client = createPublicClient({
+                        chain: networkId as any,
+                        transport: http(biconomyConnector.wallet?.rpcProvider.transport.url),
+                    });
+
+                    const wethContractWithSigner = getContract({
+                        abi: multipleCollateral.WETH.abi,
+                        address: multipleCollateral.WETH.addresses[networkId],
+                        client: client as Client,
+                    });
+
+                    const encodedCallWrapEth = encodeFunctionData({
+                        abi: wethContractWithSigner.abi,
+                        functionName: 'deposit',
+                        args: [],
+                    });
+
+                    const wrapEthTx = {
+                        to: wethContractWithSigner.address,
+                        data: encodedCallWrapEth,
+                        value: buyInAmountParam,
+                    };
+                    transactionArray.push(wrapEthTx);
+                }
+                transactionArray.push(transaction);
+                const { wait } = await biconomyConnector.wallet.sendTransaction(
+                    transactionArray,
+                    isEth
+                        ? {
+                              params: {
+                                  sessionSigner: sessionSigner,
+                                  sessionValidationModule: import.meta.env['VITE_APP_SVM_ADDRESS_' + networkId],
+                              },
+                          }
+                        : {
+                              paymasterServiceData: {
+                                  mode: PaymasterMode.ERC20,
+                                  preferredToken: collateral,
+                              },
+                              params: {
+                                  sessionSigner: sessionSigner,
+                                  sessionValidationModule: import.meta.env['VITE_APP_SVM_ADDRESS_' + networkId],
+                              },
+                          }
+                );
 
                 const {
                     receipt: { transactionHash },
