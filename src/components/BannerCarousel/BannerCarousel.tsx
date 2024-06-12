@@ -44,10 +44,10 @@ const BannerCarousel: React.FC = () => {
 
 const Container = styled.div`
     position: relative;
-    width: 974px;
-    height: 130px;
     max-width: 100%;
+    height: 130px;
     overflow: hidden;
+    border: 1px solid ${(props) => props.theme.borderColor.quaternary};
     border-radius: 11px;
     margin: 0 0 20px 0;
     z-index: 0;
@@ -58,8 +58,7 @@ const Container = styled.div`
 
 const StyledDiv = styled.div<{ image: string; hasHref: boolean }>`
     max-width: 100%;
-    width: 974px;
-    height: 120px;
+    height: 130px;
     background-image: ${(props) => `url(${props.image})`};
     cursor: ${(props) => (props.hasHref ? 'pointer' : 'default')};
     background-position: center;
