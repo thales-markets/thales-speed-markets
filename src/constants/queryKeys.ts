@@ -1,6 +1,7 @@
 import { NetworkId } from 'thales-utils';
 
 const QUERY_KEYS = {
+    Banners: (networkId: NetworkId) => ['banners', networkId],
     WalletBalances: {
         StableCoinBalance: (walletAddress: string, networkId: NetworkId) => [
             'walletBalances',

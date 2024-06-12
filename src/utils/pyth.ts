@@ -11,7 +11,7 @@ import {
 import { NetworkId, bigNumberFormatter, floorNumberToDecimals } from 'thales-utils';
 import { parseUnits } from 'viem';
 
-export const getPriceServiceEndpoint = (networkId: NetworkId) => {
+const getPriceServiceEndpoint = (networkId: NetworkId) => {
     if ([NetworkId.OptimismSepolia, NetworkId.ZkSyncSepolia, NetworkId.BlastSepolia].includes(networkId)) {
         return PRICE_SERVICE_ENDPOINTS.testnet;
     } else {

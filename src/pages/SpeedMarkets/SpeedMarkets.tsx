@@ -1,4 +1,3 @@
-import banner from 'assets/images/speed-markets-banner.png';
 import Modal from 'components/Modal';
 import PageLinkBanner from 'components/PageLinkBanner';
 import SPAAnchor from 'components/SPAAnchor/SPAAnchor';
@@ -36,6 +35,7 @@ import SelectBuyin from './components/SelectBuyin';
 import SelectPosition from './components/SelectPosition';
 import { SelectedPosition } from './components/SelectPosition/SelectPosition';
 import SelectTime from './components/SelectTime';
+import BannerCarousel from 'components/BannerCarousel';
 
 const SpeedMarkets: React.FC = () => {
     const { t } = useTranslation();
@@ -219,7 +219,7 @@ const SpeedMarkets: React.FC = () => {
                 <SimpleLoader />
             ) : (
                 <>
-                    <HeaderImage />
+                    <BannerCarousel />
                     <ContentWrapper>
                         <LeftSide>
                             <Info>
@@ -346,17 +346,6 @@ const Container = styled.div`
     min-height: 580px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         min-height: 190px;
-    }
-`;
-
-const HeaderImage = styled.div`
-    height: 130px;
-    background-image: url(${banner});
-    background-position: center;
-    border: 1px solid ${(props) => props.theme.borderColor.quaternary};
-    border-radius: 11px;
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        display: none;
     }
 `;
 
