@@ -46,7 +46,7 @@ const UserInfo: React.FC<UserInfoProps> = ({
     const handleCopy = () => {
         const id = toast.loading(t('user-info.copying-address'), getLoadingToastOptions());
         try {
-            navigator.clipboard.writeText(biconomyConnector.address);
+            navigator.clipboard.writeText(isBiconomy ? biconomyConnector.address : (address as string));
             toast.update(id, getInfoToastOptions(t('user-info.copied'), id));
         } catch (e) {
             toast.update(id, getErrorToastOptions('Error', id));
@@ -80,7 +80,10 @@ const UserInfo: React.FC<UserInfoProps> = ({
                     ) : (
                         <FlexDivColumn>
                             <TextLabel>{t('user-info.deposit-address')} </TextLabel>
-                            <Value>{address?.toLowerCase()}</Value>
+                            <Value>
+                                {address?.toLowerCase()}
+                                <CopyIcon onClick={handleCopy} className="network-icon network-icon--copy" />
+                            </Value>
                         </FlexDivColumn>
                     )}
 
