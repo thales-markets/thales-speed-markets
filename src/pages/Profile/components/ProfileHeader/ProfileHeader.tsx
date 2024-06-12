@@ -64,7 +64,7 @@ const ProfileHeader: React.FC = () => {
                         </Tooltip>
                         <SessionWrapper>
                             <TextLabel>{t('user-info.session-valid')}: </TextLabel>
-                            <Value>{formatShortDateWithFullTime(Number(validUntil) * 1000)}</Value>
+                            <Value>{validUntil ? formatShortDateWithFullTime(Number(validUntil) * 1000) : '-'}</Value>
                         </SessionWrapper>
                     </>
                 ) : (

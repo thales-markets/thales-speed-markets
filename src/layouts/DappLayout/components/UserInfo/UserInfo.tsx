@@ -90,7 +90,7 @@ const UserInfo: React.FC<UserInfoProps> = ({
                     {isBiconomy && (
                         <SessionWrapper>
                             <TextLabel>{t('user-info.session-valid')} </TextLabel>
-                            <Value>{formatShortDateWithFullTime(Number(validUntil) * 1000)}</Value>
+                            <Value>{validUntil ? formatShortDateWithFullTime(Number(validUntil) * 1000) : '-'}</Value>
                         </SessionWrapper>
                     )}
                 </FlexColumn>
