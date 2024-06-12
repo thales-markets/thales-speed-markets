@@ -66,11 +66,11 @@
         },
         "wallet": {
             "connect-your-wallet": "Login",
-            "wallet-options": "Wallet options",
             "disclaimer-info": "By Singing Up to Speed Markets  <terms>Terms of Use</terms> and Privacy Policy you acknowledge that you have read and understand the Thales DAO protocol <disclaimer>disclaimer</disclaimer>.",
             "connect-wallet-modal-title": "Sign Up to speed markets",
             "connect-with-wallet": "Connect with wallet",
-            "or-connect-with": "Or"
+            "or-connect-with": "Or",
+            "copy-address": "Copy address"
         },
         "errors": {
             "unknown-error-try-again": "An unknown error occurred after you submitted. Please try again.",

@@ -1,23 +1,27 @@
+import { getUserInfo } from '@particle-network/auth-core';
+import OutsideClick from 'components/OutsideClick';
+import SPAAnchor from 'components/SPAAnchor';
+import {
+    getErrorToastOptions,
+    getInfoToastOptions,
+    getLoadingToastOptions,
+} from 'components/ToastMessage/ToastMessage';
+import { LINKS } from 'constants/links';
+import ROUTES from 'constants/routes';
+import { LOCAL_STORAGE_KEYS } from 'constants/storage';
+import { ScreenSizeBreakpoint } from 'enums/ui';
+import { t } from 'i18next';
 import React from 'react';
+import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+import { getIsBiconomy } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivColumn, FlexDivRowCentered, FlexDivStart } from 'styles/common';
-import { getUserInfo } from '@particle-network/auth-core';
-import biconomyConnector from 'utils/biconomyWallet';
-import { toast } from 'react-toastify';
-import { getErrorToastOptions, getInfoToastOptions } from 'components/ToastMessage/ToastMessage';
-import { t } from 'i18next';
-import { formatShortDateWithFullTime } from 'utils/formatters/date';
-import { useAccount, useChainId, useDisconnect } from 'wagmi';
-import { LOCAL_STORAGE_KEYS } from 'constants/storage';
-import SPAAnchor from 'components/SPAAnchor';
-import { buildHref } from 'utils/routes';
-import ROUTES from 'constants/routes';
-import OutsideClick from 'components/OutsideClick';
-import { useSelector } from 'react-redux';
-import { getIsBiconomy } from 'redux/modules/wallet';
 import { RootState } from 'types/ui';
-import { LINKS } from 'constants/links';
-import { ScreenSizeBreakpoint } from 'enums/ui';
+import biconomyConnector from 'utils/biconomyWallet';
+import { formatShortDateWithFullTime } from 'utils/formatters/date';
+import { buildHref } from 'utils/routes';
+import { useAccount, useChainId, useDisconnect } from 'wagmi';
 
 type UserInfoProps = {
     setUserInfoOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -40,12 +44,12 @@ const UserInfo: React.FC<UserInfoProps> = ({
     const validUntil = window.localStorage.getItem(LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId]);
 
     const handleCopy = () => {
-        const id = toast.loading(t('user-info.copying-address'));
+        const id = toast.loading(t('user-info.copying-address'), getLoadingToastOptions());
         try {
             navigator.clipboard.writeText(biconomyConnector.address);
-            toast.update(id, getInfoToastOptions(t('user-info.copied'), ''));
+            toast.update(id, getInfoToastOptions(t('user-info.copied'), id));
         } catch (e) {
-            toast.update(id, getErrorToastOptions('Error', ''));
+            toast.update(id, getErrorToastOptions('Error', id));
         }
     };
 

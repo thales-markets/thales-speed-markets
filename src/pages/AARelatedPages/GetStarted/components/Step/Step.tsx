@@ -1,7 +1,11 @@
 import Button from 'components/Button';
 import Modal from 'components/Modal';
 import OutsideClick from 'components/OutsideClick';
-import { getErrorToastOptions, getInfoToastOptions } from 'components/ToastMessage/ToastMessage';
+import {
+    getErrorToastOptions,
+    getInfoToastOptions,
+    getLoadingToastOptions,
+} from 'components/ToastMessage/ToastMessage';
 import ROUTES from 'constants/routes';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import { GetStartedStep } from 'enums/wizard';
@@ -122,12 +126,12 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
     const changeCurrentStep = () => (isDisabled ? null : setCurrentStep(stepType));
 
     const handleCopy = () => {
-        const id = toast.loading(t('user-info.copying-address'));
+        const id = toast.loading(t('user-info.copying-address'), getLoadingToastOptions());
         try {
             navigator.clipboard.writeText(isBiconomy ? biconomyConnector.address : (walletAddress as string));
-            toast.update(id, getInfoToastOptions(t('user-info.copied'), ''));
+            toast.update(id, getInfoToastOptions(t('user-info.copied'), id));
         } catch (e) {
-            toast.update(id, getErrorToastOptions('Error', ''));
+            toast.update(id, getErrorToastOptions('Error', id));
         }
     };
 

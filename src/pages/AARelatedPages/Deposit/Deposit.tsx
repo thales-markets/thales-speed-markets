@@ -1,28 +1,32 @@
 import Button from 'components/Button';
+import Modal from 'components/Modal';
+import OutsideClick from 'components/OutsideClick';
 import SPAAnchor from 'components/SPAAnchor';
+import {
+    getErrorToastOptions,
+    getInfoToastOptions,
+    getLoadingToastOptions,
+} from 'components/ToastMessage/ToastMessage';
+import TotalBalance from 'components/TotalBalance';
 import ROUTES from 'constants/routes';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import { LinkContainer, LinkWrapper, NavigationIcon } from 'pages/SpeedMarketsOverview/SpeedMarketsOverview';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import { getIsBiconomy } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDiv } from 'styles/common';
+import { Coins } from 'thales-utils';
 import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
-import { buildHref } from 'utils/routes';
-import { useChainId, useAccount } from 'wagmi';
-import QRCodeModal from '../Withdraw/components/QRCodeModal';
-import Modal from 'components/Modal';
-import OutsideClick from 'components/OutsideClick';
-import { getOnRamperUrl } from 'utils/particleWallet/utils';
-import { getInfoToastOptions, getErrorToastOptions } from 'components/ToastMessage/ToastMessage';
-import { toast } from 'react-toastify';
-import TotalBalance from 'components/TotalBalance';
-import { getNetworkNameByNetworkId } from 'utils/network';
 import { getCollaterals } from 'utils/currency';
-import { Coins } from 'thales-utils';
+import { getNetworkNameByNetworkId } from 'utils/network';
+import { getOnRamperUrl } from 'utils/particleWallet/utils';
+import { buildHref } from 'utils/routes';
+import { useAccount, useChainId } from 'wagmi';
+import QRCodeModal from '../Withdraw/components/QRCodeModal';
 
 const Tutorials = [
     {
@@ -54,12 +58,12 @@ const Deposit: React.FC = () => {
     }, [networkId, apiKey]);
 
     const handleCopy = () => {
-        const id = toast.loading(t('user-info.copying-address'));
+        const id = toast.loading(t('user-info.copying-address'), getLoadingToastOptions());
         try {
             navigator.clipboard.writeText(isBiconomy ? biconomyConnector.address : (walletAddress as string));
-            toast.update(id, getInfoToastOptions(t('user-info.copied'), ''));
+            toast.update(id, getInfoToastOptions(t('user-info.copied'), id));
         } catch (e) {
-            toast.update(id, getErrorToastOptions('Error', ''));
+            toast.update(id, getErrorToastOptions('Error', id));
         }
     };
 

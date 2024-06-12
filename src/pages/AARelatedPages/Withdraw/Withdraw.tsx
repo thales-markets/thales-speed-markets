@@ -7,17 +7,26 @@ import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipl
 import queryString from 'query-string';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
+import Modal from 'components/Modal';
+import {
+    getErrorToastOptions,
+    getLoadingToastOptions,
+    getSuccessToastOptions,
+} from 'components/ToastMessage/ToastMessage';
 import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsBiconomy } from 'redux/modules/wallet';
+import { coinParser } from 'thales-utils';
 import { RootState } from 'types/ui';
+import { ViemContract } from 'types/viem';
+import { executeBiconomyTransactionWithConfirmation } from 'utils/biconomy';
 import biconomyConnector from 'utils/biconomyWallet';
+import multipleCollateral from 'utils/contracts/multipleCollateralContract';
 import { getCollaterals } from 'utils/currency';
 import { getNetworkNameByNetworkId } from 'utils/network';
 import { getContract, isAddress } from 'viem';
-import { useAccount, useChainId, useClient } from 'wagmi';
-import CollateralDropdown from './components/CollateralDropdown';
+import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 import {
     FormContainer,
     InputContainer,
@@ -26,14 +35,7 @@ import {
     WarningIcon,
     Wrapper,
 } from '../styled-components';
-import Modal from 'components/Modal';
-import { executeBiconomyTransactionWithConfirmation } from 'utils/biconomy';
-import { getErrorToastOptions, getSuccessToastOptions } from 'components/ToastMessage/ToastMessage';
-import { toast } from 'react-toastify';
-import multipleCollateral from 'utils/contracts/multipleCollateralContract';
-import { useWalletClient } from 'wagmi';
-import { ViemContract } from 'types/viem';
-import { coinParser } from 'thales-utils';
+import CollateralDropdown from './components/CollateralDropdown';
 
 type FormValidation = {
     walletAddress: boolean;
@@ -107,8 +109,8 @@ const Withdraw: React.FC<DepositProps> = ({ isOpen, onClose }) => {
     };
 
     const handleSubmit = async () => {
-        const id = toast.loading(t('withdraw.toast-messages.pending'));
-        console.log('submit');
+        const id = toast.loading(t('withdraw.toast-messages.pending'), getLoadingToastOptions());
+
         try {
             if (multipleCollateral && walletClient.data) {
                 const collateralContractWithSigner = getContract({
@@ -126,11 +128,11 @@ const Withdraw: React.FC<DepositProps> = ({ isOpen, onClose }) => {
                         coinParser('' + amount, networkId, getCollaterals(networkId)[selectedToken]),
                     ]
                 );
-                toast.update(id, getSuccessToastOptions(t('withdraw.toast-messages.success'), ''));
+                toast.update(id, getSuccessToastOptions(t('withdraw.toast-messages.success'), id));
             }
         } catch (e) {
             console.log('Error ', e);
-            toast.update(id, getErrorToastOptions(t('withdraw.toast-messages.error'), ''));
+            toast.update(id, getErrorToastOptions(t('withdraw.toast-messages.error'), id));
         }
     };
 

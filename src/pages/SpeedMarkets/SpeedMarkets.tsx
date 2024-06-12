@@ -353,7 +353,7 @@ const HeaderImage = styled.div`
     height: 130px;
     background-image: url(${banner});
     background-position: center;
-    border: 1px solid ${(props) => props.theme.borderColor.quinary};
+    border: 1px solid ${(props) => props.theme.borderColor.quaternary};
     border-radius: 11px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         display: none;
