@@ -158,12 +158,6 @@ const SpeedMarkets: React.FC = () => {
     }, [networkId, resetData]);
 
     useEffect(() => {
-        if (isResetTriggered) {
-            setIsResetTriggered(false);
-        }
-    }, [isResetTriggered]);
-
-    useEffect(() => {
         setBuyinAmount(0);
     }, [isChained]);
 
@@ -180,6 +174,7 @@ const SpeedMarkets: React.FC = () => {
                         onDeltaChange={setDeltaTimeSec}
                         ammSpeedMarketsLimits={ammSpeedMarketsLimitsData}
                         isResetTriggered={isResetTriggered}
+                        setIsResetTriggered={setIsResetTriggered}
                         isChained={isChained}
                     />
                 )}
@@ -203,6 +198,7 @@ const SpeedMarkets: React.FC = () => {
                         onDeltaChange={setDeltaTimeSec}
                         ammSpeedMarketsLimits={ammSpeedMarketsLimitsData}
                         isResetTriggered={isResetTriggered}
+                        setIsResetTriggered={setIsResetTriggered}
                         isChained={isChained}
                     />
                 )}
@@ -215,6 +211,7 @@ const SpeedMarkets: React.FC = () => {
                         ammChainedSpeedMarketsLimits={ammChainedSpeedMarketsLimitsData}
                         currencyKey={currencyKey}
                         isResetTriggered={isResetTriggered}
+                        setIsResetTriggered={setIsResetTriggered}
                         setHasError={setHasError}
                     />
                 )}

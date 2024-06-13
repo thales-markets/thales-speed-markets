@@ -40,6 +40,7 @@ type SelectBuyinProps = {
     ammChainedSpeedMarketsLimits: AmmChainedSpeedMarketsLimits | null;
     currencyKey: string;
     isResetTriggered: boolean;
+    setIsResetTriggered: React.Dispatch<boolean>;
     setHasError: React.Dispatch<boolean>;
 };
 
@@ -53,6 +54,7 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
     ammChainedSpeedMarketsLimits,
     currencyKey,
     isResetTriggered,
+    setIsResetTriggered,
     setHasError,
 }) => {
     const networkId = useChainId();
@@ -273,8 +275,9 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
         if (isResetTriggered) {
             setBuyinAmount(0);
             setSelectedStableBuyinAmount(0);
+            setIsResetTriggered(false);
         }
-    }, [isResetTriggered]);
+    }, [isResetTriggered, setIsResetTriggered]);
 
     const onMaxClick = () => {
         const maxWalletAmount = isConnected
