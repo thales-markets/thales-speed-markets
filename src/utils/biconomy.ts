@@ -162,9 +162,7 @@ export const executeBiconomyTransaction = async (
             }
         };
 
-        const approved = await hasAllowance(networkId, collateral as `0x{string}`);
-
-        if (!approved || !validUntil || Number(nowDate) > Number(dateUntilValid)) {
+        if (!validUntil || Number(nowDate) > Number(dateUntilValid)) {
             const txHash = await createSessionAndExecuteTxs();
             return txHash;
         } else {
