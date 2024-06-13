@@ -81,6 +81,17 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
         });
     };
 
+    const onClearAllHandle = () => {
+        resetData();
+        setIsChained(false);
+        history.push({
+            pathname: location.pathname,
+            search: queryString.stringify({
+                isChained: false,
+            }),
+        });
+    };
+
     const getBonusTooltip = (isBonusUnknown: boolean, direction: Positions, bonus: string) => (
         <Tooltip
             overlay={
@@ -104,7 +115,7 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
                 <FlexDivSpaceBetween>
                     <HeaderText> {t('speed-markets.steps.choose-direction')}</HeaderText>
                     {selected.length > 1 && (
-                        <ClearAll onClick={() => resetData()}>
+                        <ClearAll onClick={onClearAllHandle}>
                             {t('speed-markets.chained.clear-all')}
                             <IconWrong className="icon icon--wrong" />
                         </ClearAll>

@@ -28,7 +28,7 @@ import { roundNumberToDecimals } from 'thales-utils';
 import { RootState } from 'types/ui';
 import { getSupportedNetworksByRoute } from 'utils/network';
 import { getCurrentPrices, getPriceConnection, getPriceId, getSupportedAssetsAsObject } from 'utils/pyth';
-import { buildHref, history } from 'utils/routes';
+import { buildHref } from 'utils/routes';
 import { useAccount, useChainId, useClient } from 'wagmi';
 import AmmSpeedTrading from './components/AmmSpeedTrading';
 import SelectAsset from './components/SelectAsset';
@@ -135,17 +135,10 @@ const SpeedMarkets: React.FC = () => {
         if (ammChainedSpeedMarketsLimitsData?.minChainedMarkets) {
             setChainedPositions(Array(ammChainedSpeedMarketsLimitsData.minChainedMarkets).fill(undefined));
         }
-        setIsChained(false);
-        history.push({
-            pathname: location.pathname,
-            search: queryString.stringify({
-                isChained: false,
-            }),
-        });
 
         setDeltaTimeSec(0);
         setBuyinAmount(0);
-    }, [ammChainedSpeedMarketsLimitsData?.minChainedMarkets, location.pathname]);
+    }, [ammChainedSpeedMarketsLimitsData?.minChainedMarkets]);
 
     useEffect(() => {
         if (!isConnected) {
