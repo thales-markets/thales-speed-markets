@@ -128,8 +128,6 @@ const SpeedMarkets: React.FC = () => {
         fetchCurrentPrices();
     }, secondsToMilliseconds(5));
 
-    console.log('IsResetTriggered', isResetTriggered);
-
     const resetData = useCallback(() => {
         setIsResetTriggered(true);
         setPositionType(undefined);
