@@ -77,6 +77,8 @@ export const executeBiconomyTransaction = async (
         console.log('methodName: ', methodName);
         console.log('contract: ', contract);
         console.log('value: ', value);
+        console.log('isEth: ', isEth);
+        console.log('buyInAmountParam: ', buyInAmountParam);
 
         const encodedCall = encodeFunctionData({
             abi: contract.abi,
@@ -137,7 +139,6 @@ export const executeBiconomyTransaction = async (
                               paymasterServiceData: {
                                   mode: PaymasterMode.ERC20,
                                   preferredToken: collateral,
-                                  maxApproval: true,
                               },
                           }
                 );
@@ -161,7 +162,9 @@ export const executeBiconomyTransaction = async (
             }
         };
 
-        if (!validUntil || Number(nowDate) > Number(dateUntilValid)) {
+        const approved = await hasAllowance(networkId, collateral as `0x{string}`);
+
+        if (!approved || !validUntil || Number(nowDate) > Number(dateUntilValid)) {
             const txHash = await createSessionAndExecuteTxs();
             return txHash;
         } else {
@@ -295,25 +298,8 @@ const getCreateSessionTxs = async (networkId: SupportedNetwork, collateralAddres
             Math.floor(sixMonths.getTime() / 1000).toString()
         );
 
-        // get client to check allowance
-        const client = createPublicClient({
-            chain: networkId as any,
-            transport: http(biconomyConnector.wallet?.rpcProvider.transport.url),
-        });
-
-        const erc20Instance = getContract({
-            abi: erc20Contract.abi,
-            address: collateralAddress as `0x${string}`,
-            client: client,
-        });
-
-        const hasAllowance = await checkAllowance(
-            maxUint256,
-            erc20Instance,
-            biconomyConnector.address,
-            speedMarketsAMMContract.addresses[networkId]
-        );
-        if (hasAllowance) {
+        const approved = await hasAllowance(networkId, collateralAddress as `0x{string}`);
+        if (approved) {
             transactionArray.push(setSessiontrx);
         } else {
             const encodedCall = encodeFunctionData({
@@ -376,3 +362,32 @@ const getSessionSigner = async (networkId: SupportedNetwork) => {
     });
     return sessionSigner;
 };
+
+const hasAllowance = async (networkId: SupportedNetwork, collateralAddress: `0x${string}`) => {
+    // get client to check allowance
+    const client = createPublicClient({
+        chain: networkId as any,
+        transport: http(biconomyConnector.wallet?.rpcProvider.transport.url),
+    });
+
+    const erc20Instance = getContract({
+        abi: erc20Contract.abi,
+        address: collateralAddress,
+        client: client,
+    });
+
+    const hasAllowance = await checkAllowance(
+        maxUint256,
+        erc20Instance,
+        biconomyConnector.address,
+        speedMarketsAMMContract.addresses[networkId]
+    );
+    return hasAllowance;
+};
+
+// const getSupportedPaymasterTokensForNetwork = (networkId: SupportedNetwork) => {
+//     const collaterals = getCollaterals(networkId);
+//     return collaterals.map((coin) => {
+//         return multipleCollateral[coin].addresses[networkId];
+//     });
+// };
