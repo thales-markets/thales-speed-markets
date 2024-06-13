@@ -124,6 +124,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                 console.log(e);
             }
         };
+
         if (isOverview) {
             setAllowance(true);
         } else if (isConnected) {
@@ -157,8 +158,9 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
         const erc20Instance = getContract({
             abi: erc20Contract.abi,
             address: erc20Contract.addresses[networkId],
-            client: client as Client,
+            client: walletClient.data as Client,
         }) as ViemContract;
+
         const addressToApprove = speedMarketsAMMContract.addresses[networkId];
 
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
