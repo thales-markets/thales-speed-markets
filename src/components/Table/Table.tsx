@@ -1,22 +1,22 @@
-import SimpleLoader from 'components/SimpleLoader';
-import { SortDirection } from 'enums/market';
-import React, { CSSProperties, DependencyList, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
-    useReactTable,
+    Cell,
+    Column,
+    Row,
+    flexRender,
     getCoreRowModel,
     getPaginationRowModel,
     getSortedRowModel,
-    flexRender,
-    Row,
-    Cell,
-    Column,
+    useReactTable,
 } from '@tanstack/react-table';
+import SelectInput from 'components/SelectInput';
+import SimpleLoader from 'components/SimpleLoader';
+import { LOCAL_STORAGE_KEYS } from 'constants/storage';
+import { SortDirection } from 'enums/market';
+import React, { CSSProperties, DependencyList, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { FlexDiv, FlexDivCentered } from 'styles/common';
-import SelectInput from 'components/SelectInput';
 import { localStore } from 'thales-utils';
-import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 
 export const PAGINATION_SIZE = [
     { value: 5, label: '5' },
@@ -253,7 +253,13 @@ const ExpandableRowReact: React.FC<{
             <TableRow
                 style={{ ...tableRowStyles, borderBottom: hidden ? '' : 'none' }}
                 cursorPointer={true}
-                onClick={(e) => !(e.target instanceof HTMLButtonElement) && setHidden(!hidden)}
+                onClick={(e) => {
+                    !(
+                        e.target instanceof HTMLButtonElement ||
+                        // quick fix for CollateralSelector
+                        (e.target as HTMLElement).parentElement?.classList.contains('clickable')
+                    ) && setHidden(!hidden);
+                }}
             >
                 {row.getAllCells().map((cell: any, cellIndex: any) => (
                     <TableCell
