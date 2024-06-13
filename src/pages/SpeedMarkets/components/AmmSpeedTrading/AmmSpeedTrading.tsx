@@ -78,8 +78,6 @@ import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 import PriceSlippage from '../PriceSlippage';
 import { SelectedPosition } from '../SelectPosition/SelectPosition';
 import SharePosition from '../SharePosition';
-import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveSpeedMarketsDataQuery';
-import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
 
 type AmmSpeedTradingProps = {
     isChained: boolean;
@@ -142,8 +140,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     const [hasAllowance, setAllowance] = useState(false);
     const [openApprovalModal, setOpenApprovalModal] = useState(false);
     const [openTwitterShareModal, setOpenTwitterShareModal] = useState(false);
-    const [toastId, setToastId] = useState<string | number>('');
-    const [numOfUserMarketsBeforeBuy, setNumOfUserMarketsBeforeBuy] = useState(-1); // deafult -1 when buy not started
 
     const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
 
@@ -222,40 +218,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         defaultCollateral,
         selectedCollateral,
     ]);
-
-    // SINGLE
-    const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
-        { networkId, client },
-        isBiconomy ? biconomyConnector.address : walletAddress || '',
-        {
-            enabled: isAppReady && isConnected && !isChained && isSubmitting,
-        }
-    );
-
-    const userOpenSpeedMarketsData = useMemo(
-        () =>
-            userActiveSpeedMarketsDataQuery.isSuccess && userActiveSpeedMarketsDataQuery.data
-                ? userActiveSpeedMarketsDataQuery.data
-                : [],
-        [userActiveSpeedMarketsDataQuery]
-    );
-
-    // CHAINED
-    const userChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
-        { networkId, client },
-        isBiconomy ? biconomyConnector.address : walletAddress || '',
-        {
-            enabled: isAppReady && isConnected && isChained && isSubmitting,
-        }
-    );
-
-    const userOpenChainedSpeedMarketsData = useMemo(
-        () =>
-            userChainedSpeedMarketsDataQuery.isSuccess && userChainedSpeedMarketsDataQuery.data
-                ? userChainedSpeedMarketsDataQuery.data
-                : [],
-        [userChainedSpeedMarketsDataQuery]
-    );
 
     const exchangeRatesMarketDataQuery = useExchangeRatesQuery(
         { networkId, client },
@@ -434,37 +396,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         positionType,
     ]);
 
-    // check if new market is created
-    useEffect(() => {
-        if (isSubmitting && numOfUserMarketsBeforeBuy === -1) {
-            setNumOfUserMarketsBeforeBuy(
-                isChained ? userOpenChainedSpeedMarketsData.length : userOpenSpeedMarketsData.length
-            );
-        } else if (!isSubmitting && toastId !== '') {
-            const numOfUserMarketsAfter = isChained
-                ? userOpenChainedSpeedMarketsData.length
-                : userOpenSpeedMarketsData.length;
-
-            // TODO: improve by comparing markets addresses before and after
-            if (numOfUserMarketsAfter - numOfUserMarketsBeforeBuy > 0) {
-                toast.update(toastId, getSuccessToastOptions(t(`common.buy.confirmation-message`), toastId));
-            } else {
-                toast.update(toastId, getErrorToastOptions(t('common.errors.buy-failed'), toastId));
-            }
-            setToastId('');
-            setNumOfUserMarketsBeforeBuy(-1);
-            setSubmittedStrikePrice(0);
-        }
-    }, [
-        numOfUserMarketsBeforeBuy,
-        isSubmitting,
-        isChained,
-        userOpenSpeedMarketsData.length,
-        userOpenChainedSpeedMarketsData.length,
-        t,
-        toastId,
-    ]);
-
     // Check allowance
     useDebouncedEffect(() => {
         if (!collateralAddress) {
@@ -573,7 +504,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
         setIsSubmitting(true);
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
-        setToastId(id);
 
         const speedMarketsAMMContractWithSigner = getContract({
             abi: speedMarketsAMMCreatorContract.abi,
@@ -646,10 +576,13 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             const txReceipt = await waitForTransactionReceipt(client as Client, { hash });
 
             if (txReceipt.status === 'success') {
+                toast.update(id, getSuccessToastOptions(t(`common.buy.confirmation-message`), id));
                 resetData();
                 setPaidAmount(0);
+                setSubmittedStrikePrice(0);
+                setIsSubmitting(false);
 
-                // wait some time for creator to pick up pending markets (after max delay it will fail for sure)
+                // wait some time for creator to pick up pending markets
                 await delay(secondsToMilliseconds(DEFAULT_CREATOR_DELAY_TIME_SEC));
 
                 refetchUserSpeedMarkets(
@@ -674,19 +607,17 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             } else {
                 console.log('Transaction status', txReceipt.status);
                 await delay(800);
-                setToastId('');
                 toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
                 setSubmittedStrikePrice(0);
+                setIsSubmitting(false);
             }
         } catch (e) {
             console.log(e);
             await delay(800);
-            setToastId('');
             toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
             setSubmittedStrikePrice(0);
+            setIsSubmitting(false);
         }
-        await delay(3000); // wait for refetch
-        setIsSubmitting(false);
     };
 
     const handleMint = async () => {

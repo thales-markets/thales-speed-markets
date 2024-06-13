@@ -71,23 +71,12 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
     };
 
     const onPlusMinusIconHandle = (isChained: boolean) => {
-        setIsChained(isChained);
         resetData();
+        setIsChained(isChained);
         history.push({
             pathname: location.pathname,
             search: queryString.stringify({
                 isChained: isChained,
-            }),
-        });
-    };
-
-    const onClearAllHandle = () => {
-        setIsChained(false);
-        resetData();
-        history.push({
-            pathname: location.pathname,
-            search: queryString.stringify({
-                isChained: false,
             }),
         });
     };
@@ -115,7 +104,7 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
                 <FlexDivSpaceBetween>
                     <HeaderText> {t('speed-markets.steps.choose-direction')}</HeaderText>
                     {selected.length > 1 && (
-                        <ClearAll onClick={onClearAllHandle}>
+                        <ClearAll onClick={() => resetData()}>
                             {t('speed-markets.chained.clear-all')}
                             <IconWrong className="icon icon--wrong" />
                         </ClearAll>

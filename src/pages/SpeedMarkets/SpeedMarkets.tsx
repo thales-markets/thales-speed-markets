@@ -1,3 +1,4 @@
+import BannerCarousel from 'components/BannerCarousel';
 import Modal from 'components/Modal';
 import PageLinkBanner from 'components/PageLinkBanner';
 import SPAAnchor from 'components/SPAAnchor/SPAAnchor';
@@ -27,7 +28,7 @@ import { roundNumberToDecimals } from 'thales-utils';
 import { RootState } from 'types/ui';
 import { getSupportedNetworksByRoute } from 'utils/network';
 import { getCurrentPrices, getPriceConnection, getPriceId, getSupportedAssetsAsObject } from 'utils/pyth';
-import { buildHref } from 'utils/routes';
+import { buildHref, history } from 'utils/routes';
 import { useAccount, useChainId, useClient } from 'wagmi';
 import AmmSpeedTrading from './components/AmmSpeedTrading';
 import SelectAsset from './components/SelectAsset';
@@ -35,7 +36,6 @@ import SelectBuyin from './components/SelectBuyin';
 import SelectPosition from './components/SelectPosition';
 import { SelectedPosition } from './components/SelectPosition/SelectPosition';
 import SelectTime from './components/SelectTime';
-import BannerCarousel from 'components/BannerCarousel';
 
 const SpeedMarkets: React.FC = () => {
     const { t } = useTranslation();
@@ -131,12 +131,21 @@ const SpeedMarkets: React.FC = () => {
     const resetData = useCallback(() => {
         setIsResetTriggered(true);
         setPositionType(undefined);
+
         if (ammChainedSpeedMarketsLimitsData?.minChainedMarkets) {
             setChainedPositions(Array(ammChainedSpeedMarketsLimitsData.minChainedMarkets).fill(undefined));
         }
+        setIsChained(false);
+        history.push({
+            pathname: location.pathname,
+            search: queryString.stringify({
+                isChained: false,
+            }),
+        });
+
         setDeltaTimeSec(0);
         setBuyinAmount(0);
-    }, [ammChainedSpeedMarketsLimitsData?.minChainedMarkets]);
+    }, [ammChainedSpeedMarketsLimitsData?.minChainedMarkets, location.pathname]);
 
     useEffect(() => {
         if (!isConnected) {
