@@ -1,9 +1,9 @@
-import ArbitrumLogo from 'assets/images/arbitrum-circle-logo.svg?react';
-import BaseLogo from 'assets/images/base-circle-logo.svg?react';
-import BlastSepoliaLogo from 'assets/images/blast-sepolia-circle-logo.svg?react';
-import OpLogo from 'assets/images/optimism-circle-logo.svg?react';
-import PolygonLogo from 'assets/images/polygon-circle-logo.svg?react';
-import ZkSyncLogo from 'assets/images/zksync-circle-logo.svg?react';
+import ArbitrumLogo from 'assets/images/network/arbitrum-circle-logo.svg?react';
+import BaseLogo from 'assets/images/network/base-circle-logo.svg?react';
+import BlastSepoliaLogo from 'assets/images/network/blast-sepolia-circle-logo.svg?react';
+import OpLogo from 'assets/images/network/optimism-circle-logo.svg?react';
+import PolygonLogo from 'assets/images/network/polygon-circle-logo.svg?react';
+import ZkSyncLogo from 'assets/images/network/zksync-circle-logo.svg?react';
 import Button from 'components/Button';
 import { TEST_NETWORKS } from 'constants/network';
 import { ScreenSizeBreakpoint } from 'enums/ui';
