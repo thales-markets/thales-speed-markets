@@ -97,7 +97,7 @@ type AmmSpeedTradingProps = {
     hasError: boolean;
 };
 
-const DEFAULT_CREATOR_DELAY_TIME_SEC = 12;
+const DEFAULT_MAX_CREATOR_DELAY_TIME_SEC = 12;
 
 const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     isChained,
@@ -582,17 +582,20 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 setSubmittedStrikePrice(0);
                 setIsSubmitting(false);
 
-                // wait some time for creator to pick up pending markets
-                await delay(secondsToMilliseconds(DEFAULT_CREATOR_DELAY_TIME_SEC));
-
-                refetchUserSpeedMarkets(
-                    isChained,
-                    networkId,
-                    (isBiconomy ? biconomyConnector.address : walletAddress) as string
-                );
-                refetchActiveSpeedMarkets(isChained, networkId);
-                refetchSpeedMarketsLimits(isChained, networkId);
-                refetchBalances((isBiconomy ? biconomyConnector.address : walletAddress) as string, networkId);
+                // wait for creator to pick up pending markets (TODO: add creator maxCreationDelay)
+                let delayTime = 0;
+                while (delayTime < DEFAULT_MAX_CREATOR_DELAY_TIME_SEC) {
+                    refetchUserSpeedMarkets(
+                        isChained,
+                        networkId,
+                        (isBiconomy ? biconomyConnector.address : walletAddress) as string
+                    );
+                    refetchActiveSpeedMarkets(isChained, networkId);
+                    refetchSpeedMarketsLimits(isChained, networkId);
+                    refetchBalances((isBiconomy ? biconomyConnector.address : walletAddress) as string, networkId);
+                    await delay(secondsToMilliseconds(1));
+                    delayTime++;
+                }
 
                 PLAUSIBLE.trackEvent(
                     isChained ? PLAUSIBLE_KEYS.chainedSpeedMarketsBuy : PLAUSIBLE_KEYS.speedMarketsBuy,
