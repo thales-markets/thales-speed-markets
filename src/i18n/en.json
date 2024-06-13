@@ -244,6 +244,7 @@
             "claim-all-in": "Claim all in",
             "claim-all-win-in": "Claim all winnings in",
             "confirmation-message": "Market(s) successfully claimed",
+            "waiting-price": "Waiting for price",
             "errors": {
                 "price-stale": "Can't resolve market with stale price"
             }

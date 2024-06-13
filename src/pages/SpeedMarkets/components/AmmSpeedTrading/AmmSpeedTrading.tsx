@@ -97,7 +97,7 @@ type AmmSpeedTradingProps = {
     hasError: boolean;
 };
 
-const DEFAULT_MAX_CREATOR_DELAY_TIME_SEC = 12;
+const DEFAULT_MAX_CREATOR_DELAY_TIME_SEC = 30;
 
 const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     isChained,

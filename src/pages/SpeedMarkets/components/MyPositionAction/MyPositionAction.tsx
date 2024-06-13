@@ -21,12 +21,12 @@ import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsMobile } from 'redux/modules/ui';
 import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
-import styled, { CSSProperties } from 'styled-components';
+import styled, { CSSProperties, useTheme } from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
 import { coinParser, formatCurrencyWithSign, roundNumberToDecimals } from 'thales-utils';
 import { UserPosition } from 'types/market';
 import { SupportedNetwork } from 'types/network';
-import { RootState } from 'types/ui';
+import { RootState, ThemeInterface } from 'types/ui';
 import { ViemContract } from 'types/viem';
 import { executeBiconomyTransaction } from 'utils/biconomy';
 import biconomyConnector from 'utils/biconomyWallet';
@@ -72,6 +72,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     setIsActionInProgress,
 }) => {
     const { t } = useTranslation();
+    const theme: ThemeInterface = useTheme();
 
     const networkId = useChainId() as SupportedNetwork;
     const client = useClient();
@@ -456,16 +457,20 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                     <div>{getResolveButton()}</div>
                 </Tooltip>
             );
+        } else if (Date.now() > position.maturityDate) {
+            return (
+                <ResultsContainer>
+                    <Value $color={position.finalPrice ? theme.status.loss : undefined} $isUpperCase>
+                        {position.finalPrice ? t('common.loss') : t('speed-markets.user-positions.waiting-price')}
+                    </Value>
+                </ResultsContainer>
+            );
         } else {
             return (
                 <ResultsContainer>
                     <TimeRemaining end={position.maturityDate} showFullCounter showSecondsCounter>
                         <TimeIcon className="icon icon--time" />
-                        <Label>
-                            {Date.now() > position.maturityDate
-                                ? t('common.result')
-                                : t('speed-markets.user-positions.result-in')}
-                        </Label>
+                        <Label>{t('speed-markets.user-positions.result-in')}</Label>
                     </TimeRemaining>
                 </ResultsContainer>
             );
@@ -545,8 +550,8 @@ export const Label = styled.span`
     padding-right: 5px;
 `;
 
-export const Value = styled.span<{ color?: string; $isUpperCase?: boolean }>`
-    color: ${(props) => props.color || props.theme.textColor.primary};
+export const Value = styled.span<{ $color?: string; $isUpperCase?: boolean }>`
+    color: ${(props) => props.$color || props.theme.textColor.primary};
     ${(props) => (props.$isUpperCase ? 'text-transform: uppercase;' : '')}
     font-weight: 700;
     line-height: 100%;
