@@ -107,6 +107,13 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
         isSubmittingBatch !== undefined && setIsSubmitting(isSubmittingBatch);
     }, [isSubmittingBatch]);
 
+    // Update action in progress status
+    useEffect(() => {
+        if (setIsActionInProgress) {
+            setIsActionInProgress(isAllowing || isSubmitting);
+        }
+    }, [isAllowing, isSubmitting, setIsActionInProgress]);
+
     useEffect(() => {
         if (!position.isClaimable || isDefaultCollateral || isOverview) {
             return;
@@ -134,6 +141,10 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 console.log(e);
             }
         };
+
+        if (isOverview) {
+            setAllowance(true);
+        }
         if (isConnected) {
             getAllowance();
         }
@@ -153,17 +164,10 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
         client,
     ]);
 
-    // Update action in progress status
-    useEffect(() => {
-        if (setIsActionInProgress) {
-            setIsActionInProgress(isAllowing || isSubmitting);
-        }
-    }, [isAllowing, isSubmitting, setIsActionInProgress]);
-
     const handleAllowance = async (approveAmount: bigint) => {
         const erc20Instance = getContract({
             abi: erc20Contract.abi,
-            address: collateralAddress,
+            address: erc20Contract.addresses[networkId],
             client: walletClient.data as Client,
         });
         const addressToApprove = chainedSpeedMarketsAMMContract?.addresses[networkId];

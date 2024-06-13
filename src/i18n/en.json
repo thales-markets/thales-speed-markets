@@ -243,7 +243,7 @@
             "claim-all-progress": "Claiming all wins",
             "claim-all-in": "Claim all in",
             "claim-all-win-in": "Claim all winnings in",
-            "confirmation-message": "Markets successfully claimed",
+            "confirmation-message": "Market(s) successfully claimed",
             "errors": {
                 "price-stale": "Can't resolve market with stale price"
             }

@@ -98,6 +98,17 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
     const [hasAllowance, setAllowance] = useState(false);
     const [isAllowing, setIsAllowing] = useState(false);
 
+    // Update action in progress status
+    useEffect(() => {
+        if (setIsActionInProgress) {
+            setIsActionInProgress(isAllowing || isSubmitting);
+        }
+    }, [isAllowing, isSubmitting, setIsActionInProgress]);
+
+    useEffect(() => {
+        isSubmittingBatch && setIsSubmitting(isSubmittingBatch);
+    }, [isSubmittingBatch]);
+
     useEffect(() => {
         if (isDefaultCollateral) {
             return;
@@ -142,17 +153,6 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
         isDefaultCollateral,
         client,
     ]);
-
-    // Update action in progress status
-    useEffect(() => {
-        if (setIsActionInProgress) {
-            setIsActionInProgress(isAllowing || isSubmitting);
-        }
-    }, [isAllowing, isSubmitting, setIsActionInProgress]);
-
-    useEffect(() => {
-        isSubmittingBatch && setIsSubmitting(isSubmittingBatch);
-    }, [isSubmittingBatch]);
 
     const handleAllowance = async (approveAmount: bigint) => {
         const erc20Instance = getContract({

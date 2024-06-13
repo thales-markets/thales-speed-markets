@@ -47,14 +47,14 @@ const UserWallet: React.FC = () => {
                     onMouseLeave={() => !isBiconomy && setWalletText('')}
                 >
                     <WalletText $isAddress={!isBiconomy}>
-                        {walletText ||
-                            (isBiconomy
-                                ? getUserInfo()?.name
-                                : truncateAddress(
-                                      walletAddress as string,
-                                      TRUNCATE_ADDRESS_NUMBER_OF_CHARS,
-                                      TRUNCATE_ADDRESS_NUMBER_OF_CHARS
-                                  ))}
+                        {isBiconomy
+                            ? getUserInfo()?.name
+                            : walletText ||
+                              truncateAddress(
+                                  walletAddress as string,
+                                  TRUNCATE_ADDRESS_NUMBER_OF_CHARS,
+                                  TRUNCATE_ADDRESS_NUMBER_OF_CHARS
+                              )}
                     </WalletText>
                 </WalletContainer>
                 <Separator />
