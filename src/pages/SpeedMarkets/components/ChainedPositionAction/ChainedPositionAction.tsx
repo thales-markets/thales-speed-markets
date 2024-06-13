@@ -164,7 +164,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
         const erc20Instance = getContract({
             abi: erc20Contract.abi,
             address: collateralAddress,
-            client: client as Client,
+            client: walletClient.data as Client,
         });
         const addressToApprove = chainedSpeedMarketsAMMContract?.addresses[networkId];
 
