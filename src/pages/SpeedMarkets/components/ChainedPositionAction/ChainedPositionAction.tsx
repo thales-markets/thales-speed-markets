@@ -297,8 +297,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                             collateralAddress,
                             chainedSpeedMarketsAMMContractWithSigner,
                             'resolveMarket',
-                            [position.market, priceUpdateDataArray],
-                            totalUpdateFee
+                            [position.market, priceUpdateDataArray]
                         );
                     } else {
                         hash = await executeBiconomyTransaction(
@@ -306,8 +305,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                             collateralAddress,
                             chainedSpeedMarketsAMMContractWithSigner,
                             'resolveMarketWithOfframp',
-                            [position.market, priceUpdateDataArray, collateralAddress, isEth],
-                            totalUpdateFee
+                            [position.market, priceUpdateDataArray, collateralAddress, isEth]
                         );
                     }
                 } else {
