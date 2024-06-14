@@ -1,3 +1,4 @@
+import BannerCarousel from 'components/BannerCarousel';
 import Modal from 'components/Modal';
 import PageLinkBanner from 'components/PageLinkBanner';
 import SPAAnchor from 'components/SPAAnchor/SPAAnchor';
@@ -35,7 +36,6 @@ import SelectBuyin from './components/SelectBuyin';
 import SelectPosition from './components/SelectPosition';
 import { SelectedPosition } from './components/SelectPosition/SelectPosition';
 import SelectTime from './components/SelectTime';
-import BannerCarousel from 'components/BannerCarousel';
 
 const SpeedMarkets: React.FC = () => {
     const { t } = useTranslation();
@@ -131,9 +131,11 @@ const SpeedMarkets: React.FC = () => {
     const resetData = useCallback(() => {
         setIsResetTriggered(true);
         setPositionType(undefined);
+
         if (ammChainedSpeedMarketsLimitsData?.minChainedMarkets) {
             setChainedPositions(Array(ammChainedSpeedMarketsLimitsData.minChainedMarkets).fill(undefined));
         }
+
         setDeltaTimeSec(0);
         setBuyinAmount(0);
     }, [ammChainedSpeedMarketsLimitsData?.minChainedMarkets]);
@@ -171,6 +173,7 @@ const SpeedMarkets: React.FC = () => {
                         onDeltaChange={setDeltaTimeSec}
                         ammSpeedMarketsLimits={ammSpeedMarketsLimitsData}
                         isResetTriggered={isResetTriggered}
+                        setIsResetTriggered={setIsResetTriggered}
                         isChained={isChained}
                     />
                 )}
@@ -194,6 +197,7 @@ const SpeedMarkets: React.FC = () => {
                         onDeltaChange={setDeltaTimeSec}
                         ammSpeedMarketsLimits={ammSpeedMarketsLimitsData}
                         isResetTriggered={isResetTriggered}
+                        setIsResetTriggered={setIsResetTriggered}
                         isChained={isChained}
                     />
                 )}
@@ -206,6 +210,7 @@ const SpeedMarkets: React.FC = () => {
                         ammChainedSpeedMarketsLimits={ammChainedSpeedMarketsLimitsData}
                         currencyKey={currencyKey}
                         isResetTriggered={isResetTriggered}
+                        setIsResetTriggered={setIsResetTriggered}
                         setHasError={setHasError}
                     />
                 )}

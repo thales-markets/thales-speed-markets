@@ -61,7 +61,11 @@ const CollateralSelector: React.FC<CollateralSelectorProps> = ({
     return (
         <Container margin={additionalStyles?.margin?.toString()} position={additionalStyles?.position}>
             <OutsideClickHandler onOutsideClick={() => setOpen(false)}>
-                <SelectedCollateral disabled={!!disabled} onClick={() => !disabled && setOpen(!open)}>
+                <SelectedCollateral
+                    disabled={!!disabled}
+                    onClick={() => !disabled && setOpen(!open)}
+                    className="clickable"
+                >
                     {!isIconHidden && (
                         <AssetIcon
                             className={`currency-icon currency-icon--${collateralArray[selectedItem].toLowerCase()}`}

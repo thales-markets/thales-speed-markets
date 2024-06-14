@@ -6,6 +6,14 @@
     color: #ffffff;
 }
 
+.network-icon--speed-full-logo:before {
+    content: '\003F';
+}
+
+.network-icon--speed-small-logo:before {
+    content: '\0040';
+}
+
 .network-icon--op:before {
     content: '\0041';
 }

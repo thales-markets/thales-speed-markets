@@ -107,6 +107,13 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
         isSubmittingBatch !== undefined && setIsSubmitting(isSubmittingBatch);
     }, [isSubmittingBatch]);
 
+    // Update action in progress status
+    useEffect(() => {
+        if (setIsActionInProgress) {
+            setIsActionInProgress(isAllowing || isSubmitting);
+        }
+    }, [isAllowing, isSubmitting, setIsActionInProgress]);
+
     useEffect(() => {
         if (!position.isClaimable || isDefaultCollateral || isOverview) {
             return;
@@ -134,6 +141,10 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 console.log(e);
             }
         };
+
+        if (isOverview) {
+            setAllowance(true);
+        }
         if (isConnected) {
             getAllowance();
         }
@@ -153,17 +164,10 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
         client,
     ]);
 
-    // Update action in progress status
-    useEffect(() => {
-        if (setIsActionInProgress) {
-            setIsActionInProgress(isAllowing || isSubmitting);
-        }
-    }, [isAllowing, isSubmitting, setIsActionInProgress]);
-
     const handleAllowance = async (approveAmount: bigint) => {
         const erc20Instance = getContract({
             abi: erc20Contract.abi,
-            address: collateralAddress,
+            address: erc20Contract.addresses[networkId],
             client: walletClient.data as Client,
         });
         const addressToApprove = chainedSpeedMarketsAMMContract?.addresses[networkId];
@@ -398,6 +402,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
     const getActionStatus = () => {
         if (!position.isResolved) {
             if (position.isClaimable) {
+                // User won
                 return hasAllowance || isDefaultCollateral ? (
                     getResolveButton()
                 ) : (
@@ -411,21 +416,29 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                     </Tooltip>
                 );
             } else if (position.resolveIndex !== undefined) {
+                // User loss
                 return isOverview ? (
                     getResolveButton()
                 ) : (
                     <ResultsContainer>
-                        <TimeRemaining
-                            end={position.strikeTimes[position.resolveIndex]}
-                            showFullCounter
-                            showSecondsCounter
-                        >
-                            <TimeIcon className="icon icon--time" />
-                            <Label>{t('common.results')}</Label>
-                        </TimeRemaining>
+                        <Value $color={theme.status.loss} $isUpperCase>
+                            {t('common.loss')}
+                        </Value>
+                    </ResultsContainer>
+                );
+            } else if (Date.now() > position.maturityDate) {
+                // Matured
+                return isOverview ? (
+                    getResolveButton()
+                ) : (
+                    <ResultsContainer>
+                        <Value $color={position.canResolve ? theme.status.loss : undefined} $isUpperCase>
+                            {position.canResolve ? t('common.loss') : t('speed-markets.user-positions.waiting-price')}
+                        </Value>
                     </ResultsContainer>
                 );
             } else {
+                // Open
                 const firstHigherTimeIndex = position.strikeTimes.findIndex((t) => t > Date.now());
                 const strikeTimeIndex =
                     firstHigherTimeIndex > -1 ? firstHigherTimeIndex : position.strikeTimes.length - 1;
@@ -437,18 +450,17 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                         <TimeRemaining end={position.strikeTimes[strikeTimeIndex]} showFullCounter showSecondsCounter>
                             <Label>
                                 <TimeIcon className="icon icon--time" />
-                                {Date.now() > position.maturityDate
-                                    ? t('common.results')
-                                    : t('speed-markets.user-positions.next-result-in')}
+                                {t('speed-markets.user-positions.next-result-in')}
                             </Label>
                         </TimeRemaining>
                     </ResultsContainer>
                 );
             }
         } else {
+            // Resolved
             return (
                 <ResultsContainer>
-                    <Value $isUpperCase color={position.isUserWinner ? theme.status.won : theme.status.loss}>
+                    <Value $isUpperCase $color={position.isUserWinner ? theme.status.won : theme.status.loss}>
                         {position.isUserWinner ? t('common.won') : t('common.loss')}
                     </Value>
                 </ResultsContainer>

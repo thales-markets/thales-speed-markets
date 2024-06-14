@@ -26,6 +26,7 @@ type SelectTimeProps = {
     onDeltaChange: React.Dispatch<number>;
     ammSpeedMarketsLimits: AmmSpeedMarketsLimits | null;
     isResetTriggered: boolean;
+    setIsResetTriggered: React.Dispatch<boolean>;
     isChained: boolean;
 };
 
@@ -38,6 +39,7 @@ const SelectTime: React.FC<SelectTimeProps> = ({
     onDeltaChange,
     ammSpeedMarketsLimits,
     isResetTriggered,
+    setIsResetTriggered,
     isChained,
 }) => {
     const { t } = useTranslation();
@@ -137,8 +139,9 @@ const SelectTime: React.FC<SelectTimeProps> = ({
     useEffect(() => {
         if (!isConnected || isResetTriggered) {
             resetData();
+            setIsResetTriggered(false);
         }
-    }, [isConnected, resetData, isResetTriggered]);
+    }, [isConnected, resetData, isResetTriggered, setIsResetTriggered]);
 
     useEffect(() => {
         resetData();
