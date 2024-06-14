@@ -143,24 +143,18 @@ const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({ isOpen, onClose
                                 <Trans
                                     i18nKey="common.wallet.disclaimer-info"
                                     components={{
-                                        disclaimer: (
-                                            <Link href={disclaimer}>
-                                                <></>
-                                            </Link>
-                                        ),
-                                        terms: (
-                                            <Link href={termsOfUse}>
-                                                <></>
-                                            </Link>
-                                        ),
+                                        disclaimer: <Link href={disclaimer} target="_blank" rel="noreferrer" />,
+                                        terms: <Link href={termsOfUse} target="_blank" rel="noreferrer" />,
                                     }}
                                 />
                             </FooterText>
-                            <Checkbox
-                                value={''}
-                                checked={termsAccepted}
-                                onChange={setTerms.bind(this, !termsAccepted)}
-                            />
+                            <CheckboxWrapper>
+                                <Checkbox
+                                    value={''}
+                                    checked={termsAccepted}
+                                    onChange={setTerms.bind(this, !termsAccepted)}
+                                />
+                            </CheckboxWrapper>
                         </FooterContainer>
                     </>
                 )}
@@ -252,7 +246,7 @@ const SocialButtonsWrapper = styled(FlexDivRow)`
     justify-content: space-between;
     width: 100%;
     gap: 20px;
-    @media (max-width: 575px) {
+    @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         gap: 10px;
         flex-wrap: wrap;
     }
@@ -267,6 +261,17 @@ const LoaderContainer = styled.div`
     height: 180px !important;
     width: 80px;
     overflow: none;
+`;
+
+const CheckboxWrapper = styled.div`
+    min-width: 180px;
+    @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
+        display: flex;
+        align-items: flex-end;
+        min-height: 22px;
+        min-width: 80px;
+        padding-right: 30px; // fix for widget bot overlapping
+    }
 `;
 
 export default ConnectWalletModal;
