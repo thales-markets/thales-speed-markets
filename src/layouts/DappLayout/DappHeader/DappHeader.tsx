@@ -134,7 +134,6 @@ const Container = styled(FlexDivRowCentered)`
 
 const LeftContainer = styled(FlexDivRowCentered)`
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        margin-bottom: 10px;
         width: 100%;
     }
 `;

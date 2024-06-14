@@ -14,7 +14,7 @@ const Logo: React.FC = () => {
     return (
         <Container>
             <SPAAnchor href={buildHref(ROUTES.Markets.Home)}>
-                <LogoIcon className={`icon-home  icon-home--speed-${isMobile ? 'small' : 'full'}-logo`} />
+                <LogoIcon className={`network-icon  network-icon--speed-${isMobile ? 'small' : 'full'}-logo`} />
             </SPAAnchor>
         </Container>
     );
@@ -25,11 +25,10 @@ const Container = styled.div``;
 const LogoIcon = styled.i`
     font-size: 125px;
     line-height: 40px;
-    margin: 3px 10px -5px 0;
+    margin-right: 10px;
     @media screen and (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         font-size: 40px;
         line-height: 40px;
-        margin: 10px 0 -5px 0;
     }
 `;
 
