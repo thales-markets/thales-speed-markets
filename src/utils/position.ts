@@ -49,10 +49,26 @@ export const mapUserHistoryToPosition = (userHistory: UserHistoryPosition): User
 export const getHistoryStatus = (position: UserHistoryPosition) => {
     let status = HistoryStatus.OPEN;
 
+    const isChained = position.sides.length > 1;
+
     if (position.isResolved) {
         status = position.isUserWinner ? HistoryStatus.WON : HistoryStatus.LOSS;
+    } else if (position.maturityDate < Date.now()) {
+        if (isChained) {
+            status = position.isClaimable
+                ? HistoryStatus.CLAIMABLE
+                : position.canResolve
+                ? HistoryStatus.LOSS
+                : HistoryStatus.OPEN;
+        } else {
+            status = position.isClaimable
+                ? HistoryStatus.CLAIMABLE
+                : position.finalPrices[0] > 0
+                ? HistoryStatus.LOSS
+                : HistoryStatus.OPEN;
+        }
     } else {
-        status = position.isClaimable ? HistoryStatus.CLAIMABLE : HistoryStatus.OPEN;
+        status = HistoryStatus.OPEN;
     }
 
     return status;
