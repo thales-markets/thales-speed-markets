@@ -259,7 +259,7 @@ const Container = styled.div`
     margin: 10px 0;
     gap: 10px;
     align-items: flex-start;
-    @media (max-width: 600px) {
+    @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         gap: 16px;
     }
 `;
@@ -300,7 +300,7 @@ const StepNumberWrapper = styled.div<{ isActive: boolean; isDisabled?: boolean; 
     ${(props) =>
         props.isActive ? '' : `background: ${props.completed ? props.theme.background.quinary : 'transparent'};`}
     cursor: ${(props) => (props.isDisabled ? 'not-allowed' : props.isActive ? 'default' : 'pointer')};
-    @media (max-width: 600px) {
+    @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         width: 36px;
         height: 36px;
     }
@@ -310,7 +310,7 @@ const StepNumberWrapper = styled.div<{ isActive: boolean; isDisabled?: boolean; 
 const StepNumber = styled.span<{ isActive: boolean }>`
     font-weight: 700;
     font-size: 29px;
-    @media (max-width: 600px) {
+    @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         font-size: 20px;
     }
     line-height: 43px;

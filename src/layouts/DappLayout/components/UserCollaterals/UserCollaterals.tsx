@@ -1,13 +1,15 @@
 import OutsideClickHandler from 'components/OutsideClick';
+import { ScreenSizeBreakpoint } from 'enums/ui';
 import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipleCollateralBalanceQuery';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
-import { getSelectedCollateralIndex, getIsBiconomy, setSelectedCollateralIndex } from 'redux/modules/wallet';
+import { getIsBiconomy, getSelectedCollateralIndex, setSelectedCollateralIndex } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivRow } from 'styles/common';
 import { Coins, formatCurrencyWithKey } from 'thales-utils';
 import { RootState } from 'types/ui';
+import biconomyConnector from 'utils/biconomyWallet';
 import {
     getCoinBalance,
     getCollateral,
@@ -18,7 +20,6 @@ import {
 } from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
 import { useAccount, useChainId, useClient } from 'wagmi';
-import biconomyConnector from 'utils/biconomyWallet';
 
 const UserCollaterals: React.FC = () => {
     const dispatch = useDispatch();
@@ -187,7 +188,7 @@ const Wrapper = styled(FlexDivRow)`
     position: relative;
     height: 100%;
 
-    @media (max-width: 500px) {
+    @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         min-width: 124px;
         width: 100%;
     }
@@ -216,7 +217,7 @@ const Dropdown = styled.div`
     padding: 5px;
     text-align: center;
     z-index: 101;
-    @media (max-width: 500px) {
+    @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         min-width: 124px;
         width: 100%;
     }

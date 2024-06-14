@@ -7,6 +7,7 @@ import { getErrorToastOptions, getSuccessToastOptions } from 'components/ToastMe
 import TextInput from 'components/fields/TextInput';
 import { LINKS } from 'constants/links';
 import ROUTES from 'constants/routes';
+import { ScreenSizeBreakpoint } from 'enums/ui';
 import useGetReffererIdQuery from 'queries/referral/useGetReffererIdQuery';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
@@ -183,7 +184,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
 
 const Container = styled(FlexDivColumnCentered)`
     width: 340px;
-    @media (max-width: 575px) {
+    @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         width: 325px;
     }
 `;

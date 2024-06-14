@@ -3,6 +3,7 @@ import Button from 'components/Button';
 import Modal from 'components/Modal';
 import Checkbox from 'components/fields/Checkbox';
 import NumericInput from 'components/fields/NumericInput/NumericInput';
+import { ScreenSizeBreakpoint } from 'enums/ui';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -97,7 +98,7 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({ defaultAmount, tokenSymbo
 
 const Container = styled(FlexDivColumnCentered)`
     width: 306px;
-    @media (max-width: 575px) {
+    @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         width: auto;
     }
 `;
