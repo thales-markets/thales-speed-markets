@@ -6,12 +6,13 @@ import {
     getInfoToastOptions,
     getLoadingToastOptions,
 } from 'components/ToastMessage/ToastMessage';
+import { LINKS } from 'constants/links';
 import ROUTES from 'constants/routes';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import { GetStartedStep } from 'enums/wizard';
 import QRCodeModal from 'pages/AARelatedPages/Withdraw/components/QRCodeModal';
 import React, { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import ReactModal from 'react-modal';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
@@ -80,11 +81,17 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
                 break;
         }
 
-        return t(transKey, {
-            network: getNetworkNameByNetworkId(networkId, true),
-            collateral: getDefaultCollateral(networkId),
-        });
-    }, [stepType, networkId, isWalletConnected, t]);
+        return (
+            <Trans
+                i18nKey={transKey}
+                values={{
+                    network: getNetworkNameByNetworkId(networkId, true),
+                    collateral: getDefaultCollateral(networkId),
+                }}
+                components={{ a: <Link target="_blank" href={LINKS.Tutorials.Root} /> }}
+            ></Trans>
+        );
+    }, [stepType, networkId, isWalletConnected]);
 
     const showStepIcon = useMemo(() => {
         if (isWalletConnected) {
@@ -423,6 +430,11 @@ const ButtonWrapper = styled.div`
     justify-content: center;
     margin-top: 20px;
     margin-bottom: 10px;
+`;
+
+const Link = styled.a`
+    color: ${(props) => props.theme.textColor.quinary};
+    text-decoration: underline;
 `;
 
 export default Step;

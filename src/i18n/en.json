@@ -339,7 +339,7 @@
             "description": {
                 "sign-up": "Log In to Speed Markets via social login or via connecting your wallet.",
                 "logged-in": "You have successfully created your Speed Markets Smart Account on the blockchain and are logged in.",
-                "deposit": "Deposit funds in your Speed Markets smart account by sending USDT and/or USDC to the address below. If you don't have USDT or USDC, you can also directly deposit them via Credit Card using the FUND WITH CARD button.",
+                "deposit": "Deposit funds in your Speed Markets smart account by sending USDT and/or USDC ({{ network }}) to the address below. If you don't have USDT or USDC, you can also directly deposit them via Credit Card using the FUND WITH CARD button. <a>Click here for Deposit Tutorials</a>.",
                 "trade": "You are all set! You have funds in your account and you can now start trading on Speed Markets!"
             }
         }

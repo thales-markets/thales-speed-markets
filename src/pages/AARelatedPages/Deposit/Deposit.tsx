@@ -27,19 +27,20 @@ import { getOnRamperUrl } from 'utils/particleWallet/utils';
 import { buildHref } from 'utils/routes';
 import { useAccount, useChainId } from 'wagmi';
 import QRCodeModal from '../Withdraw/components/QRCodeModal';
+import { LINKS } from 'constants/links';
 
 const Tutorials = [
     {
         name: 'Coinbase',
-        url: 'https://docs.thales.io/thales-speed-markets/speed-market-deposit-guides/deposit-usdc-from-coinbase',
+        url: LINKS.Tutorials.Coinbase,
     },
     {
         name: 'Binance Mobile',
-        url: 'https://docs.thales.io/thales-speed-markets/speed-market-deposit-guides/deposit-from-binance-mobile-app',
+        url: LINKS.Tutorials.BinanceMobile,
     },
     {
         name: 'Binance Website',
-        url: 'https://docs.thales.io/thales-speed-markets/speed-market-deposit-guides/deposit-from-binance-website',
+        url: LINKS.Tutorials.BinanceWebsite,
     },
 ];
 
