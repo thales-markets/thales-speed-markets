@@ -32,8 +32,8 @@ const CheckboxContainer = styled.label`
     display: block;
     position: relative;
     cursor: pointer;
-    font-size: 15px;
-    line-height: 18px;
+    font-size: 18px;
+    line-height: 22px;
     text-transform: uppercase;
     color: ${(props) => props.theme.textColor.primary};
     -webkit-user-select: none;

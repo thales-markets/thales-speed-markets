@@ -4,6 +4,7 @@ import {
     getInfoToastOptions,
     getLoadingToastOptions,
 } from 'components/ToastMessage/ToastMessage';
+import { ScreenSizeBreakpoint } from 'enums/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -66,7 +67,7 @@ const UserWallet: React.FC = () => {
 
 const Container = styled.div`
     z-index: 10000;
-    @media (max-width: 500px) {
+    @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         width: 100%;
     }
 `;
@@ -90,7 +91,7 @@ const WalletContainer = styled.div<{ $isAddress: boolean }>`
     align-items: center;
     padding: 0 10px;
 
-    @media (max-width: 500px) {
+    @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         min-width: fit-content;
         max-width: 100px;
         padding: 4px 7px;

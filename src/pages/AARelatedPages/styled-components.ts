@@ -26,7 +26,7 @@ export const FormContainer = styled(FlexDiv)`
     gap: 18px;
     height: 100%;
     width: 100%;
-    @media (max-width: 600px) {
+    @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         width: 100%;
     }
 `;
@@ -56,7 +56,7 @@ export const WarningContainer = styled(FlexDiv)`
     font-size: 18px;
     border-radius: 5px;
     margin-top: 4px;
-    @media (max-width: 600px) {
+    @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         font-size: 12px;
     }
 `;

@@ -12,6 +12,7 @@ import SelectInput from 'components/SelectInput';
 import SimpleLoader from 'components/SimpleLoader';
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 import { SortDirection } from 'enums/market';
+import { ScreenSizeBreakpoint } from 'enums/ui';
 import React, { CSSProperties, DependencyList, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -356,7 +357,7 @@ const SortIcon = styled.i<{ selected: boolean; sortDirection: SortDirection }>`
                     : "'\\006A'"
                 : "'\\006A'"};
     }
-    @media (max-width: 512px) {
+    @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         font-size: ${(props) => (props.selected && props.sortDirection !== SortDirection.NONE ? 17 : 14)}px;
     }
 `;

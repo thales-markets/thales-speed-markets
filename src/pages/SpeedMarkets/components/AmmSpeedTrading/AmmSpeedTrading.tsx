@@ -6,6 +6,7 @@ import {
     getLoadingToastOptions,
     getSuccessToastOptions,
 } from 'components/ToastMessage/ToastMessage';
+import Tooltip from 'components/Tooltip';
 import { PLAUSIBLE, PLAUSIBLE_KEYS } from 'constants/analytics';
 import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
 import {
@@ -709,13 +710,20 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 );
             } else {
                 return (
-                    <Button disabled={isAllowing} onClick={() => setOpenApprovalModal(true)}>
-                        {isAllowing
-                            ? t('common.enable-wallet-access.approve-progress')
-                            : t('common.enable-wallet-access.approve')}
-                        <CollateralText>&nbsp;{isEth ? CRYPTO_CURRENCY_MAP.WETH : selectedCollateral}</CollateralText>
-                        {isAllowing ? '...' : ''}
-                    </Button>
+                    <>
+                        <Button disabled={isAllowing} onClick={() => setOpenApprovalModal(true)}>
+                            {isAllowing
+                                ? t('common.enable-wallet-access.approve-progress')
+                                : t('common.enable-wallet-access.approve')}
+                            <CollateralText>
+                                &nbsp;
+                                {isEth ? CRYPTO_CURRENCY_MAP.WETH : selectedCollateral}
+                            </CollateralText>
+                            {!isMobile && <Tooltip overlay={t('speed-markets.tooltips.eth-to-weth')} />}
+                            {isAllowing ? '...' : ''}
+                        </Button>
+                        {isMobile && <InfoText>{t('speed-markets.tooltips.eth-to-weth')}</InfoText>}
+                    </>
                 );
             }
         }
@@ -904,6 +912,13 @@ const QuoteText = styled.span`
     font-weight: 800;
     line-height: 100%;
     text-transform: capitalize;
+`;
+
+const InfoText = styled.span`
+    font-weight: 400;
+    font-size: 13px;
+    letter-spacing: 0.13px;
+    color: ${(props) => props.theme.textColor.quinary};
 `;
 
 export default AmmSpeedTrading;
