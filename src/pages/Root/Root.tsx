@@ -51,9 +51,9 @@ const Root: React.FC<RootProps> = ({ store }) => {
                 <Provider store={store}>
                     <AuthCoreContextProvider
                         options={{
-                            projectId: '2b8c8b75-cc7a-4111-923f-0043b9fa908b',
-                            clientKey: 'cS3khABdBgfK4m8CzYcL1xcgVM6cuflmNY6dFxdY',
-                            appId: 'aab773d8-c4e9-43ae-aa57-0d898f3dbf46',
+                            projectId: import.meta.env.VITE_APP_PARTICLE_PROJECT_ID,
+                            clientKey: import.meta.env.VITE_APP_PARTICLE_CLIENT_KEY,
+                            appId: import.meta.env.VITE_APP_PARTICLE_API_ID,
                             language: 'en',
                             wallet: {
                                 visible: false,
