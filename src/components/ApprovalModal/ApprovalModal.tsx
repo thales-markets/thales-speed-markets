@@ -6,9 +6,12 @@ import NumericInput from 'components/fields/NumericInput/NumericInput';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
+import { getIsMobile } from 'redux/modules/ui';
 import styled from 'styled-components';
 import { FlexDivCentered, FlexDivColumnCentered, FlexDivRow } from 'styles/common';
 import { Coins, bigNumberFormatter, coinParser } from 'thales-utils';
+import { RootState } from 'types/ui';
 import { maxUint256 } from 'viem';
 import { useAccount, useChainId } from 'wagmi';
 
@@ -24,6 +27,8 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({ defaultAmount, tokenSymbo
     const { t } = useTranslation();
     const { isConnected } = useAccount();
     const networkId = useChainId();
+    const isMobile = useSelector((state: RootState) => getIsMobile(state));
+
     const [amount, setAmount] = useState<number | string>(defaultAmount);
     const [approveAll, setApproveAll] = useState<boolean>(true);
     const [isAmountValid, setIsAmountValid] = useState<boolean>(true);
@@ -65,7 +70,7 @@ const ApprovalModal: React.FC<ApprovalModalProps> = ({ defaultAmount, tokenSymbo
             title={t('common.enable-wallet-access.approve', { currencyKey: tokenSymbol })}
             onClose={onClose}
             shouldCloseOnOverlayClick={false}
-            width="100%"
+            width={isMobile ? '100%' : 'auto'}
         >
             <Container>
                 <CheckboxContainer>

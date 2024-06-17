@@ -143,6 +143,7 @@ const CardPosition: React.FC<CardPositionProps> = ({
                                 disabled={isActionInProgress}
                                 isIconHidden
                                 additionalStyles={{ margin: '0' }}
+                                invertCollors
                             />
                         </InfoRow>
                     )}

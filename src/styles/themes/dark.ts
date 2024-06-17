@@ -76,8 +76,8 @@ export default {
             secondary: Colors.PURPLE,
         },
         textColor: {
-            primary: Colors.WHITE,
-            secondary: Colors.PURPLE,
+            primary: Colors.PURPLE,
+            secondary: Colors.WHITE,
         },
     },
     link: {

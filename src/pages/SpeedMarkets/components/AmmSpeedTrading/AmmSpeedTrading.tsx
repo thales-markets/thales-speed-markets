@@ -98,7 +98,7 @@ type AmmSpeedTradingProps = {
     hasError: boolean;
 };
 
-const DEFAULT_MAX_CREATOR_DELAY_TIME_SEC = 30;
+const DEFAULT_MAX_CREATOR_DELAY_TIME_SEC = 15;
 
 const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     isChained,
@@ -594,7 +594,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                     refetchActiveSpeedMarkets(isChained, networkId);
                     refetchSpeedMarketsLimits(isChained, networkId);
                     refetchBalances((isBiconomy ? biconomyConnector.address : walletAddress) as string, networkId);
-                    await delay(secondsToMilliseconds(1));
+                    await delay(1500);
                     delayTime++;
                 }
 

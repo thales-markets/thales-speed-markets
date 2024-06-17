@@ -21,6 +21,7 @@
         "market": "Market",
         "on": "on",
         "in": "in",
+        "of": "of",
         "with": "with",
         "above": "Above",
         "below": "Below",
@@ -39,6 +40,7 @@
         "bonus": "Bonus",
         "home": "Home",
         "chart": "Chart",
+        "page": "Page",
         "time-remaining": {
             "ended": "ended",
             "years": "years",

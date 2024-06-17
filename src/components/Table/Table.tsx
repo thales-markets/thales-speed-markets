@@ -13,7 +13,7 @@ import SimpleLoader from 'components/SimpleLoader';
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 import { SortDirection } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
-import React, { CSSProperties, DependencyList, useMemo, useState } from 'react';
+import React, { CSSProperties, DependencyList, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { FlexDiv, FlexDivCentered } from 'styles/common';
@@ -81,23 +81,34 @@ const Table: React.FC<TableProps> = ({
         pageIndex: 0, //initial page index
         pageSize: rowsPerPage || PAGINATION_SIZE[0].value, //default page size
     });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const memoizedColumns = useMemo(() => columns, [...columnsDeps, t]);
+
     const tableInstance = useReactTable({
         columns: memoizedColumns,
         data,
         ...options,
         initialState,
         autoResetSortBy: false,
+        autoResetPageIndex: false, // turn off auto reset of pageIndex
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
-        onPaginationChange: setPagination, //update the pagination state when internal APIs mutate the pagination state
+        onPaginationChange: setPagination, // update the pagination state when internal APIs mutate the pagination state
         state: {
-            //...
             pagination,
         },
     });
+
+    // handle resetting the pageIndex to avoid showing empty pages (required when autoResetPageIndex is turned off)
+    useEffect(() => {
+        const maxPageIndex = Math.ceil(data.length / pagination.pageSize) - 1;
+
+        if (pagination.pageIndex > maxPageIndex) {
+            setPagination({ ...pagination, pageIndex: maxPageIndex });
+        }
+    }, [data.length, pagination]);
 
     return (
         <>
@@ -206,9 +217,9 @@ const Table: React.FC<TableProps> = ({
                 </SelectWrapper>
 
                 <SelectWrapper className="flex items-center gap-1">
-                    <PaginationLabel>Page</PaginationLabel>
+                    <PaginationLabel>{t('common.page')}</PaginationLabel>
                     <PaginationLabel>
-                        {tableInstance.getState().pagination.pageIndex + 1} of{' '}
+                        {tableInstance.getState().pagination.pageIndex + 1} {t('common.of')}{' '}
                         {tableInstance.getPageCount().toLocaleString()}
                     </PaginationLabel>
                 </SelectWrapper>

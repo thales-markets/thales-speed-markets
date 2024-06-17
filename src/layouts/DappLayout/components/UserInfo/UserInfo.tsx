@@ -171,19 +171,6 @@ const FlexColumn = styled(FlexDivColumn)`
     }
 `;
 
-const MenuItem = styled(FlexDivStart)`
-    align-items: center;
-    cursor: pointer;
-
-    &:hover {
-        color: ${(props) => props.theme.link.textColor.primary};
-        i,
-        span {
-            color: ${(props) => props.theme.link.textColor.primary};
-        }
-    }
-`;
-
 const TextLabel = styled.span`
     color: ${(props) => props.theme.textColor.quinary};
     font-size: 14px;
@@ -198,7 +185,7 @@ const Value = styled(TextLabel)`
 `;
 
 const Icon = styled.i`
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.dropDown.textColor.primary};
     font-size: 24px;
     margin-right: 6px;
 `;
@@ -210,10 +197,23 @@ const CopyIcon = styled.i`
     margin-left: 4px;
 `;
 const Label = styled.span`
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.dropDown.textColor.primary};
     font-size: 14px;
     font-weight: 800;
     line-height: 300%;
+`;
+
+const MenuItem = styled(FlexDivStart)`
+    align-items: center;
+    cursor: pointer;
+
+    &:hover {
+        color: ${(props) => props.theme.dropDown.textColor.secondary};
+        ${Icon},
+        ${Label} {
+            color: ${(props) => props.theme.dropDown.textColor.secondary};
+        }
+    }
 `;
 
 const SessionWrapper = styled(FlexDivRowCentered)`
