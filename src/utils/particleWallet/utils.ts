@@ -27,10 +27,7 @@ export const isSocialLogin = (authType: any) => isSocialAuthType(authType) || (a
 export const getOnRamperUrl = (apiKey: string, walletAddress: string, networkId: SupportedNetwork) => {
     return `https://buy.onramper.com?apiKey=${apiKey}&mode=buy&onlyCryptos=${supportedOnramperTokens(
         networkId
-    )}&networkWallets=${getNetworkNameByNetworkId(
-        networkId,
-        true
-    )}:${walletAddress}'&themeName=dark&containerColor=181a20&primaryColor=1D976C&secondaryColor=2b3139&cardColor=2b3139&primaryTextColor=ffffff&secondaryTextColor=848e9c&borderRadius=0.5&wgBorderRadius=1'`;
+    )}&networkWallets=${getNetworkNameByNetworkId(networkId, true)}:${walletAddress}&${ONRAMPER_STYLE}`;
 };
 
 const supportedOnramperTokens = (networkId: SupportedNetwork) => {
@@ -49,3 +46,6 @@ const supportedOnramperTokens = (networkId: SupportedNetwork) => {
             return 'usdc_optimism, usdt_optimism, dai_optimism, op_optimism, eth_optimism, usdc_arbitrum, usdt_arbitrum, dai_arbitrum, arb_arbitrum, eth_arbitrum, usdc_base, eth_base, usdc_polygon, usdc_zksync';
     }
 };
+
+const ONRAMPER_STYLE =
+    'themeName=dark&containerColor=000000ff&primaryColor=c294f5ff&secondaryColor=000000ff&cardColor=1a1a1a&primaryTextColor=ffffff&secondaryTextColor=ffffff&borderRadius=0.5&wgBorderRadius=1';
