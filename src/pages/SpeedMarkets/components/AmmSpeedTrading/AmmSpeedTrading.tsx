@@ -356,12 +356,13 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
     // Submit validations
     useEffect(() => {
-        const payout = convertToStable(paidAmount) * potentialProfit;
-        if (payout > 0) {
+        const convertedStablePaidAmount = convertToStable(paidAmount);
+        if (convertedStablePaidAmount > 0) {
             if (isChained) {
                 if (ammChainedSpeedMarketsLimits?.risk) {
                     setOutOfLiquidity(
-                        ammChainedSpeedMarketsLimits?.risk.current + payout > ammChainedSpeedMarketsLimits?.risk.max
+                        ammChainedSpeedMarketsLimits?.risk.current + convertedStablePaidAmount >
+                            ammChainedSpeedMarketsLimits?.risk.max
                     );
                     setOutOfLiquidityPerDirection(false);
                 }
@@ -371,7 +372,8 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 )[0];
                 if (riskPerAssetAndDirectionData) {
                     setOutOfLiquidityPerDirection(
-                        riskPerAssetAndDirectionData?.current + payout > riskPerAssetAndDirectionData?.max
+                        riskPerAssetAndDirectionData?.current + convertedStablePaidAmount >
+                            riskPerAssetAndDirectionData?.max
                     );
                 }
 
@@ -379,7 +381,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                     (data) => data.currency === currencyKey
                 )[0];
                 if (riskPerAssetData) {
-                    setOutOfLiquidity(riskPerAssetData?.current + payout > riskPerAssetData?.max);
+                    setOutOfLiquidity(riskPerAssetData?.current + convertedStablePaidAmount > riskPerAssetData?.max);
                 }
             }
         } else {
@@ -392,7 +394,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         currencyKey,
         convertToStable,
         paidAmount,
-        potentialProfit,
         positionType,
     ]);
 
