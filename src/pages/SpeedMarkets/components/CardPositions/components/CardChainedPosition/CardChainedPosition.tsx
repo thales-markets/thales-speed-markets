@@ -188,6 +188,7 @@ const CardChainedPosition: React.FC<CardChainedPositionProps> = ({
                                 disabled={isActionInProgress}
                                 isIconHidden
                                 additionalStyles={{ margin: '0' }}
+                                invertCollors
                             />
                         </InfoRow>
                     )}

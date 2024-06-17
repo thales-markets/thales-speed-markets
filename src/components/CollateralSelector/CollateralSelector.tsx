@@ -21,6 +21,7 @@ type CollateralSelectorProps = {
     exchangeRates?: Rates | null;
     dropDownWidth?: string;
     additionalStyles?: CSSProperties;
+    invertCollors?: boolean;
 };
 
 const CollateralSelector: React.FC<CollateralSelectorProps> = ({
@@ -34,6 +35,7 @@ const CollateralSelector: React.FC<CollateralSelectorProps> = ({
     exchangeRates,
     dropDownWidth,
     additionalStyles,
+    invertCollors,
 }) => {
     const dispatch = useDispatch();
 
@@ -71,12 +73,12 @@ const CollateralSelector: React.FC<CollateralSelectorProps> = ({
                             className={`currency-icon currency-icon--${collateralArray[selectedItem].toLowerCase()}`}
                         />
                     )}
-                    <SelectedTextCollateral color={additionalStyles?.color}>
+                    <SelectedTextCollateral invertCollors={invertCollors}>
                         {collateralArray[selectedItem]}
                     </SelectedTextCollateral>
                     {collateralArray.length > 1 && (
                         <Arrow
-                            color={additionalStyles?.color}
+                            invertCollors={invertCollors}
                             className={open ? `icon icon--caret-up` : `icon icon--caret-down`}
                         />
                     )}
@@ -92,21 +94,26 @@ const CollateralSelector: React.FC<CollateralSelectorProps> = ({
                                               onChangeCollateral(collateral.index);
                                               dispatch(setSelectedCollateralIndex(collateral.index));
                                           }}
+                                          invertCollors={invertCollors}
                                       >
+                                          {selectedItem === i && <SelectedIndicator />}
                                           <div>
                                               <Icon
+                                                  invertCollors={invertCollors}
                                                   className={`currency-icon currency-icon--${collateral.name.toLowerCase()}`}
                                               />
-                                              <TextCollateral fontWeight="400">{collateral.name}</TextCollateral>
+                                              <TextCollateral invertCollors={invertCollors} fontWeight="400">
+                                                  {collateral.name}
+                                              </TextCollateral>
                                           </div>
                                           <div>
-                                              <TextCollateral fontWeight="400">
+                                              <TextCollateral invertCollors={invertCollors} fontWeight="400">
                                                   {formatCurrencyWithSign(
                                                       null,
                                                       collateralBalances ? collateralBalances[collateral.name] : 0
                                                   )}
                                               </TextCollateral>
-                                              <TextCollateral fontWeight="800">
+                                              <TextCollateral invertCollors={invertCollors} fontWeight="800">
                                                   {!exchangeRates?.[collateral.name] &&
                                                   !isStableCurrency(collateral.name as Coins)
                                                       ? '...'
@@ -131,8 +138,10 @@ const CollateralSelector: React.FC<CollateralSelectorProps> = ({
                                               onChangeCollateral(index);
                                               dispatch(setSelectedCollateralIndex(index));
                                           }}
+                                          invertCollors={invertCollors}
                                       >
-                                          <TextCollateral>{collateral}</TextCollateral>
+                                          {selectedItem === index && <SelectedIndicator />}
+                                          <TextCollateral invertCollors={invertCollors}>{collateral}</TextCollateral>
                                       </CollateralOption>
                                   );
                               })}
@@ -158,8 +167,9 @@ const Text = styled.span<{ fontWeight?: string }>`
     }
 `;
 
-const TextCollateral = styled(Text)<{ color?: string }>`
-    color: ${(props) => (props.color ? props.color : props.theme.dropDown.textColor.primary)};
+const TextCollateral = styled(Text)<{ invertCollors?: boolean }>`
+    color: ${(props) =>
+        props.invertCollors ? props.theme.dropDown.textColor.secondary : props.theme.dropDown.textColor.primary};
     font-weight: 700;
     -webkit-user-select: none;
     -moz-user-select: none;
@@ -169,14 +179,16 @@ const TextCollateral = styled(Text)<{ color?: string }>`
 `;
 
 const SelectedTextCollateral = styled(TextCollateral)`
-    color: ${(props) => (props.color ? props.color : props.theme.dropDown.textColor.primary)};
+    color: ${(props) =>
+        props.invertCollors ? props.theme.dropDown.textColor.secondary : props.theme.dropDown.textColor.primary};
     margin-right: 4px;
 `;
 
-const Arrow = styled.i<{ color?: string }>`
+const Arrow = styled.i<{ invertCollors?: boolean }>`
     font-size: 10px;
     text-transform: none;
-    color: ${(props) => (props.color ? props.color : props.theme.dropDown.textColor.primary)};
+    color: ${(props) =>
+        props.invertCollors ? props.theme.dropDown.textColor.secondary : props.theme.dropDown.textColor.primary};
     margin-bottom: 2px;
 `;
 
@@ -208,25 +220,29 @@ const DetailedDropdown = styled(FlexDivColumnCentered)<{ width?: string }>`
     z-index: 100;
 `;
 
-const CollateralOption = styled.div`
+const CollateralOption = styled.div<{ invertCollors?: boolean }>`
     display: flex;
     align-items: center;
-    padding: 5px 7px;
+    padding: 5px 7px 5px 17px;
     border-radius: 8px;
     cursor: pointer;
     &:hover {
         ${TextCollateral} {
-            color: ${(props) => props.theme.dropDown.textColor.secondary};
+            color: ${(props) =>
+                props.invertCollors
+                    ? props.theme.dropDown.textColor.primary
+                    : props.theme.dropDown.textColor.secondary};
         }
     }
 `;
 
-const Icon = styled.i`
+const Icon = styled.i<{ invertCollors?: boolean }>`
     font-size: 25px;
     line-height: 100%;
     margin-right: 10px;
     background: ${(props) => props.theme.dropDown.background.primary};
-    color: ${(props) => props.theme.dropDown.textColor.primary};
+    color: ${(props) =>
+        props.invertCollors ? props.theme.dropDown.textColor.secondary : props.theme.dropDown.textColor.primary};
     border-radius: 50%;
 `;
 
@@ -235,15 +251,27 @@ const AssetIcon = styled(Icon)`
     margin-right: 4px;
 `;
 
-const DetailedCollateralOption = styled(FlexDivSpaceBetween)`
+const DetailedCollateralOption = styled(FlexDivSpaceBetween)<{ invertCollors?: boolean }>`
     padding: 5px 24px;
     border-radius: 8px;
     cursor: pointer;
     &:hover {
         ${Icon}, ${TextCollateral} {
-            color: ${(props) => props.theme.dropDown.textColor.secondary};
+            color: ${(props) =>
+                props.invertCollors
+                    ? props.theme.dropDown.textColor.primary
+                    : props.theme.dropDown.textColor.secondary};
         }
     }
+`;
+
+export const SelectedIndicator = styled.div`
+    position: absolute;
+    left: 8px;
+    background: ${(props) => props.theme.button.textColor.tertiary};
+    border-radius: 20px;
+    width: 6px;
+    height: 6px;
 `;
 
 export default CollateralSelector;

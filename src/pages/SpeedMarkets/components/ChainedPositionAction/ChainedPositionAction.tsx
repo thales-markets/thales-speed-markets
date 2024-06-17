@@ -480,6 +480,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                         disabled={isSubmitting || isAllowing}
                         isIconHidden
                         additionalStyles={{ margin: '0 12px 0 0' }}
+                        invertCollors
                     />
                 )}
                 {getActionStatus()}

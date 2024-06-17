@@ -126,6 +126,11 @@ const NetworkWrapper = styled.div`
     cursor: pointer;
     width: 100%;
     padding-left: 10px;
+    &:hover {
+        ${AssetIcon}, ${NetworkText} {
+            color: ${(props) => props.theme.dropDown.textColor.secondary};
+        }
+    }
 `;
 
 const NetworkSelectedIndicator = styled.div`

@@ -386,6 +386,7 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
                                             onChangeCollateral={() => {}}
                                             disabled
                                             isIconHidden
+                                            invertCollors
                                         />
                                     </CollateralSelectorContainer>
                                 )}
