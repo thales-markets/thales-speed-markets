@@ -89,7 +89,11 @@ const SharePosition: React.FC<{
                     />
                 ) : (
                     <SharePositionModal
-                        type={position.isClaimable ? 'resolved-speed' : 'potential-speed'}
+                        type={
+                            position.isClaimable || (position as UserPosition).isResolved
+                                ? 'resolved-speed'
+                                : 'potential-speed'
+                        }
                         positions={[(position as UserPosition).side]}
                         currencyKey={position.currencyKey}
                         strikeDate={position.maturityDate}
