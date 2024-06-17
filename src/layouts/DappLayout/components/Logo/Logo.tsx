@@ -29,6 +29,7 @@ const LogoIcon = styled.i`
     @media screen and (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         font-size: 40px;
         line-height: 40px;
+        margin-right: 0;
     }
 `;
 
