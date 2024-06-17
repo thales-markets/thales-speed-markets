@@ -238,15 +238,13 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
                     width="auto"
                 >
                     <OutsideClick onOutsideClick={() => setShowOnramper(false)}>
-                        <div style={{ background: 'black', marginBottom: '2px' }}>
-                            <iframe
+                        <ModalWrapper>
+                            <IFrame
                                 src={onramperUrl}
                                 title="Onramper Widget"
-                                height="630px"
-                                width="420px"
                                 allow="accelerometer; autoplay; camera; gyroscope; payment"
                             />
-                        </div>
+                        </ModalWrapper>
                     </OutsideClick>
                 </Modal>
             )}
@@ -435,6 +433,16 @@ const ButtonWrapper = styled.div`
 const Link = styled.a`
     color: ${(props) => props.theme.textColor.quinary};
     text-decoration: underline;
+`;
+
+const ModalWrapper = styled.div`
+    background: ${(props) => props.theme.background.primary};
+    margin-bottom: 2px;
+`;
+
+const IFrame = styled.iframe`
+    height: 630px;
+    width: 420px;
 `;
 
 export default Step;
