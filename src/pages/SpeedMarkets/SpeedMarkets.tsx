@@ -23,7 +23,7 @@ import { useLocation } from 'react-router-dom';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
 import styled from 'styled-components';
-import { BoldText, PAGE_MAX_WIDTH } from 'styles/common';
+import { BoldText, FlexDivEnd, PAGE_MAX_WIDTH } from 'styles/common';
 import { roundNumberToDecimals } from 'thales-utils';
 import { RootState } from 'types/ui';
 import { getSupportedNetworksByRoute } from 'utils/network';
@@ -298,7 +298,7 @@ const SpeedMarkets: React.FC = () => {
                             showTabs
                         />
                     )}
-                    <OverviewLinkWrapper $isTableAbove={isConnected}>
+                    <OverviewLinkWrapper>
                         <SPAAnchor
                             href={buildHref(
                                 `${ROUTES.Markets.SpeedMarketsOverview}?isChained=${
@@ -398,29 +398,37 @@ const Info = styled.span`
     min-height: 40px;
 `;
 
-const OverviewLinkWrapper = styled.div<{ $isTableAbove: boolean }>`
+const OverviewLinkWrapper = styled(FlexDivEnd)`
     position: relative;
-    width: max-content;
-    margin-top: ${(props) => (props.$isTableAbove ? '-39px' : '20px')};
+    margin-top: 20px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         margin-top: 10px;
     }
 `;
 
 const OverviewLinkText = styled.span`
+    font-family: ${(props) => props.theme.fontFamily.secondary};
     font-size: 18px;
+    font-weight: 800;
     line-height: 110%;
+    text-transform: uppercase;
     &:hover {
         text-decoration: underline;
+    }
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        font-weight: 500;
     }
 `;
 
 const ArrowRight = styled.i`
-    font-size: 14px;
+    font-size: 20px;
+    font-weight: 800;
     margin-left: 6px;
+    margin-top: -4px;
     color: ${(props) => props.theme.textColor.primary};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        margin-bottom: 4px;
+        font-size: 16px;
+        font-weight: 400;
     }
 `;
 

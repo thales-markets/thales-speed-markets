@@ -47,7 +47,7 @@ export const Tab = styled.span<{
     box-shadow: ${(props) => (props.$active ? `0px 2px ${props.theme.borderColor.quaternary};` : '')};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         font-size: 14px;
-        line-height: 24px;
+        line-height: 30px;
         padding: 0 20px;
     }
 `;
@@ -91,6 +91,6 @@ export const Notification = styled.span<{ $isSelected: boolean }>`
         line-height: 20px;
         min-width: 20px;
         margin-left: 6px;
-        padding: 0 5px 0 4px;
+        padding: 0 5px;
     }
 `;

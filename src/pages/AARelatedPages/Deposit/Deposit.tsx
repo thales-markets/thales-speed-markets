@@ -73,7 +73,7 @@ const Deposit: React.FC = () => {
             <LinkContainer>
                 <SPAAnchor href={`${buildHref(ROUTES.Markets.SpeedMarkets)}`}>
                     <LinkWrapper>
-                        <NavigationIcon isLeft className={`icon icon--left`} />
+                        <NavigationIcon isLeft className={`icon icon--arrow`} />
                         {t('speed-markets.title')}
                     </LinkWrapper>
                 </SPAAnchor>
