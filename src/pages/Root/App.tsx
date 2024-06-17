@@ -27,7 +27,7 @@ import enTranslation from '../../i18n/en.json';
 import biconomyConnector from 'utils/biconomyWallet';
 import { setIsBiconomy } from 'redux/modules/wallet';
 import { particleWagmiWallet } from 'utils/particleWallet/particleWagmiWallet';
-import { useConnect as useParticleConnect } from '@particle-network/auth-core-modal';
+import { useConnect as useParticleConnect, useSolana } from '@particle-network/auth-core-modal';
 import { AuthCoreEvent, getLatestAuthType, particleAuth, SocialAuthType } from '@particle-network/auth-core';
 import { isSocialLogin } from 'utils/particleWallet/utils';
 import Deposit from 'pages/AARelatedPages/Deposit';
@@ -41,6 +41,7 @@ const App = () => {
     const { connect } = useConnect();
     const { isConnected } = useAccount();
     const { connectionStatus } = useParticleConnect();
+    const { address: solanaAddress, enable } = useSolana();
 
     // particle context provider is overriding our i18n configuration and languages, so we need to add our localization after the initialization of particle context
     // initialization of particle context is happening in Root
@@ -81,13 +82,14 @@ const App = () => {
                     biconomyPaymasterApiKey: PAYMASTER_API_KEY,
                 });
                 const smartAddress = await smartAccount.getAccountAddress();
+                if (!solanaAddress) await enable();
 
-                biconomyConnector.setWallet(smartAccount, smartAddress);
+                biconomyConnector.setWallet(smartAccount, smartAddress, solanaAddress ?? '');
                 dispatch(setIsBiconomy(true));
             };
             createSmartAccount();
         }
-    }, [dispatch, switchChain, networkId, disconnect, walletClient]);
+    }, [dispatch, switchChain, networkId, disconnect, walletClient, enable, solanaAddress]);
 
     useEffect(() => {
         if (connectionStatus === 'connected' && isSocialLogin(getLatestAuthType())) {
