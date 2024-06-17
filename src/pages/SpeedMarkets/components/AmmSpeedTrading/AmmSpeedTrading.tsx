@@ -356,13 +356,12 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
     // Submit validations
     useEffect(() => {
-        const convertedStablePaidAmount = convertToStable(paidAmount);
-        if (convertedStablePaidAmount > 0) {
+        const payout = convertToStable(paidAmount) * potentialProfit;
+        if (payout > 0) {
             if (isChained) {
                 if (ammChainedSpeedMarketsLimits?.risk) {
                     setOutOfLiquidity(
-                        ammChainedSpeedMarketsLimits?.risk.current + convertedStablePaidAmount >
-                            ammChainedSpeedMarketsLimits?.risk.max
+                        ammChainedSpeedMarketsLimits?.risk.current + payout > ammChainedSpeedMarketsLimits?.risk.max
                     );
                     setOutOfLiquidityPerDirection(false);
                 }
@@ -372,8 +371,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 )[0];
                 if (riskPerAssetAndDirectionData) {
                     setOutOfLiquidityPerDirection(
-                        riskPerAssetAndDirectionData?.current + convertedStablePaidAmount >
-                            riskPerAssetAndDirectionData?.max
+                        riskPerAssetAndDirectionData?.current + payout > riskPerAssetAndDirectionData?.max
                     );
                 }
 
@@ -381,7 +379,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                     (data) => data.currency === currencyKey
                 )[0];
                 if (riskPerAssetData) {
-                    setOutOfLiquidity(riskPerAssetData?.current + convertedStablePaidAmount > riskPerAssetData?.max);
+                    setOutOfLiquidity(riskPerAssetData?.current + payout > riskPerAssetData?.max);
                 }
             }
         } else {
@@ -394,6 +392,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         currencyKey,
         convertToStable,
         paidAmount,
+        potentialProfit,
         positionType,
     ]);
 
@@ -771,7 +770,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                                     strikePrice: currentPrice ?? 0,
                                     maturityDate: Date.now() + secondsToMilliseconds(deltaTimeSec || 100),
                                     paid: convertToStable(paidAmount),
-                                    payout: SPEED_MARKETS_QUOTE * convertToStable(paidAmount),
+                                    payout: potentialProfit * convertToStable(paidAmount),
                                     currentPrice: currentPrice ?? 0,
                                     finalPrice: currentPrice ?? 0,
                                     isClaimable: false,

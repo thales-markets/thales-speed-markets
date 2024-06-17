@@ -1,6 +1,6 @@
 import Tooltip from 'components/Tooltip';
 import { USD_SIGN } from 'constants/currency';
-import { secondsToMilliseconds } from 'date-fns';
+import { millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
 import useInterval from 'hooks/useInterval';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -28,7 +28,10 @@ const MarketPrice: React.FC<{ position: UserPosition | UserHistoryPosition }> = 
             setIsMatured(true);
 
             if (finalPrice === 0) {
-                refetchPythPrice(getPriceId(networkId, position.currencyKey), position.maturityDate);
+                refetchPythPrice(
+                    getPriceId(networkId, position.currencyKey),
+                    millisecondsToSeconds(position.maturityDate)
+                );
             }
         }
     }, secondsToMilliseconds(1));
