@@ -17,6 +17,7 @@ import { WagmiProvider } from 'wagmi';
 import App from './App';
 import { wagmiConfig } from './wagmiConfig';
 import { AuthCoreContextProvider } from '@particle-network/auth-core-modal';
+import { PARTICLE_STYLE } from 'utils/particleWallet/utils';
 
 window.Buffer = window.Buffer || buffer;
 
@@ -57,6 +58,8 @@ const Root: React.FC<RootProps> = ({ store }) => {
                             wallet: {
                                 visible: false,
                             },
+                            themeType: 'dark',
+                            customStyle: PARTICLE_STYLE,
                         }}
                     >
                         <WagmiProvider config={wagmiConfig}>

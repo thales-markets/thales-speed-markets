@@ -5,6 +5,7 @@ import { getNetworkNameByNetworkId } from 'utils/network';
 import { Connector } from 'wagmi';
 import { isSocialAuthType } from '@particle-network/auth-core';
 import { NetworkId } from 'thales-utils';
+import { CustomStyle } from '@particle-network/auth-core-modal';
 
 export const getClassNameForParticalLogin = (socialId: ParticalTypes) => {
     const label = PARTICAL_LOGINS_CLASSNAMES.find((item) => item.socialId == socialId)?.className;
@@ -49,3 +50,38 @@ const supportedOnramperTokens = (networkId: SupportedNetwork) => {
 
 const ONRAMPER_STYLE =
     'themeName=dark&containerColor=000000ff&primaryColor=c294f5ff&secondaryColor=000000ff&cardColor=1a1a1a&primaryTextColor=ffffff&secondaryTextColor=ffffff&borderRadius=0.5&wgBorderRadius=1';
+
+// light
+export const PARTICLE_STYLE: CustomStyle = {
+    theme: {
+        dark: {
+            themeBackgroundColor: '#000000',
+            primaryBtnColor: '#000',
+            primaryBtnBackgroundColor: '#c294f5',
+            secondaryBtnColor: '#fff',
+            secondaryBtnBackgroundColor: '#474747',
+            textColor: '#fff',
+            secondaryTextColor: '#c294f5',
+            iconBorderColor: '#000000',
+            accentColor: '#c294f5',
+            inputBackgroundColor: '#2b2b2c',
+            inputBorderColor: '#c294f5',
+            inputPlaceholderColor: '#ffffff',
+            cardBorderColor: '#000000',
+            cardUnclickableBackgroundColor: '#181818',
+            cardUnclickableBorderColor: '#c294f5',
+            cardDividerColor: '#252525',
+            tagBackgroundColor: '#202327',
+            modalBackgroundColor: '#212324',
+            tipsBackgroundColor: '#eab98159',
+        },
+    },
+    logo: 'https://wallet.particle.network/favicon.ico',
+    projectName: 'Particle Auth',
+    subtitle: 'Login to App to continue',
+    modalWidth: 400,
+    modalHeight: 650,
+    primaryBtnBorderRadius: '30px',
+    modalBorderRadius: '8px',
+    cardBorderRadius: '8px',
+};
