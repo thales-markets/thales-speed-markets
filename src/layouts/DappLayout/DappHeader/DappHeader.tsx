@@ -4,20 +4,28 @@ import NetworkSwitch from 'components/NetworkSwitch';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import GetStarted from 'pages/AARelatedPages/GetStarted';
 import Withdraw from 'pages/AARelatedPages/Withdraw';
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { getIsMobile } from 'redux/modules/ui';
-import { getWalletConnectModalVisibility, setWalletConnectModalVisibility } from 'redux/modules/wallet';
+import { getIsBiconomy, getWalletConnectModalVisibility, setWalletConnectModalVisibility } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivRow, FlexDivRowCentered, PAGE_MAX_WIDTH } from 'styles/common';
 import { RootState } from 'types/ui';
-import { useAccount } from 'wagmi';
+import { useAccount, useChainId, useClient } from 'wagmi';
 import Logo from '../components/Logo';
 import Notifications from '../components/Notifications';
 import ReferralModal from '../components/ReferralModal';
 import UserInfo from '../components/UserInfo';
 import UserWallet from '../components/UserWallet';
+import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipleCollateralBalanceQuery';
+import useExchangeRatesQuery, { Rates } from 'queries/rates/useExchangeRatesQuery';
+import { getIsAppReady } from 'redux/modules/app';
+import biconomyConnector from 'utils/biconomyWallet';
+import { getCollaterals, isStableCurrency } from 'utils/currency';
+import { Coins } from 'thales-utils';
+import { navigateTo } from 'utils/routes';
+import ROUTES from 'constants/routes';
 
 const DappHeader: React.FC = () => {
     const { t } = useTranslation();
@@ -26,6 +34,12 @@ const DappHeader: React.FC = () => {
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
     const connectWalletModalVisibility = useSelector((state: RootState) => getWalletConnectModalVisibility(state));
     const { isConnected } = useAccount();
+    const networkId = useChainId();
+    const client = useClient();
+    const { address } = useAccount();
+    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
+    const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
+    const walletAddress = isBiconomy ? biconomyConnector.address : address;
 
     const [openReferralModal, setOpenReferralModal] = useState(false);
     const [openGetStarted, setOpenGetStarted] = useState(false);
@@ -33,6 +47,46 @@ const DappHeader: React.FC = () => {
     const [openWithdraw, setOpenWithdraw] = useState(false);
 
     const burgerMenuRef = useRef<HTMLElement>(null);
+
+    const multipleCollateralBalances = useMultipleCollateralBalanceQuery(
+        walletAddress as any,
+        { networkId, client },
+        {
+            enabled: isAppReady,
+        }
+    );
+
+    const exchangeRatesQuery = useExchangeRatesQuery(
+        { networkId, client },
+        {
+            enabled: isAppReady,
+        }
+    );
+
+    const exchangeRates: Rates | null =
+        exchangeRatesQuery.isSuccess && exchangeRatesQuery.data ? exchangeRatesQuery.data : null;
+
+    const getUSDForCollateral = useCallback(
+        (token: Coins) =>
+            (multipleCollateralBalances.data ? multipleCollateralBalances.data[token] : 0) *
+            (isStableCurrency(token as Coins) ? 1 : exchangeRates?.[token] || 0),
+        [multipleCollateralBalances, exchangeRates]
+    );
+
+    const totalBalanceValue = useMemo(() => {
+        let total = 0;
+        try {
+            if (exchangeRates && multipleCollateralBalances.data) {
+                getCollaterals(networkId).forEach((token: Coins) => {
+                    total += getUSDForCollateral(token);
+                });
+            }
+
+            return total ? total : 0;
+        } catch (e) {
+            return 0;
+        }
+    }, [exchangeRates, multipleCollateralBalances.data, networkId, getUSDForCollateral]);
 
     return (
         <Container>
@@ -45,9 +99,11 @@ const DappHeader: React.FC = () => {
                             height="30px"
                             margin="auto 0"
                             fontSize="12px"
-                            onClick={() => setOpenGetStarted(true)}
+                            onClick={() =>
+                                totalBalanceValue > 0 ? navigateTo(ROUTES.Deposit) : setOpenGetStarted(true)
+                            }
                         >
-                            {t('common.header.get-started')}
+                            {t(totalBalanceValue > 0 ? 'deposit.title' : 'common.header.get-started')}
                         </Button>
                     )}
                 </FlexDivRow>
@@ -78,9 +134,9 @@ const DappHeader: React.FC = () => {
                         height="30px"
                         margin="10px"
                         fontSize="12px"
-                        onClick={() => setOpenGetStarted(true)}
+                        onClick={() => (totalBalanceValue > 0 ? navigateTo(ROUTES.Deposit) : setOpenGetStarted(true))}
                     >
-                        {t('common.header.get-started')}
+                        {t(totalBalanceValue > 0 ? 'deposit.title' : 'common.header.get-started')}
                     </Button>
                 )}
 
