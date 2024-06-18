@@ -11,7 +11,7 @@ import { Coins, formatCurrencyWithSign } from 'thales-utils';
 import { isStableCurrency } from 'utils/currency';
 
 type CollateralSelectorProps = {
-    collateralArray: Array<string>;
+    collateralArray: Array<Coins>;
     selectedItem: number;
     onChangeCollateral: (index: number) => void;
     disabled?: boolean;
@@ -49,7 +49,7 @@ const CollateralSelector: React.FC<CollateralSelectorProps> = ({
     );
 
     const collateralsDetailsSorted = useMemo(() => {
-        const mappedCollaterals = collateralArray.map((collateral, index) => ({ name: collateral as Coins, index }));
+        const mappedCollaterals = collateralArray.map((collateral, index) => ({ name: collateral, index }));
         if (!isDetailedView) {
             return mappedCollaterals;
         }
@@ -96,7 +96,7 @@ const CollateralSelector: React.FC<CollateralSelectorProps> = ({
                                           }}
                                           invertCollors={invertCollors}
                                       >
-                                          {selectedItem === i && <SelectedIndicator />}
+                                          {collateralArray[selectedItem] === collateral.name && <SelectedIndicator />}
                                           <div>
                                               <Icon
                                                   invertCollors={invertCollors}
@@ -140,7 +140,7 @@ const CollateralSelector: React.FC<CollateralSelectorProps> = ({
                                           }}
                                           invertCollors={invertCollors}
                                       >
-                                          {selectedItem === index && <SelectedIndicator />}
+                                          {collateralArray[selectedItem] === collateral && <SelectedIndicator />}
                                           <TextCollateral invertCollors={invertCollors}>{collateral}</TextCollateral>
                                       </CollateralOption>
                                   );
