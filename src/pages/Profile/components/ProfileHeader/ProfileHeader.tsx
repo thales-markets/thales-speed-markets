@@ -18,11 +18,13 @@ import {
 import { toast } from 'react-toastify';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import Tooltip from 'components/Tooltip';
+import { getIsMobile } from 'redux/modules/ui';
 
 const ProfileHeader: React.FC = () => {
     const networkId = useChainId();
     const { address } = useAccount();
     const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
+    const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const validUntil = window.localStorage.getItem(LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId]);
 
@@ -38,12 +40,14 @@ const ProfileHeader: React.FC = () => {
 
     return (
         <Container>
+            {isBiconomy && !isMobile && <UserAvatar src={getUserInfo()?.avatar} />}
             <FlexColumn>
                 {isBiconomy ? (
                     <>
                         <FlexDivRowCentered>
+                            {isBiconomy && isMobile && <UserAvatar src={getUserInfo()?.avatar} />}
                             <FlexDivColumn>
-                                <TextLabel>{getUserInfo()?.name} </TextLabel>
+                                <Name>{getUserInfo()?.name} </Name>
                                 <Value>{getUserInfo()?.google_email}</Value>
                             </FlexDivColumn>
                         </FlexDivRowCentered>
@@ -82,21 +86,14 @@ const Container = styled(FlexDivSpaceBetween)`
     width: 100%;
     align-items: flex-start;
     padding-top: 18px;
+    gap: 20px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         padding-top: 0;
         flex-direction: column;
-        gap: 10px;
     }
 `;
 const FlexColumn = styled(FlexDivColumn)`
     gap: 10px;
-    &:nth-child(2) {
-        padding: 20px 0;
-        margin-top: 10px;
-        border-top: 1px solid ${(props) => props.theme.borderColor.quaternary};
-        border-bottom: 1px solid ${(props) => props.theme.borderColor.quaternary};
-        margin-bottom: 10px;
-    }
 `;
 
 const TextLabel = styled.span`
@@ -104,6 +101,13 @@ const TextLabel = styled.span`
     font-size: 14px;
     font-weight: 700;
     line-height: normal;
+`;
+
+const Name = styled(TextLabel)`
+    font-size: 26px;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        font-size: 18px;
+    }
 `;
 
 const Value = styled(TextLabel)`
@@ -120,6 +124,17 @@ const CopyIcon = styled.i`
 
 const SessionWrapper = styled(FlexDiv)`
     gap: 8px;
+`;
+
+const UserAvatar = styled.img`
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        width: 44px;
+        height: 44px;
+        margin-right: 8px;
+    }
 `;
 
 export default ProfileHeader;
