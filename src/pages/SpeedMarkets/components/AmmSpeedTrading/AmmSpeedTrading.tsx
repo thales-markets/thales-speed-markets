@@ -771,7 +771,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                                     strikePrice: currentPrice ?? 0,
                                     maturityDate: Date.now() + secondsToMilliseconds(deltaTimeSec || 100),
                                     paid: convertToStable(paidAmount),
-                                    payout: SPEED_MARKETS_QUOTE * convertToStable(paidAmount),
+                                    payout: potentialProfit * convertToStable(paidAmount),
                                     currentPrice: currentPrice ?? 0,
                                     finalPrice: currentPrice ?? 0,
                                     isClaimable: false,

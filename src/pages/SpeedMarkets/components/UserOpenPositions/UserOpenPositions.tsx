@@ -5,6 +5,7 @@ import { USD_SIGN } from 'constants/currency';
 import { millisecondsToSeconds } from 'date-fns';
 import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
+import { Tab, Tabs } from 'pages/Profile/styled-components';
 import { CollateralSelectorContainer } from 'pages/SpeedMarkets/components/MyPositionAction/MyPositionAction';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
@@ -16,7 +17,7 @@ import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
 import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
 import styled from 'styled-components';
-import { FlexDiv, FlexDivCentered, FlexDivColumn, FlexDivEnd, FlexDivStart, GradientContainer } from 'styles/common';
+import { FlexDiv, FlexDivCentered, FlexDivColumn, FlexDivEnd, FlexDivStart } from 'styles/common';
 import { formatCurrencyWithSign } from 'thales-utils';
 import { UserChainedPosition, UserPosition } from 'types/market';
 import { RootState } from 'types/ui';
@@ -318,7 +319,7 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
                         <MobileTitle>{t('speed-markets.user-positions.your-positions')}</MobileTitle>
                         <Tabs>
                             <Tab
-                                $isSelected={!isChainedSelected}
+                                $active={!isChainedSelected}
                                 onClick={() => {
                                     setIsChainedSelected(false);
                                     onChainedSelectedChange && onChainedSelectedChange(false);
@@ -332,7 +333,7 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
                                 )}
                             </Tab>
                             <Tab
-                                $isSelected={isChainedSelected}
+                                $active={isChainedSelected}
                                 onClick={() => {
                                     setIsChainedSelected(true);
                                     onChainedSelectedChange && onChainedSelectedChange(true);
@@ -348,7 +349,6 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
                                 )}
                             </Tab>
                         </Tabs>
-                        <TabsSeparator />
                     </>
                 )}
 
@@ -485,28 +485,14 @@ const Container = styled.div`
     flex-direction: column;
 `;
 
-const Header = styled(FlexDivColumn)``;
-
-const Tabs = styled(FlexDivStart)`
-    align-items: center;
-    gap: 150px;
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        gap: 100px;
-    }
-`;
-
-const Tab = styled.span<{ $isSelected: boolean }>`
-    font-size: 18px;
-    font-weight: 800;
-    line-height: 36px;
-    text-align: left;
-    text-transform: uppercase;
-    color: ${(props) => (props.$isSelected ? props.theme.textColor.quinary : props.theme.textColor.primary)};
-    cursor: pointer;
+const Header = styled(FlexDivColumn)`
+    gap: 15px;
 `;
 
 const Notification = styled.span<{ $isSelected: boolean }>`
     display: inline-block;
+    position: relative;
+    top: -2px;
     background: ${(props) =>
         props.$isSelected ? props.theme.button.background.secondary : props.theme.button.background.quaternary};
     border-radius: 30px;
@@ -519,12 +505,9 @@ const Notification = styled.span<{ $isSelected: boolean }>`
     padding: 0 5px;
     margin-left: 6px;
     text-align: center;
-`;
-
-const TabsSeparator = styled(GradientContainer)`
-    height: 2px;
-    padding-top: 0;
-    margin-bottom: 13px;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        top: 0px;
+    }
 `;
 
 const Filters = styled(FlexDivStart)`
