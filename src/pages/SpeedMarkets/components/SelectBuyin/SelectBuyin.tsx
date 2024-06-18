@@ -2,7 +2,7 @@ import CollateralSelector from 'components/CollateralSelector';
 import NumericInput from 'components/fields/NumericInput';
 import { USD_SIGN } from 'constants/currency';
 import { Positions } from 'enums/market';
-import { ScreenSizeBreakpoint } from 'enums/ui';
+import useDebouncedEffect from 'hooks/useDebouncedEffect';
 import { t } from 'i18next';
 import useExchangeRatesQuery, { Rates } from 'queries/rates/useExchangeRatesQuery';
 import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipleCollateralBalanceQuery';
@@ -11,9 +11,15 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
-import styled from 'styled-components';
-import { FlexDivCentered, FlexDivRow } from 'styles/common';
-import { NetworkId, ceilNumberToDecimals, truncToDecimals } from 'thales-utils';
+import {
+    Coins,
+    NetworkId,
+    ceilNumberToDecimals,
+    floorNumberToDecimals,
+    formatCurrencyWithKey,
+    formatCurrencyWithSign,
+    truncToDecimals,
+} from 'thales-utils';
 import { AmmChainedSpeedMarketsLimits, AmmSpeedMarketsLimits } from 'types/market';
 import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
@@ -29,8 +35,15 @@ import {
 import { getIsMultiCollateralSupported } from 'utils/network';
 import { useAccount, useChainId, useClient } from 'wagmi';
 import { SelectedPosition } from '../SelectPosition/SelectPosition';
-import { Header, HeaderText } from '../SelectPosition/styled-components';
-import useDebouncedEffect from 'hooks/useDebouncedEffect';
+import {
+    Amount,
+    BuyinAmountsWrapper,
+    DollarSign,
+    Header,
+    HeaderBalance,
+    HeaderText,
+    WalletIcon,
+} from '../SelectPosition/styled-components';
 
 type SelectBuyinProps = {
     onChange: React.Dispatch<number>;
@@ -317,10 +330,26 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
         setBuyinAmount(maxPaidAmount);
     };
 
+    const getUSDForCollateral = useCallback(
+        (collateral: Coins) =>
+            (multipleCollateralBalances.data ? multipleCollateralBalances.data[collateral] : 0) *
+            (isStableCurrency(collateral) ? 1 : exchangeRates?.[collateral] || 0),
+        [multipleCollateralBalances.data, exchangeRates]
+    );
+
+    const collateral = getCollaterals(networkId)[selectedCollateralIndex];
+
     return (
         <div>
             <Header>
-                <HeaderText> {t('speed-markets.steps.enter-buyin')}</HeaderText>
+                <HeaderText>{t('speed-markets.steps.enter-buyin')}</HeaderText>
+                <HeaderBalance>
+                    <WalletIcon className="icon icon--wallet-balance" />
+                    {`${formatCurrencyWithKey(
+                        collateral,
+                        multipleCollateralBalances.data ? multipleCollateralBalances.data[collateral] : 0
+                    )} (${formatCurrencyWithSign(USD_SIGN, getUSDForCollateral(collateral))})`}
+                </HeaderBalance>
             </Header>
             <BuyinAmountsWrapper>
                 {stableBuyinAmounts.map((amount, index) => {
@@ -340,7 +369,7 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
                 })}
             </BuyinAmountsWrapper>
             <NumericInput
-                value={buyinAmount || ''}
+                value={floorNumberToDecimals(buyinAmount, 8) || ''}
                 placeholder={t('common.enter-amount')}
                 onChange={(_, value) => {
                     setSelectedStableBuyinAmount(isStableCurrency(selectedCollateral) ? Number(value) : 0);
@@ -371,36 +400,5 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
         </div>
     );
 };
-
-const BuyinAmountsWrapper = styled(FlexDivRow)`
-    margin-bottom: 10px;
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        width: 100%;
-        justify-content: center;
-        gap: 10px;
-    }
-`;
-
-const Amount = styled(FlexDivCentered)<{ $isSelected: boolean }>`
-    width: 60px;
-    height: 40px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 800;
-    line-height: 100%;
-    ${(props) => (props.$isSelected ? '' : `border: 2px solid ${props.theme.button.borderColor.secondary};`)}
-    background: ${(props) =>
-        props.$isSelected ? props.theme.button.background.secondary : props.theme.button.background.primary};
-    color: ${(props) =>
-        props.$isSelected ? props.theme.button.textColor.secondary : props.theme.button.textColor.tertiary};
-    cursor: pointer;
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        width: 100%;
-    }
-`;
-
-const DollarSign = styled.span`
-    padding-right: 2px;
-`;
 
 export default SelectBuyin;

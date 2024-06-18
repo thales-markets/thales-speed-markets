@@ -1,6 +1,6 @@
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import styled from 'styled-components';
-import { FlexDivCentered, FlexDivColumn, FlexDivColumnCentered, FlexDivRow, FlexDivSpaceBetween } from 'styles/common';
+import { FlexDivCentered, FlexDivColumnCentered, FlexDivRow, FlexDivSpaceBetween } from 'styles/common';
 
 export const PositionContainer = styled(FlexDivRow)`
     align-items: center;
@@ -17,7 +17,7 @@ export const PlusMinusIcon = styled.i`
     cursor: pointer;
 `;
 
-export const Header = styled(FlexDivColumn)`
+export const Header = styled(FlexDivRow)`
     margin-bottom: 12px;
 `;
 
@@ -27,6 +27,19 @@ export const HeaderText = styled.span`
     line-height: 18px;
     text-transform: uppercase;
     color: ${(props) => props.theme.textColor.quinary};
+`;
+
+export const HeaderBalance = styled.span`
+    font-size: 14px;
+    line-height: 18px;
+    color: ${(props) => props.theme.textColor.quinary};
+`;
+
+export const WalletIcon = styled.i`
+    font-size: 16px;
+    color: ${(props) => props.theme.icon.textColor.tertiary};
+    margin-right: 5px;
+    margin-top: -2px;
 `;
 
 export const HeaderSubText = styled(HeaderText)`
@@ -144,4 +157,35 @@ export const Bonus = styled.div<{ $isSelected: boolean }>`
     font-size: 13px;
     font-weight: 700;
     white-space: nowrap;
+`;
+
+export const BuyinAmountsWrapper = styled(FlexDivRow)`
+    margin-bottom: 10px;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        width: 100%;
+        justify-content: center;
+        gap: 10px;
+    }
+`;
+
+export const Amount = styled(FlexDivCentered)<{ $isSelected: boolean }>`
+    width: 60px;
+    height: 40px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 100%;
+    ${(props) => (props.$isSelected ? '' : `border: 2px solid ${props.theme.button.borderColor.secondary};`)}
+    background: ${(props) =>
+        props.$isSelected ? props.theme.button.background.secondary : props.theme.button.background.primary};
+    color: ${(props) =>
+        props.$isSelected ? props.theme.button.textColor.secondary : props.theme.button.textColor.tertiary};
+    cursor: pointer;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        width: 100%;
+    }
+`;
+
+export const DollarSign = styled.span`
+    padding-right: 2px;
 `;
