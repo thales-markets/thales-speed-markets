@@ -123,11 +123,11 @@ const RightContainer = styled(FlexDivCentered)<{ hasLabel?: boolean }>`
 `;
 
 const CurrencyLabel = styled.label<{ $hasSeparator?: boolean }>`
-    border-left: ${(props) => (props.$hasSeparator ? `2px solid ${props.theme.textColor.primary}` : 'none')};
+    border-left: ${(props) => (props.$hasSeparator ? `2px solid ${props.theme.input.textColor.secondary}` : 'none')};
     font-weight: bold;
     font-size: 13px;
     line-height: 26px;
-    color: ${(props) => props.theme.input.textColor.primary};
+    color: ${(props) => props.theme.input.textColor.secondary};
     padding-left: 8px;
     padding-right: 12px;
     pointer-events: none;
@@ -173,7 +173,7 @@ const ValidationText = styled.span`
 `;
 
 const CurrencyComponentContainer = styled(FlexDivCentered)<{ $hasSeparator?: boolean }>`
-    ${(props) => (props.$hasSeparator ? `border-left: 2px solid ${props.theme.textColor.primary};` : '')}
+    ${(props) => (props.$hasSeparator ? `border-left: 2px solid ${props.theme.input.textColor.secondary};` : '')}
     line-height: 15px;
     padding-right: 2px;
     &.disabled {

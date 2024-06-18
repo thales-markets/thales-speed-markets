@@ -17,3 +17,8 @@
     font-family: 'NetworkIcons';
     src: local('NetworkIcons'), url(/fonts/speedmarkets.ttf) format('truetype');
 }
+
+@font-face {
+    font-family: 'SocialIcons';
+    src: local('SocialIcons'), url(/fonts/socialIcons.ttf) format('truetype');
+}

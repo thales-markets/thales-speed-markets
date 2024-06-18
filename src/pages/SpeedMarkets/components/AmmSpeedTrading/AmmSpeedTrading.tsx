@@ -773,7 +773,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                                     paid: convertToStable(paidAmount),
                                     payout: potentialProfit * convertToStable(paidAmount),
                                     currentPrice: currentPrice ?? 0,
-                                    finalPrice: currentPrice ?? 0,
+                                    finalPrice: 0,
                                     isClaimable: false,
                                     isResolved: false,
                                     createdAt: 0,

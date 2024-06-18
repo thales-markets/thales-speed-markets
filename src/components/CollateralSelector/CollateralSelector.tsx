@@ -44,7 +44,7 @@ const CollateralSelector: React.FC<CollateralSelectorProps> = ({
     const getUSDForCollateral = useCallback(
         (collateral: Coins) =>
             (collateralBalances ? collateralBalances[collateral] : 0) *
-            (isStableCurrency(collateral as Coins) ? 1 : exchangeRates?.[collateral] || 0),
+            (isStableCurrency(collateral) ? 1 : exchangeRates?.[collateral] || 0),
         [collateralBalances, exchangeRates]
     );
 
@@ -115,11 +115,11 @@ const CollateralSelector: React.FC<CollateralSelectorProps> = ({
                                               </TextCollateral>
                                               <TextCollateral invertCollors={invertCollors} fontWeight="800">
                                                   {!exchangeRates?.[collateral.name] &&
-                                                  !isStableCurrency(collateral.name as Coins)
+                                                  !isStableCurrency(collateral.name)
                                                       ? '...'
                                                       : ` (${formatCurrencyWithSign(
                                                             USD_SIGN,
-                                                            getUSDForCollateral(collateral.name as Coins)
+                                                            getUSDForCollateral(collateral.name)
                                                         )})`}
                                               </TextCollateral>
                                           </div>
