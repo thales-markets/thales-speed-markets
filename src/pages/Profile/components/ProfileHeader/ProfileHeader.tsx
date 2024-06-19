@@ -1,7 +1,7 @@
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 import { t } from 'i18next';
 import { getUserInfo } from '@particle-network/auth-core';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { getIsBiconomy } from 'redux/modules/wallet';
 import styled from 'styled-components';
@@ -19,6 +19,20 @@ import { toast } from 'react-toastify';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import Tooltip from 'components/Tooltip';
 import { getIsMobile } from 'redux/modules/ui';
+
+import avatar1 from 'assets/images/avatars/avatar1.webp';
+import avatar2 from 'assets/images/avatars/avatar2.webp';
+import avatar3 from 'assets/images/avatars/avatar3.webp';
+import avatar4 from 'assets/images/avatars/avatar4.webp';
+import avatar5 from 'assets/images/avatars/avatar1.webp';
+import avatar6 from 'assets/images/avatars/avatar2.webp';
+import avatar7 from 'assets/images/avatars/avatar3.webp';
+import avatar8 from 'assets/images/avatars/avatar4.webp';
+import avatar9 from 'assets/images/avatars/avatar1.webp';
+import avatar10 from 'assets/images/avatars/avatar2.webp';
+import avatar11 from 'assets/images/avatars/avatar3.webp';
+import avatar12 from 'assets/images/avatars/avatar4.webp';
+import avatar13 from 'assets/images/avatars/avatar2.webp';
 
 const ProfileHeader: React.FC = () => {
     const networkId = useChainId();
@@ -38,14 +52,76 @@ const ProfileHeader: React.FC = () => {
         }
     };
 
+    const avatarUrl = useMemo(() => {
+        if (isBiconomy) {
+            const userInfo = getUserInfo();
+            if (userInfo && userInfo.avatar) {
+                return userInfo.avatar;
+            }
+
+            function getRandomInt(max: number) {
+                return Math.floor(Math.random() * max);
+            }
+
+            const randomAvatarIndex = getRandomInt(13) + 1;
+            let avatarUrlLocal = localStorage.getItem(LOCAL_STORAGE_KEYS.AVATAR_URL);
+            if (!avatarUrlLocal) {
+                switch (randomAvatarIndex) {
+                    case 1:
+                        avatarUrlLocal = avatar1;
+                        break;
+                    case 2:
+                        avatarUrlLocal = avatar2;
+                        break;
+                    case 3:
+                        avatarUrlLocal = avatar3;
+                        break;
+                    case 4:
+                        avatarUrlLocal = avatar4;
+                        break;
+                    case 5:
+                        avatarUrlLocal = avatar5;
+                        break;
+                    case 6:
+                        avatarUrlLocal = avatar6;
+                        break;
+                    case 7:
+                        avatarUrlLocal = avatar7;
+                        break;
+                    case 8:
+                        avatarUrlLocal = avatar8;
+                        break;
+                    case 9:
+                        avatarUrlLocal = avatar9;
+                        break;
+                    case 10:
+                        avatarUrlLocal = avatar10;
+                        break;
+                    case 11:
+                        avatarUrlLocal = avatar11;
+                        break;
+                    case 12:
+                        avatarUrlLocal = avatar12;
+                        break;
+                    case 13:
+                        avatarUrlLocal = avatar13;
+                        break;
+                }
+                if (avatarUrlLocal) localStorage.setItem(LOCAL_STORAGE_KEYS.AVATAR_URL, avatarUrlLocal);
+            }
+
+            return avatarUrlLocal;
+        }
+    }, [isBiconomy]);
+
     return (
         <Container>
-            {isBiconomy && !isMobile && <UserAvatar src={getUserInfo()?.avatar} />}
+            {isBiconomy && !isMobile && <UserAvatar src={avatarUrl as string} />}
             <FlexColumn>
                 {isBiconomy ? (
                     <>
                         <FlexDivRowCentered>
-                            {isBiconomy && isMobile && <UserAvatar src={getUserInfo()?.avatar} />}
+                            {isBiconomy && isMobile && <UserAvatar src={avatarUrl as string} />}
                             <FlexDivColumn>
                                 <Name>{getUserInfo()?.name} </Name>
                                 <Value>{getUserInfo()?.google_email}</Value>

@@ -25,4 +25,5 @@ export const LOCAL_STORAGE_KEYS = {
         11155420: 'sessionValidUntil_11155420',
         168587773: 'sessionValidUntil_168587773',
     },
+    AVATAR_URL: 'avatar-url',
 };
