@@ -1,11 +1,15 @@
 {
-    "short_name": "Speed Markets",
     "name": "Speed Markets by THALES",
+    "short_name": "Speed Markets",
+    "start_url": "./speed-markets",
+    "display": "standalone",
+    "background_color": "#000",
+    "theme_color": "#000",
     "icons": [
         {
             "src": "32x32.png",
             "sizes": "32x32",
-            "type": "image/x-icon"
+            "type": "image/png"
         },
         {
             "src": "/android-icon-36x36.png",
@@ -43,8 +47,5 @@
             "type": "image/png",
             "density": "4.0"
         }
-    ],
-    "start_url": "./speed-markets",
-    "display": "standalone",
-    "background_color": "#000"
+    ]
 }
