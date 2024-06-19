@@ -55,7 +55,7 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
 
     const customStyles = {
         content: {
-            top: isMobile ? '41%' : '50%',
+            top: isMobile ? '45%' : '50%',
             left: '50%',
             right: 'auto',
             bottom: 'auto',

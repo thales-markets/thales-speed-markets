@@ -110,8 +110,11 @@ const Container = styled(FlexDivColumnCentered)<{ currencyKey: string; type: Sha
     background-position: center;
 
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        width: 357px;
-        height: 476px;
+        width: ${(props) => (props.type === 'speed-won' ? '347px' : '357px')};
+        height: ${(props) => (props.type === 'speed-won' ? '466px' : '476px')};
+
+        ${(props) => (props.type !== 'speed-won' ? 'border-width: 5px;' : '')}
+
         background-size: cover;
     }
 `;
@@ -120,6 +123,10 @@ export const ContainerBorder = styled.div<{ $isWon: boolean }>`
     ${(props) => (props.$isWon ? `background: ${props.theme.flexCard.background.won};` : '')}
     ${(props) => (props.$isWon ? 'padding: 10px;' : '')}
     ${(props) => (props.$isWon ? 'border-radius: 15px;' : '')}
+
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        ${(props) => (props.$isWon ? 'padding: 5px;' : '')}
+    }
 `;
 
 const MarketDetailsContainer = styled(FlexDivColumn)`
@@ -223,6 +230,10 @@ const Footer = styled(FlexDivCentered)<{ color: string }>`
     padding-left: 16px;
     text-transform: uppercase;
     white-space: nowrap;
+
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        letter-spacing: 1em;
+    }
 `;
 
 export const LossWatermark = styled(FlexDivCentered)`

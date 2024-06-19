@@ -142,8 +142,11 @@ const Container = styled(FlexDivColumnCentered)<{ $isWon: boolean }>`
     background-position: center;
 
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        width: 357px;
-        height: 476px;
+        width: ${(props) => (props.$isWon ? '347px' : '357px')};
+        height: ${(props) => (props.$isWon ? '466px' : '476px')};
+
+        ${(props) => (!props.$isWon ? 'border-width: 5px;' : '')}
+
         background-size: cover;
     }
 `;
@@ -205,6 +208,9 @@ const Footer = styled(FlexDivCentered)<{ color: string }>`
     padding-left: 14px;
     text-transform: uppercase;
     white-space: nowrap;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        letter-spacing: 0.9em;
+    }
 `;
 
 export default ChainedSpeedMarketFlexCard;
