@@ -5,7 +5,7 @@
         "buy": {
             "label": "Buy",
             "progress-label": "Buying in progress...",
-            "confirmation-message": "Successfully bought - market created"
+            "confirmation-message": "Successfully submitted market creation"
         },
         "mint": {
             "label": "Get",
@@ -19,8 +19,10 @@
         "search-placeholder": "Search...",
         "progress": "Please wait...",
         "market": "Market",
+        "markets": "Markets",
         "on": "on",
         "in": "in",
+        "of": "of",
         "with": "with",
         "above": "Above",
         "below": "Below",
@@ -39,6 +41,7 @@
         "bonus": "Bonus",
         "home": "Home",
         "chart": "Chart",
+        "page": "Page",
         "time-remaining": {
             "ended": "ended",
             "years": "years",
@@ -66,7 +69,7 @@
         },
         "wallet": {
             "connect-your-wallet": "Login",
-            "disclaimer-info": "By Singing Up to Speed Markets  <terms>Terms of Use</terms> and Privacy Policy you acknowledge that you have read and understand the Thales DAO protocol <disclaimer>disclaimer</disclaimer>.",
+            "disclaimer-info": "By Signing Up to Speed Markets  <terms>Terms of Use</terms> and Privacy Policy you acknowledge that you have read and understand the Thales DAO protocol <disclaimer>disclaimer</disclaimer>.",
             "connect-wallet-modal-title": "Sign Up to speed markets",
             "connect-with-wallet": "Connect with wallet",
             "or-connect-with": "Or",
@@ -147,8 +150,7 @@
         },
         "flex-card": {
             "strike-price": "Strike price",
-            "strike-date": "Strike date",
-            "entry-price": "Entry price",
+            "market-duration": "Market duration",
             "buy-in": "Buy-In",
             "potential-win": "Potential win",
             "share": "Share",
@@ -243,22 +245,25 @@
             "claim-all-progress": "Claiming all wins",
             "claim-all-in": "Claim all in",
             "claim-all-win-in": "Claim all winnings in",
-            "confirmation-message": "Markets successfully claimed",
+            "confirmation-message": "Market(s) successfully claimed",
+            "waiting-price": "Waiting for price",
             "errors": {
                 "price-stale": "Can't resolve market with stale price"
             }
         },
-        "profit": "Potential profit",
+        "profit": "Profit",
+        "potential-profit": "Potential profit",
         "slippage": "slippage",
         "slippage-info": "Slippage tollerance",
         "tooltips": {
-            "current-price": "Current price as reported by Pyth oracles",
+            "current-price": "Current price as reported by Pyth oracles.",
             "liquidity": "Current available liquidity for this Asset: {{liquidityPerAsset}}<br><br>Total available for Buy-In per direction<br>Available for UP: {{liquidityPerUp}}<br>Available for DOWN: {{liquidityPerDown}}",
             "payout-conversion": "Win amount can be slightly different due to conversion rate at execution time",
             "final-price-missing": "Oracle price snapshot for this market's timestamp is still being processed. Even if contract input is delayed by the Pyth oracles, the price snapshot will be true to the moment of market expiration",
             "bonus-unknown": "This direction offers bonus return. Exact bonus depends on selected Duration.",
             "bonus-info": "Bonus return for {{bonusDirection}} is +{{bonusPerc}}",
-            "slippage": "Your trade will revert if the live price changes more than this percentage from your chosen Strike Price during trade execution."
+            "slippage": "Your trade will revert if the live price changes more than this percentage from your chosen Strike Price during trade execution.",
+            "eth-to-weth": "Your ETH will be wrapped to WETH before executing the trade."
         },
         "overview": {
             "title": "Overview",
@@ -282,7 +287,6 @@
             "name": "Chained Speed Markets",
             "info": "Create a custom chain of {{minMarkets}} - {{maxMarkets}} Speed Markets for a maximum potential return of ~ <bold>{{maxRoi}}x</bold>!",
             "directions": "Directions",
-            "roi": "ROI: {{value}}",
             "clear-all": "Clear all",
             "asset-price": "If {{asset}} price sequence",
             "starting-from": "starting from",
@@ -339,7 +343,7 @@
             "description": {
                 "sign-up": "Log In to Speed Markets via social login or via connecting your wallet.",
                 "logged-in": "You have successfully created your Speed Markets Smart Account on the blockchain and are logged in.",
-                "deposit": "Deposit funds in your Speed Markets smart account by sending USDT and/or USDC to the address below. If you don't have USDT or USDC, you can also directly deposit them via Credit Card using the FUND WITH CARD button.",
+                "deposit": "Deposit funds in your Speed Markets smart account by sending USDT and/or USDC ({{ network }}) to the address below. If you don't have USDT or USDC, you can also directly deposit them via Credit Card using the FUND WITH CARD button. <a>Click here for Deposit Tutorials</a>.",
                 "trade": "You are all set! You have funds in your account and you can now start trading on Speed Markets!"
             }
         }

@@ -110,7 +110,7 @@ const Profile: React.FC = () => {
             <LinkContainer>
                 <SPAAnchor href={`${buildHref(ROUTES.Markets.SpeedMarkets)}`}>
                     <LinkWrapper>
-                        <NavigationIcon isLeft className={`icon icon--left`} />
+                        <NavigationIcon isLeft className={`icon icon--arrow`} />
                         {t('speed-markets.title')}
                     </LinkWrapper>
                 </SPAAnchor>
@@ -192,7 +192,7 @@ const Profile: React.FC = () => {
                                 {t('profile.history-limit', { days: MARKET_DURATION_IN_DAYS })}
                             </TabSectionSubtitle>
                         </TabSectionTitle>
-                        <TabSection $isEmpty={positionsSize === 0}>
+                        <TabSection $isEmpty={false}>
                             <UserHistoricalPositions
                                 currentPrices={currentPrices}
                                 searchAddress={searchAddress}

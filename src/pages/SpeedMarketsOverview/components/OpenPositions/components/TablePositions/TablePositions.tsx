@@ -126,7 +126,7 @@ const TablePositions: React.FC<TablePositionsProps> = ({
 };
 
 export const Header = styled.p`
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => props.theme.textColor.primary};
     font-size: 13px;
     font-weight: 700;
 `;
@@ -143,13 +143,13 @@ export const Wrapper = styled.div<{ first?: boolean }>`
 export const AssetIcon = styled.i`
     font-size: 25px;
     line-height: 100%;
-    background: ${(props) => props.theme.icon.background.secondary};
-    color: ${(props) => props.theme.icon.textColor.quaternary};
+    background: ${(props) => props.theme.icon.background.primary};
+    color: ${(props) => props.theme.icon.textColor.tertiary};
     border-radius: 50%;
 `;
 
 export const Value = styled.span`
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     font-size: 13px;
     font-weight: 700;
 `;

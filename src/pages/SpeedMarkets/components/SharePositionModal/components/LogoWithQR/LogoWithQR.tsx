@@ -1,4 +1,3 @@
-import SpeedMarketsLogo from 'assets/images/flex-cards/speed-markets-logo.svg';
 import ROUTES from 'constants/routes';
 import useGetReffererIdQuery from 'queries/referral/useGetReffererIdQuery';
 import React from 'react';
@@ -11,7 +10,7 @@ import biconomyConnector from 'utils/biconomyWallet';
 import { buildReferrerLink } from 'utils/routes';
 import { useAccount } from 'wagmi';
 
-const SpeedMarketsFooter: React.FC = () => {
+const LogoWithQR: React.FC<{ color: string }> = ({ color }) => {
     const { address: walletAddress, isConnected } = useAccount();
     const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
 
@@ -23,10 +22,10 @@ const SpeedMarketsFooter: React.FC = () => {
 
     return (
         <Container>
-            <Logo src={SpeedMarketsLogo} />
+            <LogoIcon $color={color} className="network-icon  network-icon--speed-full-logo" />
             {reffererID && (
-                <ReferralWrapper>
-                    <QRCode size={70} value={buildReferrerLink(ROUTES.Home, reffererID)} />
+                <ReferralWrapper $color={color}>
+                    <QRCode size={53} value={buildReferrerLink(ROUTES.Home, reffererID)} bgColor={color} />
                 </ReferralWrapper>
             )}
         </Container>
@@ -36,22 +35,22 @@ const SpeedMarketsFooter: React.FC = () => {
 const Container = styled.div`
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
     width: 100%;
-    height: 60px;
-    margin: 10px 0px;
+    height: 63px;
 `;
 
-const Logo = styled.img`
-    width: 70%;
+const LogoIcon = styled.i<{ $color: string }>`
+    font-size: 130px;
+    color: ${(props) => props.$color};
 `;
 
-const ReferralWrapper = styled.div`
+const ReferralWrapper = styled.div<{ $color: string }>`
     display: flex;
     justify-content: flex-start;
-    background-color: white;
+    background-color: ${(props) => props.$color};
     padding: 5px;
 `;
 
-export default SpeedMarketsFooter;
+export default LogoWithQR;

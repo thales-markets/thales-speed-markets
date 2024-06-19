@@ -69,7 +69,7 @@ const NetworkIconWrapper = styled.div<{ isConnected: boolean }>`
     position: relative;
     height: 30px;
     border-radius: 20px;
-    border: 2px solid ${(props) => props.theme.borderColor.quaternary};
+    border: 2px solid ${(props) => props.theme.borderColor.primary};
     display: flex;
     justify-content: center;
     gap: 4px;
@@ -108,7 +108,7 @@ const NetworkDropDown = styled.div`
     top: 36px;
     left: -60px;
     flex-direction: column;
-    border: 2px solid ${(props) => props.theme.borderColor.quaternary};
+    border: 2px solid ${(props) => props.theme.borderColor.primary};
     background-color: ${(props) => props.theme.background.primary};
     border-radius: 20px;
     width: 130px;
@@ -126,6 +126,11 @@ const NetworkWrapper = styled.div`
     cursor: pointer;
     width: 100%;
     padding-left: 10px;
+    &:hover {
+        ${AssetIcon}, ${NetworkText} {
+            color: ${(props) => props.theme.dropDown.textColor.secondary};
+        }
+    }
 `;
 
 const NetworkSelectedIndicator = styled.div`

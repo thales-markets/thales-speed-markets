@@ -54,7 +54,7 @@ const SPAAnchor: React.FC<FieldValidationMessageProps> = ({
 };
 
 const Anchor = styled.a`
-    color: ${(props) => props.theme.link.textColor.secondary};
+    color: ${(props) => props.theme.link.textColor.primary};
     display: contents;
 `;
 

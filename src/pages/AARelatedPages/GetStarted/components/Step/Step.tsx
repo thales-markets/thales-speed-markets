@@ -6,12 +6,13 @@ import {
     getInfoToastOptions,
     getLoadingToastOptions,
 } from 'components/ToastMessage/ToastMessage';
+import { LINKS } from 'constants/links';
 import ROUTES from 'constants/routes';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import { GetStartedStep } from 'enums/wizard';
 import QRCodeModal from 'pages/AARelatedPages/Withdraw/components/QRCodeModal';
 import React, { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import ReactModal from 'react-modal';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
@@ -80,11 +81,17 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
                 break;
         }
 
-        return t(transKey, {
-            network: getNetworkNameByNetworkId(networkId, true),
-            collateral: getDefaultCollateral(networkId),
-        });
-    }, [stepType, networkId, isWalletConnected, t]);
+        return (
+            <Trans
+                i18nKey={transKey}
+                values={{
+                    network: getNetworkNameByNetworkId(networkId, true),
+                    collateral: getDefaultCollateral(networkId),
+                }}
+                components={{ a: <Link target="_blank" href={LINKS.Tutorials.Root} /> }}
+            ></Trans>
+        );
+    }, [stepType, networkId, isWalletConnected]);
 
     const showStepIcon = useMemo(() => {
         if (isWalletConnected) {
@@ -231,15 +238,13 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
                     width="auto"
                 >
                     <OutsideClick onOutsideClick={() => setShowOnramper(false)}>
-                        <div style={{ background: 'black', marginBottom: '2px' }}>
-                            <iframe
+                        <ModalWrapper>
+                            <IFrame
                                 src={onramperUrl}
                                 title="Onramper Widget"
-                                height="630px"
-                                width="420px"
                                 allow="accelerometer; autoplay; camera; gyroscope; payment"
                             />
-                        </div>
+                        </ModalWrapper>
                     </OutsideClick>
                 </Modal>
             )}
@@ -252,7 +257,7 @@ const Container = styled.div`
     margin: 10px 0;
     gap: 10px;
     align-items: flex-start;
-    @media (max-width: 600px) {
+    @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         gap: 16px;
     }
 `;
@@ -260,7 +265,7 @@ const Container = styled.div`
 const StepNumberSection = styled(FlexDivCentered)``;
 
 const StepDescriptionSection = styled(FlexDivColumn)<{ isActive: boolean; isDisabled?: boolean }>`
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     cursor: ${(props) => (props.isDisabled ? 'not-allowed' : 'pointer')};
     overflow: hidden;
     ${(props) => (!props.isActive ? 'opacity: 0.5;' : '')}
@@ -270,7 +275,7 @@ const StepTitle = styled.span<{ completed?: boolean }>`
     font-weight: 700;
     font-size: 20px;
     line-height: 27px;
-    color: ${(props) => (props.completed ? props.theme.background.quinary : '')};
+    color: ${(props) => (props.completed ? props.theme.background.secondary : '')};
     margin-bottom: 4px;
 `;
 
@@ -279,7 +284,7 @@ const StepDescription = styled.p<{ completed?: boolean }>`
     font-size: 14px;
     line-height: 16px;
     text-align: justify;
-    color: ${(props) => (props.completed ? props.theme.background.quinary : '')};
+    color: ${(props) => (props.completed ? props.theme.background.secondary : '')};
 `;
 
 const StepNumberWrapper = styled.div<{ isActive: boolean; isDisabled?: boolean; completed?: boolean }>`
@@ -289,11 +294,11 @@ const StepNumberWrapper = styled.div<{ isActive: boolean; isDisabled?: boolean; 
     width: 45px;
     height: 45px;
     border-radius: 50%;
-    border: 2px solid ${(props) => (props.completed ? props.theme.textColor.quinary : props.theme.textColor.primary)};
+    border: 2px solid ${(props) => (props.completed ? props.theme.textColor.primary : props.theme.textColor.secondary)};
     ${(props) =>
-        props.isActive ? '' : `background: ${props.completed ? props.theme.background.quinary : 'transparent'};`}
+        props.isActive ? '' : `background: ${props.completed ? props.theme.background.secondary : 'transparent'};`}
     cursor: ${(props) => (props.isDisabled ? 'not-allowed' : props.isActive ? 'default' : 'pointer')};
-    @media (max-width: 600px) {
+    @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         width: 36px;
         height: 36px;
     }
@@ -303,7 +308,7 @@ const StepNumberWrapper = styled.div<{ isActive: boolean; isDisabled?: boolean; 
 const StepNumber = styled.span<{ isActive: boolean }>`
     font-weight: 700;
     font-size: 29px;
-    @media (max-width: 600px) {
+    @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         font-size: 20px;
     }
     line-height: 43px;
@@ -325,7 +330,7 @@ const AddressContainer = styled.div`
     border-radius: 6px;
     padding: 12px;
     background: ${(props) => props.theme.background.primary};
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
 `;
 
 const Address = styled.span`
@@ -346,7 +351,7 @@ const QRIcon = styled.i`
     cursor: pointer;
     right: 90px;
     top: 8px;
-    color: ${(props) => props.theme.input.textColor.secondary};
+    color: ${(props) => props.theme.input.textColor.primary};
 `;
 
 const CopyText = styled.span`
@@ -372,7 +377,7 @@ const Separator = styled.div`
         font-weight: 800;
         line-height: 12px;
         letter-spacing: -0.5px;
-        color: ${(props) => props.theme.textColor.primary};
+        color: ${(props) => props.theme.textColor.secondary};
         background: ${(props) => props.theme.background.primary};
         top: 50%; /* position the top  edge of the element at the middle of the parent */
         left: 50%; /* position the left edge of the element at the middle of the parent */
@@ -397,7 +402,7 @@ const OnRampWrapper = styled(OnramperDiv)`
 
 const OnramperIcons = styled.i`
     font-size: 70px;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         font-size: 60px;
     }
@@ -423,6 +428,21 @@ const ButtonWrapper = styled.div`
     justify-content: center;
     margin-top: 20px;
     margin-bottom: 10px;
+`;
+
+const Link = styled.a`
+    color: ${(props) => props.theme.textColor.primary};
+    text-decoration: underline;
+`;
+
+const ModalWrapper = styled.div`
+    background: ${(props) => props.theme.background.primary};
+    margin-bottom: 2px;
+`;
+
+const IFrame = styled.iframe`
+    height: 630px;
+    width: 420px;
 `;
 
 export default Step;

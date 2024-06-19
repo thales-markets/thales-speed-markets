@@ -7,6 +7,7 @@ import { getErrorToastOptions, getSuccessToastOptions } from 'components/ToastMe
 import TextInput from 'components/fields/TextInput';
 import { LINKS } from 'constants/links';
 import ROUTES from 'constants/routes';
+import { ScreenSizeBreakpoint } from 'enums/ui';
 import useGetReffererIdQuery from 'queries/referral/useGetReffererIdQuery';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
@@ -183,7 +184,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
 
 const Container = styled(FlexDivColumnCentered)`
     width: 340px;
-    @media (max-width: 575px) {
+    @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         width: 325px;
     }
 `;
@@ -191,7 +192,7 @@ const Container = styled(FlexDivColumnCentered)`
 const Info = styled.p`
     font-size: 13px;
     line-height: 110%;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     text-align: justify;
     margin-top: 20px;
 `;
@@ -206,9 +207,9 @@ const Step = styled(FlexDivStart)`
 const StepNumber = styled(FlexDivCentered)`
     width: 36px;
     height: 36px;
-    border: 2px solid ${(props) => props.theme.textColor.primary};
+    border: 2px solid ${(props) => props.theme.textColor.secondary};
     border-radius: 50%;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     font-weight: 700;
     font-size: 18px;
     line-height: 100%;
@@ -217,7 +218,7 @@ const StepName = styled.span`
     font-weight: 400;
     font-size: 18px;
     line-height: 100%;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     padding-left: 8px;
     text-transform: capitalize;
 `;
@@ -228,7 +229,7 @@ const RowWrapper = styled(FlexDivRowCentered)<{ marginBottom?: string }>`
 `;
 
 const GeneratedLink = styled.span`
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     font-size: 13px;
     font-weight: 600;
     white-space: nowrap;

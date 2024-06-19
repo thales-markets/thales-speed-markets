@@ -19,8 +19,8 @@ import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
 import erc20Contract from './contracts/collateralContract';
 import chainedSpeedMarketsAMMContract from './contracts/chainedSpeedMarketsAMMContract';
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
-import { checkAllowance } from './network';
 import multipleCollateral from './contracts/multipleCollateralContract';
+import { addMonths } from 'date-fns';
 
 export const executeBiconomyTransactionWithConfirmation = async (
     collateral: string,
@@ -76,6 +76,8 @@ export const executeBiconomyTransaction = async (
         console.log('methodName: ', methodName);
         console.log('contract: ', contract);
         console.log('value: ', value);
+        console.log('isEth: ', isEth);
+        console.log('buyInAmountParam: ', buyInAmountParam);
 
         const encodedCall = encodeFunctionData({
             abi: contract.abi,
@@ -131,14 +133,13 @@ export const executeBiconomyTransaction = async (
                 const { wait } = await biconomyConnector.wallet.sendTransaction(
                     transactionArray,
                     isEth
-                        ? {
+                        ? {}
+                        : {
                               paymasterServiceData: {
                                   mode: PaymasterMode.ERC20,
                                   preferredToken: collateral,
-                                  maxApproval: true,
                               },
                           }
-                        : {}
                 );
 
                 const {
@@ -250,11 +251,11 @@ const getCreateSessionTxs = async (networkId: SupportedNetwork, collateralAddres
 
         const dateAfter = new Date();
         const dateUntil = new Date();
-        dateUntil.setHours(dateAfter.getHours() + 1);
+        const sixMonths = addMonths(Number(dateUntil), 6);
 
         const sessionTxData = await sessionModule.createSessionData([
             {
-                validUntil: Math.floor(dateUntil.getTime() / 1000),
+                validUntil: Math.floor(sixMonths.getTime() / 1000),
                 validAfter: Math.floor(dateAfter.getTime() / 1000),
                 sessionValidationModule: import.meta.env['VITE_APP_SVM_ADDRESS_' + networkId],
                 sessionPublicKey: sessionKeyEOA.address as `0x${string}`,
@@ -291,66 +292,44 @@ const getCreateSessionTxs = async (networkId: SupportedNetwork, collateralAddres
         window.localStorage.setItem(LOCAL_STORAGE_KEYS.SESSION_P_KEY[networkId], privateKey);
         window.localStorage.setItem(
             LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId],
-            Math.floor(dateUntil.getTime() / 1000).toString()
+            Math.floor(sixMonths.getTime() / 1000).toString()
         );
 
-        // get client to check allowance
-        const client = createPublicClient({
-            chain: networkId as any,
-            transport: http(biconomyConnector.wallet?.rpcProvider.transport.url),
+        const encodedCall = encodeFunctionData({
+            abi: erc20Abi,
+            functionName: 'approve',
+            args: [speedMarketsAMMContract.addresses[networkId], maxUint256],
         });
 
-        const erc20Instance = getContract({
-            abi: erc20Contract.abi,
-            address: collateralAddress as `0x${string}`,
-            client: client,
+        const encodedCallChained = encodeFunctionData({
+            abi: erc20Abi,
+            functionName: 'approve',
+            args: [chainedSpeedMarketsAMMContract.addresses[networkId], maxUint256],
         });
 
-        const hasAllowance = await checkAllowance(
-            maxUint256,
-            erc20Instance,
-            biconomyConnector.address,
-            speedMarketsAMMContract.addresses[networkId]
+        const approvalTxSingle = {
+            to: collateralAddress,
+            data: encodedCall,
+        };
+
+        const approvalTxChained = {
+            to: collateralAddress,
+            data: encodedCallChained,
+        };
+
+        const approvalTxSingleClaim = {
+            to: erc20Contract.addresses[networkId],
+            data: encodedCall,
+        };
+
+        const approvalTxChainedClaim = {
+            to: erc20Contract.addresses[networkId],
+            data: encodedCallChained,
+        };
+
+        transactionArray.push(
+            ...[setSessiontrx, approvalTxSingle, approvalTxChained, approvalTxSingleClaim, approvalTxChainedClaim]
         );
-        if (hasAllowance) {
-            transactionArray.push(setSessiontrx);
-        } else {
-            const encodedCall = encodeFunctionData({
-                abi: erc20Abi,
-                functionName: 'approve',
-                args: [speedMarketsAMMContract.addresses[networkId], maxUint256],
-            });
-
-            const encodedCallChained = encodeFunctionData({
-                abi: erc20Abi,
-                functionName: 'approve',
-                args: [chainedSpeedMarketsAMMContract.addresses[networkId], maxUint256],
-            });
-
-            const approvalTxSingle = {
-                to: collateralAddress,
-                data: encodedCall,
-            };
-
-            const approvalTxChained = {
-                to: collateralAddress,
-                data: encodedCallChained,
-            };
-
-            const approvalTxSingleClaim = {
-                to: erc20Contract.addresses[networkId],
-                data: encodedCall,
-            };
-
-            const approvalTxChainedClaim = {
-                to: erc20Contract.addresses[networkId],
-                data: encodedCallChained,
-            };
-
-            transactionArray.push(
-                ...[setSessiontrx, approvalTxSingle, approvalTxChained, approvalTxSingleClaim, approvalTxChainedClaim]
-            );
-        }
 
         return transactionArray;
     }
@@ -375,3 +354,32 @@ const getSessionSigner = async (networkId: SupportedNetwork) => {
     });
     return sessionSigner;
 };
+
+// const hasAllowance = async (networkId: SupportedNetwork, collateralAddress: `0x${string}`) => {
+//     // get client to check allowance
+//     const client = createPublicClient({
+//         chain: networkId as any,
+//         transport: http(biconomyConnector.wallet?.rpcProvider.transport.url),
+//     });
+
+//     const erc20Instance = getContract({
+//         abi: erc20Contract.abi,
+//         address: collateralAddress,
+//         client: client,
+//     });
+
+//     const hasAllowance = await checkAllowance(
+//         maxUint256,
+//         erc20Instance,
+//         biconomyConnector.address,
+//         speedMarketsAMMContract.addresses[networkId]
+//     );
+//     return hasAllowance;
+// };
+
+// const getSupportedPaymasterTokensForNetwork = (networkId: SupportedNetwork) => {
+//     const collaterals = getCollaterals(networkId);
+//     return collaterals.map((coin) => {
+//         return multipleCollateral[coin].addresses[networkId];
+//     });
+// };

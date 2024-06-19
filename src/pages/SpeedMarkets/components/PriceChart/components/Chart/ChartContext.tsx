@@ -52,11 +52,11 @@ export const ChartComponent: React.FC<ChartProps> = ({
             grid: {
                 vertLines: {
                     visible: true,
-                    color: theme.borderColor.primary,
+                    color: theme.borderColor.tertiary,
                 },
                 horzLines: {
                     visible: true,
-                    color: theme.borderColor.primary,
+                    color: theme.borderColor.tertiary,
                 },
             },
             timeScale: {
@@ -149,5 +149,5 @@ const ResetButton = styled.div`
 `;
 
 const ReloadIcon = styled.i`
-    color: ${(props) => props.theme.icon.textColor.tertiary};
+    color: ${(props) => props.theme.icon.textColor.primary};
 `;

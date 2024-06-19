@@ -46,13 +46,13 @@ const Circle = styled.circle<{ width: number }>`
 
 const ProgressTrack = styled(Circle)<{ $strokeWidth: number }>`
     fill: none;
-    stroke: ${(props) => props.theme.borderColor.primary};
+    stroke: ${(props) => props.theme.borderColor.tertiary};
     stroke-width: ${(props) => props.$strokeWidth}px;
 `;
 
 const ProgressIndicator = styled(Circle)<{ $strokeWidth: number }>`
     fill: none;
-    stroke: ${(props) => props.theme.borderColor.quaternary};
+    stroke: ${(props) => props.theme.borderColor.primary};
     stroke-width: ${(props) => props.$strokeWidth}px;
     stroke-linecap: round;
     stroke-dasharray: ${(props) => props.width * 2};

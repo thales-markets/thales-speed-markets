@@ -71,8 +71,8 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
     };
 
     const onPlusMinusIconHandle = (isChained: boolean) => {
-        setIsChained(isChained);
         resetData();
+        setIsChained(isChained);
         history.push({
             pathname: location.pathname,
             search: queryString.stringify({
@@ -82,8 +82,8 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
     };
 
     const onClearAllHandle = () => {
-        setIsChained(false);
         resetData();
+        setIsChained(false);
         history.push({
             pathname: location.pathname,
             search: queryString.stringify({
@@ -105,7 +105,7 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
                     values={{ bonusDirection: direction, bonusPerc: bonus }}
                 />
             }
-            customIconStyling={{ fontSize: '11px', color: theme.textColor.quaternary }}
+            customIconStyling={{ fontSize: '11px', color: theme.textColor.tertiary }}
         />
     );
 

@@ -1,4 +1,5 @@
 import { secondsToMilliseconds } from 'date-fns';
+import { ScreenSizeBreakpoint } from 'enums/ui';
 import React, { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ToastOptions, ToastPosition, TypeOptions, toast } from 'react-toastify';
@@ -49,7 +50,7 @@ const Message = styled.span<{ isLargeFont?: boolean }>`
     font-family: ${(props) => props.theme.fontFamily.secondary};
     font-weight: 500;
     font-size: ${(props) => (props.isLargeFont ? '18px' : '13px')};
-    @media (max-width: 600px) {
+    @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         line-height: ${(props) => (props.isLargeFont ? '18px' : '13px')};
     }
 `;

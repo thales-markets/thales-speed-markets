@@ -29,7 +29,7 @@ const SpeedMarketsOverview: React.FC = () => {
                 <LinkContainer>
                     <SPAAnchor href={`${buildHref(ROUTES.Markets.SpeedMarkets)}?isChained=${isChainedMarkets}`}>
                         <LinkWrapper>
-                            <NavigationIcon isLeft className={`icon icon--left`} />
+                            <NavigationIcon isLeft className={`icon icon--arrow`} />
                             {isChainedMarkets ? t('speed-markets.chained.name') : t('speed-markets.title')}
                         </LinkWrapper>
                     </SPAAnchor>
@@ -43,7 +43,7 @@ const SpeedMarketsOverview: React.FC = () => {
                         >
                             <LinkWrapper>
                                 {isChainedMarkets ? t('speed-markets.title') : t('speed-markets.chained.name')}
-                                <NavigationIcon isLeft={false} className={`icon icon--right`} />
+                                <NavigationIcon isLeft={false} className={`icon icon--arrow`} />
                             </LinkWrapper>
                         </SPAAnchor>
                     </LinkContainer>
@@ -63,16 +63,17 @@ const Header = styled(FlexDivRow)`
     font-size: 18px;
     line-height: 100%;
     width: 100%;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         display: none;
     }
 `;
 
 export const LinkContainer = styled.div`
+    font-family: ${(props) => props.theme.fontFamily.secondary};
     font-size: 18px;
     font-weight: 800;
-    color: ${(props) => props.theme.link.textColor.secondary};
+    color: ${(props) => props.theme.link.textColor.primary};
     text-transform: uppercase;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         display: none;
@@ -87,8 +88,9 @@ export const LinkWrapper = styled.span`
 
 export const NavigationIcon = styled.i<{ isLeft: boolean }>`
     position: relative;
-    top: -1px;
+    top: ${(props) => (props.isLeft ? '-1px' : '-4px')};
     ${(props) => (props.isLeft ? 'margin-right: 6px;' : 'margin-left: 6px;')}
+    ${(props) => (props.isLeft ? 'transform: rotate(180deg);' : '')}
     text-transform: none;
 `;
 

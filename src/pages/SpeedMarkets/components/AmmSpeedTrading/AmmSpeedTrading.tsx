@@ -6,6 +6,7 @@ import {
     getLoadingToastOptions,
     getSuccessToastOptions,
 } from 'components/ToastMessage/ToastMessage';
+import Tooltip from 'components/Tooltip';
 import { PLAUSIBLE, PLAUSIBLE_KEYS } from 'constants/analytics';
 import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
 import {
@@ -78,8 +79,6 @@ import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 import PriceSlippage from '../PriceSlippage';
 import { SelectedPosition } from '../SelectPosition/SelectPosition';
 import SharePosition from '../SharePosition';
-import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveSpeedMarketsDataQuery';
-import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
 
 type AmmSpeedTradingProps = {
     isChained: boolean;
@@ -99,7 +98,7 @@ type AmmSpeedTradingProps = {
     hasError: boolean;
 };
 
-const DEFAULT_CREATOR_DELAY_TIME_SEC = 12;
+const DEFAULT_MAX_CREATOR_DELAY_TIME_SEC = 15;
 
 const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     isChained,
@@ -142,8 +141,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     const [hasAllowance, setAllowance] = useState(false);
     const [openApprovalModal, setOpenApprovalModal] = useState(false);
     const [openTwitterShareModal, setOpenTwitterShareModal] = useState(false);
-    const [toastId, setToastId] = useState<string | number>('');
-    const [numOfUserMarketsBeforeBuy, setNumOfUserMarketsBeforeBuy] = useState(-1); // deafult -1 when buy not started
 
     const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
 
@@ -222,40 +219,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         defaultCollateral,
         selectedCollateral,
     ]);
-
-    // SINGLE
-    const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
-        { networkId, client },
-        isBiconomy ? biconomyConnector.address : walletAddress || '',
-        {
-            enabled: isAppReady && isConnected && !isChained && isSubmitting,
-        }
-    );
-
-    const userOpenSpeedMarketsData = useMemo(
-        () =>
-            userActiveSpeedMarketsDataQuery.isSuccess && userActiveSpeedMarketsDataQuery.data
-                ? userActiveSpeedMarketsDataQuery.data
-                : [],
-        [userActiveSpeedMarketsDataQuery]
-    );
-
-    // CHAINED
-    const userChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
-        { networkId, client },
-        isBiconomy ? biconomyConnector.address : walletAddress || '',
-        {
-            enabled: isAppReady && isConnected && isChained && isSubmitting,
-        }
-    );
-
-    const userOpenChainedSpeedMarketsData = useMemo(
-        () =>
-            userChainedSpeedMarketsDataQuery.isSuccess && userChainedSpeedMarketsDataQuery.data
-                ? userChainedSpeedMarketsDataQuery.data
-                : [],
-        [userChainedSpeedMarketsDataQuery]
-    );
 
     const exchangeRatesMarketDataQuery = useExchangeRatesQuery(
         { networkId, client },
@@ -434,37 +397,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         positionType,
     ]);
 
-    // check if new market is created
-    useEffect(() => {
-        if (isSubmitting && numOfUserMarketsBeforeBuy === -1) {
-            setNumOfUserMarketsBeforeBuy(
-                isChained ? userOpenChainedSpeedMarketsData.length : userOpenSpeedMarketsData.length
-            );
-        } else if (!isSubmitting && toastId !== '') {
-            const numOfUserMarketsAfter = isChained
-                ? userOpenChainedSpeedMarketsData.length
-                : userOpenSpeedMarketsData.length;
-
-            // TODO: improve by comparing markets addresses before and after
-            if (numOfUserMarketsAfter - numOfUserMarketsBeforeBuy > 0) {
-                toast.update(toastId, getSuccessToastOptions(t(`common.buy.confirmation-message`), toastId));
-            } else {
-                toast.update(toastId, getErrorToastOptions(t('common.errors.buy-failed'), toastId));
-            }
-            setToastId('');
-            setNumOfUserMarketsBeforeBuy(-1);
-            setSubmittedStrikePrice(0);
-        }
-    }, [
-        numOfUserMarketsBeforeBuy,
-        isSubmitting,
-        isChained,
-        userOpenSpeedMarketsData.length,
-        userOpenChainedSpeedMarketsData.length,
-        t,
-        toastId,
-    ]);
-
     // Check allowance
     useDebouncedEffect(() => {
         if (!collateralAddress) {
@@ -573,7 +505,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
         setIsSubmitting(true);
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
-        setToastId(id);
 
         const speedMarketsAMMContractWithSigner = getContract({
             abi: speedMarketsAMMCreatorContract.abi,
@@ -646,20 +577,26 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             const txReceipt = await waitForTransactionReceipt(client as Client, { hash });
 
             if (txReceipt.status === 'success') {
+                toast.update(id, getSuccessToastOptions(t(`common.buy.confirmation-message`), id));
                 resetData();
                 setPaidAmount(0);
+                setSubmittedStrikePrice(0);
+                setIsSubmitting(false);
 
-                // wait some time for creator to pick up pending markets (after max delay it will fail for sure)
-                await delay(secondsToMilliseconds(DEFAULT_CREATOR_DELAY_TIME_SEC));
-
-                refetchUserSpeedMarkets(
-                    isChained,
-                    networkId,
-                    (isBiconomy ? biconomyConnector.address : walletAddress) as string
-                );
-                refetchActiveSpeedMarkets(isChained, networkId);
-                refetchSpeedMarketsLimits(isChained, networkId);
-                refetchBalances((isBiconomy ? biconomyConnector.address : walletAddress) as string, networkId);
+                // wait for creator to pick up pending markets (TODO: add creator maxCreationDelay)
+                let delayTime = 0;
+                while (delayTime < DEFAULT_MAX_CREATOR_DELAY_TIME_SEC) {
+                    refetchUserSpeedMarkets(
+                        isChained,
+                        networkId,
+                        (isBiconomy ? biconomyConnector.address : walletAddress) as string
+                    );
+                    refetchActiveSpeedMarkets(isChained, networkId);
+                    refetchSpeedMarketsLimits(isChained, networkId);
+                    refetchBalances((isBiconomy ? biconomyConnector.address : walletAddress) as string, networkId);
+                    await delay(1500);
+                    delayTime++;
+                }
 
                 PLAUSIBLE.trackEvent(
                     isChained ? PLAUSIBLE_KEYS.chainedSpeedMarketsBuy : PLAUSIBLE_KEYS.speedMarketsBuy,
@@ -674,19 +611,17 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             } else {
                 console.log('Transaction status', txReceipt.status);
                 await delay(800);
-                setToastId('');
                 toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
                 setSubmittedStrikePrice(0);
+                setIsSubmitting(false);
             }
         } catch (e) {
             console.log(e);
             await delay(800);
-            setToastId('');
             toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
             setSubmittedStrikePrice(0);
+            setIsSubmitting(false);
         }
-        await delay(3000); // wait for refetch
-        setIsSubmitting(false);
     };
 
     const handleMint = async () => {
@@ -775,13 +710,20 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 );
             } else {
                 return (
-                    <Button disabled={isAllowing} onClick={() => setOpenApprovalModal(true)}>
-                        {isAllowing
-                            ? t('common.enable-wallet-access.approve-progress')
-                            : t('common.enable-wallet-access.approve')}
-                        <CollateralText>&nbsp;{isEth ? CRYPTO_CURRENCY_MAP.WETH : selectedCollateral}</CollateralText>
-                        {isAllowing ? '...' : ''}
-                    </Button>
+                    <>
+                        <Button disabled={isAllowing} onClick={() => setOpenApprovalModal(true)}>
+                            {isAllowing
+                                ? t('common.enable-wallet-access.approve-progress')
+                                : t('common.enable-wallet-access.approve')}
+                            <CollateralText>
+                                &nbsp;
+                                {isEth ? CRYPTO_CURRENCY_MAP.WETH : selectedCollateral}
+                            </CollateralText>
+                            {!isMobile && <Tooltip overlay={t('speed-markets.tooltips.eth-to-weth')} />}
+                            {isAllowing ? '...' : ''}
+                        </Button>
+                        {isMobile && <InfoText>{t('speed-markets.tooltips.eth-to-weth')}</InfoText>}
+                    </>
                 );
             }
         }
@@ -829,12 +771,12 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                                     strikePrice: currentPrice ?? 0,
                                     maturityDate: Date.now() + secondsToMilliseconds(deltaTimeSec || 100),
                                     paid: convertToStable(paidAmount),
-                                    payout: SPEED_MARKETS_QUOTE * convertToStable(paidAmount),
+                                    payout: potentialProfit * convertToStable(paidAmount),
                                     currentPrice: currentPrice ?? 0,
-                                    finalPrice: currentPrice ?? 0,
+                                    finalPrice: 0,
                                     isClaimable: false,
                                     isResolved: false,
-                                    createdAt: 0,
+                                    createdAt: Date.now(),
                                 }}
                                 isDisabled={isButtonDisabled}
                                 isOpen={openTwitterShareModal}
@@ -855,7 +797,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             <FinalizeTrade>
                 <ColumnSpaceBetween ref={inputWrapperRef}>
                     <QuoteContainer>
-                        <QuoteLabel>{t('speed-markets.profit')}</QuoteLabel>
+                        <QuoteLabel>{t('speed-markets.potential-profit')}</QuoteLabel>
                         <QuoteText>{potentialProfit ? `${truncToDecimals(potentialProfit)}x` : '-'}</QuoteText>
                     </QuoteContainer>
                     {isMobile && getTradingDetails()}
@@ -909,7 +851,7 @@ const TradingDetailsContainer = styled(FlexDivRowCentered)<{ isChained: boolean 
 
 const FinalizeTrade = styled(FlexDivCentered)`
     width: 340px;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     font-size: 13px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         width: 100%;
@@ -934,7 +876,7 @@ const ShareWrapper = styled.div`
 
 const ShareText = styled.span<{ $isDisabled: boolean }>`
     margin-right: 5px;
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => props.theme.textColor.primary};
     cursor: ${(props) => (props.$isDisabled ? 'default' : 'pointer')};
     opacity: ${(props) => (props.$isDisabled ? '0.5' : '1')};
     font-size: 14px;
@@ -954,8 +896,8 @@ const QuoteContainer = styled.div`
     height: 90px;
     padding: 20px;
     border-radius: 8px;
-    background: ${(props) => props.theme.background.quinary};
-    color: ${(props) => props.theme.input.textColor.tertiary};
+    background: ${(props) => props.theme.background.secondary};
+    color: ${(props) => props.theme.input.textColor.secondary};
 `;
 
 const QuoteLabel = styled.span`
@@ -970,6 +912,13 @@ const QuoteText = styled.span`
     font-weight: 800;
     line-height: 100%;
     text-transform: capitalize;
+`;
+
+const InfoText = styled.span`
+    font-weight: 400;
+    font-size: 13px;
+    letter-spacing: 0.13px;
+    color: ${(props) => props.theme.textColor.primary};
 `;
 
 export default AmmSpeedTrading;

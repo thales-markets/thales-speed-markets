@@ -257,7 +257,7 @@ export const SpeedLogo = styled.i`
 
 export const HeaderLinks = styled(FlexDivSpaceBetween)`
     width: 50%;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     margin-left: 4%;
     gap: 20px;
 
@@ -364,7 +364,7 @@ export const Title = styled.h1`
     font-size: 55px;
     line-height: 100%;
     font-weight: 900;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     text-transform: uppercase;
     @media screen and (max-width: ${ScreenSizeBreakpoint.EXTRA_LARGE}px) {
         font-size: 50px;
@@ -381,7 +381,7 @@ export const TitleDesc = styled.p`
     font-size: 18px;
     line-height: 110%;
     font-weight: 400;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
 `;
 
 export const ButtonContainer = styled(FlexDivCentered)<{ isBottom?: boolean }>`
@@ -437,7 +437,7 @@ export const ContentIconWrapper = styled(FlexDivEnd)`
 const ContentIcon = styled.i`
     font-size: 113px;
     line-height: 110%;
-    background: ${(props) => props.theme.icon.textColor.primary};
+    background: ${(props) => props.theme.icon.textColor.quaternary};
     background-clip: text;
     -webkit-text-fill-color: transparent;
     margin: 0;
@@ -501,7 +501,7 @@ export const ContentTextTitle = styled.h2`
     font-size: 30px;
     line-height: 110%;
     font-weight: 900;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     text-transform: uppercase;
     @media screen and (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         font-size: 20px;
@@ -511,7 +511,7 @@ export const ContentTextDesc = styled.p`
     font-size: 16px;
     line-height: 100%;
     font-weight: 400;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     @media screen and (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         font-size: 14px;
     }
@@ -555,7 +555,7 @@ export const LogoText = styled.span`
     font-size: 18px;
     line-height: 150%;
     font-weight: 600;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
 
     @media screen and (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         font-size: 13px;
@@ -564,7 +564,7 @@ export const LogoText = styled.span`
 
 export const Link = styled.a`
     font-weight: 800;
-    color: ${(props) => props.theme.link.textColor.secondary};
+    color: ${(props) => props.theme.link.textColor.primary};
     text-align: center;
     &:hover {
         text-decoration: underline;

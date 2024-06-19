@@ -1,22 +1,23 @@
-import SimpleLoader from 'components/SimpleLoader';
-import { SortDirection } from 'enums/market';
-import React, { CSSProperties, DependencyList, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
-    useReactTable,
+    Cell,
+    Column,
+    Row,
+    flexRender,
     getCoreRowModel,
     getPaginationRowModel,
     getSortedRowModel,
-    flexRender,
-    Row,
-    Cell,
-    Column,
+    useReactTable,
 } from '@tanstack/react-table';
+import SelectInput from 'components/SelectInput';
+import SimpleLoader from 'components/SimpleLoader';
+import { LOCAL_STORAGE_KEYS } from 'constants/storage';
+import { SortDirection } from 'enums/market';
+import { ScreenSizeBreakpoint } from 'enums/ui';
+import React, { CSSProperties, DependencyList, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { FlexDiv, FlexDivCentered } from 'styles/common';
-import SelectInput from 'components/SelectInput';
 import { localStore } from 'thales-utils';
-import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 
 export const PAGINATION_SIZE = [
     { value: 5, label: '5' },
@@ -80,23 +81,34 @@ const Table: React.FC<TableProps> = ({
         pageIndex: 0, //initial page index
         pageSize: rowsPerPage || PAGINATION_SIZE[0].value, //default page size
     });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const memoizedColumns = useMemo(() => columns, [...columnsDeps, t]);
+
     const tableInstance = useReactTable({
         columns: memoizedColumns,
         data,
         ...options,
         initialState,
         autoResetSortBy: false,
+        autoResetPageIndex: false, // turn off auto reset of pageIndex
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
-        onPaginationChange: setPagination, //update the pagination state when internal APIs mutate the pagination state
+        onPaginationChange: setPagination, // update the pagination state when internal APIs mutate the pagination state
         state: {
-            //...
             pagination,
         },
     });
+
+    // handle resetting the pageIndex to avoid showing empty pages (required when autoResetPageIndex is turned off)
+    useEffect(() => {
+        const maxPageIndex = Math.ceil(data.length / pagination.pageSize) - 1;
+
+        if (pagination.pageIndex > maxPageIndex) {
+            setPagination({ ...pagination, pageIndex: maxPageIndex });
+        }
+    }, [data.length, pagination]);
 
     return (
         <>
@@ -205,9 +217,9 @@ const Table: React.FC<TableProps> = ({
                 </SelectWrapper>
 
                 <SelectWrapper className="flex items-center gap-1">
-                    <PaginationLabel>Page</PaginationLabel>
+                    <PaginationLabel>{t('common.page')}</PaginationLabel>
                     <PaginationLabel>
-                        {tableInstance.getState().pagination.pageIndex + 1} of{' '}
+                        {tableInstance.getState().pagination.pageIndex + 1} {t('common.of')}{' '}
                         {tableInstance.getPageCount().toLocaleString()}
                     </PaginationLabel>
                 </SelectWrapper>
@@ -253,7 +265,13 @@ const ExpandableRowReact: React.FC<{
             <TableRow
                 style={{ ...tableRowStyles, borderBottom: hidden ? '' : 'none' }}
                 cursorPointer={true}
-                onClick={(e) => !(e.target instanceof HTMLButtonElement) && setHidden(!hidden)}
+                onClick={(e) => {
+                    !(
+                        e.target instanceof HTMLButtonElement ||
+                        // quick fix for CollateralSelector
+                        (e.target as HTMLElement).parentElement?.classList.contains('clickable')
+                    ) && setHidden(!hidden);
+                }}
             >
                 {row.getAllCells().map((cell: any, cellIndex: any) => (
                     <TableCell
@@ -288,7 +306,7 @@ const TableBody = styled.div`
 const TableRow = styled(FlexDiv)<{ cursorPointer?: boolean }>`
     cursor: ${(props) => (props.cursorPointer ? 'pointer' : 'default')};
     min-height: 38px;
-    border-bottom: 1px solid ${(props) => props.theme.borderColor.quaternary};
+    border-bottom: 1px solid ${(props) => props.theme.borderColor.primary};
 `;
 
 const TableRowHead = styled(TableRow)`
@@ -350,7 +368,7 @@ const SortIcon = styled.i<{ selected: boolean; sortDirection: SortDirection }>`
                     : "'\\006A'"
                 : "'\\006A'"};
     }
-    @media (max-width: 512px) {
+    @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         font-size: ${(props) => (props.selected && props.sortDirection !== SortDirection.NONE ? 17 : 14)}px;
     }
 `;
@@ -383,7 +401,7 @@ const PaginationWrapper = styled.div`
 `;
 
 const PaginationLabel = styled.p`
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => props.theme.textColor.primary};
     font-size: 13px;
     font-weight: 700;
     line-height: 10%;
@@ -395,8 +413,8 @@ const ArrowWrapper = styled.span<{ disabled: boolean }>`
     font-size: 14px;
     padding: 4px;
     border-radius: 14px;
-    border: 2px solid ${(props) => props.theme.borderColor.quaternary};
-    color: ${(props) => props.theme.textColor.primary};
+    border: 2px solid ${(props) => props.theme.borderColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     opacity: ${(props) => (props.disabled ? 0.5 : 1)};
     cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
     width: 40px;

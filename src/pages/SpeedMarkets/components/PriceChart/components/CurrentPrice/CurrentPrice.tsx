@@ -84,7 +84,7 @@ const Price = styled.span<{ $isUp?: boolean }>`
             ? props.$isUp
                 ? props.theme.price.up
                 : props.theme.price.down
-            : props.theme.textColor.primary};
+            : props.theme.textColor.secondary};
 
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         font-size: 18px;

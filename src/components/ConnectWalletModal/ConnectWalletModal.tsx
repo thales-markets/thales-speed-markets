@@ -143,24 +143,18 @@ const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({ isOpen, onClose
                                 <Trans
                                     i18nKey="common.wallet.disclaimer-info"
                                     components={{
-                                        disclaimer: (
-                                            <Link href={disclaimer}>
-                                                <></>
-                                            </Link>
-                                        ),
-                                        terms: (
-                                            <Link href={termsOfUse}>
-                                                <></>
-                                            </Link>
-                                        ),
+                                        disclaimer: <Link href={disclaimer} target="_blank" rel="noreferrer" />,
+                                        terms: <Link href={termsOfUse} target="_blank" rel="noreferrer" />,
                                     }}
                                 />
                             </FooterText>
-                            <Checkbox
-                                value={''}
-                                checked={termsAccepted}
-                                onChange={setTerms.bind(this, !termsAccepted)}
-                            />
+                            <CheckboxWrapper>
+                                <Checkbox
+                                    value={''}
+                                    checked={termsAccepted}
+                                    onChange={setTerms.bind(this, !termsAccepted)}
+                                />
+                            </CheckboxWrapper>
                         </FooterContainer>
                     </>
                 )}
@@ -185,9 +179,9 @@ const Container = styled.div`
 `;
 
 const Link = styled.a`
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     text-decoration: underline;
-    text-decoration-color: ${(props) => props.theme.textColor.primary};
+    text-decoration-color: ${(props) => props.theme.textColor.secondary};
     line-height: 18px;
 `;
 
@@ -210,7 +204,7 @@ const FooterContainer = styled(FlexDivCentered)<{ disabled: boolean }>`
         margin-top: 28px;
     }
 
-    border-top: ${(props) => (props.disabled ? `1px ${props.theme.borderColor.quaternary} solid` : '')};
+    border-top: ${(props) => (props.disabled ? `1px ${props.theme.borderColor.primary} solid` : '')};
 `;
 const WalletIconsWrapper = styled(FlexDivCentered)`
     justify-content: center;
@@ -220,12 +214,12 @@ const WalletIconsWrapper = styled(FlexDivCentered)`
 const WalletIcon = styled.i`
     font-size: 20px;
     margin-right: 5px;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
 `;
 
 const WalletName = styled.span`
     font-family: ${(props) => props.theme.fontFamily.secondary};
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     text-transform: uppercase;
     font-weight: 800;
     font-size: 18px;
@@ -252,7 +246,7 @@ const SocialButtonsWrapper = styled(FlexDivRow)`
     justify-content: space-between;
     width: 100%;
     gap: 20px;
-    @media (max-width: 575px) {
+    @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         gap: 10px;
         flex-wrap: wrap;
     }
@@ -267,6 +261,17 @@ const LoaderContainer = styled.div`
     height: 180px !important;
     width: 80px;
     overflow: none;
+`;
+
+const CheckboxWrapper = styled.div`
+    min-width: 180px;
+    @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
+        display: flex;
+        align-items: flex-end;
+        min-height: 22px;
+        min-width: 80px;
+        padding-right: 30px; // fix for widget bot overlapping
+    }
 `;
 
 export default ConnectWalletModal;
