@@ -192,7 +192,7 @@ const Container = styled(FlexDivColumnCentered)`
 const Info = styled.p`
     font-size: 13px;
     line-height: 110%;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     text-align: justify;
     margin-top: 20px;
 `;
@@ -207,9 +207,9 @@ const Step = styled(FlexDivStart)`
 const StepNumber = styled(FlexDivCentered)`
     width: 36px;
     height: 36px;
-    border: 2px solid ${(props) => props.theme.textColor.primary};
+    border: 2px solid ${(props) => props.theme.textColor.secondary};
     border-radius: 50%;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     font-weight: 700;
     font-size: 18px;
     line-height: 100%;
@@ -218,7 +218,7 @@ const StepName = styled.span`
     font-weight: 400;
     font-size: 18px;
     line-height: 100%;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     padding-left: 8px;
     text-transform: capitalize;
 `;
@@ -229,7 +229,7 @@ const RowWrapper = styled(FlexDivRowCentered)<{ marginBottom?: string }>`
 `;
 
 const GeneratedLink = styled.span`
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     font-size: 13px;
     font-weight: 600;
     white-space: nowrap;

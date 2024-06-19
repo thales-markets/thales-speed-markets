@@ -306,7 +306,7 @@ const TableBody = styled.div`
 const TableRow = styled(FlexDiv)<{ cursorPointer?: boolean }>`
     cursor: ${(props) => (props.cursorPointer ? 'pointer' : 'default')};
     min-height: 38px;
-    border-bottom: 1px solid ${(props) => props.theme.borderColor.quaternary};
+    border-bottom: 1px solid ${(props) => props.theme.borderColor.primary};
 `;
 
 const TableRowHead = styled(TableRow)`
@@ -401,7 +401,7 @@ const PaginationWrapper = styled.div`
 `;
 
 const PaginationLabel = styled.p`
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => props.theme.textColor.primary};
     font-size: 13px;
     font-weight: 700;
     line-height: 10%;
@@ -413,8 +413,8 @@ const ArrowWrapper = styled.span<{ disabled: boolean }>`
     font-size: 14px;
     padding: 4px;
     border-radius: 14px;
-    border: 2px solid ${(props) => props.theme.borderColor.quaternary};
-    color: ${(props) => props.theme.textColor.primary};
+    border: 2px solid ${(props) => props.theme.borderColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     opacity: ${(props) => (props.disabled ? 0.5 : 1)};
     cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
     width: 40px;

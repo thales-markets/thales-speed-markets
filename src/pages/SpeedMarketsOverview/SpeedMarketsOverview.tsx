@@ -63,7 +63,7 @@ const Header = styled(FlexDivRow)`
     font-size: 18px;
     line-height: 100%;
     width: 100%;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         display: none;
     }
@@ -73,7 +73,7 @@ export const LinkContainer = styled.div`
     font-family: ${(props) => props.theme.fontFamily.secondary};
     font-size: 18px;
     font-weight: 800;
-    color: ${(props) => props.theme.link.textColor.secondary};
+    color: ${(props) => props.theme.link.textColor.primary};
     text-transform: uppercase;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         display: none;

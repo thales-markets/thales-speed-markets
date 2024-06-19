@@ -265,7 +265,7 @@ const Container = styled.div`
 const StepNumberSection = styled(FlexDivCentered)``;
 
 const StepDescriptionSection = styled(FlexDivColumn)<{ isActive: boolean; isDisabled?: boolean }>`
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     cursor: ${(props) => (props.isDisabled ? 'not-allowed' : 'pointer')};
     overflow: hidden;
     ${(props) => (!props.isActive ? 'opacity: 0.5;' : '')}
@@ -275,7 +275,7 @@ const StepTitle = styled.span<{ completed?: boolean }>`
     font-weight: 700;
     font-size: 20px;
     line-height: 27px;
-    color: ${(props) => (props.completed ? props.theme.background.quinary : '')};
+    color: ${(props) => (props.completed ? props.theme.background.secondary : '')};
     margin-bottom: 4px;
 `;
 
@@ -284,7 +284,7 @@ const StepDescription = styled.p<{ completed?: boolean }>`
     font-size: 14px;
     line-height: 16px;
     text-align: justify;
-    color: ${(props) => (props.completed ? props.theme.background.quinary : '')};
+    color: ${(props) => (props.completed ? props.theme.background.secondary : '')};
 `;
 
 const StepNumberWrapper = styled.div<{ isActive: boolean; isDisabled?: boolean; completed?: boolean }>`
@@ -294,9 +294,9 @@ const StepNumberWrapper = styled.div<{ isActive: boolean; isDisabled?: boolean; 
     width: 45px;
     height: 45px;
     border-radius: 50%;
-    border: 2px solid ${(props) => (props.completed ? props.theme.textColor.quinary : props.theme.textColor.primary)};
+    border: 2px solid ${(props) => (props.completed ? props.theme.textColor.primary : props.theme.textColor.secondary)};
     ${(props) =>
-        props.isActive ? '' : `background: ${props.completed ? props.theme.background.quinary : 'transparent'};`}
+        props.isActive ? '' : `background: ${props.completed ? props.theme.background.secondary : 'transparent'};`}
     cursor: ${(props) => (props.isDisabled ? 'not-allowed' : props.isActive ? 'default' : 'pointer')};
     @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         width: 36px;
@@ -330,7 +330,7 @@ const AddressContainer = styled.div`
     border-radius: 6px;
     padding: 12px;
     background: ${(props) => props.theme.background.primary};
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
 `;
 
 const Address = styled.span`
@@ -351,7 +351,7 @@ const QRIcon = styled.i`
     cursor: pointer;
     right: 90px;
     top: 8px;
-    color: ${(props) => props.theme.input.textColor.secondary};
+    color: ${(props) => props.theme.input.textColor.primary};
 `;
 
 const CopyText = styled.span`
@@ -377,7 +377,7 @@ const Separator = styled.div`
         font-weight: 800;
         line-height: 12px;
         letter-spacing: -0.5px;
-        color: ${(props) => props.theme.textColor.primary};
+        color: ${(props) => props.theme.textColor.secondary};
         background: ${(props) => props.theme.background.primary};
         top: 50%; /* position the top  edge of the element at the middle of the parent */
         left: 50%; /* position the left edge of the element at the middle of the parent */
@@ -402,7 +402,7 @@ const OnRampWrapper = styled(OnramperDiv)`
 
 const OnramperIcons = styled.i`
     font-size: 70px;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         font-size: 60px;
     }
@@ -431,7 +431,7 @@ const ButtonWrapper = styled.div`
 `;
 
 const Link = styled.a`
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => props.theme.textColor.primary};
     text-decoration: underline;
 `;
 

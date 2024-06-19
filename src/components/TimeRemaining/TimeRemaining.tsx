@@ -83,7 +83,7 @@ const getColor = (duration: Duration, theme: ThemeInterface) => {
         duration.hours ||
         (duration.minutes && duration.minutes >= 2)
     ) {
-        return theme.textColor.quinary;
+        return theme.textColor.primary;
     }
     return theme.error.textColor.primary;
 };

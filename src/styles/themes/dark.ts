@@ -7,23 +7,18 @@ export default {
     },
     background: {
         primary: Colors.BLACK,
-        secondary: Colors.GRAY,
-        tertiary: '',
-        quaternary: '',
-        quinary: Colors.PURPLE,
+        secondary: Colors.PURPLE,
+        tertiary: Colors.GRAY,
     },
     textColor: {
-        primary: Colors.WHITE,
-        secondary: '',
-        tertiary: '',
-        quaternary: Colors.GREEN,
-        quinary: Colors.PURPLE,
+        primary: Colors.PURPLE,
+        secondary: Colors.WHITE,
+        tertiary: Colors.GREEN,
     },
     borderColor: {
-        primary: Colors.GRAY,
-        secondary: '',
-        tertiary: `linear-gradient(90deg, ${Colors.PURPLE_DARK} 0%, ${Colors.BLUE} 100%)`,
-        quaternary: Colors.PURPLE,
+        primary: Colors.PURPLE,
+        secondary: `linear-gradient(90deg, ${Colors.PURPLE_DARK} 0%, ${Colors.BLUE} 100%)`,
+        tertiary: Colors.GRAY,
     },
     button: {
         background: {
@@ -36,12 +31,10 @@ export default {
             primary: Colors.WHITE,
             secondary: Colors.BLACK,
             tertiary: Colors.PURPLE,
-            quaternary: '',
         },
         borderColor: {
             primary: `linear-gradient(90deg, ${Colors.PURPLE_DARK} 0%, ${Colors.BLUE} 100%)`,
             secondary: Colors.PURPLE,
-            tertiary: '',
         },
     },
     input: {
@@ -52,10 +45,9 @@ export default {
             },
         },
         textColor: {
-            primary: Colors.WHITE,
-            secondary: Colors.PURPLE,
-            tertiary: Colors.BLACK,
-            quaternary: Colors.RED,
+            primary: Colors.PURPLE,
+            secondary: Colors.BLACK,
+            tertiary: Colors.RED,
         },
         borderColor: {
             primary: Colors.PURPLE,
@@ -82,28 +74,24 @@ export default {
     },
     link: {
         textColor: {
-            primary: Colors.PURPLE,
-            secondary: Colors.WHITE,
+            primary: Colors.WHITE,
+            secondary: Colors.PURPLE,
         },
     },
     icon: {
         background: {
-            primary: '',
-            secondary: Colors.BLACK,
-            tertiary: Colors.PURPLE,
+            primary: Colors.BLACK,
+            secondary: Colors.PURPLE,
         },
         textColor: {
-            primary: `linear-gradient(180deg, ${Colors.PURPLE_DARK_2} 0%, ${Colors.BLUE_DEEP_SKY} 100%)`,
+            primary: Colors.PURPLE,
             secondary: Colors.BLACK,
-            tertiary: Colors.PURPLE,
-            quaternary: Colors.WHITE,
+            tertiary: Colors.WHITE,
+            quaternary: `linear-gradient(180deg, ${Colors.PURPLE_DARK_2} 0%, ${Colors.BLUE_DEEP_SKY} 100%)`,
         },
     },
     error: {
         textColor: {
-            primary: Colors.RED,
-        },
-        borderColor: {
             primary: Colors.RED,
         },
     },

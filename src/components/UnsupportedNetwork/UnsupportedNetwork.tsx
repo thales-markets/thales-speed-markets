@@ -143,7 +143,7 @@ const Title = styled.p`
     font-weight: 700;
     font-size: 22px;
     line-height: 25px;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     text-align: center;
     margin: 20px 0;
 `;
@@ -152,7 +152,7 @@ const ExplanationText = styled.p`
     font-weight: 400;
     font-size: 18px;
     line-height: 20px;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     text-align: center;
     margin-bottom: 5px;
 `;

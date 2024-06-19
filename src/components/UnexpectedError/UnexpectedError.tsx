@@ -77,11 +77,11 @@ const UnexpectedError: React.FC<{ theme: ThemeInterface }> = ({ theme }) => {
 const Container = styled(FlexDivColumnCentered)<{ theme: ThemeInterface }>`
     height: 100%;
     background: ${(props) => props.theme.background.primary};
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     font-family: ${(props) => props.theme.fontFamily.primary};
 
     a {
-        color: ${(props) => props.theme.link.textColor.primary};
+        color: ${(props) => props.theme.link.textColor.secondary};
     }
     button:hover {
         color: ${(props) => props.theme.button.textColor.tertiary};

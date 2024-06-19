@@ -851,7 +851,7 @@ const TradingDetailsContainer = styled(FlexDivRowCentered)<{ isChained: boolean 
 
 const FinalizeTrade = styled(FlexDivCentered)`
     width: 340px;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     font-size: 13px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         width: 100%;
@@ -876,7 +876,7 @@ const ShareWrapper = styled.div`
 
 const ShareText = styled.span<{ $isDisabled: boolean }>`
     margin-right: 5px;
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => props.theme.textColor.primary};
     cursor: ${(props) => (props.$isDisabled ? 'default' : 'pointer')};
     opacity: ${(props) => (props.$isDisabled ? '0.5' : '1')};
     font-size: 14px;
@@ -896,8 +896,8 @@ const QuoteContainer = styled.div`
     height: 90px;
     padding: 20px;
     border-radius: 8px;
-    background: ${(props) => props.theme.background.quinary};
-    color: ${(props) => props.theme.input.textColor.tertiary};
+    background: ${(props) => props.theme.background.secondary};
+    color: ${(props) => props.theme.input.textColor.secondary};
 `;
 
 const QuoteLabel = styled.span`
@@ -918,7 +918,7 @@ const InfoText = styled.span`
     font-weight: 400;
     font-size: 13px;
     letter-spacing: 0.13px;
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => props.theme.textColor.primary};
 `;
 
 export default AmmSpeedTrading;

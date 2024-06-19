@@ -150,7 +150,7 @@ const Container = styled.div`
     right: 0;
 
     border-radius: 15px;
-    border: 2px solid ${(props) => props.theme.borderColor.quaternary};
+    border: 2px solid ${(props) => props.theme.borderColor.primary};
     padding: 14px;
     background: ${(props) => props.theme.background.primary};
     z-index: 1000;
@@ -165,21 +165,21 @@ const FlexColumn = styled(FlexDivColumn)`
     &:nth-child(2) {
         padding: 20px 0;
         margin-top: 10px;
-        border-top: 1px solid ${(props) => props.theme.borderColor.quaternary};
-        border-bottom: 1px solid ${(props) => props.theme.borderColor.quaternary};
+        border-top: 1px solid ${(props) => props.theme.borderColor.primary};
+        border-bottom: 1px solid ${(props) => props.theme.borderColor.primary};
         margin-bottom: 10px;
     }
 `;
 
 const TextLabel = styled.span`
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => props.theme.textColor.primary};
     font-size: 14px;
     font-weight: 700;
     line-height: normal;
 `;
 
 const Value = styled(TextLabel)`
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     font-weight: 400;
     white-space: pre;
 `;
@@ -191,7 +191,7 @@ const Icon = styled.i`
 `;
 
 const CopyIcon = styled.i`
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     font-size: 18px;
     cursor: pointer;
     margin-left: 4px;

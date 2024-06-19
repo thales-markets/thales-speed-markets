@@ -40,11 +40,11 @@ export const Tab = styled.span<{
     font-size: 18px;
     line-height: 40px;
     text-transform: uppercase;
-    color: ${(props) => (props.$active ? props.theme.textColor.quinary : props.theme.textColor.primary)};
+    color: ${(props) => (props.$active ? props.theme.textColor.primary : props.theme.textColor.secondary)};
     cursor: pointer;
     padding: 0 50px;
     white-space: pre;
-    box-shadow: ${(props) => (props.$active ? `0px 2px ${props.theme.borderColor.quaternary};` : '')};
+    box-shadow: ${(props) => (props.$active ? `0px 2px ${props.theme.borderColor.primary};` : '')};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         font-size: 14px;
         line-height: 30px;
@@ -63,14 +63,14 @@ export const TabSectionTitle = styled.p`
     font-weight: 800;
     font-size: 18px;
     line-height: 100%;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
 `;
 
 export const TabSectionSubtitle = styled.span`
     font-size: 13px;
     font-weight: 700;
     line-height: 11px;
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => props.theme.textColor.primary};
     text-align: left;
 `;
 

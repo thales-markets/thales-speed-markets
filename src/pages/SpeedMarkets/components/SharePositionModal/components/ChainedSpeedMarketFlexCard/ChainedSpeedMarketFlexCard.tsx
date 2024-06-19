@@ -74,7 +74,7 @@ const ChainedSpeedMarketFlexCard: React.FC<SharePositionData> = ({
                     </HeaderRow>
                     {positions.map((position, index) => {
                         return (
-                            <DirectionRow key={index} isLast={index === positions.length - 1}>
+                            <DirectionRow key={index} color={textColor} isLast={index === positions.length - 1}>
                                 <Text width={8} color={textColor}>
                                     {index + 1}
                                 </Text>
@@ -171,9 +171,9 @@ const DirectionsHeaderLabel = styled.span<{ color: string; width?: number; paddi
     ${(props) => (props.padding ? `padding: ${props.padding};` : '')}
 `;
 
-const DirectionRow = styled(FlexDivRow)<{ isLast?: boolean }>`
+const DirectionRow = styled(FlexDivRow)<{ color: string; isLast?: boolean }>`
     border-bottom: ${(props) => (props.isLast ? 'solid' : 'dashed')} 2px;
-    border-color: ${(props) => props.theme.borderColor.primary};
+    border-color: ${(props) => props.color};
     padding-left: 5px;
 `;
 

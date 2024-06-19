@@ -37,7 +37,7 @@ export const InputLabel = styled.p<{ marginTop?: string }>`
     line-height: normal;
     margin-top: ${(props) => (props.marginTop ? props.marginTop : '')};
     margin-bottom: 5px;
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => props.theme.textColor.primary};
 `;
 
 export const InputContainer = styled(FlexDiv)`
@@ -48,7 +48,7 @@ export const InputContainer = styled(FlexDiv)`
 
 export const WarningContainer = styled(FlexDiv)`
     width: 100%;
-    background-color: ${(props) => props.theme.background.quinary};
+    background-color: ${(props) => props.theme.background.secondary};
     color: ${(props) => props.theme.background.primary};
     padding: 12px 8px;
     align-items: center;

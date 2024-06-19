@@ -24,7 +24,7 @@ const SelectInput: React.FC<SelectInputProps> = ({ options, handleChange, defaul
             width: '100%',
             // color: props.selectProps.menuColor,
             backgroundColor: theme.background.primary,
-            border: `2px solid ${theme.borderColor.quaternary}`,
+            border: `2px solid ${theme.borderColor.primary}`,
             marginTop: 5,
             borderRadius: 8,
             overflow: 'auto',
@@ -36,12 +36,12 @@ const SelectInput: React.FC<SelectInputProps> = ({ options, handleChange, defaul
         }),
         option: (base: CSSObjectWithLabel, props: OptionProps<SelectOption, boolean, GroupBase<SelectOption>>) => ({
             ...base,
-            color: theme.textColor.primary,
+            color: theme.textColor.secondary,
             backgroundColor: props?.isFocused ? theme.background.primary : 'transparent',
             cursor: 'pointer',
             borderRadius: 8,
             '&:hover': {
-                color: theme.textColor.quinary,
+                color: theme.textColor.primary,
             },
             '&:active': {
                 backgroundColor: theme.background.primary,
@@ -50,15 +50,15 @@ const SelectInput: React.FC<SelectInputProps> = ({ options, handleChange, defaul
         control: (base: CSSObjectWithLabel, props: ControlProps<SelectOption, boolean, GroupBase<SelectOption>>) => ({
             ...base,
             backgroundColor: theme.background.primary,
-            border: `2px solid ${theme.borderColor.quaternary}`,
-            color: theme.textColor.primary,
+            border: `2px solid ${theme.borderColor.primary}`,
+            color: theme.textColor.secondary,
             borderRadius: '8px',
             minHeight: 38,
             height: 38,
             cursor: 'pointer',
             boxShadow: 'none',
             '&:hover': {
-                border: `2px solid ${theme.borderColor.quaternary}`,
+                border: `2px solid ${theme.borderColor.primary}`,
                 boxShadow: 'none',
             },
             opacity: props.isDisabled ? 0.4 : 1,
@@ -67,21 +67,21 @@ const SelectInput: React.FC<SelectInputProps> = ({ options, handleChange, defaul
         }),
         placeholder: (base: CSSObjectWithLabel) => ({
             ...base,
-            color: theme.textColor.primary,
+            color: theme.textColor.secondary,
         }),
         singleValue: (base: CSSObjectWithLabel) => ({
             ...base,
-            color: theme.textColor.primary,
+            color: theme.textColor.secondary,
         }),
         indicatorSeparator: () => ({
             display: 'none',
         }),
         dropdownIndicator: (base: CSSObjectWithLabel) => ({
             ...base,
-            color: theme.textColor.quinary,
+            color: theme.textColor.primary,
             [':hover']: {
                 ...base[':hover'],
-                color: theme.textColor.quinary,
+                color: theme.textColor.primary,
             },
         }),
     };
@@ -110,7 +110,7 @@ const DropdownIndicator: React.FC<any> = (props) => {
 const Icon = styled.i`
     font-size: 12px;
     line-height: 100%;
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => props.theme.textColor.primary};
 `;
 
 export default SelectInput;

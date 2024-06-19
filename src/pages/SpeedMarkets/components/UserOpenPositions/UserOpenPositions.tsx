@@ -538,7 +538,7 @@ const MobileTitle = styled.span`
         font-weight: 700;
         font-size: 18px;
         line-height: 100%;
-        color: ${(props) => props.theme.textColor.primary};
+        color: ${(props) => props.theme.textColor.secondary};
         text-transform: uppercase;
     }
 `;
@@ -582,7 +582,7 @@ const ClaimAll = styled.span`
     font-weight: 800;
     line-height: 100%;
     text-align: center;
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => props.theme.textColor.primary};
 `;
 
 const NoPositionsText = styled.span`
@@ -593,7 +593,7 @@ const NoPositionsText = styled.span`
     font-weight: 600;
     font-size: 15px;
     line-height: 100%;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     min-width: max-content;
 `;
 

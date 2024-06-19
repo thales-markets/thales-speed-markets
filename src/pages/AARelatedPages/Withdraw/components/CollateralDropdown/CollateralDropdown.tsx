@@ -60,8 +60,8 @@ const Container = styled.div`
     justify-content: flex-start;
     padding: 7px;
     border-radius: 8px;
-    border: 2px solid ${(props) => props.theme.borderColor.quaternary};
-    color: ${(props) => props.theme.textColor.primary};
+    border: 2px solid ${(props) => props.theme.borderColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     position: relative;
     max-height: 40px;
     cursor: pointer;
@@ -90,13 +90,13 @@ const Icon = styled.i`
     font-size: 25px;
     line-height: 100%;
     margin-right: 10px;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
 `;
 
 const Arrow = styled.i`
     font-size: 10px;
     text-transform: none;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     position: absolute;
     right: 10px;
 `;

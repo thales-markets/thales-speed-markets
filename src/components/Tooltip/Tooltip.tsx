@@ -26,7 +26,7 @@ const Tooltip: React.FC<TooltipProps> = ({ overlay, children, customIconStyling 
 };
 
 const Container = styled.div`
-    background: ${(props) => props.theme.borderColor.tertiary};
+    background: ${(props) => props.theme.borderColor.secondary};
     border-width: 1px;
     border-radius: 2px;
     padding: 1px;
@@ -35,7 +35,7 @@ const Container = styled.div`
 const Content = styled.div`
     background: ${(props) => props.theme.background.primary};
     border-radius: 2px;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     font-weight: 700;
     padding: 10px;
 `;
@@ -49,7 +49,7 @@ const InfoIcon = styled.i`
     cursor: pointer;
     margin-top: 1px;
     margin-left: 4px;
-    color: ${(props) => props.theme.icon.background.tertiary};
+    color: ${(props) => props.theme.icon.background.secondary};
     &:before {
         font-family: Icons !important;
         content: '\\0046';

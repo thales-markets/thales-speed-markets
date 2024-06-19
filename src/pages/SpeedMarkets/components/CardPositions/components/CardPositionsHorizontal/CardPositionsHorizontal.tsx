@@ -102,7 +102,7 @@ const Icon = styled.i`
     line-height: 100%;
     width: 15px;
     height: 24px;
-    color: ${(props) => props.theme.icon.textColor.tertiary};
+    color: ${(props) => props.theme.icon.textColor.primary};
 `;
 
 const IconLeft = styled(Icon)`

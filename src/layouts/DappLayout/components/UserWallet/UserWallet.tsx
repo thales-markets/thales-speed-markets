@@ -76,7 +76,7 @@ const Wrapper = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 2px solid ${(props) => props.theme.borderColor.quaternary};
+    border: 2px solid ${(props) => props.theme.borderColor.primary};
     border-radius: 20px;
     height: 30px;
 `;
@@ -99,7 +99,7 @@ const WalletContainer = styled.div<{ $isAddress: boolean }>`
 `;
 
 const WalletText = styled.span<{ $isAddress: boolean }>`
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => props.theme.textColor.primary};
     font-family: ${(props) => props.theme.fontFamily.secondary};
     font-weight: 700;
     font-size: 12px;
@@ -113,7 +113,7 @@ const WalletText = styled.span<{ $isAddress: boolean }>`
 const Separator = styled.div`
     width: 4px;
     height: 12px;
-    background: ${(props) => props.theme.borderColor.quaternary};
+    background: ${(props) => props.theme.borderColor.primary};
 `;
 
 export default UserWallet;
