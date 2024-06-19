@@ -189,6 +189,7 @@ const Name = styled(TextLabel)`
 const Value = styled(TextLabel)`
     color: ${(props) => props.theme.textColor.secondary};
     font-weight: 400;
+    white-space: pre;
 `;
 
 const CopyIcon = styled.i`
