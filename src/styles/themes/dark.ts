@@ -149,11 +149,6 @@ export default {
         },
     },
     flexCard: {
-        down: Colors.RED,
-        up: Colors.GREEN,
-        resolved: Colors.YELLOW_DARK,
-        text: Colors.GRAY_BLUE,
-
         background: {
             potential: Colors.GREEN_POTENTIAL,
             won: `linear-gradient(6.97deg, ${Colors.GOLD_1} -2.18%, ${Colors.GOLD_2} 23.54%, ${Colors.GOLD_3} 44.36%, ${Colors.GOLD_4} 65.19%, ${Colors.GOLD_3} 81.11%, ${Colors.GOLD_5} 103.16%, ${Colors.GOLD_3} 120.31%)`,
