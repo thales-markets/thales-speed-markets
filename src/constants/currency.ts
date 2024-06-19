@@ -33,7 +33,7 @@ export const STABLE_COINS = [
 ];
 
 const FIAT_CURRENCY = ['USD'];
-export const FIAT_CURRENCY_MAP = keyBy(FIAT_CURRENCY);
+const FIAT_CURRENCY_MAP = keyBy(FIAT_CURRENCY);
 const FIAT_CURRENCY_SIGN = {
     [FIAT_CURRENCY_MAP.USD]: '$',
 };
