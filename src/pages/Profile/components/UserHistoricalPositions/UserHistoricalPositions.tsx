@@ -396,7 +396,7 @@ const NoPositionsText = styled.span`
     font-weight: 600;
     font-size: 15px;
     line-height: 100%;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     min-width: max-content;
 `;
 

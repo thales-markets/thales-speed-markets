@@ -394,7 +394,7 @@ const Info = styled.span`
     font-size: 18px;
     font-weight: 300;
     line-height: 20px;
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => props.theme.textColor.primary};
     min-height: 40px;
 `;
 
@@ -425,7 +425,7 @@ const ArrowRight = styled.i`
     font-weight: 800;
     margin-left: 6px;
     margin-top: -4px;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         font-size: 16px;
         font-weight: 400;

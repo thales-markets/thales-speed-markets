@@ -266,7 +266,7 @@ const Label = styled.span<{ margin?: string }>`
     font-weight: 400;
     font-size: 18px;
     line-height: 100%;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     ${(props) => (props.margin ? `margin: ${props.margin};` : '')};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         font-size: 18px;
@@ -277,7 +277,7 @@ const Label = styled.span<{ margin?: string }>`
 `;
 
 const Value = styled(Label)`
-    color: ${(props) => props.theme.textColor.quaternary};
+    color: ${(props) => props.theme.textColor.tertiary};
 `;
 
 const PythIconWrap = styled.div`
@@ -289,7 +289,7 @@ const PythIconWrap = styled.div`
     i {
         font-size: 40px;
         line-height: 10px;
-        color: ${(props) => props.theme.textColor.quinary};
+        color: ${(props) => props.theme.textColor.primary};
     }
 `;
 

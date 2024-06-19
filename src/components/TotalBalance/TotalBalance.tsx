@@ -183,7 +183,7 @@ const ColumnWrapper = styled(FlexDivCentered)`
 const TotalBalanceWrapper = styled(FlexDivCentered)`
     gap: 10px;
     min-width: 190px;
-    border-bottom: 2px solid ${(props) => props.theme.borderColor.quaternary};
+    border-bottom: 2px solid ${(props) => props.theme.borderColor.primary};
     padding-bottom: 14px;
     align-items: flex-end;
 `;
@@ -194,7 +194,7 @@ const SectionLabel = styled.span`
     line-height: 90%; /* 12.6px */
     letter-spacing: 1px;
     text-transform: capitalize;
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => props.theme.textColor.primary};
     margin-bottom: 8px;
     white-space: pre;
 `;
@@ -206,7 +206,7 @@ const TotalBalanceSpan = styled.span`
     line-height: 104.8%; /* 27.248px */
     text-transform: capitalize;
     width: 100%;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     white-space: pre;
 `;
 
@@ -238,13 +238,13 @@ const Token = styled(FlexDiv)`
 const TokenName = styled.span`
     font-weight: 700;
     font-size: 12px;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
 `;
 
 const TokenIcon = styled.i`
     font-size: 20px;
     margin-right: 5px;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     font-weight: 100;
 `;
 
@@ -252,7 +252,7 @@ const IndividualTokenBalance = styled.span`
     font-size: 12px;
     font-weight: 600;
     text-align: right;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
 `;
 
 export default TotalBalance;

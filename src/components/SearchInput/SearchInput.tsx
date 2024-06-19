@@ -50,7 +50,7 @@ const Icon = styled.i`
     position: absolute;
     left: 18px;
     font-size: 22px;
-    color: ${(props) => props.theme.icon.textColor.tertiary};
+    color: ${(props) => props.theme.icon.textColor.primary};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         left: 8px;
     }

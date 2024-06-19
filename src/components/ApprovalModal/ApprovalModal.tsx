@@ -120,7 +120,7 @@ const Text = styled.span`
     font-size: 15px;
     line-height: 18px;
     text-transform: uppercase;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
 `;
 
 const ButtonContainer = styled(FlexDivCentered)`

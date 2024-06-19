@@ -162,7 +162,7 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({ position }) => {
                                         padding={userWonStatuses[index] ? undefined : '1px 0'}
                                         color={
                                             userWonStatuses[index]
-                                                ? theme.textColor.quinary
+                                                ? theme.textColor.primary
                                                 : theme.error.textColor.primary
                                         }
                                         className={userWonStatuses[index] ? 'icon icon--correct' : 'icon icon--wrong'}
@@ -181,7 +181,7 @@ const ChainedPosition: React.FC<ChainedPositionProps> = ({ position }) => {
 
 const Container = styled(FlexDivSpaceBetween)`
     background: ${(props) => props.theme.background.primary};
-    border-bottom: 1px solid ${(props) => props.theme.borderColor.quaternary};
+    border-bottom: 1px solid ${(props) => props.theme.borderColor.primary};
     min-height: 144px;
     width: 100%;
     padding: 10px;
@@ -216,8 +216,8 @@ const Text = styled.span<{
         props.color
             ? props.color
             : props.isActiveColor
-            ? props.theme.textColor.primary
-            : props.theme.textColor.primary};
+            ? props.theme.textColor.secondary
+            : props.theme.textColor.secondary};
     white-space: nowrap;
     ${(props) => (props.padding ? `padding: ${props.padding};` : '')}
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
@@ -233,7 +233,7 @@ const PositionDetails = styled(FlexDivStart)`
 const Dash = styled.div`
     width: 14px;
     height: 3px;
-    background: ${(props) => props.theme.background.quinary};
+    background: ${(props) => props.theme.background.secondary};
     border-radius: 3px;
     margin: 9px 0 8px 0;
 `;
@@ -253,7 +253,7 @@ const Separator = styled.div`
     min-width: 2px;
     width: 2px;
     height: 110px;
-    background: ${(props) => props.theme.borderColor.quaternary};
+    background: ${(props) => props.theme.borderColor.primary};
     border-radius: 3px;
     margin: 10px 60px 0px 10px;
 `;

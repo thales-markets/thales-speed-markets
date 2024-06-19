@@ -179,9 +179,9 @@ const Container = styled.div`
 `;
 
 const Link = styled.a`
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     text-decoration: underline;
-    text-decoration-color: ${(props) => props.theme.textColor.primary};
+    text-decoration-color: ${(props) => props.theme.textColor.secondary};
     line-height: 18px;
 `;
 
@@ -204,7 +204,7 @@ const FooterContainer = styled(FlexDivCentered)<{ disabled: boolean }>`
         margin-top: 28px;
     }
 
-    border-top: ${(props) => (props.disabled ? `1px ${props.theme.borderColor.quaternary} solid` : '')};
+    border-top: ${(props) => (props.disabled ? `1px ${props.theme.borderColor.primary} solid` : '')};
 `;
 const WalletIconsWrapper = styled(FlexDivCentered)`
     justify-content: center;
@@ -214,12 +214,12 @@ const WalletIconsWrapper = styled(FlexDivCentered)`
 const WalletIcon = styled.i`
     font-size: 20px;
     margin-right: 5px;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
 `;
 
 const WalletName = styled.span`
     font-family: ${(props) => props.theme.fontFamily.secondary};
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     text-transform: uppercase;
     font-weight: 800;
     font-size: 18px;

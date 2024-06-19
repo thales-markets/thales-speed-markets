@@ -13,7 +13,7 @@ export const FieldLabel = styled.label`
     font-weight: normal;
     font-size: 13px;
     line-height: 15px;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     margin-bottom: 6px;
     text-transform: uppercase;
 `;
@@ -29,7 +29,7 @@ export const Input = styled.input<{ fontSize?: string; width?: string; height?: 
     border-radius: 8px;
     outline: 0;
     background: ${(props) => props.theme.input.background.primary};
-    color: ${(props) => props.theme.input.textColor.secondary};
+    color: ${(props) => props.theme.input.textColor.primary};
     font-weight: normal;
     font-size: ${(props) => props.fontSize || '15px'};
     line-height: 18px;
@@ -40,11 +40,11 @@ export const Input = styled.input<{ fontSize?: string; width?: string; height?: 
         color: ${(props) => props.theme.input.placeholderColor.primary};
     }
     &::selection {
-        color: ${(props) => props.theme.input.textColor.tertiary};
+        color: ${(props) => props.theme.input.textColor.secondary};
         background: ${(props) => props.theme.input.background.selection.primary};
     }
     &:focus {
-        color: ${(props) => props.theme.input.textColor.secondary};
+        color: ${(props) => props.theme.input.textColor.primary};
         border: 2px solid ${(props) => props.theme.input.borderColor.focus.primary};
         box-sizing: border-box;
     }

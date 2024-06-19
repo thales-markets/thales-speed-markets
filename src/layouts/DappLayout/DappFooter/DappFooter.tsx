@@ -88,7 +88,7 @@ const TextLink = styled.a`
     font-size: 12px;
     line-height: 27px;
     font-weight: 400;
-    color: ${(props) => props.theme.link.textColor.secondary};
+    color: ${(props) => props.theme.link.textColor.primary};
     text-align: center;
     &:hover {
         text-decoration: underline;
@@ -104,7 +104,7 @@ const FooterIcon = styled.i`
         pointer-events: none;
     }
     font-size: 27px;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
 `;
 
 const DescriptionWrapper = styled(FlexDivRow)``;
@@ -113,7 +113,7 @@ const Description = styled.p`
     font-size: 13px;
     line-height: 100%;
     font-weight: 400;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     text-align: justify;
 `;
 

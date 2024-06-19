@@ -116,7 +116,7 @@ const SharePosition: React.FC<{
 };
 
 const ShareIcon = styled.i<{ $color?: string; $disabled: boolean }>`
-    color: ${(props) => (props.$color ? props.$color : props.theme.textColor.quinary)};
+    color: ${(props) => (props.$color ? props.$color : props.theme.textColor.primary)};
     cursor: ${(props) => (props.$disabled ? 'default' : 'pointer')};
     opacity: ${(props) => (props.$disabled ? '0.5' : '1')};
     font-size: 20px;

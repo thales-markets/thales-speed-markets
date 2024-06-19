@@ -219,7 +219,7 @@ const GlobalStyle = createGlobalStyle`
     }
     html {
         scroll-behavior: smooth;
-        scrollbar-color: ${(props) => props.theme.background.quinary} transparent;
+        scrollbar-color: ${(props) => props.theme.background.secondary} transparent;
     }
     body {
         background: ${(props) => props.theme.background.primary};
@@ -231,22 +231,22 @@ const GlobalStyle = createGlobalStyle`
     .rc-tooltip-placement-top .rc-tooltip-arrow,
     .rc-tooltip-placement-topLeft .rc-tooltip-arrow,
     .rc-tooltip-placement-topRight .rc-tooltip-arrow {
-        border-top-color: ${(props) => props.theme.borderColor.quaternary};
+        border-top-color: ${(props) => props.theme.borderColor.primary};
     }
     .rc-tooltip-placement-right .rc-tooltip-arrow,
     .rc-tooltip-placement-rightTop .rc-tooltip-arrow,
     .rc-tooltip-placement-rightBottom .rc-tooltip-arrow {
-        border-right-color: ${(props) => props.theme.borderColor.quaternary};
+        border-right-color: ${(props) => props.theme.borderColor.primary};
     }
     .rc-tooltip-placement-left .rc-tooltip-arrow,
     .rc-tooltip-placement-leftTop .rc-tooltip-arrow,
     .rc-tooltip-placement-leftBottom .rc-tooltip-arrow {
-        border-left-color: ${(props) => props.theme.borderColor.quaternary};
+        border-left-color: ${(props) => props.theme.borderColor.primary};
     }
     .rc-tooltip-placement-bottom .rc-tooltip-arrow,
     .rc-tooltip-placement-bottomLeft .rc-tooltip-arrow,
     .rc-tooltip-placement-bottomRight .rc-tooltip-arrow {
-        border-bottom-color: ${(props) => props.theme.borderColor.quaternary};
+        border-bottom-color: ${(props) => props.theme.borderColor.primary};
     }
 `;
 

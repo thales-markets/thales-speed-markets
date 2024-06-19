@@ -105,7 +105,7 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
                     values={{ bonusDirection: direction, bonusPerc: bonus }}
                 />
             }
-            customIconStyling={{ fontSize: '11px', color: theme.textColor.quaternary }}
+            customIconStyling={{ fontSize: '11px', color: theme.textColor.tertiary }}
         />
     );
 

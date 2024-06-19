@@ -35,7 +35,7 @@ const CheckboxContainer = styled.label`
     font-size: 18px;
     line-height: 22px;
     text-transform: uppercase;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -56,7 +56,7 @@ const Checkmark = styled.span`
     height: 22px;
     width: 22px;
     border-radius: 5px;
-    border: 2px solid ${(props) => props.theme.textColor.primary};
+    border: 2px solid ${(props) => props.theme.textColor.secondary};
     background-color: transparent;
 
     :after {
@@ -67,7 +67,7 @@ const Checkmark = styled.span`
         top: -1px;
         width: 5px;
         height: 14px;
-        border: solid ${(props) => props.theme.textColor.primary};
+        border: solid ${(props) => props.theme.textColor.secondary};
         border-width: 0 2px 2px 0;
         -webkit-transform: rotate(45deg);
         -ms-transform: rotate(45deg);

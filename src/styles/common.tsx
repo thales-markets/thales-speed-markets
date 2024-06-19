@@ -51,7 +51,7 @@ export const ExtraBoldText = styled.span`
 
 export const GradientContainer = styled.div<{ width?: number; borderRadius?: string }>`
     padding: 2px;
-    background: ${(props) => props.theme.borderColor.tertiary};
+    background: ${(props) => props.theme.borderColor.secondary};
     border-radius: ${(props) => props.borderRadius ?? '8px'};
     width: ${(props) => (props.width ? `${props.width}px` : '100%')};
 `;

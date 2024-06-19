@@ -28,16 +28,16 @@ interface RootProps {
 const theme = getDefaultTheme();
 const rainbowCustomTheme = merge(darkTheme(), {
     colors: {
-        accentColor: ThemeMap[theme].textColor.quinary,
+        accentColor: ThemeMap[theme].textColor.primary,
         accentColorForeground: ThemeMap[theme].button.textColor.secondary,
         modalBackground: ThemeMap[theme].background.primary,
-        modalBorder: ThemeMap[theme].borderColor.quaternary,
+        modalBorder: ThemeMap[theme].borderColor.primary,
         profileForeground: ThemeMap[theme].background.primary,
         closeButton: ThemeMap[theme].button.textColor.tertiary,
         closeButtonBackground: ThemeMap[theme].button.background.primary,
         actionButtonBorder: 'transparent',
     },
-    shadows: { dialog: ThemeMap[theme].borderColor.quaternary },
+    shadows: { dialog: ThemeMap[theme].borderColor.primary },
     radii: { menuButton: '8px' },
 });
 

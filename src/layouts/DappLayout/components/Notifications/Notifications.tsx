@@ -255,7 +255,7 @@ const Bell = styled.i`
 
 const Icon = styled.i`
     font-size: 26px;
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => props.theme.textColor.primary};
 `;
 
 export default Notifications;

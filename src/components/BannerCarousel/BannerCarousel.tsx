@@ -47,7 +47,7 @@ const Container = styled.div`
     max-width: 100%;
     height: 130px;
     overflow: hidden;
-    border: 1px solid ${(props) => props.theme.borderColor.quaternary};
+    border: 1px solid ${(props) => props.theme.borderColor.primary};
     border-radius: 11px;
     margin: 0 0 20px 0;
     z-index: 0;

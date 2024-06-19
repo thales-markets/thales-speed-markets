@@ -211,7 +211,7 @@ const Container = styled(FlexDiv)`
 `;
 
 const Description = styled.h2`
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     font-family: ${(props) => props.theme.fontFamily.secondary};
     font-size: 18px;
     font-weight: 800;
@@ -228,7 +228,7 @@ const AddressContainer = styled.div`
     border-radius: 6px;
     padding: 0 10px 0 0;
     background: ${(props) => props.theme.background.primary};
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
 `;
 
 const Address = styled.span`
@@ -249,7 +249,7 @@ const QRIcon = styled.i`
     cursor: pointer;
     right: 90px;
     top: 8px;
-    color: ${(props) => props.theme.input.textColor.secondary};
+    color: ${(props) => props.theme.input.textColor.primary};
 `;
 
 const CopyText = styled.span`
@@ -275,7 +275,7 @@ const Separator = styled.div`
         font-weight: 800;
         line-height: 12px;
         letter-spacing: -0.5px;
-        color: ${(props) => props.theme.textColor.primary};
+        color: ${(props) => props.theme.textColor.secondary};
         background: ${(props) => props.theme.background.primary};
         top: 50%; /* position the top  edge of the element at the middle of the parent */
         left: 50%; /* position the left edge of the element at the middle of the parent */
@@ -300,7 +300,7 @@ const OnRampWrapper = styled(OnramperDiv)`
 
 const OnramperIcons = styled.i`
     font-size: 70px;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         font-size: 60px;
     }
@@ -320,7 +320,7 @@ const DepositContainer = styled.div`
 `;
 
 const Label = styled.span`
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => props.theme.textColor.primary};
     font-size: 14px;
     font-weight: 700;
     line-height: normal;
@@ -329,7 +329,7 @@ const Label = styled.span`
 `;
 
 const WarningMessage = styled.span`
-    background: ${(props) => props.theme.background.quinary};
+    background: ${(props) => props.theme.background.secondary};
     color: ${(props) => props.theme.background.primary};
     padding: 10px 12px;
     width: 100%;
@@ -346,7 +346,7 @@ const TutorialsWrapper = styled.div`
     width: 100%;
     border-radius: 15px;
     gap: 14px;
-    background: ${(props) => props.theme.background.quinary};
+    background: ${(props) => props.theme.background.secondary};
     color: ${(props) => props.theme.background.primary};
     display: flex;
     flex-direction: column;
@@ -381,7 +381,7 @@ const Token = styled.span`
     align-items: center;
     justify-content: center;
     border-radius: 8px;
-    background: ${(props) => props.theme.background.quinary};
+    background: ${(props) => props.theme.background.secondary};
     color: ${(props) => props.theme.background.primary};
     width: 110px;
     height: 40px;

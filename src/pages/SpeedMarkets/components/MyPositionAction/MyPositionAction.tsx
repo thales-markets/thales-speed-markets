@@ -552,7 +552,7 @@ export const Label = styled.span`
 `;
 
 export const Value = styled.span<{ $color?: string; $isUpperCase?: boolean }>`
-    color: ${(props) => props.$color || props.theme.textColor.primary};
+    color: ${(props) => props.$color || props.theme.textColor.secondary};
     ${(props) => (props.$isUpperCase ? 'text-transform: uppercase;' : '')}
     font-weight: 700;
     line-height: 100%;

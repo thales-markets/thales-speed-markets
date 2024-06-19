@@ -20,7 +20,7 @@ export const getColorPerPosition = (position: Positions, theme: ThemeInterface) 
         case Positions.DOWN:
             return theme.price.down;
         default:
-            return theme.textColor.primary;
+            return theme.textColor.secondary;
     }
 };
 
@@ -31,8 +31,8 @@ export const getStatusColor = (status: HistoryStatus, theme: ThemeInterface) => 
         case HistoryStatus.LOSS:
             return theme.status.loss;
         case HistoryStatus.CLAIMABLE:
-            return theme.textColor.quinary;
-        default:
             return theme.textColor.primary;
+        default:
+            return theme.textColor.secondary;
     }
 };

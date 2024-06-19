@@ -173,7 +173,7 @@ const FlexColumn = styled(FlexDivColumn)`
 `;
 
 const TextLabel = styled.span`
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => props.theme.textColor.primary};
     font-size: 14px;
     font-weight: 700;
     line-height: normal;
@@ -187,12 +187,12 @@ const Name = styled(TextLabel)`
 `;
 
 const Value = styled(TextLabel)`
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     font-weight: 400;
 `;
 
 const CopyIcon = styled.i`
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     font-size: 18px;
     cursor: pointer;
     margin-left: 4px;
