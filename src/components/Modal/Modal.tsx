@@ -27,7 +27,7 @@ const getDefaultStyle = (theme: ThemeInterface, width?: string, zIndex?: number,
         right: 'auto',
         bottom: 'auto',
         padding: '2px',
-        background: isMobile ? theme.background.primary : theme.borderColor.tertiary,
+        background: isMobile ? theme.background.primary : theme.borderColor.secondary,
         width: width ?? (isMobile ? 'auto' : '720px'),
         maxWidth: '100%',
         borderRadius: isMobile ? '0' : '15px',
@@ -88,7 +88,7 @@ const PrimaryHeading = styled.h1`
     font-weight: 800;
     text-transform: uppercase;
     line-height: 20px;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     text-align: center;
 `;
 
@@ -110,7 +110,7 @@ const CloseIcon = styled.i`
     &:before {
         font-family: Icons !important;
         content: '\\0076';
-        color: ${(props) => props.theme.textColor.quinary};
+        color: ${(props) => props.theme.textColor.primary};
     }
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         font-size: 14px;

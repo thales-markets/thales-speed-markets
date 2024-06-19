@@ -23,4 +23,12 @@ export const LINKS = {
         BenchmarksPrice: 'https://benchmarks.pyth.network/v1/updates/price/',
         BenchmarksTradingViewHistory: 'https://benchmarks.pyth.network/v1/shims/tradingview/history',
     },
+    Tutorials: {
+        Root: 'https://docs.thales.io/thales-speed-markets/speed-market-deposit-guides',
+        Coinbase: 'https://docs.thales.io/thales-speed-markets/speed-market-deposit-guides/deposit-usdc-from-coinbase',
+        BinanceMobile:
+            'https://docs.thales.io/thales-speed-markets/speed-market-deposit-guides/deposit-from-binance-mobile-app',
+        BinanceWebsite:
+            'https://docs.thales.io/thales-speed-markets/speed-market-deposit-guides/deposit-from-binance-website',
+    },
 };

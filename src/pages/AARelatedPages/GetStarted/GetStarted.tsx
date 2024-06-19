@@ -132,7 +132,7 @@ const ProgressBar = styled(FlexDiv)<{ selected?: boolean }>`
     height: 6px;
     width: 32%;
     border-radius: 10px;
-    background: ${(props) => (props.selected ? props.theme.textColor.quinary : props.theme.textColor.primary)};
+    background: ${(props) => (props.selected ? props.theme.textColor.primary : props.theme.textColor.secondary)};
 `;
 
 export default GetStarted;

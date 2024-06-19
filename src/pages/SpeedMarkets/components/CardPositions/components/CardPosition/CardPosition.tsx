@@ -143,6 +143,7 @@ const CardPosition: React.FC<CardPositionProps> = ({
                                 disabled={isActionInProgress}
                                 isIconHidden
                                 additionalStyles={{ margin: '0' }}
+                                invertCollors
                             />
                         </InfoRow>
                     )}
@@ -179,7 +180,7 @@ const Container = styled(FlexDivColumn)<{ $borderColor?: string }>`
     width: 100%;
     min-width: 100%;
     min-height: 123px;
-    border: 1px solid ${(props) => (props.$borderColor ? props.$borderColor : props.theme.borderColor.quaternary)};
+    border: 1px solid ${(props) => (props.$borderColor ? props.$borderColor : props.theme.borderColor.primary)};
     border-radius: 8px;
     padding: 14px 10px;
 `;
@@ -203,14 +204,14 @@ export const InfoRow = styled(FlexDivStart)`
 export const Action = styled(FlexDivSpaceBetween)``;
 
 export const Text = styled.span`
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     font-size: 13px;
     font-weight: 800;
     line-height: 13px;
 `;
 
 export const Label = styled(Text)`
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => props.theme.textColor.primary};
     font-weight: 500;
     margin-right: 5px;
 `;

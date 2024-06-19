@@ -27,7 +27,7 @@ import enTranslation from '../../i18n/en.json';
 import biconomyConnector from 'utils/biconomyWallet';
 import { setIsBiconomy } from 'redux/modules/wallet';
 import { particleWagmiWallet } from 'utils/particleWallet/particleWagmiWallet';
-import { useConnect as useParticleConnect } from '@particle-network/auth-core-modal';
+import { useConnect as useParticleConnect, useSolana } from '@particle-network/auth-core-modal';
 import { AuthCoreEvent, getLatestAuthType, particleAuth, SocialAuthType } from '@particle-network/auth-core';
 import { isSocialLogin } from 'utils/particleWallet/utils';
 import Deposit from 'pages/AARelatedPages/Deposit';
@@ -41,6 +41,7 @@ const App = () => {
     const { connect } = useConnect();
     const { isConnected } = useAccount();
     const { connectionStatus } = useParticleConnect();
+    const { address: solanaAddress, enable } = useSolana();
 
     // particle context provider is overriding our i18n configuration and languages, so we need to add our localization after the initialization of particle context
     // initialization of particle context is happening in Root
@@ -81,13 +82,14 @@ const App = () => {
                     biconomyPaymasterApiKey: PAYMASTER_API_KEY,
                 });
                 const smartAddress = await smartAccount.getAccountAddress();
+                if (!solanaAddress) await enable();
 
-                biconomyConnector.setWallet(smartAccount, smartAddress);
+                biconomyConnector.setWallet(smartAccount, smartAddress, solanaAddress ?? '');
                 dispatch(setIsBiconomy(true));
             };
             createSmartAccount();
         }
-    }, [dispatch, switchChain, networkId, disconnect, walletClient]);
+    }, [dispatch, switchChain, networkId, disconnect, walletClient, enable, solanaAddress]);
 
     useEffect(() => {
         if (connectionStatus === 'connected' && isSocialLogin(getLatestAuthType())) {
@@ -217,7 +219,7 @@ const GlobalStyle = createGlobalStyle`
     }
     html {
         scroll-behavior: smooth;
-        scrollbar-color: ${(props) => props.theme.background.quinary} transparent;
+        scrollbar-color: ${(props) => props.theme.background.secondary} transparent;
     }
     body {
         background: ${(props) => props.theme.background.primary};
@@ -229,22 +231,22 @@ const GlobalStyle = createGlobalStyle`
     .rc-tooltip-placement-top .rc-tooltip-arrow,
     .rc-tooltip-placement-topLeft .rc-tooltip-arrow,
     .rc-tooltip-placement-topRight .rc-tooltip-arrow {
-        border-top-color: ${(props) => props.theme.borderColor.quaternary};
+        border-top-color: ${(props) => props.theme.borderColor.primary};
     }
     .rc-tooltip-placement-right .rc-tooltip-arrow,
     .rc-tooltip-placement-rightTop .rc-tooltip-arrow,
     .rc-tooltip-placement-rightBottom .rc-tooltip-arrow {
-        border-right-color: ${(props) => props.theme.borderColor.quaternary};
+        border-right-color: ${(props) => props.theme.borderColor.primary};
     }
     .rc-tooltip-placement-left .rc-tooltip-arrow,
     .rc-tooltip-placement-leftTop .rc-tooltip-arrow,
     .rc-tooltip-placement-leftBottom .rc-tooltip-arrow {
-        border-left-color: ${(props) => props.theme.borderColor.quaternary};
+        border-left-color: ${(props) => props.theme.borderColor.primary};
     }
     .rc-tooltip-placement-bottom .rc-tooltip-arrow,
     .rc-tooltip-placement-bottomLeft .rc-tooltip-arrow,
     .rc-tooltip-placement-bottomRight .rc-tooltip-arrow {
-        border-bottom-color: ${(props) => props.theme.borderColor.quaternary};
+        border-bottom-color: ${(props) => props.theme.borderColor.primary};
     }
 `;
 

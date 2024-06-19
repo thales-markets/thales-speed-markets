@@ -21,12 +21,29 @@ export const Header = styled(FlexDivColumn)`
     margin-bottom: 12px;
 `;
 
+export const HeaderRow = styled(FlexDivRow)`
+    margin-bottom: 12px;
+`;
+
 export const HeaderText = styled.span`
     font-size: 14px;
     font-weight: 700;
     line-height: 18px;
     text-transform: uppercase;
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => props.theme.textColor.primary};
+`;
+
+export const HeaderBalance = styled.span`
+    font-size: 14px;
+    line-height: 18px;
+    color: ${(props) => props.theme.textColor.primary};
+`;
+
+export const WalletIcon = styled.i`
+    font-size: 16px;
+    color: ${(props) => props.theme.icon.textColor.primary};
+    margin-right: 5px;
+    margin-top: -2px;
 `;
 
 export const HeaderSubText = styled(HeaderText)`
@@ -116,11 +133,11 @@ const PositionSymbol = styled(FlexDivCentered)<{ size?: number }>`
     width: ${(props) => (props.size ? props.size : '36')}px;
     height: ${(props) => (props.size ? props.size : '36')}px;
     border-radius: 50%;
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => props.theme.textColor.primary};
 `;
 
 export const PositionsSymbol = styled(PositionSymbol)<{ $isSelected?: boolean }>`
-    color: ${(props) => (props.$isSelected ? props.theme.background.primary : props.theme.textColor.quinary)};
+    color: ${(props) => (props.$isSelected ? props.theme.background.primary : props.theme.textColor.primary)};
 `;
 
 export const Icon = styled.i<{ size?: number; padding?: string; color?: string; isDisabled?: boolean }>`
@@ -138,10 +155,41 @@ export const Bonus = styled.div<{ $isSelected: boolean }>`
     padding: 0 8px;
     background-color: ${(props) => props.theme.background.primary};
     border: 1px solid
-        ${(props) => (props.$isSelected ? props.theme.borderColor.quaternary : props.theme.background.primary)};
+        ${(props) => (props.$isSelected ? props.theme.borderColor.primary : props.theme.background.primary)};
     border-radius: 8px;
-    color: ${(props) => props.theme.textColor.quaternary};
+    color: ${(props) => props.theme.textColor.tertiary};
     font-size: 13px;
     font-weight: 700;
     white-space: nowrap;
+`;
+
+export const BuyinAmountsWrapper = styled(FlexDivRow)`
+    margin-bottom: 10px;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        width: 100%;
+        justify-content: center;
+        gap: 10px;
+    }
+`;
+
+export const Amount = styled(FlexDivCentered)<{ $isSelected: boolean }>`
+    width: 60px;
+    height: 40px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 100%;
+    ${(props) => (props.$isSelected ? '' : `border: 2px solid ${props.theme.button.borderColor.secondary};`)}
+    background: ${(props) =>
+        props.$isSelected ? props.theme.button.background.secondary : props.theme.button.background.primary};
+    color: ${(props) =>
+        props.$isSelected ? props.theme.button.textColor.secondary : props.theme.button.textColor.tertiary};
+    cursor: pointer;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        width: 100%;
+    }
+`;
+
+export const DollarSign = styled.span`
+    padding-right: 2px;
 `;

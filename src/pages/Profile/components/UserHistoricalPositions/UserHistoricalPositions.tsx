@@ -225,13 +225,17 @@ const UserHistoricalPositions: React.FC<UserHistoricalPositionsProps> = ({
 
     // ALL: (SINGLE=open(not matured + matured) + resolved) + (CHAINED=open(not matured + matured) + resolved)
 
-    const allUserOpenSpeedMarketsData = isFilterChainedSelected
-        ? []
-        : activeSpeedNotMatured.concat(maturedUserSpeedMarketsWithPrices, userResolvedSpeedMarketsHistoryData);
+    const allSingle = activeSpeedNotMatured.concat(
+        maturedUserSpeedMarketsWithPrices,
+        userResolvedSpeedMarketsHistoryData
+    );
+    const allUserOpenSpeedMarketsData = isFilterChainedSelected ? [] : allSingle;
 
-    const allUserOpenChainedMarketsData = isFilterSingleSelected
-        ? []
-        : chainedWithoutMaturedPositions.concat(partiallyMaturedWithPrices, userResolvedChainedSpeedMarketsData);
+    const allChained = chainedWithoutMaturedPositions.concat(
+        partiallyMaturedWithPrices,
+        userResolvedChainedSpeedMarketsData
+    );
+    const allUserOpenChainedMarketsData = isFilterSingleSelected ? [] : allChained;
 
     const sortedUserMarketsData = allUserOpenSpeedMarketsData
         .concat(allUserOpenChainedMarketsData)
@@ -244,7 +248,7 @@ const UserHistoricalPositions: React.FC<UserHistoricalPositionsProps> = ({
     const noPositions =
         !isLoading && allUserOpenChainedMarketsData.length === 0 && allUserOpenSpeedMarketsData.length === 0;
 
-    const hasSomePositions = allUserOpenChainedMarketsData.length > 0 || allUserOpenSpeedMarketsData.length > 0;
+    const hasSomePositions = allSingle.length > 0 || allChained.length > 0;
 
     const positions = noPositions ? dummyPositions : sortedUserMarketsData;
 
@@ -392,7 +396,7 @@ const NoPositionsText = styled.span`
     font-weight: 600;
     font-size: 15px;
     line-height: 100%;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     min-width: max-content;
 `;
 

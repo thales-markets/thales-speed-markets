@@ -108,7 +108,7 @@ const StyledToastContainer = styled(ToastContainer)`
     &&&.Toastify__toast-container {
         z-index: 30000;
         width: auto;
-        @media (max-width: 600px) {
+        @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
             top: 0;
             padding: 0;
             left: 0;
@@ -136,7 +136,7 @@ const StyledToastContainer = styled(ToastContainer)`
         }
         color: ${(props) => props.theme.toastMessages.success.textColor.primary};
 
-        @media (max-width: 600px) {
+        @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
             width: 100vw;
             border-radius: 0;
         }

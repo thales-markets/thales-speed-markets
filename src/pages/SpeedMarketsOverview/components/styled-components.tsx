@@ -27,7 +27,7 @@ export const Title = styled.span`
     line-height: 100%;
     margin-left: 20px;
     text-transform: uppercase;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         margin-left: 0;
     }
@@ -59,7 +59,7 @@ export const NoPositionsText = styled.span`
     font-weight: 600;
     font-size: 15px;
     line-height: 100%;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.theme.textColor.secondary};
     min-width: max-content;
     overflow: hidden;
 `;

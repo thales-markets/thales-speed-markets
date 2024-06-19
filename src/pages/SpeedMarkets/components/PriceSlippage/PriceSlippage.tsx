@@ -76,9 +76,9 @@ const Container = styled(FlexDivCentered)`
     max-width: 152px;
     height: 40px;
     padding: 5px;
-    border: 1px solid ${(props) => props.theme.borderColor.quaternary};
+    border: 1px solid ${(props) => props.theme.borderColor.primary};
     border-radius: 8px;
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => props.theme.textColor.primary};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         left: 12px;
         bottom: 12px;
@@ -92,7 +92,7 @@ const SlippageDetailsWrapper = styled.div`
     top: -2px;
     right: -2px;
     padding: 1px;
-    background: ${(props) => props.theme.borderColor.tertiary};
+    background: ${(props) => props.theme.borderColor.secondary};
     border-radius: 8px;
     z-index: 2;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
@@ -138,14 +138,14 @@ const SlippageButton = styled(FlexDivCentered)<{ $isSelected: boolean }>`
 `;
 
 const Percent = styled.span`
-    color: ${(props) => props.theme.input.textColor.secondary};
+    color: ${(props) => props.theme.input.textColor.primary};
     margin-right: 6px;
 `;
 
 const GearIcon = styled.i`
     cursor: pointer;
     font-size: 14px;
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => props.theme.textColor.primary};
     margin-left: 5px;
 `;
 

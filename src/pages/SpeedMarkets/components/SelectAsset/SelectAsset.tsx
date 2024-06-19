@@ -88,9 +88,9 @@ const AssetIcon = styled.i<{ $isSelected: boolean }>`
     line-height: 100%;
     border-radius: 50%;
     background: ${(props) =>
-        props.$isSelected ? props.theme.icon.textColor.tertiary : props.theme.icon.textColor.secondary};
+        props.$isSelected ? props.theme.icon.textColor.primary : props.theme.icon.textColor.secondary};
     color: ${(props) =>
-        props.$isSelected ? props.theme.icon.textColor.secondary : props.theme.icon.textColor.tertiary};
+        props.$isSelected ? props.theme.icon.textColor.secondary : props.theme.icon.textColor.primary};
 `;
 
 const AssetName = styled.p`

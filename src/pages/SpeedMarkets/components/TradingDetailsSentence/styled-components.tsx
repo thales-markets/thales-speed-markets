@@ -9,7 +9,7 @@ export const Text = styled.span`
     font-weight: 800;
     font-size: 18px;
     line-height: 24px;
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => props.theme.textColor.primary};
     text-align: center;
 `;
 

@@ -17,6 +17,7 @@ import { WagmiProvider } from 'wagmi';
 import App from './App';
 import { wagmiConfig } from './wagmiConfig';
 import { AuthCoreContextProvider } from '@particle-network/auth-core-modal';
+import { PARTICLE_STYLE } from 'utils/particleWallet/utils';
 
 window.Buffer = window.Buffer || buffer;
 
@@ -27,16 +28,16 @@ interface RootProps {
 const theme = getDefaultTheme();
 const rainbowCustomTheme = merge(darkTheme(), {
     colors: {
-        accentColor: ThemeMap[theme].textColor.quinary,
+        accentColor: ThemeMap[theme].textColor.primary,
         accentColorForeground: ThemeMap[theme].button.textColor.secondary,
         modalBackground: ThemeMap[theme].background.primary,
-        modalBorder: ThemeMap[theme].borderColor.quaternary,
+        modalBorder: ThemeMap[theme].borderColor.primary,
         profileForeground: ThemeMap[theme].background.primary,
         closeButton: ThemeMap[theme].button.textColor.tertiary,
         closeButtonBackground: ThemeMap[theme].button.background.primary,
         actionButtonBorder: 'transparent',
     },
-    shadows: { dialog: ThemeMap[theme].borderColor.quaternary },
+    shadows: { dialog: ThemeMap[theme].borderColor.primary },
     radii: { menuButton: '8px' },
 });
 
@@ -50,13 +51,15 @@ const Root: React.FC<RootProps> = ({ store }) => {
                 <Provider store={store}>
                     <AuthCoreContextProvider
                         options={{
-                            projectId: '2b8c8b75-cc7a-4111-923f-0043b9fa908b',
-                            clientKey: 'cS3khABdBgfK4m8CzYcL1xcgVM6cuflmNY6dFxdY',
-                            appId: 'aab773d8-c4e9-43ae-aa57-0d898f3dbf46',
+                            projectId: import.meta.env.VITE_APP_PARTICLE_PROJECT_ID,
+                            clientKey: import.meta.env.VITE_APP_PARTICLE_CLIENT_KEY,
+                            appId: import.meta.env.VITE_APP_PARTICLE_API_ID,
                             language: 'en',
                             wallet: {
                                 visible: false,
                             },
+                            themeType: 'dark',
+                            customStyle: PARTICLE_STYLE,
                         }}
                     >
                         <WagmiProvider config={wagmiConfig}>

@@ -4,17 +4,12 @@ import { ParticalTypes } from 'types/wallet';
 import { getNetworkNameByNetworkId } from 'utils/network';
 import { Connector } from 'wagmi';
 import { isSocialAuthType } from '@particle-network/auth-core';
+import { NetworkId } from 'thales-utils';
+import { CustomStyle } from '@particle-network/auth-core-modal';
 
 export const getClassNameForParticalLogin = (socialId: ParticalTypes) => {
     const label = PARTICAL_LOGINS_CLASSNAMES.find((item) => item.socialId == socialId)?.className;
     return label ? label : '';
-};
-
-export const getOnRamperUrl = (apiKey: string, walletAddress: string, networkId: SupportedNetwork) => {
-    return `https://buy.onramper.com?apiKey=${apiKey}&mode=buy&onlyCryptos=usdc_arbitrum,usdt_arbitrum,usdc_base,usdc_optimism,usdt_optimism&networkWallets=${getNetworkNameByNetworkId(
-        networkId,
-        true
-    )}:${walletAddress}'&themeName=dark&containerColor=181a20&primaryColor=1D976C&secondaryColor=2b3139&cardColor=2b3139&primaryTextColor=ffffff&secondaryTextColor=848e9c&borderRadius=0.5&wgBorderRadius=1'`;
 };
 
 export const getSpecificConnectorFromConnectorsArray = (
@@ -29,3 +24,64 @@ export const getSpecificConnectorFromConnectorsArray = (
 };
 
 export const isSocialLogin = (authType: any) => isSocialAuthType(authType) || (authType as any) === 'twitterv1';
+
+export const getOnRamperUrl = (apiKey: string, walletAddress: string, networkId: SupportedNetwork) => {
+    return `https://buy.onramper.com?apiKey=${apiKey}&mode=buy&onlyCryptos=${supportedOnramperTokens(
+        networkId
+    )}&networkWallets=${getNetworkNameByNetworkId(networkId, true)}:${walletAddress}&${ONRAMPER_STYLE}`;
+};
+
+const supportedOnramperTokens = (networkId: SupportedNetwork) => {
+    switch (networkId) {
+        case NetworkId.OptimismMainnet:
+            return 'usdc_optimism,usdt_optimism,dai_optimism,op_optimism,eth_optimism';
+        case NetworkId.Arbitrum:
+            return 'usdc_arbitrum,usdt_arbitrum,dai_arbitrum,arb_arbitrum,eth_arbitrum';
+        case NetworkId.Base:
+            return 'usdc_base,eth_base';
+        case NetworkId.PolygonMainnet:
+            return 'usdc_polygon';
+        case NetworkId.ZkSync:
+            return 'usdc_zksync';
+        default:
+            return 'usdc_optimism, usdt_optimism, dai_optimism, op_optimism, eth_optimism, usdc_arbitrum, usdt_arbitrum, dai_arbitrum, arb_arbitrum, eth_arbitrum, usdc_base, eth_base, usdc_polygon, usdc_zksync';
+    }
+};
+
+const ONRAMPER_STYLE =
+    'themeName=dark&containerColor=000000ff&primaryColor=c294f5ff&secondaryColor=000000ff&cardColor=1a1a1a&primaryTextColor=ffffff&secondaryTextColor=ffffff&borderRadius=0.5&wgBorderRadius=1';
+
+// light
+export const PARTICLE_STYLE: CustomStyle = {
+    theme: {
+        dark: {
+            themeBackgroundColor: '#000000',
+            primaryBtnColor: '#000',
+            primaryBtnBackgroundColor: '#c294f5',
+            secondaryBtnColor: '#fff',
+            secondaryBtnBackgroundColor: '#474747',
+            textColor: '#fff',
+            secondaryTextColor: '#c294f5',
+            iconBorderColor: '#000000',
+            accentColor: '#c294f5',
+            inputBackgroundColor: '#2b2b2c',
+            inputBorderColor: '#c294f5',
+            inputPlaceholderColor: '#ffffff',
+            cardBorderColor: '#000000',
+            cardUnclickableBackgroundColor: '#181818',
+            cardUnclickableBorderColor: '#c294f5',
+            cardDividerColor: '#252525',
+            tagBackgroundColor: '#202327',
+            modalBackgroundColor: '#212324',
+            tipsBackgroundColor: '#eab98159',
+        },
+    },
+    logo: 'https://wallet.particle.network/favicon.ico',
+    projectName: 'Particle Auth',
+    subtitle: 'Login to App to continue',
+    modalWidth: 400,
+    modalHeight: 650,
+    primaryBtnBorderRadius: '30px',
+    modalBorderRadius: '8px',
+    cardBorderRadius: '8px',
+};

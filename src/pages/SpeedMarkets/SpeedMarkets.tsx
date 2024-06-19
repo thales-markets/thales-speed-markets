@@ -1,3 +1,4 @@
+import BannerCarousel from 'components/BannerCarousel';
 import Modal from 'components/Modal';
 import PageLinkBanner from 'components/PageLinkBanner';
 import SPAAnchor from 'components/SPAAnchor/SPAAnchor';
@@ -22,7 +23,7 @@ import { useLocation } from 'react-router-dom';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
 import styled from 'styled-components';
-import { BoldText, PAGE_MAX_WIDTH } from 'styles/common';
+import { BoldText, FlexDivEnd, PAGE_MAX_WIDTH } from 'styles/common';
 import { roundNumberToDecimals } from 'thales-utils';
 import { RootState } from 'types/ui';
 import { getSupportedNetworksByRoute } from 'utils/network';
@@ -35,7 +36,6 @@ import SelectBuyin from './components/SelectBuyin';
 import SelectPosition from './components/SelectPosition';
 import { SelectedPosition } from './components/SelectPosition/SelectPosition';
 import SelectTime from './components/SelectTime';
-import BannerCarousel from 'components/BannerCarousel';
 
 const SpeedMarkets: React.FC = () => {
     const { t } = useTranslation();
@@ -131,9 +131,11 @@ const SpeedMarkets: React.FC = () => {
     const resetData = useCallback(() => {
         setIsResetTriggered(true);
         setPositionType(undefined);
+
         if (ammChainedSpeedMarketsLimitsData?.minChainedMarkets) {
             setChainedPositions(Array(ammChainedSpeedMarketsLimitsData.minChainedMarkets).fill(undefined));
         }
+
         setDeltaTimeSec(0);
         setBuyinAmount(0);
     }, [ammChainedSpeedMarketsLimitsData?.minChainedMarkets]);
@@ -171,6 +173,7 @@ const SpeedMarkets: React.FC = () => {
                         onDeltaChange={setDeltaTimeSec}
                         ammSpeedMarketsLimits={ammSpeedMarketsLimitsData}
                         isResetTriggered={isResetTriggered}
+                        setIsResetTriggered={setIsResetTriggered}
                         isChained={isChained}
                     />
                 )}
@@ -194,6 +197,7 @@ const SpeedMarkets: React.FC = () => {
                         onDeltaChange={setDeltaTimeSec}
                         ammSpeedMarketsLimits={ammSpeedMarketsLimitsData}
                         isResetTriggered={isResetTriggered}
+                        setIsResetTriggered={setIsResetTriggered}
                         isChained={isChained}
                     />
                 )}
@@ -206,6 +210,7 @@ const SpeedMarkets: React.FC = () => {
                         ammChainedSpeedMarketsLimits={ammChainedSpeedMarketsLimitsData}
                         currencyKey={currencyKey}
                         isResetTriggered={isResetTriggered}
+                        setIsResetTriggered={setIsResetTriggered}
                         setHasError={setHasError}
                     />
                 )}
@@ -293,7 +298,7 @@ const SpeedMarkets: React.FC = () => {
                             showTabs
                         />
                     )}
-                    <OverviewLinkWrapper $isTableAbove={isConnected}>
+                    <OverviewLinkWrapper>
                         <SPAAnchor
                             href={buildHref(
                                 `${ROUTES.Markets.SpeedMarketsOverview}?isChained=${
@@ -389,33 +394,41 @@ const Info = styled.span`
     font-size: 18px;
     font-weight: 300;
     line-height: 20px;
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => props.theme.textColor.primary};
     min-height: 40px;
 `;
 
-const OverviewLinkWrapper = styled.div<{ $isTableAbove: boolean }>`
+const OverviewLinkWrapper = styled(FlexDivEnd)`
     position: relative;
-    width: max-content;
-    margin-top: ${(props) => (props.$isTableAbove ? '-39px' : '20px')};
+    margin-top: 20px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         margin-top: 10px;
     }
 `;
 
 const OverviewLinkText = styled.span`
+    font-family: ${(props) => props.theme.fontFamily.secondary};
     font-size: 18px;
+    font-weight: 800;
     line-height: 110%;
+    text-transform: uppercase;
     &:hover {
         text-decoration: underline;
+    }
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        font-weight: 500;
     }
 `;
 
 const ArrowRight = styled.i`
-    font-size: 14px;
+    font-size: 20px;
+    font-weight: 800;
     margin-left: 6px;
-    color: ${(props) => props.theme.textColor.primary};
+    margin-top: -4px;
+    color: ${(props) => props.theme.textColor.secondary};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        margin-bottom: 4px;
+        font-size: 16px;
+        font-weight: 400;
     }
 `;
 

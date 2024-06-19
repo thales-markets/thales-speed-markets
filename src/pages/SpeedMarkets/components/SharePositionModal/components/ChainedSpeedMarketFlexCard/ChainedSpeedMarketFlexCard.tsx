@@ -1,7 +1,5 @@
-import ChainedLostBackground from 'assets/images/flex-cards/chained-lost.png';
-import ChainedWonBackground from 'assets/images/flex-cards/chained-won.png';
-import { FIAT_CURRENCY_MAP, USD_SIGN } from 'constants/currency';
-import { Positions } from 'enums/market';
+import ZeusCard from 'assets/images/flexCards/zeus-card.png';
+import { USD_SIGN } from 'constants/currency';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import { Icon } from 'pages/SpeedMarkets/components/SelectPosition/styled-components';
 import React from 'react';
@@ -9,12 +7,19 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsMobile } from 'redux/modules/ui';
 import styled, { useTheme } from 'styled-components';
-import { FlexDiv, FlexDivCentered, FlexDivColumn, FlexDivEnd, FlexDivRow } from 'styles/common';
-import { formatCurrency, formatCurrencyWithSign, roundNumberToDecimals } from 'thales-utils';
+import { FlexDivCentered, FlexDivColumn, FlexDivColumnCentered, FlexDivRow } from 'styles/common';
+import { formatCurrencyWithSign, truncToDecimals } from 'thales-utils';
 import { SharePositionData } from 'types/flexCards';
 import { RootState, ThemeInterface } from 'types/ui';
-import { getSynthName } from 'utils/currency';
 import { isUserWinner } from 'utils/speedAmm';
+import LogoWithQR from '../LogoWithQR';
+import {
+    ContainerBorder,
+    LossWatermark,
+    Status,
+    StatusContainer,
+    StatusHeading,
+} from '../SpeedMarketFlexCard/SpeedMarketFlexCard';
 
 const ChainedSpeedMarketFlexCard: React.FC<SharePositionData> = ({
     type,
@@ -24,7 +29,6 @@ const ChainedSpeedMarketFlexCard: React.FC<SharePositionData> = ({
     finalPrices,
     buyIn,
     payout,
-    payoutMultiplier,
 }) => {
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
@@ -37,219 +41,176 @@ const ChainedSpeedMarketFlexCard: React.FC<SharePositionData> = ({
         (position, i) => finalPrices && strikePrices && isUserWinner(position, strikePrices[i], finalPrices[i])
     );
 
-    const roi = payoutMultiplier ? roundNumberToDecimals(payoutMultiplier ** positions.length) : 0;
+    const profit = truncToDecimals(payout / buyIn);
+
+    const textColor = isWonType ? theme.flexCard.textColor.won : theme.flexCard.textColor.loss;
 
     return (
-        <Container isWon={isWonType}>
-            <ContentWrapper isWon={isWonType}>
-                <HeaderWrapper isWon={isWonType}>
-                    {isWonType && <Won>{t('common.flex-card.won')}</Won>}
-                    {isWonType && <Payout>{formatCurrencyWithSign(USD_SIGN, payout ?? 0)}</Payout>}
-                    <HeaderLabel>{t('speed-markets.chained.name')}</HeaderLabel>
-                </HeaderWrapper>
-                <AssetDiv isWon={isWonType}>
-                    <CurrencyIcon className={`currency-icon currency-icon--${currencyKey.toLowerCase()}`} />
-                    <AssetLabel>{getSynthName(currencyKey)}</AssetLabel>
-                    <AssetLabel isBold>{currencyKey}</AssetLabel>
-                </AssetDiv>
-                <FlexDivEnd>
-                    <DirectionsHeaderLabel width={isMobile ? 88 : 94}>{t('common.direction')}</DirectionsHeaderLabel>
-                    <DirectionsHeaderLabel width={isMobile ? 94 : 100}>
-                        {t('common.strike-price')}
-                    </DirectionsHeaderLabel>
-                    <DirectionsHeaderLabel width={isMobile ? 78 : 84}>
-                        {t('speed-markets.user-positions.final-price')}
-                    </DirectionsHeaderLabel>
-                    <DirectionsHeaderLabel width={38}>{t('common.result')}</DirectionsHeaderLabel>
-                </FlexDivEnd>
-                {positions.map((position, index) => {
-                    return (
-                        <DirectionRow key={index} isLast={index === positions.length - 1}>
-                            <Text width={8} $isBold>
-                                {index + 1}
-                            </Text>
-                            <FlexDivCentered>
-                                {position === Positions.UP ? (
-                                    <Icon size={20} color={theme.price.up} className="icon icon--caret-up" />
-                                ) : (
-                                    <Icon size={20} color={theme.price.down} className="icon icon--caret-down" />
-                                )}
-                                <Text width={50} $isBold padding="0 0 0 5px">
-                                    {position}
+        <ContainerBorder $isWon={isWonType}>
+            <Container $isWon={isWonType}>
+                <FlexDivColumn>
+                    <LogoWithQR color={textColor} />
+                    {isWonType && (
+                        <StatusContainer>
+                            <StatusHeading color={textColor}>{t('common.flex-card.won')}</StatusHeading>
+                            <Status color={textColor}>{formatCurrencyWithSign(USD_SIGN, payout ?? 0)}</Status>
+                        </StatusContainer>
+                    )}
+                </FlexDivColumn>
+                <ContentWrapper isWon={isWonType}>
+                    <HeaderRow>
+                        <DirectionsHeaderLabel color={textColor} width={isMobile ? 88 : 75} $isLeft>
+                            {t('common.direction')}
+                        </DirectionsHeaderLabel>
+                        <DirectionsHeaderLabel color={textColor} width={isMobile ? 94 : 95}>
+                            {t('common.strike-price')}
+                        </DirectionsHeaderLabel>
+                        <DirectionsHeaderLabel color={textColor} width={isMobile ? 78 : 95} padding="0 0 0 12px">
+                            {t('speed-markets.user-positions.final-price')}
+                        </DirectionsHeaderLabel>
+                        <DirectionsHeaderLabel color={textColor} width={42}>
+                            {t('common.result')}
+                        </DirectionsHeaderLabel>
+                    </HeaderRow>
+                    {positions.map((position, index) => {
+                        return (
+                            <DirectionRow key={index} color={textColor} isLast={index === positions.length - 1}>
+                                <Text width={8} color={textColor}>
+                                    {index + 1}
                                 </Text>
-                            </FlexDivCentered>
-                            <Text width={90} $isCenter={!(strikePrices && strikePrices[index])}>
-                                {strikePrices && strikePrices[index]
-                                    ? `${currencyKey} ${formatCurrencyWithSign(USD_SIGN, strikePrices[index])}`
-                                    : '-'}
-                            </Text>
-                            <Text width={90} $isCenter={!(finalPrices && finalPrices[index])}>
-                                {finalPrices && finalPrices[index]
-                                    ? `${currencyKey} ${formatCurrencyWithSign(USD_SIGN, finalPrices[index])}`
-                                    : '-'}
-                            </Text>
-                            <Text width={20} $isCenter={userStatusByDirection[index] === undefined}>
-                                {userStatusByDirection[index] === undefined ? (
-                                    '-'
-                                ) : userStatusByDirection[index] ? (
-                                    <Icon size={20} color={theme.flexCard.up} className="icon icon--correct" />
-                                ) : (
-                                    <Icon size={20} color={theme.flexCard.down} className="icon icon--wrong" />
-                                )}
-                            </Text>
-                        </DirectionRow>
-                    );
-                })}
-                <FlexDivRow>
-                    <Text $isUppercase>{`${t('common.flex-card.buy-in')}: ${formatCurrency(buyIn)} ${
-                        FIAT_CURRENCY_MAP.USD
-                    }`}</Text>
-                    <Text>{`${t('speed-markets.chained.roi', {
-                        value: roi,
-                    })}x`}</Text>
-                </FlexDivRow>
-            </ContentWrapper>
-            {!isWonType && <LossWatermark>{t('common.loss')}</LossWatermark>}
-        </Container>
+                                <FlexDivCentered>
+                                    <Icon
+                                        size={20}
+                                        color={textColor}
+                                        className={`icon icon--caret-${position.toLowerCase()}`}
+                                    />
+                                    <Text width={50} color={textColor} $isLeft $isBold padding="0 0 0 5px">
+                                        {position}
+                                    </Text>
+                                </FlexDivCentered>
+                                <Text width={105} color={textColor}>
+                                    {strikePrices && strikePrices[index]
+                                        ? `${currencyKey} ${formatCurrencyWithSign(USD_SIGN, strikePrices[index])}`
+                                        : '-'}
+                                </Text>
+                                <Text width={105} color={textColor}>
+                                    {finalPrices && finalPrices[index]
+                                        ? `${currencyKey} ${formatCurrencyWithSign(USD_SIGN, finalPrices[index])}`
+                                        : '-'}
+                                </Text>
+                                <Text width={25} color={textColor} $isLeft>
+                                    {userStatusByDirection[index] === undefined ? (
+                                        '-'
+                                    ) : (
+                                        <Icon
+                                            size={20}
+                                            color={textColor}
+                                            className={`icon icon--${
+                                                userStatusByDirection[index] ? 'correct' : 'wrong'
+                                            }`}
+                                        />
+                                    )}
+                                </Text>
+                            </DirectionRow>
+                        );
+                    })}
+                    <FlexDivRow>
+                        <Text color={textColor} $isBold>
+                            {`${t('common.flex-card.buy-in')}: ${formatCurrencyWithSign(USD_SIGN, buyIn)}`}
+                        </Text>
+                        <Text color={textColor} $isBold>{`${
+                            isWonType ? t('speed-markets.profit') : t('speed-markets.potential-profit')
+                        }: ${profit}x`}</Text>
+                    </FlexDivRow>
+                </ContentWrapper>
+                <Footer color={textColor}>{`${t('speed-markets.chained.label')} ${t('common.markets')}`}</Footer>
+                {!isWonType && <LossWatermark>{t('common.loss')}</LossWatermark>}
+            </Container>
+        </ContainerBorder>
     );
 };
 
-const Container = styled(FlexDivCentered)<{ isWon: boolean }>`
+const Container = styled(FlexDivColumnCentered)<{ $isWon: boolean }>`
+    ${(props) => (props.$isWon ? '' : `border: 10px solid ${props.theme.flexCard.background.loss};`)}
     border-radius: 15px;
-    display: flex;
-    flex-direction: column;
-    width: 383px;
-    height: 510px;
-    padding: 10px 20px;
-    background: ${(props) => `url(${props.isWon ? ChainedWonBackground : ChainedLostBackground})`};
+
+    width: ${(props) => (props.$isWon ? '363px' : '383px')};
+    height: ${(props) => (props.$isWon ? '490px' : '510px')};
+
+    padding: 10px;
+    background: url(${ZeusCard});
+    background-position: center;
+
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        width: 357px;
-        height: 476px;
+        width: ${(props) => (props.$isWon ? '347px' : '357px')};
+        height: ${(props) => (props.$isWon ? '466px' : '476px')};
+
+        ${(props) => (!props.$isWon ? 'border-width: 5px;' : '')}
+
         background-size: cover;
     }
-`;
-
-const HeaderWrapper = styled(FlexDivColumn)<{ isWon: boolean }>`
-    width: 100%;
-    margin-top: ${(props) => (props.isWon ? '3' : '13')}px;
 `;
 
 const ContentWrapper = styled(FlexDivColumn)<{ isWon: boolean }>`
     width: 100%;
     justify-content: end;
-    opacity: ${(props) => (props.isWon ? '1' : '0.5')};
 `;
 
-const Won = styled.span`
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: ${(props) => props.theme.textColor.primary};
-    font-size: 35px;
-    font-weight: 300;
-    text-transform: uppercase;
-    text-align: center;
-    ::before {
-        width: 13px;
-        height: 13px;
-        margin: 0px 5px;
-        transform: rotate(45deg);
-        content: '';
-        display: inline-block;
-        background-color: ${(props) => props.theme.textColor.primary};
-    }
-    ::after {
-        width: 13px;
-        margin: 0px 5px;
-        height: 13px;
-        transform: rotate(45deg);
-        content: '';
-        display: inline-block;
-        background-color: ${(props) => props.theme.textColor.primary};
-    }
+const HeaderRow = styled(FlexDivRow)`
+    padding-left: 20px;
 `;
 
-const Payout = styled.span`
-    font-size: 45px;
-    font-weight: 800;
-    text-align: center;
-    color: ${(props) => props.theme.flexCard.up};
-`;
-
-const HeaderLabel = styled.span`
-    color: ${(props) => props.theme.textColor.primary};
-    font-size: 21px;
-    font-weight: 400;
-    text-align: center;
-    text-transform: uppercase;
-`;
-
-const AssetDiv = styled(FlexDiv)<{ isWon: boolean }>`
-    justify-content: center;
-    align-items: center;
-    flex-direction: row;
-    margin-bottom: 20px;
-    opacity: ${(props) => (props.isWon ? '1' : '0.4')};
-`;
-
-const CurrencyIcon = styled.i`
-    font-size: 40px;
-    margin-right: 11px;
-`;
-
-const AssetLabel = styled.span<{ isBold?: boolean }>`
-    color: ${(props) => props.theme.textColor.primary};
-    font-size: 22px;
-    font-weight: ${(props) => (props.isBold ? 700 : 300)};
-    text-transform: uppercase;
-    :nth-child(2) {
-        margin-right: 5px;
-    }
-`;
-
-const DirectionsHeaderLabel = styled.span<{ width?: number }>`
-    font-size: 13px;
-    font-weight: 600;
-    color: ${(props) => props.theme.flexCard.text};
+const DirectionsHeaderLabel = styled.span<{ color: string; width?: number; padding?: string; $isLeft?: boolean }>`
+    font-family: ${(props) => props.theme.fontFamily.secondary};
+    font-size: 12px;
+    font-weight: 500;
+    color: ${(props) => props.color};
+    text-align: ${(props) => (props.$isLeft ? 'left' : 'center')};
     text-transform: capitalize;
     width: ${(props) => (props.width ? `${props.width}px` : 'initial')};
+    ${(props) => (props.padding ? `padding: ${props.padding};` : '')}
 `;
 
-const DirectionRow = styled(FlexDivRow)<{ isLast?: boolean }>`
-    border-bottom: ${(props) => (props.isLast ? 'solid' : 'dashed')} 1.5px;
-    border-color: ${(props) => props.theme.borderColor.primary};
-    padding: 0 10px;
+const DirectionRow = styled(FlexDivRow)<{ color: string; isLast?: boolean }>`
+    border-bottom: ${(props) => (props.isLast ? 'solid' : 'dashed')} 2px;
+    border-color: ${(props) => props.color};
+    padding-left: 5px;
 `;
 
 const Text = styled.span<{
+    color: string;
     width?: number;
     $isBold?: boolean;
     $isUppercase?: boolean;
     padding?: string;
-    $isCenter?: boolean;
+    $isLeft?: boolean;
 }>`
+    font-family: ${(props) => props.theme.fontFamily.secondary};
     font-size: 13px;
-    font-weight: ${(props) => (props.$isBold ? 700 : 400)};
+    font-weight: ${(props) => (props.$isBold ? 800 : 500)};
     line-height: 230%;
-    color: ${(props) => props.theme.textColor.primary};
-    text-transform: ${(props) => (props.$isUppercase ? 'uppercase' : 'capitalize')};
+    color: ${(props) => props.color};
     width: ${(props) => (props.width ? `${props.width}px` : 'initial')};
-    text-align: ${(props) => (props.$isCenter ? 'center' : 'left')};
+    text-align: ${(props) => (props.$isLeft ? 'left' : 'center')};
     padding: ${(props) => (props.padding ? props.padding : '0')};
+    text-transform: ${(props) => (props.$isUppercase ? 'uppercase' : 'capitalize')};
+    text-wrap: nowrap;
 `;
 
-const LossWatermark = styled(FlexDivCentered)`
-    position: absolute;
-    width: 295px;
-    height: 110px;
-    transform: rotate(-45deg);
-    border: 10px solid ${(props) => props.theme.flexCard.down};
-    border-radius: 20px;
-    font-size: 55px;
-    font-weight: 700;
-    letter-spacing: 16px;
+const Footer = styled(FlexDivCentered)<{ color: string }>`
+    color: ${(props) => props.color};
+    font-family: ${(props) => props.theme.fontFamily.secondary};
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 1em;
+    text-align: center;
+    margin-top: 10px;
+    padding-left: 14px;
     text-transform: uppercase;
-    color: ${(props) => props.theme.flexCard.down};
+    white-space: nowrap;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        letter-spacing: 0.9em;
+    }
 `;
 
 export default ChainedSpeedMarketFlexCard;

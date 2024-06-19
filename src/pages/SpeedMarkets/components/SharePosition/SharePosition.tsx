@@ -1,14 +1,15 @@
-import { secondsToMilliseconds } from 'date-fns';
+import { intervalToDuration, secondsToMilliseconds } from 'date-fns';
 import useInterval from 'hooks/useInterval';
 import React, { useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { UserChainedPosition, UserPosition } from 'types/market';
+import { UserHistoryPosition } from 'types/profile';
 import { ThemeInterface } from 'types/ui';
+import { formattedDurationFull } from 'utils/formatters/date';
 import { getHistoryStatus, mapUserPositionToHistory } from 'utils/position';
+import { isUserWinner } from 'utils/speedAmm';
 import { getStatusColor } from 'utils/style';
 import SharePositionModal from '../SharePositionModal';
-import { UserHistoryPosition } from 'types/profile';
-import { isUserWinner } from 'utils/speedAmm';
 
 const SharePosition: React.FC<{
     position: UserPosition | UserChainedPosition;
@@ -44,13 +45,7 @@ const SharePosition: React.FC<{
 
     const displayShare = isChained
         ? (position as UserChainedPosition).canResolve || (position as UserChainedPosition).isResolved
-        : position.isClaimable ||
-          !isMatured ||
-          isUserWinner(
-              (position as UserPosition).side,
-              (position as UserPosition).strikePrice,
-              (position as UserPosition).finalPrice
-          );
+        : true;
 
     const historyStatus = position.isResolved
         ? getHistoryStatus(
@@ -58,6 +53,14 @@ const SharePosition: React.FC<{
           )
         : undefined;
     const iconColor = historyStatus && getStatusColor(historyStatus, theme);
+
+    const singleWinStatus = !isChained
+        ? isUserWinner(
+              (position as UserPosition).side,
+              (position as UserPosition).strikePrice,
+              (position as UserPosition).finalPrice
+          )
+        : undefined;
 
     return (
         <>
@@ -75,27 +78,33 @@ const SharePosition: React.FC<{
                         type={
                             position.isClaimable || (position as UserChainedPosition).isUserWinner
                                 ? 'chained-speed-won'
-                                : 'chained-speed-lost'
+                                : 'chained-speed-loss'
                         }
                         positions={(position as UserChainedPosition).sides}
                         currencyKey={position.currencyKey}
-                        strikeDate={position.maturityDate}
                         strikePrices={(position as UserChainedPosition).strikePrices}
                         finalPrices={(position as UserChainedPosition).finalPrices}
                         buyIn={position.paid}
                         payout={position.payout}
-                        payoutMultiplier={(position as UserChainedPosition).payoutMultiplier}
                         onClose={() => setOpenTwitterShareModal(false)}
                     />
                 ) : (
                     <SharePositionModal
-                        type={position.isClaimable ? 'resolved-speed' : 'potential-speed'}
+                        type={
+                            singleWinStatus === undefined
+                                ? 'speed-potential'
+                                : singleWinStatus
+                                ? 'speed-won'
+                                : 'speed-loss'
+                        }
                         positions={[(position as UserPosition).side]}
                         currencyKey={position.currencyKey}
-                        strikeDate={position.maturityDate}
                         strikePrices={[(position as UserPosition).strikePrice]}
                         buyIn={position.paid}
                         payout={position.payout}
+                        marketDuration={formattedDurationFull(
+                            intervalToDuration({ start: position.createdAt, end: position.maturityDate })
+                        )}
                         onClose={() => {
                             setOpenTwitterShareModal(false);
                             onClose && onClose();
@@ -107,7 +116,7 @@ const SharePosition: React.FC<{
 };
 
 const ShareIcon = styled.i<{ $color?: string; $disabled: boolean }>`
-    color: ${(props) => (props.$color ? props.$color : props.theme.textColor.quinary)};
+    color: ${(props) => (props.$color ? props.$color : props.theme.textColor.primary)};
     cursor: ${(props) => (props.$disabled ? 'default' : 'pointer')};
     opacity: ${(props) => (props.$disabled ? '0.5' : '1')};
     font-size: 20px;

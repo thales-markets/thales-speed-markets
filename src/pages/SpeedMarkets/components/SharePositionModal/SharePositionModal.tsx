@@ -13,11 +13,11 @@ import ReactModal from 'react-modal';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsMobile } from 'redux/modules/ui';
-import styled from 'styled-components';
-import { FlexDivColumnCentered } from 'styles/common';
+import styled, { useTheme } from 'styled-components';
+import { FlexDivCentered, FlexDivColumnCentered } from 'styles/common';
 import { isFirefox, isIos, isMetamask } from 'thales-utils';
 import { SharePositionData } from 'types/flexCards';
-import { RootState } from 'types/ui';
+import { RootState, ThemeInterface } from 'types/ui';
 import ChainedSpeedMarketFlexCard from './components/ChainedSpeedMarketFlexCard';
 import SpeedMarketFlexCard from './components/SpeedMarketFlexCard';
 
@@ -36,13 +36,13 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
     currencyKey,
     strikePrices,
     finalPrices,
-    strikeDate,
     buyIn,
     payout,
-    payoutMultiplier,
+    marketDuration,
     onClose,
 }) => {
     const { t } = useTranslation();
+    const theme: ThemeInterface = useTheme();
 
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
@@ -50,13 +50,13 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
     const [toastId, setToastId] = useState<string | number>(0);
     const [isMetamaskBrowser, setIsMetamaskBrowser] = useState(false);
 
-    const isChainedMarkets = ['chained-speed-won', 'chained-speed-lost'].includes(type);
+    const isChainedMarkets = ['chained-speed-won', 'chained-speed-loss'].includes(type);
 
     const ref = useRef<HTMLDivElement>(null);
 
     const customStyles = {
         content: {
-            top: isMobile ? '41%' : '50%',
+            top: isMobile ? '45%' : '50%',
             left: '50%',
             right: 'auto',
             bottom: 'auto',
@@ -235,6 +235,20 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
         onClose();
     };
 
+    const borderColor =
+        type === 'speed-potential'
+            ? theme.flexCard.background.potential
+            : type === 'speed-won' || type === 'chained-speed-won'
+            ? theme.flexCard.background.won
+            : theme.flexCard.background.loss;
+
+    const textColor =
+        type === 'speed-potential'
+            ? theme.flexCard.textColor.potential
+            : type === 'speed-won' || type === 'chained-speed-won'
+            ? theme.flexCard.textColor.won
+            : theme.flexCard.background.loss;
+
     return (
         <ReactModal
             isOpen
@@ -244,38 +258,42 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
             contentElement={(props, children) => (
                 <>
                     <div {...props}>{children}</div>
-                    {isMobile && <CloseIcon className={`icon icon--x-sign`} onClick={onClose} />}
+                    {isMobile && <CloseIcon $textColor={textColor} className={`icon icon--x-sign`} onClick={onClose} />}
                 </>
             )}
         >
             <Container ref={ref}>
-                {!isMobile && <CloseIcon className={`icon icon--x-sign`} onClick={onClose} />}
+                {!isMobile && <CloseIcon $textColor={textColor} className={`icon icon--x-sign`} onClick={onClose} />}
                 {isChainedMarkets ? (
                     <ChainedSpeedMarketFlexCard
                         type={type}
                         currencyKey={currencyKey}
                         positions={positions}
-                        strikeDate={strikeDate}
                         strikePrices={strikePrices}
                         finalPrices={finalPrices}
                         buyIn={buyIn}
                         payout={payout}
-                        payoutMultiplier={payoutMultiplier}
                     />
                 ) : (
                     <SpeedMarketFlexCard
                         type={type}
                         currencyKey={currencyKey}
                         positions={positions}
-                        strikeDate={strikeDate}
                         strikePrices={strikePrices}
                         buyIn={buyIn}
                         payout={payout}
+                        marketDuration={marketDuration}
                     />
                 )}
-                <TwitterShare disabled={isLoading} onClick={onTwitterShareClick}>
-                    <TwitterIcon className="icon-home icon-home--twitter-x" disabled={isLoading} fontSize={'30px'} />
-                    <TwitterShareLabel>{t('common.flex-card.share')}</TwitterShareLabel>
+                <TwitterShare disabled={isLoading} onClick={onTwitterShareClick} $borderColor={borderColor}>
+                    <TwitterShareContent>
+                        <TwitterIcon
+                            className="icon-home icon-home--twitter-x"
+                            disabled={isLoading}
+                            $textColor={textColor}
+                        />
+                        <TwitterShareLabel $textColor={textColor}>{t('common.flex-card.share')}</TwitterShareLabel>
+                    </TwitterShareContent>
                 </TwitterShare>
             </Container>
         </ReactModal>
@@ -292,20 +310,20 @@ const Container = styled(FlexDivColumnCentered)`
     }
 `;
 
-const CloseIcon = styled.i`
+const CloseIcon = styled.i<{ $textColor: string }>`
     position: absolute;
     top: -20px;
     right: -20px;
     font-size: 20px;
     cursor: pointer;
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => props.$textColor};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         top: 10px;
         right: 10px;
     }
 `;
 
-const TwitterShare = styled(FlexDivColumnCentered)<{ disabled?: boolean }>`
+const TwitterShare = styled(FlexDivColumnCentered)<{ $borderColor: string; disabled?: boolean }>`
     align-items: center;
     position: absolute;
     left: 0;
@@ -318,26 +336,33 @@ const TwitterShare = styled(FlexDivColumnCentered)<{ disabled?: boolean }>`
     width: 100%;
     height: 55px;
     border-radius: 15px;
-    background: ${(props) => props.theme.button.background.secondary};
+    padding: 2px;
+    background: ${(props) => props.$borderColor};
     cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
     opacity: ${(props) => (props.disabled ? '0.4' : '1')};
 `;
 
-const TwitterIcon = styled.i<{ disabled?: boolean; fontSize?: string; padding?: string }>`
-    font-size: ${(props) => (props.fontSize ? props.fontSize : '20px')};
-    color: ${(props) => props.theme.button.textColor.secondary};
+const TwitterShareContent = styled(FlexDivCentered)`
+    width: 100%;
+    height: 100%;
+    background: ${(props) => props.theme.button.background.primary};
+    border-radius: 15px;
+`;
+
+const TwitterIcon = styled.i<{ $textColor: string; disabled?: boolean }>`
+    font-size: 30px;
+    color: ${(props) => props.$textColor};
     cursor: ${(props) => (props.disabled ? 'default' : 'pointer')};
     opacity: ${(props) => (props.disabled ? '0.4' : '1')};
     margin-right: 10px;
-    ${(props) => (props.padding ? `padding: ${props.padding};` : '')}
 `;
 
-const TwitterShareLabel = styled.span`
+const TwitterShareLabel = styled.span<{ $textColor: string }>`
     font-weight: 800;
     font-size: 18px;
     line-height: 25px;
     text-transform: uppercase;
-    color: ${(props) => props.theme.button.textColor.secondary};
+    color: ${(props) => props.$textColor};
 `;
 
 export default React.memo(SharePositionModal);

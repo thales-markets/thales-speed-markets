@@ -90,7 +90,7 @@ const UserInfo: React.FC<UserInfoProps> = ({
                     {isBiconomy && (
                         <SessionWrapper>
                             <TextLabel>{t('user-info.session-valid')} </TextLabel>
-                            <Value>{formatShortDateWithFullTime(Number(validUntil) * 1000)}</Value>
+                            <Value>{validUntil ? formatShortDateWithFullTime(Number(validUntil) * 1000) : '-'}</Value>
                         </SessionWrapper>
                     )}
                 </FlexColumn>
@@ -150,7 +150,7 @@ const Container = styled.div`
     right: 0;
 
     border-radius: 15px;
-    border: 2px solid ${(props) => props.theme.borderColor.quaternary};
+    border: 2px solid ${(props) => props.theme.borderColor.primary};
     padding: 14px;
     background: ${(props) => props.theme.background.primary};
     z-index: 1000;
@@ -165,10 +165,42 @@ const FlexColumn = styled(FlexDivColumn)`
     &:nth-child(2) {
         padding: 20px 0;
         margin-top: 10px;
-        border-top: 1px solid ${(props) => props.theme.borderColor.quaternary};
-        border-bottom: 1px solid ${(props) => props.theme.borderColor.quaternary};
+        border-top: 1px solid ${(props) => props.theme.borderColor.primary};
+        border-bottom: 1px solid ${(props) => props.theme.borderColor.primary};
         margin-bottom: 10px;
     }
+`;
+
+const TextLabel = styled.span`
+    color: ${(props) => props.theme.textColor.primary};
+    font-size: 14px;
+    font-weight: 700;
+    line-height: normal;
+`;
+
+const Value = styled(TextLabel)`
+    color: ${(props) => props.theme.textColor.secondary};
+    font-weight: 400;
+    white-space: pre;
+`;
+
+const Icon = styled.i`
+    color: ${(props) => props.theme.dropDown.textColor.primary};
+    font-size: 24px;
+    margin-right: 6px;
+`;
+
+const CopyIcon = styled.i`
+    color: ${(props) => props.theme.textColor.secondary};
+    font-size: 18px;
+    cursor: pointer;
+    margin-left: 4px;
+`;
+const Label = styled.span`
+    color: ${(props) => props.theme.dropDown.textColor.primary};
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 300%;
 `;
 
 const MenuItem = styled(FlexDivStart)`
@@ -176,44 +208,12 @@ const MenuItem = styled(FlexDivStart)`
     cursor: pointer;
 
     &:hover {
-        color: ${(props) => props.theme.link.textColor.primary};
-        i,
-        span {
-            color: ${(props) => props.theme.link.textColor.primary};
+        color: ${(props) => props.theme.dropDown.textColor.secondary};
+        ${Icon},
+        ${Label} {
+            color: ${(props) => props.theme.dropDown.textColor.secondary};
         }
     }
-`;
-
-const TextLabel = styled.span`
-    color: ${(props) => props.theme.textColor.quinary};
-    font-size: 14px;
-    font-weight: 700;
-    line-height: normal;
-`;
-
-const Value = styled(TextLabel)`
-    color: ${(props) => props.theme.textColor.primary};
-    font-weight: 400;
-    white-space: pre;
-`;
-
-const Icon = styled.i`
-    color: ${(props) => props.theme.textColor.primary};
-    font-size: 24px;
-    margin-right: 6px;
-`;
-
-const CopyIcon = styled.i`
-    color: ${(props) => props.theme.textColor.primary};
-    font-size: 18px;
-    cursor: pointer;
-    margin-left: 4px;
-`;
-const Label = styled.span`
-    color: ${(props) => props.theme.textColor.primary};
-    font-size: 14px;
-    font-weight: 800;
-    line-height: 300%;
 `;
 
 const SessionWrapper = styled(FlexDivRowCentered)`

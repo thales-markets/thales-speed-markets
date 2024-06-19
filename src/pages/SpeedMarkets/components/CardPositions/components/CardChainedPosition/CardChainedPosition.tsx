@@ -188,6 +188,7 @@ const CardChainedPosition: React.FC<CardChainedPositionProps> = ({
                                 disabled={isActionInProgress}
                                 isIconHidden
                                 additionalStyles={{ margin: '0' }}
+                                invertCollors
                             />
                         </InfoRow>
                     )}
@@ -220,7 +221,7 @@ const Container = styled(FlexDivColumn)<{ $borderColor?: string }>`
     width: 100%;
     min-width: 100%;
     min-height: 155px;
-    border: 1px solid ${(props) => (props.$borderColor ? props.$borderColor : props.theme.borderColor.quaternary)};
+    border: 1px solid ${(props) => (props.$borderColor ? props.$borderColor : props.theme.borderColor.primary)};
     border-radius: 8px;
     padding: 14px 10px;
 `;

@@ -1,6 +1,11 @@
 import { Positions } from 'enums/market';
 
-export type SharePositionType = 'resolved-speed' | 'potential-speed' | 'chained-speed-won' | 'chained-speed-lost';
+export type SharePositionType =
+    | 'speed-potential'
+    | 'speed-won'
+    | 'speed-loss'
+    | 'chained-speed-won'
+    | 'chained-speed-loss';
 
 export type SharePositionData = {
     type: SharePositionType;
@@ -8,8 +13,7 @@ export type SharePositionData = {
     currencyKey: string;
     strikePrices?: number[];
     finalPrices?: number[];
-    strikeDate: number;
     buyIn: number;
     payout: number;
-    payoutMultiplier?: number;
+    marketDuration?: string;
 };

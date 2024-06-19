@@ -52,7 +52,7 @@ const Items = styled.div`
     width: calc(100% - 20px);
     max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px;
     height: 40px;
-    background: ${(props) => props.theme.background.quinary};
+    background: ${(props) => props.theme.background.secondary};
     box-shadow: 0px 0px 40px 10px ${(props) => props.theme.background.primary};
     border-radius: 30px;
     z-index: 9;

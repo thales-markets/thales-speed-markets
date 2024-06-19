@@ -7,23 +7,18 @@ export default {
     },
     background: {
         primary: Colors.BLACK,
-        secondary: Colors.GRAY,
-        tertiary: '',
-        quaternary: '',
-        quinary: Colors.PURPLE,
+        secondary: Colors.PURPLE,
+        tertiary: Colors.GRAY,
     },
     textColor: {
-        primary: Colors.WHITE,
-        secondary: '',
-        tertiary: '',
-        quaternary: Colors.GREEN,
-        quinary: Colors.PURPLE,
+        primary: Colors.PURPLE,
+        secondary: Colors.WHITE,
+        tertiary: Colors.GREEN,
     },
     borderColor: {
-        primary: Colors.GRAY,
-        secondary: '',
-        tertiary: `linear-gradient(90deg, ${Colors.PURPLE_DARK} 0%, ${Colors.BLUE} 100%)`,
-        quaternary: Colors.PURPLE,
+        primary: Colors.PURPLE,
+        secondary: `linear-gradient(90deg, ${Colors.PURPLE_DARK} 0%, ${Colors.BLUE} 100%)`,
+        tertiary: Colors.GRAY,
     },
     button: {
         background: {
@@ -36,12 +31,10 @@ export default {
             primary: Colors.WHITE,
             secondary: Colors.BLACK,
             tertiary: Colors.PURPLE,
-            quaternary: '',
         },
         borderColor: {
             primary: `linear-gradient(90deg, ${Colors.PURPLE_DARK} 0%, ${Colors.BLUE} 100%)`,
             secondary: Colors.PURPLE,
-            tertiary: '',
         },
     },
     input: {
@@ -52,10 +45,9 @@ export default {
             },
         },
         textColor: {
-            primary: Colors.WHITE,
-            secondary: Colors.PURPLE,
-            tertiary: Colors.BLACK,
-            quaternary: Colors.RED,
+            primary: Colors.PURPLE,
+            secondary: Colors.BLACK,
+            tertiary: Colors.RED,
         },
         borderColor: {
             primary: Colors.PURPLE,
@@ -76,34 +68,30 @@ export default {
             secondary: Colors.PURPLE,
         },
         textColor: {
-            primary: Colors.WHITE,
-            secondary: Colors.PURPLE,
-        },
-    },
-    link: {
-        textColor: {
             primary: Colors.PURPLE,
             secondary: Colors.WHITE,
         },
     },
+    link: {
+        textColor: {
+            primary: Colors.WHITE,
+            secondary: Colors.PURPLE,
+        },
+    },
     icon: {
         background: {
-            primary: '',
-            secondary: Colors.BLACK,
-            tertiary: Colors.PURPLE,
+            primary: Colors.BLACK,
+            secondary: Colors.PURPLE,
         },
         textColor: {
-            primary: `linear-gradient(180deg, ${Colors.PURPLE_DARK_2} 0%, ${Colors.BLUE_DEEP_SKY} 100%)`,
+            primary: Colors.PURPLE,
             secondary: Colors.BLACK,
-            tertiary: Colors.PURPLE,
-            quaternary: Colors.WHITE,
+            tertiary: Colors.WHITE,
+            quaternary: `linear-gradient(180deg, ${Colors.PURPLE_DARK_2} 0%, ${Colors.BLUE_DEEP_SKY} 100%)`,
         },
     },
     error: {
         textColor: {
-            primary: Colors.RED,
-        },
-        borderColor: {
             primary: Colors.RED,
         },
     },
@@ -149,10 +137,12 @@ export default {
         },
     },
     flexCard: {
-        down: Colors.RED,
-        up: Colors.GREEN,
-        resolved: Colors.YELLOW_DARK,
-        text: Colors.GRAY_BLUE,
+        background: {
+            potential: Colors.GREEN_POTENTIAL,
+            won: `linear-gradient(6.97deg, ${Colors.GOLD_1} -2.18%, ${Colors.GOLD_2} 23.54%, ${Colors.GOLD_3} 44.36%, ${Colors.GOLD_4} 65.19%, ${Colors.GOLD_3} 81.11%, ${Colors.GOLD_5} 103.16%, ${Colors.GOLD_3} 120.31%)`,
+            loss: Colors.RED,
+        },
+        textColor: { potential: Colors.GREEN_POTENTIAL, won: Colors.YELLOW_LIGHT, loss: Colors.WHITE + '80' }, // opacity 50%
     },
     chart: {
         candleUp: Colors.GREEN,

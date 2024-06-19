@@ -4,6 +4,7 @@ import {
     getInfoToastOptions,
     getLoadingToastOptions,
 } from 'components/ToastMessage/ToastMessage';
+import { ScreenSizeBreakpoint } from 'enums/ui';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -47,14 +48,14 @@ const UserWallet: React.FC = () => {
                     onMouseLeave={() => !isBiconomy && setWalletText('')}
                 >
                     <WalletText $isAddress={!isBiconomy}>
-                        {walletText ||
-                            (isBiconomy
-                                ? getUserInfo()?.name
-                                : truncateAddress(
-                                      walletAddress as string,
-                                      TRUNCATE_ADDRESS_NUMBER_OF_CHARS,
-                                      TRUNCATE_ADDRESS_NUMBER_OF_CHARS
-                                  ))}
+                        {isBiconomy
+                            ? getUserInfo()?.name
+                            : walletText ||
+                              truncateAddress(
+                                  walletAddress as string,
+                                  TRUNCATE_ADDRESS_NUMBER_OF_CHARS,
+                                  TRUNCATE_ADDRESS_NUMBER_OF_CHARS
+                              )}
                     </WalletText>
                 </WalletContainer>
                 <Separator />
@@ -66,7 +67,7 @@ const UserWallet: React.FC = () => {
 
 const Container = styled.div`
     z-index: 10000;
-    @media (max-width: 500px) {
+    @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         width: 100%;
     }
 `;
@@ -75,7 +76,7 @@ const Wrapper = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 2px solid ${(props) => props.theme.borderColor.quaternary};
+    border: 2px solid ${(props) => props.theme.borderColor.primary};
     border-radius: 20px;
     height: 30px;
 `;
@@ -90,7 +91,7 @@ const WalletContainer = styled.div<{ $isAddress: boolean }>`
     align-items: center;
     padding: 0 10px;
 
-    @media (max-width: 500px) {
+    @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         min-width: fit-content;
         max-width: 100px;
         padding: 4px 7px;
@@ -98,7 +99,7 @@ const WalletContainer = styled.div<{ $isAddress: boolean }>`
 `;
 
 const WalletText = styled.span<{ $isAddress: boolean }>`
-    color: ${(props) => props.theme.textColor.quinary};
+    color: ${(props) => props.theme.textColor.primary};
     font-family: ${(props) => props.theme.fontFamily.secondary};
     font-weight: 700;
     font-size: 12px;
@@ -112,7 +113,7 @@ const WalletText = styled.span<{ $isAddress: boolean }>`
 const Separator = styled.div`
     width: 4px;
     height: 12px;
-    background: ${(props) => props.theme.borderColor.quaternary};
+    background: ${(props) => props.theme.borderColor.primary};
 `;
 
 export default UserWallet;
