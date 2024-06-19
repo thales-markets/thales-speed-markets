@@ -1,97 +1,113 @@
-import DownBackground from 'assets/images/flex-cards/down-background.png';
-import ZeusResolvedWinBackground from 'assets/images/flex-cards/resolved.png';
-import UpBackground from 'assets/images/flex-cards/up-background.png';
-import { USD_SIGN } from 'constants/currency';
-import { Positions } from 'enums/market';
+import BtcCard from 'assets/images/flexCards/btc-card.png';
+import EthCard from 'assets/images/flexCards/eth-card.png';
+import { CRYPTO_CURRENCY_MAP, USD_SIGN } from 'constants/currency';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-import { FlexDiv } from 'styles/common';
+import styled, { useTheme } from 'styled-components';
+import {
+    FlexDiv,
+    FlexDivCentered,
+    FlexDivColumn,
+    FlexDivColumnCentered,
+    FlexDivRow,
+    FlexDivRowCentered,
+} from 'styles/common';
 import { formatCurrencyWithSign } from 'thales-utils';
 import { SharePositionData, SharePositionType } from 'types/flexCards';
+import { ThemeInterface } from 'types/ui';
 import { getSynthName } from 'utils/currency';
-import { formatShortDateWithFullTime } from 'utils/formatters/date';
-import SpeedMarketsFooter from '../SpeedMarketsFooter';
+import LogoWithQR from '../LogoWithQR';
 
 const SpeedMarketFlexCard: React.FC<SharePositionData> = ({
     type,
     positions,
     currencyKey,
     strikePrices,
-    strikeDate,
     buyIn,
     payout,
+    marketDuration,
 }) => {
     const { t } = useTranslation();
+    const theme: ThemeInterface = useTheme();
 
     const strikePrice = formatCurrencyWithSign(USD_SIGN, strikePrices ? strikePrices[0] : 0);
 
     const position = positions[0];
 
+    const textColor =
+        type === 'speed-potential'
+            ? theme.flexCard.textColor.potential
+            : type === 'speed-won'
+            ? theme.flexCard.textColor.won
+            : theme.flexCard.textColor.loss;
+
     return (
-        <Container position={position} type={type}>
-            {type == 'resolved-speed' && <SpeedMarketsFooter />}
-            <PositionInfo type={type}>
-                <CurrencyIcon className={`currency-icon currency-icon--${currencyKey.toLowerCase()}`} />
-                <AssetName>{getSynthName(currencyKey)}</AssetName>
-                <Position>{`${currencyKey.toUpperCase()} ${position}`}</Position>
-            </PositionInfo>
-            <PotentialWinContainer type={type}>
-                <PotentialWinHeading>
-                    {type == 'potential-speed' ? t('common.flex-card.potential-win') : t('common.flex-card.won')}
-                </PotentialWinHeading>
-                <PotentialWin position={position} type={type}>
-                    {formatCurrencyWithSign(USD_SIGN, payout ?? 0)}
-                </PotentialWin>
-            </PotentialWinContainer>
-            <MarketDetailsContainer type={type}>
-                <MarketDetailsItemContainer type={type}>
-                    <ItemName type={type}>
-                        {type == 'potential-speed'
-                            ? t('common.flex-card.entry-price')
-                            : t('common.flex-card.strike-price')}
-                    </ItemName>
-                    <Value type={type}>{strikePrice}</Value>
-                </MarketDetailsItemContainer>
-                <MarketDetailsItemContainer type={type}>
-                    <ItemName type={type}>{t('common.flex-card.strike-date')}</ItemName>
-                    <Value type={type}>{formatShortDateWithFullTime(strikeDate)}</Value>
-                </MarketDetailsItemContainer>
-                <MarketDetailsItemContainer type={type}>
-                    <ItemName type={type}>{t('common.flex-card.buy-in')}</ItemName>
-                    <Value type={type}>{formatCurrencyWithSign(USD_SIGN, buyIn ?? 0)}</Value>
-                </MarketDetailsItemContainer>
-            </MarketDetailsContainer>
-            {type == 'potential-speed' && <SpeedMarketsFooter />}
-        </Container>
+        <ContainerBorder $isWon={type === 'speed-won'}>
+            <Container currencyKey={currencyKey} type={type}>
+                <FlexDivColumn>
+                    <LogoWithQR color={textColor} />
+                    {type !== 'speed-loss' && (
+                        <StatusContainer>
+                            <StatusHeading color={textColor}>
+                                {type === 'speed-potential'
+                                    ? t('common.flex-card.potential-win')
+                                    : t('common.flex-card.won')}
+                            </StatusHeading>
+                            <Status color={textColor}>{formatCurrencyWithSign(USD_SIGN, payout ?? 0)}</Status>
+                        </StatusContainer>
+                    )}
+                </FlexDivColumn>
+                <FlexDivRow>
+                    <FlexDivRowCentered>
+                        <CurrencyIcon
+                            color={textColor}
+                            className={`currency-icon currency-icon--${currencyKey.toLowerCase()}`}
+                        />
+                        <Asset>
+                            <AssetName color={textColor}>{getSynthName(currencyKey)}</AssetName>
+                            <Position color={textColor}>{`${currencyKey.toUpperCase()} ${position}`}</Position>
+                        </Asset>
+                    </FlexDivRowCentered>
+                    <MarketDetailsContainer>
+                        <FlexDivRowCentered>
+                            <ItemName color={textColor}>{t('common.flex-card.strike-price')}</ItemName>
+                            <Value color={textColor}>{strikePrice}</Value>
+                        </FlexDivRowCentered>
+                        <FlexDivRowCentered>
+                            <ItemName color={textColor}>{t('common.flex-card.market-duration')}</ItemName>
+                            <Value color={textColor}>{marketDuration}</Value>
+                        </FlexDivRowCentered>
+                        <FlexDivRowCentered>
+                            <ItemName color={textColor}>{t('common.flex-card.buy-in')}</ItemName>
+                            <Value color={textColor}>{formatCurrencyWithSign(USD_SIGN, buyIn)}</Value>
+                        </FlexDivRowCentered>
+                    </MarketDetailsContainer>
+                </FlexDivRow>
+                <Footer color={textColor}>{`${t('speed-markets.single')} ${t('common.markets')}`}</Footer>
+                {type === 'speed-loss' && <LossWatermark>{t('common.loss')}</LossWatermark>}
+            </Container>
+        </ContainerBorder>
     );
 };
 
-const Container = styled.div<{ position: Positions; type: SharePositionType }>`
-    border: ${(props) =>
-        `10px solid ${
-            props.type == 'resolved-speed'
-                ? props.theme.flexCard.resolved
-                : props.position == 'UP'
-                ? props.theme.flexCard.up
-                : props.theme.flexCard.down
-        }`};
+const Container = styled(FlexDivColumnCentered)<{ currencyKey: string; type: SharePositionType }>`
+    ${(props) =>
+        props.type === 'speed-won'
+            ? ''
+            : `border: 10px solid ${
+                  props.type === 'speed-potential'
+                      ? props.theme.flexCard.background.potential
+                      : props.theme.flexCard.background.loss
+              };`}
     border-radius: 15px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 383px;
-    height: 510px;
-    padding: 10px 10px;
-    background: ${(props) =>
-        `url(${
-            props.type == 'resolved-speed'
-                ? ZeusResolvedWinBackground
-                : props.position == 'DOWN'
-                ? DownBackground
-                : UpBackground
-        }), lightgray 50% / cover no-repeat`};
+
+    width: ${(props) => (props.type === 'speed-won' ? '363px' : '383px')};
+    height: ${(props) => (props.type === 'speed-won' ? '490px' : '510px')};
+
+    padding: 10px;
+    background: ${(props) => `url(${props.currencyKey === CRYPTO_CURRENCY_MAP.BTC ? BtcCard : EthCard})`};
+    background-position: center;
 
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         width: 357px;
@@ -100,49 +116,45 @@ const Container = styled.div<{ position: Positions; type: SharePositionType }>`
     }
 `;
 
-const MarketDetailsContainer = styled(FlexDiv)<{ type: SharePositionType }>`
-    width: 100%;
-    flex-direction: ${(props) => (props.type == 'potential-speed' ? 'column' : 'row')};
-    margin-bottom: ${(props) => (props.type == 'potential-speed' ? '10px' : '0px')};
-    margin-top: ${(props) => (props.type == 'potential-speed' ? '140px' : '')};
+export const ContainerBorder = styled.div<{ $isWon: boolean }>`
+    ${(props) => (props.$isWon ? `background: ${props.theme.flexCard.background.won};` : '')}
+    ${(props) => (props.$isWon ? 'padding: 10px;' : '')}
+    ${(props) => (props.$isWon ? 'border-radius: 15px;' : '')}
 `;
 
-const MarketDetailsItemContainer = styled(FlexDiv)<{ type: SharePositionType }>`
-    justify-content: space-between;
-    flex-direction: ${(props) => (props.type == 'potential-speed' ? '' : 'column')};
-    align-items: center;
-    margin-bottom: 5px;
-    width: 100%;
+const MarketDetailsContainer = styled(FlexDivColumn)`
+    max-width: 185px;
+    gap: 5px;
 `;
 
-const ItemName = styled.span<{ type: SharePositionType }>`
+const ItemName = styled.span<{ color: string }>`
+    color: ${(props) => props.color};
+    font-family: ${(props) => props.theme.fontFamily.secondary};
+    font-size: 14px;
+    font-weight: 400;
     text-transform: capitalize;
-    color: ${(props) => (props.type == 'potential-speed' ? props.theme.textColor.primary : props.theme.flexCard.text)};
-    font-size: ${(props) => (props.type == 'potential-speed' ? '18px' : '13px')};
-    font-weight: ${(props) => (props.type == 'potential-speed' ? '700' : '400')};
 `;
 
-const Value = styled.span<{ type: SharePositionType }>`
+const Value = styled.span<{ color: string }>`
+    font-family: ${(props) => props.theme.fontFamily.secondary};
     font-weight: 700;
-    text-transform: capitalize;
     text-wrap: nowrap;
-    text-align: ${(props) => (props.type == 'potential-speed' ? '' : 'center')};
-    font-size: ${(props) => (props.type == 'potential-speed' ? '18px' : '13px')};
-    color: ${(props) => props.theme.textColor.primary};
+    font-size: 14px;
+    color: ${(props) => props.color};
 `;
 
-const PotentialWinContainer = styled(FlexDiv)<{ type: SharePositionType }>`
+export const StatusContainer = styled(FlexDiv)`
     width: 100%;
     flex-direction: column;
-    margin-top: 50px;
-    margin: ${(props) => (props.type.includes('resolve') ? '10px 0px 0px 0px' : '20px 0px')};
+    margin-top: 10px;
 `;
 
-const PotentialWinHeading = styled.span`
+export const StatusHeading = styled.span<{ color: string }>`
     display: flex;
     align-items: center;
     justify-content: center;
-    color: ${(props) => props.theme.textColor.primary};
+    color: ${(props) => props.color};
+    font-family: ${(props) => props.theme.fontFamily.secondary};
     font-size: 35px;
     font-weight: 300;
     text-transform: uppercase;
@@ -154,7 +166,7 @@ const PotentialWinHeading = styled.span`
         transform: rotate(45deg);
         content: '';
         display: inline-block;
-        background-color: ${(props) => props.theme.textColor.primary};
+        background-color: ${(props) => props.color};
     }
     ::after {
         width: 13px;
@@ -163,48 +175,71 @@ const PotentialWinHeading = styled.span`
         transform: rotate(45deg);
         content: '';
         display: inline-block;
-        background-color: ${(props) => props.theme.textColor.primary};
+        background-color: ${(props) => props.color};
     }
 `;
 
-const PotentialWin = styled.span<{ position: Positions; type: SharePositionType }>`
+export const Status = styled.span<{ color: string }>`
+    font-family: ${(props) => props.theme.fontFamily.secondary};
     font-size: 45px;
     font-weight: 800;
     text-align: center;
-    color: ${(props) =>
-        `${
-            props.type == 'resolved-speed'
-                ? props.theme.textColor.primary
-                : props.position == 'UP'
-                ? props.theme.flexCard.up
-                : props.theme.flexCard.down
-        }`};
+    color: ${(props) => props.color};
 `;
 
-const PositionInfo = styled(FlexDiv)<{ type: SharePositionType }>`
-    justify-content: center;
-    align-items: center;
-    flex-direction: row;
-    margin-top: ${(props) => (props.type == 'resolved-speed' ? '200px' : '10px')};
-`;
-
-const CurrencyIcon = styled.i`
+const CurrencyIcon = styled.i<{ color: string }>`
     font-size: 40px;
-    margin-right: 11px;
+    margin-right: 5px;
+    color: ${(props) => props.color};
 `;
 
-const AssetName = styled.span`
-    color: ${(props) => props.theme.textColor.primary};
-    font-size: 22px;
-    margin-right: 5px;
+const Asset = styled(FlexDivColumn)`
+    gap: 5px;
+`;
+
+const AssetName = styled.span<{ color: string }>`
+    color: ${(props) => props.color};
+    font-family: ${(props) => props.theme.fontFamily.secondary};
+    font-size: 18px;
     font-weight: 400;
     text-transform: capitalize;
 `;
 
-const Position = styled.span`
-    color: ${(props) => props.theme.textColor.primary};
-    font-size: 22px;
+const Position = styled.span<{ color: string }>`
+    font-family: ${(props) => props.theme.fontFamily.secondary};
+    color: ${(props) => props.color};
+    font-size: 18px;
     font-weight: 700;
+`;
+
+const Footer = styled(FlexDivCentered)<{ color: string }>`
+    color: ${(props) => props.color};
+    font-family: ${(props) => props.theme.fontFamily.secondary};
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 1.1em;
+    text-align: center;
+    margin-top: 10px;
+    padding-left: 16px;
+    text-transform: uppercase;
+    white-space: nowrap;
+`;
+
+export const LossWatermark = styled(FlexDivCentered)`
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: auto;
+    width: 295px;
+    height: 110px;
+    transform: rotate(-45deg);
+    border: 10px solid ${(props) => props.theme.flexCard.background.loss};
+    border-radius: 20px;
+    font-size: 55px;
+    font-weight: 700;
+    letter-spacing: 16px;
+    text-transform: uppercase;
+    color: ${(props) => props.theme.flexCard.background.loss};
 `;
 
 export default SpeedMarketFlexCard;

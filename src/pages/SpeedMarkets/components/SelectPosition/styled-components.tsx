@@ -1,6 +1,6 @@
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import styled from 'styled-components';
-import { FlexDivCentered, FlexDivColumnCentered, FlexDivRow, FlexDivSpaceBetween } from 'styles/common';
+import { FlexDivCentered, FlexDivColumn, FlexDivColumnCentered, FlexDivRow, FlexDivSpaceBetween } from 'styles/common';
 
 export const PositionContainer = styled(FlexDivRow)`
     align-items: center;
@@ -17,7 +17,11 @@ export const PlusMinusIcon = styled.i`
     cursor: pointer;
 `;
 
-export const Header = styled(FlexDivRow)`
+export const Header = styled(FlexDivColumn)`
+    margin-bottom: 12px;
+`;
+
+export const HeaderRow = styled(FlexDivRow)`
     margin-bottom: 12px;
 `;
 

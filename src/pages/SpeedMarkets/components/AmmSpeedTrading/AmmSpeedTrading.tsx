@@ -776,7 +776,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                                     finalPrice: 0,
                                     isClaimable: false,
                                     isResolved: false,
-                                    createdAt: 0,
+                                    createdAt: Date.now(),
                                 }}
                                 isDisabled={isButtonDisabled}
                                 isOpen={openTwitterShareModal}
@@ -797,7 +797,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             <FinalizeTrade>
                 <ColumnSpaceBetween ref={inputWrapperRef}>
                     <QuoteContainer>
-                        <QuoteLabel>{t('speed-markets.profit')}</QuoteLabel>
+                        <QuoteLabel>{t('speed-markets.potential-profit')}</QuoteLabel>
                         <QuoteText>{potentialProfit ? `${truncToDecimals(potentialProfit)}x` : '-'}</QuoteText>
                     </QuoteContainer>
                     {isMobile && getTradingDetails()}

@@ -66,6 +66,7 @@ export const Colors = {
     GREEN_LIGHT: '#7DDD97',
     GREEN_DARK: '#00994B',
     GREEN_DARKER: '#00A069',
+    GREEN_POTENTIAL: '#BEFFCD',
 
     BLACK: '#000000',
 
@@ -79,6 +80,13 @@ export const Colors = {
     RED_DARK: '#EC0039',
 
     YELLOW_DARK: '#9b8327',
+    YELLOW_LIGHT: '#FEF5AB',
+
+    GOLD_1: '#FBD04E',
+    GOLD_2: '#B77517',
+    GOLD_3: '#EFC146',
+    GOLD_4: '#FFF8B0',
+    GOLD_5: '#804200',
 
     PURPLE: '#C294F5',
     PURPLE_HALF: '#C294f580', // 50%

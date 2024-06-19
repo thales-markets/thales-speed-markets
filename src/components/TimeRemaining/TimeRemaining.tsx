@@ -30,28 +30,6 @@ const TimeRemaining: React.FC<TimeRemainingProps> = ({ end, showFullCounter, sho
     const [timeInterval, setTimeInterval] = useState<number | null>(countdownDisabled ? null : ONE_SECOND_IN_MS);
     const [duration, setDuration] = useState<Duration>(intervalToDuration({ start: now, end }));
 
-    const dateTimeTranslationMap = {
-        years: t('common.time-remaining.years'),
-        year: t('common.time-remaining.year'),
-        months: t('common.time-remaining.months'),
-        month: t('common.time-remaining.month'),
-        weeks: t('common.time-remaining.weeks'),
-        week: t('common.time-remaining.week'),
-        days: t('common.time-remaining.days'),
-        day: t('common.time-remaining.day'),
-        hours: t('common.time-remaining.hours'),
-        hour: t('common.time-remaining.hour'),
-        minutes: t('common.time-remaining.minutes'),
-        minute: t('common.time-remaining.minute'),
-        seconds: t('common.time-remaining.seconds'),
-        second: t('common.time-remaining.second'),
-        'days-short': t('common.time-remaining.days-short'),
-        'hours-short': t('common.time-remaining.hours-short'),
-        'minutes-short': t('common.time-remaining.minutes-short'),
-        'seconds-short': t('common.time-remaining.seconds-short'),
-        'months-short': t('common.time-remaining.months-short'),
-    };
-
     useEffect(() => {
         const nowValue = Date.now();
 
@@ -90,8 +68,8 @@ const TimeRemaining: React.FC<TimeRemainingProps> = ({ end, showFullCounter, sho
                     : showRemainingInWeeks
                     ? `${weeksDiff} ${t('common.time-remaining.weeks')}`
                     : showFullCounter
-                    ? formattedDurationFull(duration, dateTimeTranslationMap, undefined, undefined, showSecondsCounter)
-                    : formattedDuration(duration, dateTimeTranslationMap)}
+                    ? formattedDurationFull(duration, undefined, undefined, showSecondsCounter)
+                    : formattedDuration(duration)}
             </Time>
         </Container>
     );

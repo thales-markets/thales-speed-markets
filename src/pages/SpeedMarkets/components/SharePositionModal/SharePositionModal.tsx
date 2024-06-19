@@ -36,10 +36,9 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
     currencyKey,
     strikePrices,
     finalPrices,
-    strikeDate,
     buyIn,
     payout,
-    payoutMultiplier,
+    marketDuration,
     onClose,
 }) => {
     const { t } = useTranslation();
@@ -50,7 +49,7 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
     const [toastId, setToastId] = useState<string | number>(0);
     const [isMetamaskBrowser, setIsMetamaskBrowser] = useState(false);
 
-    const isChainedMarkets = ['chained-speed-won', 'chained-speed-lost'].includes(type);
+    const isChainedMarkets = ['chained-speed-won', 'chained-speed-loss'].includes(type);
 
     const ref = useRef<HTMLDivElement>(null);
 
@@ -255,22 +254,20 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
                         type={type}
                         currencyKey={currencyKey}
                         positions={positions}
-                        strikeDate={strikeDate}
                         strikePrices={strikePrices}
                         finalPrices={finalPrices}
                         buyIn={buyIn}
                         payout={payout}
-                        payoutMultiplier={payoutMultiplier}
                     />
                 ) : (
                     <SpeedMarketFlexCard
                         type={type}
                         currencyKey={currencyKey}
                         positions={positions}
-                        strikeDate={strikeDate}
                         strikePrices={strikePrices}
                         buyIn={buyIn}
                         payout={payout}
+                        marketDuration={marketDuration}
                     />
                 )}
                 <TwitterShare disabled={isLoading} onClick={onTwitterShareClick}>

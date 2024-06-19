@@ -39,7 +39,7 @@ import {
     Amount,
     BuyinAmountsWrapper,
     DollarSign,
-    Header,
+    HeaderRow,
     HeaderBalance,
     HeaderText,
     WalletIcon,
@@ -341,7 +341,7 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
 
     return (
         <div>
-            <Header>
+            <HeaderRow>
                 <HeaderText>{t('speed-markets.steps.enter-buyin')}</HeaderText>
                 <HeaderBalance>
                     <WalletIcon className="icon icon--wallet-balance" />
@@ -350,7 +350,7 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
                         multipleCollateralBalances.data ? multipleCollateralBalances.data[collateral] : 0
                     )} (${formatCurrencyWithSign(USD_SIGN, getUSDForCollateral(collateral))})`}
                 </HeaderBalance>
-            </Header>
+            </HeaderRow>
             <BuyinAmountsWrapper>
                 {stableBuyinAmounts.map((amount, index) => {
                     return (

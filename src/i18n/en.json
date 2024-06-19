@@ -19,6 +19,7 @@
         "search-placeholder": "Search...",
         "progress": "Please wait...",
         "market": "Market",
+        "markets": "Markets",
         "on": "on",
         "in": "in",
         "of": "of",
@@ -149,8 +150,7 @@
         },
         "flex-card": {
             "strike-price": "Strike price",
-            "strike-date": "Strike date",
-            "entry-price": "Entry price",
+            "market-duration": "Market duration",
             "buy-in": "Buy-In",
             "potential-win": "Potential win",
             "share": "Share",
@@ -251,7 +251,8 @@
                 "price-stale": "Can't resolve market with stale price"
             }
         },
-        "profit": "Potential profit",
+        "profit": "Profit",
+        "potential-profit": "Potential profit",
         "slippage": "slippage",
         "slippage-info": "Slippage tollerance",
         "tooltips": {
@@ -286,7 +287,6 @@
             "name": "Chained Speed Markets",
             "info": "Create a custom chain of {{minMarkets}} - {{maxMarkets}} Speed Markets for a maximum potential return of ~ <bold>{{maxRoi}}x</bold>!",
             "directions": "Directions",
-            "roi": "ROI: {{value}}",
             "clear-all": "Clear all",
             "asset-price": "If {{asset}} price sequence",
             "starting-from": "starting from",
