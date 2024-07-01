@@ -276,7 +276,7 @@
             "resolve-progress": "Resolving...",
             "resolve": "Resolve",
             "resolve-all": "Resolve all",
-            "confirmation-message": "Markets successfully resolved",
+            "confirmation-message": "Market(s) successfully resolved",
             "no-resolve-positions": "No markets for this section with price",
             "user": "User",
             "no-positions": "No markets for this section"
