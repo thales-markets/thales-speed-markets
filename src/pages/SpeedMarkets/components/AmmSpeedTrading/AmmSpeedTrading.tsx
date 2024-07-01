@@ -99,6 +99,7 @@ type AmmSpeedTradingProps = {
 };
 
 const DEFAULT_MAX_CREATOR_DELAY_TIME_SEC = 15;
+const CREATION_CHECK_DELAY_TIME_SEC = 1.5;
 
 const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     isChained,
@@ -594,8 +595,9 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                     refetchActiveSpeedMarkets(isChained, networkId);
                     refetchSpeedMarketsLimits(isChained, networkId);
                     refetchBalances((isBiconomy ? biconomyConnector.address : walletAddress) as string, networkId);
-                    await delay(1500);
-                    delayTime++;
+
+                    await delay(secondsToMilliseconds(CREATION_CHECK_DELAY_TIME_SEC));
+                    delayTime += CREATION_CHECK_DELAY_TIME_SEC;
                 }
 
                 PLAUSIBLE.trackEvent(
