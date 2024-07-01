@@ -47,6 +47,7 @@ import { SupportedNetwork } from 'types/network';
 import { ViemContract } from 'types/viem';
 import { executeBiconomyTransaction } from 'utils/biconomy';
 import biconomyConnector from 'utils/biconomyWallet';
+import { getContractAbi } from 'utils/contracts/abi';
 import chainedSpeedMarketsAMMContract from 'utils/contracts/chainedSpeedMarketsAMMContract';
 import erc20Contract from 'utils/contracts/collateralContract';
 import multipleCollateral from 'utils/contracts/multipleCollateralContract';
@@ -212,7 +213,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
 
         const chainedSpeedMarketsAMMContractWithSigner = getContract({
-            abi: chainedSpeedMarketsAMMContract.abi,
+            abi: getContractAbi(chainedSpeedMarketsAMMContract.abi, networkId),
             address: chainedSpeedMarketsAMMContract.addresses[networkId],
             client: walletClient.data as Client,
         }) as ViemContract;

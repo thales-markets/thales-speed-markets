@@ -7,7 +7,7 @@ import { bigNumberFormatter, coinFormatter, parseBytes32String, roundNumberToDec
 import { UserChainedPosition } from 'types/market';
 import { QueryConfig } from 'types/network';
 import { ViemContract } from 'types/viem';
-import { getContarctAbi } from 'utils/contracts/abi';
+import { getContractAbi } from 'utils/contracts/abi';
 import chainedSpeedMarketsAMMContract from 'utils/contracts/chainedSpeedMarketsAMMContract';
 import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
 import { getContract } from 'viem';
@@ -24,13 +24,13 @@ const useUserActiveChainedSpeedMarketsDataQuery = (
 
             try {
                 const speedMarketsDataContractLocal = getContract({
-                    abi: getContarctAbi(speedMarketsDataContract, queryConfig.networkId),
+                    abi: getContractAbi(speedMarketsDataContract, queryConfig.networkId),
                     address: speedMarketsDataContract.addresses[queryConfig.networkId],
                     client: queryConfig.client,
                 }) as ViemContract;
 
                 const chainedMarketsAMMContract = getContract({
-                    abi: chainedSpeedMarketsAMMContract.abi,
+                    abi: getContractAbi(chainedSpeedMarketsAMMContract.abi, queryConfig.networkId),
                     address: chainedSpeedMarketsAMMContract.addresses[queryConfig.networkId],
                     client: queryConfig.client,
                 }) as ViemContract;

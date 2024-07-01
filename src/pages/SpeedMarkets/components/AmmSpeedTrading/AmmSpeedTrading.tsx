@@ -49,6 +49,7 @@ import { RootState } from 'types/ui';
 import { ViemContract } from 'types/viem';
 import { executeBiconomyTransaction } from 'utils/biconomy';
 import biconomyConnector from 'utils/biconomyWallet';
+import { getContractAbi } from 'utils/contracts/abi';
 import chainedSpeedMarketsAMMContract from 'utils/contracts/chainedSpeedMarketsAMMContract';
 import erc20Contract from 'utils/contracts/collateralContract';
 import multipleCollateral from 'utils/contracts/multipleCollateralContract';
@@ -508,7 +509,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
 
         const speedMarketsAMMContractWithSigner = getContract({
-            abi: speedMarketsAMMCreatorContract.abi,
+            abi: getContractAbi(speedMarketsAMMCreatorContract, networkId),
             address: speedMarketsAMMCreatorContract.addresses[networkId],
             client: walletClient.data as Client,
         });

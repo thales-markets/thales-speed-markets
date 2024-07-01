@@ -21,7 +21,7 @@ import { delay } from 'utils/timer';
 import { getContract } from 'viem';
 import { executeBiconomyTransaction } from './biconomy';
 import biconomyConnector from './biconomyWallet';
-import { getContarctAbi } from './contracts/abi';
+import { getContractAbi } from './contracts/abi';
 import chainedSpeedMarketsAMMContract from './contracts/chainedSpeedMarketsAMMContract';
 import erc20Contract from './contracts/collateralContract';
 import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
@@ -198,7 +198,7 @@ export const resolveAllSpeedPositions = async (
     const id = toast.loading(getDefaultToastContent(i18n.t('common.progress')), getLoadingToastOptions());
 
     const speedMarketsAMMContractWithSigner = getContract({
-        abi: getContarctAbi(speedMarketsAMMContract, queryConfig.networkId),
+        abi: getContractAbi(speedMarketsAMMContract, queryConfig.networkId),
         address: speedMarketsAMMContract.addresses[queryConfig.networkId],
         client: queryConfig.client,
     }) as ViemContract;

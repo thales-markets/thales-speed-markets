@@ -30,7 +30,7 @@ import { RootState, ThemeInterface } from 'types/ui';
 import { ViemContract } from 'types/viem';
 import { executeBiconomyTransaction } from 'utils/biconomy';
 import biconomyConnector from 'utils/biconomyWallet';
-import { getContarctAbi } from 'utils/contracts/abi';
+import { getContractAbi } from 'utils/contracts/abi';
 import erc20Contract from 'utils/contracts/collateralContract';
 import multipleCollateral from 'utils/contracts/multipleCollateralContract';
 import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
@@ -232,7 +232,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
             const isEth = collateralAddress === ZERO_ADDRESS;
 
             const speedMarketsAMMContractWithSigner = getContract({
-                abi: getContarctAbi(speedMarketsAMMContract, networkId),
+                abi: getContractAbi(speedMarketsAMMContract, networkId),
                 address: speedMarketsAMMContract.addresses[networkId],
                 client: walletClient.data as Client,
             }) as ViemContract;
@@ -305,7 +305,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
 
         const speedMarketsAMMContractWithSigner = getContract({
-            abi: getContarctAbi(speedMarketsAMMContract, networkId),
+            abi: getContractAbi(speedMarketsAMMContract, networkId),
             address: speedMarketsAMMContract.addresses[networkId],
             client: walletClient.data as Client,
         }) as ViemContract;

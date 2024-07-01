@@ -1,5 +1,7 @@
+import { DEFAULT_SESSION_KEY_MANAGER_MODULE, createSessionKeyManagerModule } from '@biconomy/account';
 import { PaymasterMode } from '@biconomy/paymaster';
-import biconomyConnector from './biconomyWallet';
+import { LOCAL_STORAGE_KEYS } from 'constants/storage';
+import { addMonths } from 'date-fns';
 import { SupportedNetwork } from 'types/network';
 import { ViemContract } from 'types/viem';
 import {
@@ -13,14 +15,12 @@ import {
     maxUint256,
 } from 'viem';
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
-import { DEFAULT_SESSION_KEY_MANAGER_MODULE, createSessionKeyManagerModule } from '@biconomy/account';
-
-import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
-import erc20Contract from './contracts/collateralContract';
+import biconomyConnector from './biconomyWallet';
+import { getContractAbi } from './contracts/abi';
 import chainedSpeedMarketsAMMContract from './contracts/chainedSpeedMarketsAMMContract';
-import { LOCAL_STORAGE_KEYS } from 'constants/storage';
+import erc20Contract from './contracts/collateralContract';
 import multipleCollateral from './contracts/multipleCollateralContract';
-import { addMonths } from 'date-fns';
+import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
 
 export const executeBiconomyTransactionWithConfirmation = async (
     collateral: string,
@@ -80,7 +80,7 @@ export const executeBiconomyTransaction = async (
         console.log('buyInAmountParam: ', buyInAmountParam);
 
         const encodedCall = encodeFunctionData({
-            abi: contract.abi,
+            abi: getContractAbi(contract, networkId),
             functionName: methodName,
             args: data ? data : ([] as any),
         });
