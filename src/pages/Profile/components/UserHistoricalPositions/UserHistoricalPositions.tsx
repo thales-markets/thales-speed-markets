@@ -380,9 +380,9 @@ const Filter = styled(FlexDivCentered)<{ $isSelected: boolean }>`
 
 const PositionsWrapper = styled.div<{ $noPositions?: boolean }>`
     position: relative;
-    min-height: 200px;
     width: 100%;
     ${(props) => (props.$noPositions ? 'filter: blur(10px);' : '')}
+    ${(props) => (props.$noPositions ? 'min-height: 200px;' : '')}
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         min-height: unset;
     }
