@@ -5,7 +5,7 @@
         "buy": {
             "label": "Buy",
             "progress-label": "Buying in progress...",
-            "confirmation-message": "Successfully submitted market creation"
+            "confirmation-message": "Successfully bought - market created"
         },
         "mint": {
             "label": "Get",

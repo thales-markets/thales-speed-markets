@@ -72,3 +72,7 @@ export type AmmChainedSpeedMarketsLimits = {
     maxPriceDelayForResolvingSec: number;
     whitelistedAddress: boolean;
 };
+
+export type AmmSpeedMarketsCreatorParams = {
+    maxCreationDelay: number;
+};

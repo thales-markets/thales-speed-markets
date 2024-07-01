@@ -1,3 +1,4 @@
+import { getPublicClient } from '@wagmi/core';
 import ApprovalModal from 'components/ApprovalModal';
 import Button from 'components/Button';
 import {
@@ -21,6 +22,7 @@ import { secondsToMilliseconds } from 'date-fns';
 import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import useDebouncedEffect from 'hooks/useDebouncedEffect';
+import { wagmiConfig } from 'pages/Root/wagmiConfig';
 import TradingDetailsSentence from 'pages/SpeedMarkets/components/TradingDetailsSentence';
 import useExchangeRatesQuery, { Rates } from 'queries/rates/useExchangeRatesQuery';
 import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipleCollateralBalanceQuery';
@@ -80,6 +82,7 @@ import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 import PriceSlippage from '../PriceSlippage';
 import { SelectedPosition } from '../SelectPosition/SelectPosition';
 import SharePosition from '../SharePosition';
+import useAmmSpeedMarketsCreatorQuery from 'queries/speedMarkets/useAmmSpeedMarketsCreatorQuery';
 
 type AmmSpeedTradingProps = {
     isChained: boolean;
@@ -100,7 +103,6 @@ type AmmSpeedTradingProps = {
 };
 
 const DEFAULT_MAX_CREATOR_DELAY_TIME_SEC = 15;
-const CREATION_CHECK_DELAY_TIME_SEC = 1.5;
 
 const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     isChained,
@@ -189,15 +191,17 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             ? getReferralWallet()
             : null;
 
+    const userAddress = (isBiconomy ? biconomyConnector.address : walletAddress) as string;
+
     const stableBalanceQuery = useStableBalanceQuery(
-        (isBiconomy ? biconomyConnector.address : walletAddress) as string,
+        userAddress,
         { networkId, client },
         {
             enabled: isAppReady && isConnected && !isMultiCollateralSupported,
         }
     );
     const multipleCollateralBalances = useMultipleCollateralBalanceQuery(
-        (isBiconomy ? biconomyConnector.address : walletAddress) as string,
+        userAddress,
         { networkId, client },
         {
             enabled: isAppReady && isConnected && isMultiCollateralSupported,
@@ -247,6 +251,17 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         },
         [selectedCollateral, exchangeRates]
     );
+
+    const ammSpeedMarketsCreatorQuery = useAmmSpeedMarketsCreatorQuery(
+        { networkId, client },
+        {
+            enabled: isAppReady,
+        }
+    );
+
+    const ammSpeedMarketsCreatorData = useMemo(() => {
+        return ammSpeedMarketsCreatorQuery.isSuccess ? ammSpeedMarketsCreatorQuery.data : null;
+    }, [ammSpeedMarketsCreatorQuery]);
 
     const skewImpact = useMemo(() => {
         const skewPerPosition = { [Positions.UP]: 0, [Positions.DOWN]: 0 };
@@ -431,7 +446,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 const allowance: boolean = await checkAllowance(
                     parsedAmount,
                     erc20Instance,
-                    (isBiconomy ? biconomyConnector.address : walletAddress) as string,
+                    userAddress,
                     addressToApprove
                 );
 
@@ -579,27 +594,43 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             const txReceipt = await waitForTransactionReceipt(client as Client, { hash });
 
             if (txReceipt.status === 'success') {
-                toast.update(id, getSuccessToastOptions(t(`common.buy.confirmation-message`), id));
-                resetData();
-                setPaidAmount(0);
-                setSubmittedStrikePrice(0);
-                setIsSubmitting(false);
+                const publicClient = getPublicClient(wagmiConfig, { chainId: networkId });
 
-                // wait for creator to pick up pending markets (TODO: add creator maxCreationDelay)
-                let delayTime = 0;
-                while (delayTime < DEFAULT_MAX_CREATOR_DELAY_TIME_SEC) {
-                    refetchUserSpeedMarkets(
-                        isChained,
-                        networkId,
-                        (isBiconomy ? biconomyConnector.address : walletAddress) as string
-                    );
-                    refetchActiveSpeedMarkets(isChained, networkId);
-                    refetchSpeedMarketsLimits(isChained, networkId);
-                    refetchBalances((isBiconomy ? biconomyConnector.address : walletAddress) as string, networkId);
+                let marketCreated = false;
+                const unwatch = publicClient.watchContractEvent({
+                    address: isChained
+                        ? chainedSpeedMarketsAMMContract.addresses[networkId]
+                        : speedMarketsAMMContract.addresses[networkId],
+                    abi: getContractAbi(
+                        isChained ? chainedSpeedMarketsAMMContract : speedMarketsAMMContract,
+                        networkId
+                    ),
+                    eventName: isChained ? 'MarketCreated' : 'MarketCreatedWithFees',
+                    args: { [isChained ? 'user' : '_user']: userAddress },
+                    onLogs: () => {
+                        marketCreated = true;
+                        toast.update(id, getSuccessToastOptions(t(`common.buy.confirmation-message`), id));
+                        resetData();
+                        setPaidAmount(0);
 
-                    await delay(secondsToMilliseconds(CREATION_CHECK_DELAY_TIME_SEC));
-                    delayTime += CREATION_CHECK_DELAY_TIME_SEC;
+                        refetchUserSpeedMarkets(isChained, networkId, userAddress);
+                        refetchActiveSpeedMarkets(isChained, networkId);
+                        refetchSpeedMarketsLimits(isChained, networkId);
+                        refetchBalances(userAddress, networkId);
+                    },
+                    onError: (error) => console.log('Error on watch event MarketCreatedWithFees', error),
+                });
+
+                // if creator didn't created market for max time then assume creation failed
+                await delay(
+                    secondsToMilliseconds(
+                        ammSpeedMarketsCreatorData?.maxCreationDelay || DEFAULT_MAX_CREATOR_DELAY_TIME_SEC
+                    )
+                );
+                if (!marketCreated) {
+                    toast.update(id, getErrorToastOptions(t('common.errors.buy-failed'), id));
                 }
+                unwatch();
 
                 PLAUSIBLE.trackEvent(
                     isChained ? PLAUSIBLE_KEYS.chainedSpeedMarketsBuy : PLAUSIBLE_KEYS.speedMarketsBuy,
@@ -615,16 +646,14 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 console.log('Transaction status', txReceipt.status);
                 await delay(800);
                 toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
-                setSubmittedStrikePrice(0);
-                setIsSubmitting(false);
             }
         } catch (e) {
             console.log(e);
             await delay(800);
             toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
-            setSubmittedStrikePrice(0);
-            setIsSubmitting(false);
         }
+        setSubmittedStrikePrice(0);
+        setIsSubmitting(false);
     };
 
     const handleMint = async () => {
@@ -649,7 +678,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                     id,
                     getSuccessToastOptions(t(`common.mint.confirmation-message`, { token: selectedCollateral }), id)
                 );
-                refetchBalances((isBiconomy ? biconomyConnector.address : walletAddress) as string, networkId);
+                refetchBalances(userAddress, networkId);
             } else {
                 console.log('Transaction status', txReceipt.status);
                 await delay(800);
@@ -722,10 +751,10 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                                 &nbsp;
                                 {isEth ? CRYPTO_CURRENCY_MAP.WETH : selectedCollateral}
                             </CollateralText>
-                            {!isMobile && <Tooltip overlay={t('speed-markets.tooltips.eth-to-weth')} />}
+                            {isEth && !isMobile && <Tooltip overlay={t('speed-markets.tooltips.eth-to-weth')} />}
                             {isAllowing ? '...' : ''}
                         </Button>
-                        {isMobile && <InfoText>{t('speed-markets.tooltips.eth-to-weth')}</InfoText>}
+                        {isEth && isMobile && <InfoText>{t('speed-markets.tooltips.eth-to-weth')}</InfoText>}
                     </>
                 );
             }
