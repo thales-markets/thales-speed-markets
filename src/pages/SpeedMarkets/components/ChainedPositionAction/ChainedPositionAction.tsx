@@ -213,7 +213,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
 
         const chainedSpeedMarketsAMMContractWithSigner = getContract({
-            abi: getContractAbi(chainedSpeedMarketsAMMContract.abi, networkId),
+            abi: getContractAbi(chainedSpeedMarketsAMMContract, networkId),
             address: chainedSpeedMarketsAMMContract.addresses[networkId],
             client: walletClient.data as Client,
         }) as ViemContract;
