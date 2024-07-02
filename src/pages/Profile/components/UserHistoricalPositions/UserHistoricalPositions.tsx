@@ -285,7 +285,9 @@ const UserHistoricalPositions: React.FC<UserHistoricalPositionsProps> = ({
             )}
             <PositionsWrapper $noPositions={noPositions}>
                 {isLoading ? (
-                    <SimpleLoader />
+                    <LoaderWrapper>
+                        <SimpleLoader />
+                    </LoaderWrapper>
                 ) : isMobile ? (
                     <CardPositions isMixedPositions isHistory isHorizontal positions={positions} />
                 ) : (
@@ -398,6 +400,10 @@ const NoPositionsText = styled.span`
     line-height: 100%;
     color: ${(props) => props.theme.textColor.secondary};
     min-width: max-content;
+`;
+
+const LoaderWrapper = styled.div`
+    min-height: 200px;
 `;
 
 export default UserHistoricalPositions;

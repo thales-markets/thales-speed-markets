@@ -398,7 +398,9 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
             </Header>
             <PositionsWrapper $noPositions={noPositions}>
                 {isLoading ? (
-                    <SimpleLoader />
+                    <LoaderWrapper>
+                        <SimpleLoader />
+                    </LoaderWrapper>
                 ) : isChainedSelected && !noPositions ? (
                     // CHAINED
                     isMobile ? (
@@ -595,6 +597,10 @@ const NoPositionsText = styled.span`
     line-height: 100%;
     color: ${(props) => props.theme.textColor.secondary};
     min-width: max-content;
+`;
+
+const LoaderWrapper = styled.div`
+    min-height: 200px;
 `;
 
 export default UserOpenPositions;
