@@ -530,7 +530,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         });
 
         const publicClient = getPublicClient(wagmiConfig, { chainId: networkId });
-        let marketCreated = false;
+        let isMarketCreated = false;
         const unwatch = publicClient.watchContractEvent({
             address: isChained
                 ? chainedSpeedMarketsAMMContract.addresses[networkId]
@@ -539,10 +539,12 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             eventName: isChained ? 'MarketCreated' : 'MarketCreatedWithFees',
             args: { [isChained ? 'user' : '_user']: userAddress },
             onLogs: () => {
-                marketCreated = true;
+                isMarketCreated = true;
                 toast.update(id, getSuccessToastOptions(t(`common.buy.confirmation-message`), id));
                 resetData();
                 setPaidAmount(0);
+                setSubmittedStrikePrice(0);
+                setIsSubmitting(false);
 
                 refetchUserSpeedMarkets(isChained, networkId, userAddress);
                 refetchActiveSpeedMarkets(isChained, networkId);
@@ -623,7 +625,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                         ammSpeedMarketsCreatorData?.maxCreationDelay || DEFAULT_MAX_CREATOR_DELAY_TIME_SEC
                     )
                 );
-                if (!marketCreated) {
+                if (!isMarketCreated) {
                     toast.update(id, getErrorToastOptions(t('common.errors.buy-failed'), id));
                 }
 
@@ -641,14 +643,16 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 console.log('Transaction status', txReceipt.status);
                 await delay(800);
                 toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
+                setSubmittedStrikePrice(0);
+                setIsSubmitting(false);
             }
         } catch (e) {
             console.log(e);
             await delay(800);
             toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
+            setSubmittedStrikePrice(0);
+            setIsSubmitting(false);
         }
-        setSubmittedStrikePrice(0);
-        setIsSubmitting(false);
         unwatch();
     };
 
