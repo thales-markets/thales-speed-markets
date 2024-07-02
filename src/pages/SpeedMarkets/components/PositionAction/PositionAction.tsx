@@ -52,7 +52,7 @@ import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 
 const ONE_HUNDRED_AND_THREE_PERCENT = 1.03;
 
-type MyPositionActionProps = {
+type PositionActionProps = {
     position: UserPosition;
     maxPriceDelayForResolvingSec?: number;
     isCollateralHidden?: boolean;
@@ -62,7 +62,7 @@ type MyPositionActionProps = {
     setIsActionInProgress?: React.Dispatch<boolean>;
 };
 
-const MyPositionAction: React.FC<MyPositionActionProps> = ({
+const PositionAction: React.FC<PositionActionProps> = ({
     position,
     maxPriceDelayForResolvingSec,
     isCollateralHidden,
@@ -566,4 +566,4 @@ export const CollateralSelectorContainer = styled(FlexDivCentered)`
     text-transform: none;
 `;
 
-export default MyPositionAction;
+export default PositionAction;

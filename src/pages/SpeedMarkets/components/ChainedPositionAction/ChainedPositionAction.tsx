@@ -22,7 +22,7 @@ import {
     TimeIcon,
     Value,
     getDefaultButtonProps,
-} from 'pages/SpeedMarkets/components/MyPositionAction/MyPositionAction';
+} from 'pages/SpeedMarkets/components/PositionAction/PositionAction';
 import { CSSProperties, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
