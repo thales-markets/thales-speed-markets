@@ -431,28 +431,32 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             : speedMarketsAMMContract.addresses[networkId];
 
         const getAllowance = async () => {
-            try {
-                const parsedAmount: bigint = coinParser(
-                    (
-                        ALLOWANCE_BUFFER_PERCENTAGE *
-                        (isStableCurrency(selectedCollateral)
-                            ? ceilNumberToDecimals(paidAmount)
-                            : ceilNumberToDecimals(paidAmount, COLLATERAL_DECIMALS[selectedCollateral]))
-                    ).toString(),
-                    networkId,
-                    selectedCollateral
-                );
+            if (isBiconomy) {
+                setAllowance(true);
+            } else {
+                try {
+                    const parsedAmount: bigint = coinParser(
+                        (
+                            ALLOWANCE_BUFFER_PERCENTAGE *
+                            (isStableCurrency(selectedCollateral)
+                                ? ceilNumberToDecimals(paidAmount)
+                                : ceilNumberToDecimals(paidAmount, COLLATERAL_DECIMALS[selectedCollateral]))
+                        ).toString(),
+                        networkId,
+                        selectedCollateral
+                    );
 
-                const allowance: boolean = await checkAllowance(
-                    parsedAmount,
-                    erc20Instance,
-                    userAddress,
-                    addressToApprove
-                );
+                    const allowance: boolean = await checkAllowance(
+                        parsedAmount,
+                        erc20Instance,
+                        userAddress,
+                        addressToApprove
+                    );
 
-                setAllowance(allowance);
-            } catch (e) {
-                console.log(e);
+                    setAllowance(allowance);
+                } catch (e) {
+                    console.log(e);
+                }
             }
         };
 
@@ -730,30 +734,22 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             return <Button disabled={true}>{t('common.errors.out-of-liquidity')}</Button>;
         }
         if (!hasAllowance) {
-            if (isBiconomy) {
-                return (
-                    <Button onClick={handleSubmit}>
-                        {isSubmitting ? t(`common.buy.progress-label`) : t(`common.buy.label`)}
+            return (
+                <>
+                    <Button disabled={isAllowing} onClick={() => setOpenApprovalModal(true)}>
+                        {isAllowing
+                            ? t('common.enable-wallet-access.approve-progress')
+                            : t('common.enable-wallet-access.approve')}
+                        <CollateralText>
+                            &nbsp;
+                            {isEth ? CRYPTO_CURRENCY_MAP.WETH : selectedCollateral}
+                        </CollateralText>
+                        {isEth && !isMobile && <Tooltip overlay={t('speed-markets.tooltips.eth-to-weth')} />}
+                        {isAllowing ? '...' : ''}
                     </Button>
-                );
-            } else {
-                return (
-                    <>
-                        <Button disabled={isAllowing} onClick={() => setOpenApprovalModal(true)}>
-                            {isAllowing
-                                ? t('common.enable-wallet-access.approve-progress')
-                                : t('common.enable-wallet-access.approve')}
-                            <CollateralText>
-                                &nbsp;
-                                {isEth ? CRYPTO_CURRENCY_MAP.WETH : selectedCollateral}
-                            </CollateralText>
-                            {isEth && !isMobile && <Tooltip overlay={t('speed-markets.tooltips.eth-to-weth')} />}
-                            {isAllowing ? '...' : ''}
-                        </Button>
-                        {isEth && isMobile && <InfoText>{t('speed-markets.tooltips.eth-to-weth')}</InfoText>}
-                    </>
-                );
-            }
+                    {isEth && isMobile && <InfoText>{t('speed-markets.tooltips.eth-to-weth')}</InfoText>}
+                </>
+            );
         }
 
         return (
