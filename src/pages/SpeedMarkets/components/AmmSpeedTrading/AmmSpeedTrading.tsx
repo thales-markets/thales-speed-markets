@@ -627,6 +627,8 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 );
                 if (!isMarketCreated) {
                     toast.update(id, getErrorToastOptions(t('common.errors.buy-failed'), id));
+                    setSubmittedStrikePrice(0);
+                    setIsSubmitting(false);
                 }
 
                 PLAUSIBLE.trackEvent(
