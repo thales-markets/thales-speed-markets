@@ -17,7 +17,7 @@ import {
     ceilNumberToDecimals,
     formatCurrencyWithKey,
     formatCurrencyWithSign,
-    truncToDecimals
+    truncToDecimals,
 } from 'thales-utils';
 import { AmmChainedSpeedMarketsLimits, AmmSpeedMarketsLimits } from 'types/market';
 import { RootState } from 'types/ui';
