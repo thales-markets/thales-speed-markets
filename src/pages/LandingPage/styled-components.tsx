@@ -526,6 +526,9 @@ export const VideoWrapper = styled(FlexDivCentered)`
     background: ${(props) => props.theme.button.borderColor.primary};
     padding: 2px;
     border-radius: 10px;
+    @media screen and (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
+        margin: 0;
+    }
 `;
 
 export const Video = styled(FlexDivCentered)`
@@ -537,13 +540,9 @@ export const Video = styled(FlexDivCentered)`
 
 export const CoinsImg = styled.img`
     position: absolute;
-    top: -140px;
-    left: -190px;
-    @media screen and (max-width: ${ScreenSizeBreakpoint.LARGE}px) {
-        width: 260px;
-        top: -108px;
-        left: -150px;
-    }
+    top: -108px;
+    left: -150px;
+    width: 200px;
     @media screen and (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         width: 108px;
         top: -44px;
