@@ -306,7 +306,9 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                             collateralAddress,
                             chainedSpeedMarketsAMMContractWithSigner,
                             'resolveMarketWithOfframp',
-                            [position.market, priceUpdateDataArray, collateralAddress, isEth]
+                            [position.market, priceUpdateDataArray, collateralAddress, isEth],
+                            undefined,
+                            isEth
                         );
                     }
                 } else {
