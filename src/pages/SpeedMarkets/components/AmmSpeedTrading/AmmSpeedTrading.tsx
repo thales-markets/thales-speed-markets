@@ -25,6 +25,7 @@ import useDebouncedEffect from 'hooks/useDebouncedEffect';
 import { wagmiConfig } from 'pages/Root/wagmiConfig';
 import TradingDetailsSentence from 'pages/SpeedMarkets/components/TradingDetailsSentence';
 import useExchangeRatesQuery, { Rates } from 'queries/rates/useExchangeRatesQuery';
+import useAmmSpeedMarketsCreatorQuery from 'queries/speedMarkets/useAmmSpeedMarketsCreatorQuery';
 import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipleCollateralBalanceQuery';
 import useStableBalanceQuery from 'queries/walletBalances/useStableBalanceQuery';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -82,7 +83,6 @@ import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 import PriceSlippage from '../PriceSlippage';
 import { SelectedPosition } from '../SelectPosition/SelectPosition';
 import SharePosition from '../SharePosition';
-import useAmmSpeedMarketsCreatorQuery from 'queries/speedMarkets/useAmmSpeedMarketsCreatorQuery';
 
 type AmmSpeedTradingProps = {
     isChained: boolean;
@@ -529,6 +529,29 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             client: walletClient.data as Client,
         });
 
+        const publicClient = getPublicClient(wagmiConfig, { chainId: networkId });
+        let marketCreated = false;
+        const unwatch = publicClient.watchContractEvent({
+            address: isChained
+                ? chainedSpeedMarketsAMMContract.addresses[networkId]
+                : speedMarketsAMMContract.addresses[networkId],
+            abi: getContractAbi(isChained ? chainedSpeedMarketsAMMContract : speedMarketsAMMContract, networkId),
+            eventName: isChained ? 'MarketCreated' : 'MarketCreatedWithFees',
+            args: { [isChained ? 'user' : '_user']: userAddress },
+            onLogs: () => {
+                marketCreated = true;
+                toast.update(id, getSuccessToastOptions(t(`common.buy.confirmation-message`), id));
+                resetData();
+                setPaidAmount(0);
+
+                refetchUserSpeedMarkets(isChained, networkId, userAddress);
+                refetchActiveSpeedMarkets(isChained, networkId);
+                refetchSpeedMarketsLimits(isChained, networkId);
+                refetchBalances(userAddress, networkId);
+            },
+            onError: (error) => console.log('Error on watch event MarketCreatedWithFees', error),
+        });
+
         try {
             const priceConnection = getPriceConnection(networkId);
             const priceId = getPriceId(networkId, currencyKey);
@@ -594,33 +617,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             const txReceipt = await waitForTransactionReceipt(client as Client, { hash });
 
             if (txReceipt.status === 'success') {
-                const publicClient = getPublicClient(wagmiConfig, { chainId: networkId });
-
-                let marketCreated = false;
-                const unwatch = publicClient.watchContractEvent({
-                    address: isChained
-                        ? chainedSpeedMarketsAMMContract.addresses[networkId]
-                        : speedMarketsAMMContract.addresses[networkId],
-                    abi: getContractAbi(
-                        isChained ? chainedSpeedMarketsAMMContract : speedMarketsAMMContract,
-                        networkId
-                    ),
-                    eventName: isChained ? 'MarketCreated' : 'MarketCreatedWithFees',
-                    args: { [isChained ? 'user' : '_user']: userAddress },
-                    onLogs: () => {
-                        marketCreated = true;
-                        toast.update(id, getSuccessToastOptions(t(`common.buy.confirmation-message`), id));
-                        resetData();
-                        setPaidAmount(0);
-
-                        refetchUserSpeedMarkets(isChained, networkId, userAddress);
-                        refetchActiveSpeedMarkets(isChained, networkId);
-                        refetchSpeedMarketsLimits(isChained, networkId);
-                        refetchBalances(userAddress, networkId);
-                    },
-                    onError: (error) => console.log('Error on watch event MarketCreatedWithFees', error),
-                });
-
                 // if creator didn't created market for max time then assume creation failed
                 await delay(
                     secondsToMilliseconds(
@@ -630,7 +626,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 if (!marketCreated) {
                     toast.update(id, getErrorToastOptions(t('common.errors.buy-failed'), id));
                 }
-                unwatch();
 
                 PLAUSIBLE.trackEvent(
                     isChained ? PLAUSIBLE_KEYS.chainedSpeedMarketsBuy : PLAUSIBLE_KEYS.speedMarketsBuy,
@@ -654,6 +649,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         }
         setSubmittedStrikePrice(0);
         setIsSubmitting(false);
+        unwatch();
     };
 
     const handleMint = async () => {
