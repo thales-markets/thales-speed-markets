@@ -145,8 +145,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
 
         if (isOverview) {
             setAllowance(true);
-        }
-        if (isConnected) {
+        } else if (isConnected) {
             getAllowance();
         }
     }, [
