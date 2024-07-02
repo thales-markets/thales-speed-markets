@@ -252,7 +252,9 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                           collateralAddress,
                           speedMarketsAMMContractWithSigner,
                           'resolveMarketWithOfframp',
-                          [position.market, priceUpdateData, collateralAddress, isEth]
+                          [position.market, priceUpdateData, collateralAddress, isEth],
+                          undefined,
+                          isEth
                       );
             } else {
                 hash = isDefaultCollateral
