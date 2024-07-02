@@ -58,7 +58,7 @@ const TablePositions: React.FC<TablePositionsProps> = ({
             cell: (cellProps: any) => (
                 <Wrapper>
                     <Value>
-                        <MarketPrice position={cellProps.row.original} />
+                        <MarketPrice position={cellProps.row.original} isRefetchDisabled />
                     </Value>
                 </Wrapper>
             ),

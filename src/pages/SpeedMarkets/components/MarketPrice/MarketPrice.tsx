@@ -11,7 +11,10 @@ import { getPriceId } from 'utils/pyth';
 import { refetchPythPrice } from 'utils/queryConnector';
 import { useChainId } from 'wagmi';
 
-const MarketPrice: React.FC<{ position: UserPosition | UserHistoryPosition }> = ({ position }) => {
+const MarketPrice: React.FC<{ position: UserPosition | UserHistoryPosition; isRefetchDisabled?: boolean }> = ({
+    position,
+    isRefetchDisabled,
+}) => {
     const { t } = useTranslation();
 
     const networkId = useChainId();
@@ -27,7 +30,7 @@ const MarketPrice: React.FC<{ position: UserPosition | UserHistoryPosition }> = 
         if (Date.now() > position.maturityDate) {
             setIsMatured(true);
 
-            if (finalPrice === 0) {
+            if (!isRefetchDisabled && finalPrice === 0) {
                 refetchPythPrice(
                     getPriceId(networkId, position.currencyKey),
                     millisecondsToSeconds(position.maturityDate)
