@@ -368,7 +368,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
             <Button
                 {...getDefaultButtonProps(isMobile)}
                 minWidth={isOverview && !isMobile ? '150px' : getDefaultButtonProps(isMobile).minWidth}
-                disabled={isSubmitting || (isOverview && !position.canResolve)}
+                disabled={isSubmitting || (isOverview && (!position.canResolve || !isConnected))}
                 additionalStyles={additionalButtonStyle}
                 onClick={() =>
                     hasAllowance || isDefaultCollateral || isOverview ? handleResolve() : setOpenApprovalModal(true)

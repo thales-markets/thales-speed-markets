@@ -432,7 +432,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                             {...getDefaultButtonProps(isMobile)}
                             minWidth="150px"
                             additionalStyles={additionalButtonStyle}
-                            disabled={isSubmitting || !position.finalPrice}
+                            disabled={isSubmitting || !position.finalPrice || !isConnected}
                             onClick={() => handleOverviewResolve()}
                         >
                             {isSubmitting && !isSubmittingBatch

@@ -281,6 +281,10 @@ export const resolveAllSpeedPositions = async (
                 toast.update(id, getSuccessToastOptions(i18n.t(`speed-markets.overview.confirmation-message`), id));
                 await delay(2000);
                 refetchActiveSpeedMarkets(false, queryConfig.networkId);
+            } else {
+                console.log('Transaction status', txReceipt.status);
+                await delay(800);
+                toast.update(id, getErrorToastOptions(i18n.t('common.errors.unknown-error-try-again'), id));
             }
         } catch (e) {
             console.log(e);
@@ -410,6 +414,10 @@ export const resolveAllChainedMarkets = async (
                 toast.update(id, getSuccessToastOptions(i18n.t(`speed-markets.overview.confirmation-message`), id));
                 await delay(2000);
                 refetchActiveSpeedMarkets(true, queryConfig.networkId);
+            } else {
+                console.log('Transaction status', txReceipt.status);
+                await delay(800);
+                toast.update(id, getErrorToastOptions(i18n.t('common.errors.unknown-error-try-again'), id));
             }
         } catch (e) {
             console.log(e);
