@@ -30,7 +30,7 @@ import { RootState, ThemeInterface } from 'types/ui';
 import { ViemContract } from 'types/viem';
 import { executeBiconomyTransaction } from 'utils/biconomy';
 import biconomyConnector from 'utils/biconomyWallet';
-import { getContarctAbi } from 'utils/contracts/abi';
+import { getContractAbi } from 'utils/contracts/abi';
 import erc20Contract from 'utils/contracts/collateralContract';
 import multipleCollateral from 'utils/contracts/multipleCollateralContract';
 import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
@@ -52,7 +52,7 @@ import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 
 const ONE_HUNDRED_AND_THREE_PERCENT = 1.03;
 
-type MyPositionActionProps = {
+type PositionActionProps = {
     position: UserPosition;
     maxPriceDelayForResolvingSec?: number;
     isCollateralHidden?: boolean;
@@ -62,7 +62,7 @@ type MyPositionActionProps = {
     setIsActionInProgress?: React.Dispatch<boolean>;
 };
 
-const MyPositionAction: React.FC<MyPositionActionProps> = ({
+const PositionAction: React.FC<PositionActionProps> = ({
     position,
     maxPriceDelayForResolvingSec,
     isCollateralHidden,
@@ -232,7 +232,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
             const isEth = collateralAddress === ZERO_ADDRESS;
 
             const speedMarketsAMMContractWithSigner = getContract({
-                abi: getContarctAbi(speedMarketsAMMContract, networkId),
+                abi: getContractAbi(speedMarketsAMMContract, networkId),
                 address: speedMarketsAMMContract.addresses[networkId],
                 client: walletClient.data as Client,
             }) as ViemContract;
@@ -252,7 +252,9 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                           collateralAddress,
                           speedMarketsAMMContractWithSigner,
                           'resolveMarketWithOfframp',
-                          [position.market, priceUpdateData, collateralAddress, isEth]
+                          [position.market, priceUpdateData, collateralAddress, isEth],
+                          undefined,
+                          isEth
                       );
             } else {
                 hash = isDefaultCollateral
@@ -305,7 +307,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
 
         const speedMarketsAMMContractWithSigner = getContract({
-            abi: getContarctAbi(speedMarketsAMMContract, networkId),
+            abi: getContractAbi(speedMarketsAMMContract, networkId),
             address: speedMarketsAMMContract.addresses[networkId],
             client: walletClient.data as Client,
         }) as ViemContract;
@@ -432,7 +434,7 @@ const MyPositionAction: React.FC<MyPositionActionProps> = ({
                             {...getDefaultButtonProps(isMobile)}
                             minWidth="150px"
                             additionalStyles={additionalButtonStyle}
-                            disabled={isSubmitting || !position.finalPrice}
+                            disabled={isSubmitting || !position.finalPrice || !isConnected}
                             onClick={() => handleOverviewResolve()}
                         >
                             {isSubmitting && !isSubmittingBatch
@@ -564,4 +566,4 @@ export const CollateralSelectorContainer = styled(FlexDivCentered)`
     text-transform: none;
 `;
 
-export default MyPositionAction;
+export default PositionAction;

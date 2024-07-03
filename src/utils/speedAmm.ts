@@ -18,10 +18,11 @@ import { ViemContract } from 'types/viem';
 import { getPriceConnection, getPriceId, priceParser } from 'utils/pyth';
 import { refetchActiveSpeedMarkets } from 'utils/queryConnector';
 import { delay } from 'utils/timer';
-import { getContract } from 'viem';
+import { Client, getContract } from 'viem';
+import { waitForTransactionReceipt } from 'viem/actions';
 import { executeBiconomyTransaction } from './biconomy';
 import biconomyConnector from './biconomyWallet';
-import { getContarctAbi } from './contracts/abi';
+import { getContractAbi } from './contracts/abi';
 import chainedSpeedMarketsAMMContract from './contracts/chainedSpeedMarketsAMMContract';
 import erc20Contract from './contracts/collateralContract';
 import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
@@ -198,7 +199,7 @@ export const resolveAllSpeedPositions = async (
     const id = toast.loading(getDefaultToastContent(i18n.t('common.progress')), getLoadingToastOptions());
 
     const speedMarketsAMMContractWithSigner = getContract({
-        abi: getContarctAbi(speedMarketsAMMContract, queryConfig.networkId),
+        abi: getContractAbi(speedMarketsAMMContract, queryConfig.networkId),
         address: speedMarketsAMMContract.addresses[queryConfig.networkId],
         client: queryConfig.client,
     }) as ViemContract;
@@ -243,9 +244,9 @@ export const resolveAllSpeedPositions = async (
 
     if (marketsToResolve.length > 0) {
         try {
-            let txHash;
+            let hash;
             if (isBiconomy && collateralAddress) {
-                txHash = isAdmin
+                hash = isAdmin
                     ? await executeBiconomyTransaction(
                           queryConfig.networkId,
                           collateralAddress,
@@ -261,7 +262,7 @@ export const resolveAllSpeedPositions = async (
                           [marketsToResolve, priceUpdateDataArray]
                       );
             } else {
-                txHash = isAdmin
+                hash = isAdmin
                     ? await speedMarketsAMMContractWithSigner.write.resolveMarketManuallyBatch([
                           marketsToResolve,
                           manualFinalPrices,
@@ -274,10 +275,16 @@ export const resolveAllSpeedPositions = async (
                       );
             }
 
-            if (txHash) {
+            const txReceipt = await waitForTransactionReceipt(queryConfig.client as Client, { hash });
+
+            if (txReceipt.status === 'success') {
                 toast.update(id, getSuccessToastOptions(i18n.t(`speed-markets.overview.confirmation-message`), id));
-                await delay(5000);
+                await delay(2000);
                 refetchActiveSpeedMarkets(false, queryConfig.networkId);
+            } else {
+                console.log('Transaction status', txReceipt.status);
+                await delay(800);
+                toast.update(id, getErrorToastOptions(i18n.t('common.errors.unknown-error-try-again'), id));
             }
         } catch (e) {
             console.log(e);
@@ -372,9 +379,9 @@ export const resolveAllChainedMarkets = async (
 
     if (marketsToResolve.length > 0) {
         try {
-            let txHash;
+            let hash;
             if (isBiconomy && collateralAddress) {
-                txHash = isAdmin
+                hash = isAdmin
                     ? await executeBiconomyTransaction(
                           queryConfig.networkId,
                           collateralAddress,
@@ -390,7 +397,7 @@ export const resolveAllChainedMarkets = async (
                           [marketsToResolve, priceUpdateDataArray]
                       );
             } else {
-                txHash = isAdmin
+                hash = isAdmin
                     ? await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarketManuallyBatch([
                           marketsToResolve,
                           manualFinalPrices,
@@ -401,10 +408,16 @@ export const resolveAllChainedMarkets = async (
                       );
             }
 
-            if (txHash) {
+            const txReceipt = await waitForTransactionReceipt(queryConfig.client as Client, { hash });
+
+            if (txReceipt.status === 'success') {
                 toast.update(id, getSuccessToastOptions(i18n.t(`speed-markets.overview.confirmation-message`), id));
-                await delay(5000);
+                await delay(2000);
                 refetchActiveSpeedMarkets(true, queryConfig.networkId);
+            } else {
+                console.log('Transaction status', txReceipt.status);
+                await delay(800);
+                toast.update(id, getErrorToastOptions(i18n.t('common.errors.unknown-error-try-again'), id));
             }
         } catch (e) {
             console.log(e);

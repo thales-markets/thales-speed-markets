@@ -285,7 +285,9 @@ const UserHistoricalPositions: React.FC<UserHistoricalPositionsProps> = ({
             )}
             <PositionsWrapper $noPositions={noPositions}>
                 {isLoading ? (
-                    <SimpleLoader />
+                    <LoaderWrapper>
+                        <SimpleLoader />
+                    </LoaderWrapper>
                 ) : isMobile ? (
                     <CardPositions isMixedPositions isHistory isHorizontal positions={positions} />
                 ) : (
@@ -380,9 +382,9 @@ const Filter = styled(FlexDivCentered)<{ $isSelected: boolean }>`
 
 const PositionsWrapper = styled.div<{ $noPositions?: boolean }>`
     position: relative;
-    min-height: 200px;
     width: 100%;
     ${(props) => (props.$noPositions ? 'filter: blur(10px);' : '')}
+    ${(props) => (props.$noPositions ? 'min-height: 200px;' : '')}
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         min-height: unset;
     }
@@ -398,6 +400,10 @@ const NoPositionsText = styled.span`
     line-height: 100%;
     color: ${(props) => props.theme.textColor.secondary};
     min-width: max-content;
+`;
+
+const LoaderWrapper = styled.div`
+    min-height: 200px;
 `;
 
 export default UserHistoricalPositions;

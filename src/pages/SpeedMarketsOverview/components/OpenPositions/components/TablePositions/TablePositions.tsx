@@ -2,7 +2,7 @@ import Table from 'components/Table';
 import { USD_SIGN } from 'constants/currency';
 import { t } from 'i18next';
 import MarketPrice from 'pages/SpeedMarkets/components/MarketPrice';
-import MyPositionAction from 'pages/SpeedMarkets/components/MyPositionAction';
+import PositionAction from 'pages/SpeedMarkets/components/PositionAction';
 import { DirectionIcon } from 'pages/SpeedMarkets/components/UserOpenPositions/components/TablePositions/TablePositions';
 import React from 'react';
 import styled from 'styled-components';
@@ -58,7 +58,7 @@ const TablePositions: React.FC<TablePositionsProps> = ({
             cell: (cellProps: any) => (
                 <Wrapper>
                     <Value>
-                        <MarketPrice position={cellProps.row.original} />
+                        <MarketPrice position={cellProps.row.original} isRefetchDisabled />
                     </Value>
                 </Wrapper>
             ),
@@ -109,7 +109,7 @@ const TablePositions: React.FC<TablePositionsProps> = ({
             accessorKey: 'action',
             cell: (cellProps: any) => (
                 <Wrapper>
-                    <MyPositionAction
+                    <PositionAction
                         position={cellProps.row.original}
                         maxPriceDelayForResolvingSec={maxPriceDelayForResolvingSec}
                         isOverview
@@ -122,7 +122,7 @@ const TablePositions: React.FC<TablePositionsProps> = ({
         },
     ];
 
-    return <Table data={data} columns={columns as any} />;
+    return <Table data={data} columns={columns as any} columnsDeps={[isAdmin, isSubmittingBatch]} />;
 };
 
 export const Header = styled.p`

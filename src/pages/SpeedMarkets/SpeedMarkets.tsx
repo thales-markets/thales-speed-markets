@@ -424,11 +424,12 @@ const ArrowRight = styled.i`
     font-size: 20px;
     font-weight: 800;
     margin-left: 6px;
-    margin-top: -4px;
+    margin-top: -3px;
     color: ${(props) => props.theme.textColor.secondary};
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         font-size: 16px;
         font-weight: 400;
+        margin-top: 0;
     }
 `;
 

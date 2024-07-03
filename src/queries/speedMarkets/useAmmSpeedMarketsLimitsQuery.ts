@@ -11,7 +11,7 @@ import { bigNumberFormatter, coinFormatter } from 'thales-utils';
 import { AmmSpeedMarketsLimits } from 'types/market';
 import { QueryConfig } from 'types/network';
 import { ViemContract } from 'types/viem';
-import { getContarctAbi } from 'utils/contracts/abi';
+import { getContractAbi } from 'utils/contracts/abi';
 import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
 import { getContract, stringToHex } from 'viem';
 
@@ -42,7 +42,7 @@ const useAmmSpeedMarketsLimitsQuery = (
 
             try {
                 const speedMarketsDataContractLocal = getContract({
-                    abi: getContarctAbi(speedMarketsDataContract, queryConfig.networkId),
+                    abi: getContractAbi(speedMarketsDataContract, queryConfig.networkId),
                     address: speedMarketsDataContract.addresses[queryConfig.networkId],
                     client: queryConfig.client,
                 }) as ViemContract;

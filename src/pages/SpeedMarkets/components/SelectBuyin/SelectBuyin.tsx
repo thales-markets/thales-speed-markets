@@ -15,7 +15,6 @@ import {
     Coins,
     NetworkId,
     ceilNumberToDecimals,
-    floorNumberToDecimals,
     formatCurrencyWithKey,
     formatCurrencyWithSign,
     truncToDecimals,
@@ -39,8 +38,8 @@ import {
     Amount,
     BuyinAmountsWrapper,
     DollarSign,
-    HeaderRow,
     HeaderBalance,
+    HeaderRow,
     HeaderText,
     WalletIcon,
 } from '../SelectPosition/styled-components';
@@ -369,7 +368,7 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
                 })}
             </BuyinAmountsWrapper>
             <NumericInput
-                value={floorNumberToDecimals(buyinAmount, 8) || ''}
+                value={ceilNumberToDecimals(buyinAmount, 8) || ''}
                 placeholder={t('common.enter-amount')}
                 onChange={(_, value) => {
                     setSelectedStableBuyinAmount(isStableCurrency(selectedCollateral) ? Number(value) : 0);

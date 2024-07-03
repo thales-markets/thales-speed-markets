@@ -8,7 +8,7 @@ import { bigNumberFormatter, coinFormatter, parseBytes32String } from 'thales-ut
 import { UserPosition } from 'types/market';
 import { QueryConfig } from 'types/network';
 import { ViemContract } from 'types/viem';
-import { getContarctAbi } from 'utils/contracts/abi';
+import { getContractAbi } from 'utils/contracts/abi';
 import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
 import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
 import { getCurrentPrices, getPriceConnection, getPriceId } from 'utils/pyth';
@@ -26,13 +26,13 @@ const useActiveSpeedMarketsDataQuery = (
 
             try {
                 const speedMarketsAMMContractLocal = getContract({
-                    abi: getContarctAbi(speedMarketsAMMContract, queryConfig.networkId),
+                    abi: getContractAbi(speedMarketsAMMContract, queryConfig.networkId),
                     address: speedMarketsAMMContract.addresses[queryConfig.networkId],
                     client: queryConfig.client,
                 }) as ViemContract;
 
                 const speedMarketsDataContractLocal = getContract({
-                    abi: getContarctAbi(speedMarketsDataContract, queryConfig.networkId),
+                    abi: getContractAbi(speedMarketsDataContract, queryConfig.networkId),
                     address: speedMarketsDataContract.addresses[queryConfig.networkId],
                     client: queryConfig.client,
                 }) as ViemContract;

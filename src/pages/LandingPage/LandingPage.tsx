@@ -66,6 +66,7 @@ import {
     ZeusImg,
     ZeusImgWrapper,
 } from './styled-components';
+import YouTubeVideo from 'components/YouTubeVideo';
 
 const LandingPage: React.FC = () => {
     const { t } = useTranslation();
@@ -249,7 +250,9 @@ const LandingPage: React.FC = () => {
                         <RocketImg src={Rocket} isVideo={true} />
                     </VideoRocketWrapper>
 
-                    <Video>VIDEO</Video>
+                    <Video>
+                        <YouTubeVideo source="https://www.youtube.com/embed/fk05qbqbuZo?rel=0" title="Speed Markets" />
+                    </Video>
                 </VideoWrapper>
 
                 <ContentRow>
