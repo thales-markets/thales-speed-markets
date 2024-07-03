@@ -252,7 +252,7 @@ const LandingPage: React.FC = () => {
 
                     <Video>
                         <YouTubeVideo
-                            source="https://www.youtube.com/embed/izARYi8nDm0?rel=0"
+                            source="https://www.youtube.com/embed/seEhZ4DRtxo?rel=0"
                             title="Speed Markets Tutoria"
                         />
                     </Video>
