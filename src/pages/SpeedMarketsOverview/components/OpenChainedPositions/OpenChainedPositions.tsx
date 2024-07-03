@@ -43,7 +43,7 @@ const OpenChainedPositions: React.FC = () => {
     const networkId = useChainId();
     const client = useClient();
     const walletClient = useWalletClient();
-    const { address: walletAddress } = useAccount();
+    const { isConnected, address: walletAddress } = useAccount();
 
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
@@ -257,7 +257,7 @@ const OpenChainedPositions: React.FC = () => {
             !isLoading &&
             !!positions.length && (
                 <Button
-                    disabled={isSubmitting || !positions.length}
+                    disabled={isSubmitting || !positions.length || !isConnected}
                     onClick={() => {
                         setIsSubmittingSection(sectionName);
                         handleResolveAll(positions, isAdmin);

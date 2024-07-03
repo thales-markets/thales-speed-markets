@@ -2,7 +2,7 @@ import CollateralSelector from 'components/CollateralSelector';
 import { USD_SIGN } from 'constants/currency';
 import { secondsToMilliseconds } from 'date-fns';
 import useInterval from 'hooks/useInterval';
-import MyPositionAction from 'pages/SpeedMarkets/components/MyPositionAction';
+import PositionAction from 'pages/SpeedMarkets/components/PositionAction';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -14,11 +14,11 @@ import { UserPosition } from 'types/market';
 import { RootState, ThemeInterface } from 'types/ui';
 import { getCollaterals } from 'utils/currency';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
+import { getHistoryStatus, mapUserPositionToHistory } from 'utils/position';
 import { getColorPerPosition, getStatusColor } from 'utils/style';
 import { useChainId } from 'wagmi';
 import MarketPrice from '../../../MarketPrice';
 import SharePosition from '../../../SharePosition';
-import { getHistoryStatus, mapUserPositionToHistory } from 'utils/position';
 
 type CardPositionProps = {
     position: UserPosition;
@@ -159,7 +159,7 @@ const CardPosition: React.FC<CardPositionProps> = ({
                         {historyStatus}
                     </Value>
                 ) : (
-                    <MyPositionAction
+                    <PositionAction
                         position={position}
                         maxPriceDelayForResolvingSec={maxPriceDelayForResolvingSec}
                         isOverview={isOverview}

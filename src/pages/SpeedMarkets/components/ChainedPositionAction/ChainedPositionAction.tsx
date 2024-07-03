@@ -22,7 +22,7 @@ import {
     TimeIcon,
     Value,
     getDefaultButtonProps,
-} from 'pages/SpeedMarkets/components/MyPositionAction/MyPositionAction';
+} from 'pages/SpeedMarkets/components/PositionAction/PositionAction';
 import { CSSProperties, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -47,6 +47,7 @@ import { SupportedNetwork } from 'types/network';
 import { ViemContract } from 'types/viem';
 import { executeBiconomyTransaction } from 'utils/biconomy';
 import biconomyConnector from 'utils/biconomyWallet';
+import { getContractAbi } from 'utils/contracts/abi';
 import chainedSpeedMarketsAMMContract from 'utils/contracts/chainedSpeedMarketsAMMContract';
 import erc20Contract from 'utils/contracts/collateralContract';
 import multipleCollateral from 'utils/contracts/multipleCollateralContract';
@@ -144,8 +145,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
 
         if (isOverview) {
             setAllowance(true);
-        }
-        if (isConnected) {
+        } else if (isConnected) {
             getAllowance();
         }
     }, [
@@ -212,7 +212,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
 
         const chainedSpeedMarketsAMMContractWithSigner = getContract({
-            abi: chainedSpeedMarketsAMMContract.abi,
+            abi: getContractAbi(chainedSpeedMarketsAMMContract, networkId),
             address: chainedSpeedMarketsAMMContract.addresses[networkId],
             client: walletClient.data as Client,
         }) as ViemContract;
@@ -305,7 +305,9 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                             collateralAddress,
                             chainedSpeedMarketsAMMContractWithSigner,
                             'resolveMarketWithOfframp',
-                            [position.market, priceUpdateDataArray, collateralAddress, isEth]
+                            [position.market, priceUpdateDataArray, collateralAddress, isEth],
+                            undefined,
+                            isEth
                         );
                     }
                 } else {
@@ -367,7 +369,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
             <Button
                 {...getDefaultButtonProps(isMobile)}
                 minWidth={isOverview && !isMobile ? '150px' : getDefaultButtonProps(isMobile).minWidth}
-                disabled={isSubmitting || (isOverview && !position.canResolve)}
+                disabled={isSubmitting || (isOverview && (!position.canResolve || !isConnected))}
                 additionalStyles={additionalButtonStyle}
                 onClick={() =>
                     hasAllowance || isDefaultCollateral || isOverview ? handleResolve() : setOpenApprovalModal(true)

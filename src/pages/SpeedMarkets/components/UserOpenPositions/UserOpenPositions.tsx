@@ -6,7 +6,7 @@ import { millisecondsToSeconds } from 'date-fns';
 import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import { Tab, Tabs } from 'pages/Profile/styled-components';
-import { CollateralSelectorContainer } from 'pages/SpeedMarkets/components/MyPositionAction/MyPositionAction';
+import { CollateralSelectorContainer } from 'pages/SpeedMarkets/components/PositionAction/PositionAction';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
 import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveSpeedMarketsDataQuery';
@@ -398,7 +398,9 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
             </Header>
             <PositionsWrapper $noPositions={noPositions}>
                 {isLoading ? (
-                    <SimpleLoader />
+                    <LoaderWrapper>
+                        <SimpleLoader />
+                    </LoaderWrapper>
                 ) : isChainedSelected && !noPositions ? (
                     // CHAINED
                     isMobile ? (
@@ -553,9 +555,9 @@ const PositionsControl = styled(FlexDiv)<{ $isAlignEnd: boolean }>`
 
 const PositionsWrapper = styled.div<{ $noPositions?: boolean }>`
     position: relative;
-    min-height: 200px;
     width: 100%;
     ${(props) => (props.$noPositions ? 'filter: blur(10px);' : '')}
+    ${(props) => (props.$noPositions ? 'min-height: 200px;' : '')}
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         min-height: unset;
     }
@@ -595,6 +597,10 @@ const NoPositionsText = styled.span`
     line-height: 100%;
     color: ${(props) => props.theme.textColor.secondary};
     min-width: max-content;
+`;
+
+const LoaderWrapper = styled.div`
+    min-height: 200px;
 `;
 
 export default UserOpenPositions;

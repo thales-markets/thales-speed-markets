@@ -1,26 +1,19 @@
+import { DEFAULT_SESSION_KEY_MANAGER_MODULE, createSessionKeyManagerModule } from '@biconomy/account';
 import { PaymasterMode } from '@biconomy/paymaster';
-import biconomyConnector from './biconomyWallet';
+import { LOCAL_STORAGE_KEYS } from 'constants/storage';
+import { addMonths } from 'date-fns';
 import { SupportedNetwork } from 'types/network';
 import { ViemContract } from 'types/viem';
-import {
-    Client,
-    createPublicClient,
-    createWalletClient,
-    encodeFunctionData,
-    erc20Abi,
-    getContract,
-    http,
-    maxUint256,
-} from 'viem';
+import { Client, createWalletClient, encodeFunctionData, erc20Abi, getContract, http, maxUint256 } from 'viem';
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
-import { DEFAULT_SESSION_KEY_MANAGER_MODULE, createSessionKeyManagerModule } from '@biconomy/account';
-
-import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
-import erc20Contract from './contracts/collateralContract';
+import biconomyConnector from './biconomyWallet';
+import { getContractAbi } from './contracts/abi';
 import chainedSpeedMarketsAMMContract from './contracts/chainedSpeedMarketsAMMContract';
-import { LOCAL_STORAGE_KEYS } from 'constants/storage';
+import erc20Contract from './contracts/collateralContract';
 import multipleCollateral from './contracts/multipleCollateralContract';
-import { addMonths } from 'date-fns';
+import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
+import { wagmiConfig } from 'pages/Root/wagmiConfig';
+import { getPublicClient } from '@wagmi/core';
 
 export const executeBiconomyTransactionWithConfirmation = async (
     collateral: string,
@@ -80,7 +73,7 @@ export const executeBiconomyTransaction = async (
         console.log('buyInAmountParam: ', buyInAmountParam);
 
         const encodedCall = encodeFunctionData({
-            abi: contract.abi,
+            abi: getContractAbi(contract, networkId),
             functionName: methodName,
             args: data ? data : ([] as any),
         });
@@ -104,10 +97,7 @@ export const executeBiconomyTransaction = async (
                 );
                 if (isEth) {
                     // swap eth to weth
-                    const client = createPublicClient({
-                        chain: networkId as any,
-                        transport: http(biconomyConnector.wallet?.rpcProvider.transport.url),
-                    });
+                    const client = getPublicClient(wagmiConfig, { chainId: networkId });
 
                     const wethContractWithSigner = getContract({
                         abi: multipleCollateral.WETH.abi,
@@ -170,10 +160,7 @@ export const executeBiconomyTransaction = async (
                 const transactionArray = [];
                 if (isEth) {
                     // swap eth to weth
-                    const client = createPublicClient({
-                        chain: networkId as any,
-                        transport: http(biconomyConnector.wallet?.rpcProvider.transport.url),
-                    });
+                    const client = getPublicClient(wagmiConfig, { chainId: networkId });
 
                     const wethContractWithSigner = getContract({
                         abi: multipleCollateral.WETH.abi,
@@ -354,32 +341,3 @@ const getSessionSigner = async (networkId: SupportedNetwork) => {
     });
     return sessionSigner;
 };
-
-// const hasAllowance = async (networkId: SupportedNetwork, collateralAddress: `0x${string}`) => {
-//     // get client to check allowance
-//     const client = createPublicClient({
-//         chain: networkId as any,
-//         transport: http(biconomyConnector.wallet?.rpcProvider.transport.url),
-//     });
-
-//     const erc20Instance = getContract({
-//         abi: erc20Contract.abi,
-//         address: collateralAddress,
-//         client: client,
-//     });
-
-//     const hasAllowance = await checkAllowance(
-//         maxUint256,
-//         erc20Instance,
-//         biconomyConnector.address,
-//         speedMarketsAMMContract.addresses[networkId]
-//     );
-//     return hasAllowance;
-// };
-
-// const getSupportedPaymasterTokensForNetwork = (networkId: SupportedNetwork) => {
-//     const collaterals = getCollaterals(networkId);
-//     return collaterals.map((coin) => {
-//         return multipleCollateral[coin].addresses[networkId];
-//     });
-// };

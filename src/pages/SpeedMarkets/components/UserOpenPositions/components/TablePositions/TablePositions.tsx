@@ -1,17 +1,17 @@
 import Table from 'components/Table';
+import { PAGINATION_SIZE } from 'components/Table/Table';
 import { USD_SIGN } from 'constants/currency';
+import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 import { t } from 'i18next';
-import MyPositionAction from 'pages/SpeedMarkets/components/MyPositionAction';
+import PositionAction from 'pages/SpeedMarkets/components/PositionAction';
 import React from 'react';
 import styled from 'styled-components';
 import { formatCurrencyWithSign, localStore } from 'thales-utils';
 import { UserPosition } from 'types/market';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import MarketPrice from '../../../MarketPrice';
-import SharePosition from '../../../SharePosition';
-import { PAGINATION_SIZE } from 'components/Table/Table';
-import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 import { Icon } from '../../../SelectPosition/styled-components';
+import SharePosition from '../../../SharePosition';
 
 type TablePositionsProps = {
     data: UserPosition[];
@@ -93,7 +93,7 @@ const TablePositions: React.FC<TablePositionsProps> = ({ data }) => {
             accessorKey: 'action',
             cell: (cellProps: any) => (
                 <Wrapper>
-                    <MyPositionAction position={cellProps.row.original} />
+                    <PositionAction position={cellProps.row.original} />
                 </Wrapper>
             ),
             size: 300,
