@@ -1,3 +1,4 @@
+import { AuthCoreContextProvider } from '@particle-network/auth-core-modal';
 import { RainbowKitProvider, darkTheme } from '@rainbow-me/rainbowkit';
 import '@rainbow-me/rainbowkit/styles.css';
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -9,15 +10,16 @@ import { ThemeMap } from 'constants/ui';
 import { merge } from 'lodash';
 import React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
+import { useTranslation } from 'react-i18next';
 import { Provider } from 'react-redux';
 import { Store } from 'redux';
+import { PARTICLE_STYLE } from 'utils/particleWallet/utils';
 import queryConnector from 'utils/queryConnector';
 import { getDefaultTheme } from 'utils/style';
 import { WagmiProvider } from 'wagmi';
+import enTranslation from '../../i18n/en.json';
 import App from './App';
 import { wagmiConfig } from './wagmiConfig';
-import { AuthCoreContextProvider } from '@particle-network/auth-core-modal';
-import { PARTICLE_STYLE } from 'utils/particleWallet/utils';
 
 window.Buffer = window.Buffer || buffer;
 
@@ -44,6 +46,11 @@ const rainbowCustomTheme = merge(darkTheme(), {
 queryConnector.setQueryClient();
 
 const Root: React.FC<RootProps> = ({ store }) => {
+    // particle context provider is overriding our i18n configuration and languages, so we need to add our localization after the initialization of particle context
+    // initialization of particle context is happening in Root
+    const { i18n } = useTranslation();
+    i18n.addResourceBundle('en', 'translation', enTranslation, true);
+
     PLAUSIBLE.enableAutoPageviews();
     return (
         <ErrorBoundary fallback={<UnexpectedError theme={ThemeMap[theme]} />} onError={() => {}}>

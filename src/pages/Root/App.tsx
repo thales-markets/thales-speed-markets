@@ -1,4 +1,6 @@
 import { createSmartAccountClient } from '@biconomy/account';
+import { AuthCoreEvent, SocialAuthType, getLatestAuthType, particleAuth } from '@particle-network/auth-core';
+import { useConnect as useParticleConnect, useSolana } from '@particle-network/auth-core-modal';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import Loader from 'components/Loader';
 import UnsupportedNetwork from 'components/UnsupportedNetwork';
@@ -6,31 +8,27 @@ import ROUTES from 'constants/routes';
 import DappLayout from 'layouts/DappLayout';
 import MainLayout from 'layouts/MainLayout';
 import ThemeProvider from 'layouts/Theme';
+import Deposit from 'pages/AARelatedPages/Deposit';
 import LandingPage from 'pages/LandingPage';
 import Profile from 'pages/Profile';
 import SpeedMarkets from 'pages/SpeedMarkets';
 import SpeedMarketsOverview from 'pages/SpeedMarketsOverview';
 import { Suspense, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Redirect, Route, Router, Switch } from 'react-router-dom';
 import { setAppReady } from 'redux/modules/app';
 import { setIsMobile } from 'redux/modules/ui';
+import { setIsBiconomy } from 'redux/modules/wallet';
 import { createGlobalStyle } from 'styled-components';
 import { SupportedNetwork } from 'types/network';
+import biconomyConnector from 'utils/biconomyWallet';
 import { isMobile } from 'utils/device';
 import { getSupportedNetworksByRoute, isNetworkSupported } from 'utils/network';
+import { particleWagmiWallet } from 'utils/particleWallet/particleWagmiWallet';
+import { isSocialLogin } from 'utils/particleWallet/utils';
 import queryConnector from 'utils/queryConnector';
 import { history } from 'utils/routes';
 import { useAccount, useChainId, useConnect, useDisconnect, useSwitchChain, useWalletClient } from 'wagmi';
-import enTranslation from '../../i18n/en.json';
-import biconomyConnector from 'utils/biconomyWallet';
-import { setIsBiconomy } from 'redux/modules/wallet';
-import { particleWagmiWallet } from 'utils/particleWallet/particleWagmiWallet';
-import { useConnect as useParticleConnect, useSolana } from '@particle-network/auth-core-modal';
-import { AuthCoreEvent, getLatestAuthType, particleAuth, SocialAuthType } from '@particle-network/auth-core';
-import { isSocialLogin } from 'utils/particleWallet/utils';
-import Deposit from 'pages/AARelatedPages/Deposit';
 
 const App = () => {
     const dispatch = useDispatch();
@@ -43,11 +41,6 @@ const App = () => {
     const { connectionStatus } = useParticleConnect();
     const { address: solanaAddress, enable } = useSolana();
 
-    // particle context provider is overriding our i18n configuration and languages, so we need to add our localization after the initialization of particle context
-    // initialization of particle context is happening in Root
-    const { i18n } = useTranslation();
-    i18n.addResourceBundle('en', 'translation', enTranslation, true);
-
     queryConnector.setQueryClient();
 
     useEffect(() => {
@@ -55,7 +48,7 @@ const App = () => {
     }, [dispatch]);
 
     useEffect(() => {
-        if (window.ethereum) {
+        if (window.ethereum && window.ethereum.on) {
             window.ethereum.on('chainChanged', (chainIdParam: string) => {
                 const ethereumChainId = Number.isInteger(chainIdParam)
                     ? Number(chainIdParam)
