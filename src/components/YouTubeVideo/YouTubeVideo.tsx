@@ -19,6 +19,7 @@ const YouTubeVideo: React.FC<YouTubeVideoProps> = ({ source, title }) => {
 
 const IFrame = styled.iframe`
     width: 100%;
+    height: 100%;
     aspect-ratio: 16 / 9;
     border-radius: inherit;
 `;
