@@ -251,7 +251,10 @@ const LandingPage: React.FC = () => {
                     </VideoRocketWrapper>
 
                     <Video>
-                        <YouTubeVideo source="https://www.youtube.com/embed/fk05qbqbuZo?rel=0" title="Speed Markets" />
+                        <YouTubeVideo
+                            source="https://www.youtube.com/embed/izARYi8nDm0?rel=0"
+                            title="Speed Markets Tutoria"
+                        />
                     </Video>
                 </VideoWrapper>
 
