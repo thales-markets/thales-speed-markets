@@ -127,7 +127,6 @@ const Table: React.FC<TableProps> = ({
                             id={header.id}
                         >
                             <HeaderTitle cssProp={header.headTitleStyle}>
-                                {' '}
                                 {flexRender(header.column.columnDef.header, header.getContext())}{' '}
                             </HeaderTitle>
                             {header.sortable && (

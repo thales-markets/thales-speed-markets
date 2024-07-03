@@ -122,7 +122,7 @@ const TablePositions: React.FC<TablePositionsProps> = ({
         },
     ];
 
-    return <Table data={data} columns={columns as any} />;
+    return <Table data={data} columns={columns as any} columnsDeps={[isAdmin, isSubmittingBatch]} />;
 };
 
 export const Header = styled.p`
