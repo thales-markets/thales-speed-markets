@@ -555,7 +555,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 refetchSpeedMarketsLimits(isChained, networkId);
                 refetchBalances(userAddress, networkId);
             },
-            onError: (error) => console.log('Error on watch event MarketCreatedWithFees', error),
+            onError: (error: Error) => console.log('Error on watch event MarketCreatedWithFees', error),
         });
 
         try {
