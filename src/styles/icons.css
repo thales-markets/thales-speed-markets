@@ -210,6 +210,10 @@
     content: '\002A';
 }
 
+.icon--pyth-rewards:before {
+    content: '\00AE';
+}
+
 .icon--market:before {
     content: '\002F';
 }
@@ -253,7 +257,6 @@
 .icon--time:before {
     content: '\003C';
 }
-
 
 .icon--stats:before {
     content: '\0041';
