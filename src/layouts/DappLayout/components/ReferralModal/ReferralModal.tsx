@@ -94,7 +94,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                address: isBiconomy ? biconomyConnector.address : walletAddress,
+                walletAddress,
                 reffererID: referrerID,
                 signature,
                 previousReffererID: savedReferrerID,
@@ -113,7 +113,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
                 getSuccessToastOptions('', 'customId')
             );
         }
-    }, [referrerID, isBiconomy, walletAddress, savedReferrerID, t, referralPage, signMessageAsync]);
+    }, [referrerID, walletAddress, savedReferrerID, t, referralPage, signMessageAsync]);
 
     const copyLink = () => {
         navigator.clipboard.writeText(referralLink);
