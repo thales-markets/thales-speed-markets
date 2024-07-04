@@ -383,8 +383,14 @@
         "docs": "Docs and Tutorials",
         "withdraw": "Withdraw",
         "referral": "Referral",
+        "pyth": "Pyth Rewards",
         "trading-profile": "Trading Profile",
         "logout": "Logout",
         "session-valid": "Session valid until"
+    },
+    "pyth-rewards": {
+        "your-address": "Your solana address for receiving pyth rewards:",
+        "info": "(To access your Solana wallet, go to wallet.particle.network and login with the same social account as on this dApp.)",
+        "input-label": "Input/change your solana address:"
     }
 }

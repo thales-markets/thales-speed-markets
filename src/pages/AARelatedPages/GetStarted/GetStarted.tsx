@@ -17,11 +17,10 @@ import Modal from 'components/Modal';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 
 type GetStartedProps = {
-    isOpen: boolean;
     onClose: () => void;
 };
 
-const GetStarted: React.FC<GetStartedProps> = ({ isOpen, onClose }) => {
+const GetStarted: React.FC<GetStartedProps> = ({ onClose }) => {
     const { t } = useTranslation();
 
     const networkId = useChainId();
@@ -81,7 +80,7 @@ const GetStarted: React.FC<GetStartedProps> = ({ isOpen, onClose }) => {
     }, [isWalletConnected, totalBalanceValue]);
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} shouldCloseOnOverlayClick={false} title={t('get-started.title')}>
+        <Modal onClose={onClose} shouldCloseOnOverlayClick={false} title={t('get-started.title')}>
             <Container>
                 <ProgressDisplayWrapper>
                     {steps.map((step, index) => {
