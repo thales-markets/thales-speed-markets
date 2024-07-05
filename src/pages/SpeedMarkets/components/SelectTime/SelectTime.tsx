@@ -32,7 +32,7 @@ type SelectTimeProps = {
 
 const SPEED_NUMBER_OF_BUTTONS = 4;
 
-const CHAINED_TIMEFRAMES_MINUTES = [2, 5, 10];
+const CHAINED_TIMEFRAMES_MINUTES = [5, 10];
 
 const SelectTime: React.FC<SelectTimeProps> = ({
     selectedDeltaSec,
