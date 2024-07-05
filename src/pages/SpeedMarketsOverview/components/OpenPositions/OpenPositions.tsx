@@ -91,9 +91,12 @@ const OpenPositions: React.FC = () => {
         [activeSpeedMarketsDataQuery]
     );
 
-    const activeSpeedNotMatured: UserPosition[] = activeSpeedMarketsData.filter(
-        (marketData) => marketData.maturityDate >= Date.now()
-    );
+    const activeSpeedNotMatured: UserPosition[] = activeSpeedMarketsData
+        .filter((marketData) => marketData.maturityDate >= Date.now())
+        .map((marketData) => {
+            const fetchedCurrentPrice = currentPrices[marketData.currencyKey];
+            return { ...marketData, currentPrice: fetchedCurrentPrice ? fetchedCurrentPrice : marketData.currentPrice };
+        });
     const activeSpeedMatured = activeSpeedMarketsData.filter((marketData) => marketData.maturityDate < Date.now());
 
     const priceRequests = activeSpeedMatured.map((marketData) => ({
