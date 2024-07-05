@@ -43,11 +43,10 @@ type FormValidation = {
 };
 
 type DepositProps = {
-    isOpen: boolean;
     onClose: () => void;
 };
 
-const Withdraw: React.FC<DepositProps> = ({ isOpen, onClose }) => {
+const Withdraw: React.FC<DepositProps> = ({ onClose }) => {
     const { t } = useTranslation();
     const networkId = useChainId();
     const walletAddress = biconomyConnector.address;
@@ -137,12 +136,7 @@ const Withdraw: React.FC<DepositProps> = ({ isOpen, onClose }) => {
     };
 
     return (
-        <Modal
-            title={t('withdraw.heading-withdraw')}
-            onClose={onClose}
-            isOpen={isOpen}
-            shouldCloseOnOverlayClick={true}
-        >
+        <Modal title={t('withdraw.heading-withdraw')} onClose={onClose} shouldCloseOnOverlayClick={true}>
             <OutsideClick onOutsideClick={onClose}>
                 <Wrapper>
                     <FormContainer>

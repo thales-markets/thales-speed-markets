@@ -68,6 +68,7 @@ const QUERY_KEYS = {
             walletAddress,
             networkId,
         ],
+        Solana: (walletAddress: string) => ['user', 'solana', walletAddress],
     },
     Profile: {
         Data: (walletAddress: string, networkId: NetworkId) => ['profile', 'data', walletAddress, networkId],
