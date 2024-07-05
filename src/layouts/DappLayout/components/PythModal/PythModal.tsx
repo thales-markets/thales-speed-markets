@@ -19,11 +19,11 @@ import RewardsImg from 'assets/images/pyth/pyth-rewards.png';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import { LINKS } from 'constants/links';
 
-type ReferralModalProps = {
+type PythModalProps = {
     onClose: () => void;
 };
 
-const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
+const PythModal: React.FC<PythModalProps> = ({ onClose }) => {
     const { t } = useTranslation();
     const { openConnectModal } = useConnectModal();
 
@@ -142,4 +142,4 @@ const InputLabel = styled.p`
     margin-bottom: 2px;
 `;
 
-export default ReferralModal;
+export default PythModal;
