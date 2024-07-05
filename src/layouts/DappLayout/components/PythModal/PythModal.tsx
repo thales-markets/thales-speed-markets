@@ -4,9 +4,7 @@ import Modal from 'components/Modal';
 import ToastMessage from 'components/ToastMessage';
 import { getErrorToastOptions, getSuccessToastOptions } from 'components/ToastMessage/ToastMessage';
 import TextInput from 'components/fields/TextInput';
-import { LINKS } from 'constants/links';
-import { ScreenSizeBreakpoint } from 'enums/ui';
-import useGetReffererIdQuery from 'queries/referral/useGetReffererIdQuery';
+import useSolanaAddressForWalletQuery from 'queries/solana/useSolanaAddressForWalletQuery';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -17,6 +15,9 @@ import { BoldText, FlexDivColumnCentered, FlexDivRowCentered } from 'styles/comm
 import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
 import { useAccount, useSignMessage } from 'wagmi';
+import RewardsImg from 'assets/images/pyth/pyth-rewards.png';
+import { ScreenSizeBreakpoint } from 'enums/ui';
+import { LINKS } from 'constants/links';
 
 type ReferralModalProps = {
     onClose: () => void;
@@ -31,17 +32,20 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
     const { signMessageAsync } = useSignMessage();
     const [solanaAddress, setSolanaAddress] = useState('');
 
-    const referrerIDQuery = useGetReffererIdQuery((isBiconomy ? biconomyConnector.address : walletAddress) as string, {
-        enabled: isConnected,
-    });
+    const solanaAddressQuery = useSolanaAddressForWalletQuery(
+        (isBiconomy ? biconomyConnector.address : walletAddress) as string,
+        {
+            enabled: isConnected,
+        }
+    );
 
     useEffect(() => {
-        if (referrerIDQuery.isSuccess && referrerIDQuery.data) {
-            setSolanaAddress(referrerIDQuery.data);
+        if (solanaAddressQuery.isSuccess && solanaAddressQuery.data) {
+            setSolanaAddress(solanaAddressQuery.data);
         } else {
             setSolanaAddress('');
         }
-    }, [referrerIDQuery.isSuccess, referrerIDQuery.data]);
+    }, [solanaAddressQuery.isSuccess, solanaAddressQuery.data]);
 
     const generateLinkHandler = useCallback(async () => {
         const signature = await signMessageAsync({ message: solanaAddress });
@@ -52,78 +56,90 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
             },
             body: JSON.stringify({
                 walletAddress,
+                smartAccountAddress: isBiconomy ? biconomyConnector.address : undefined,
                 solanaAddress,
                 signature,
             }),
         });
         if (!response.ok) {
             toast(
-                <ToastMessage id="customId" type="error" message={t('common.referral.generate.id-exists')} />,
+                <ToastMessage id="customId" type="error" message={t('common.errors.unknown-error-try-again')} />,
                 getErrorToastOptions('', 'customId')
             );
         } else {
             toast(
-                <ToastMessage id="customId" type="success" message={t('common.referral.generate.id-create-success')} />,
+                <ToastMessage id="customId" type="success" message={t('pyth-rewards.success')} />,
                 getSuccessToastOptions('', 'customId')
             );
         }
-    }, [solanaAddress, walletAddress, t, signMessageAsync]);
-
-    // const copyLink = () => {
-    //     navigator.clipboard.writeText(solanaAddress);
-    //     toast(
-    //         <ToastMessage id="customId" type="success" message={t('common.referral.copied')} />,
-    //         getSuccessToastOptions('', 'customId')
-    //     );
-    // };
+    }, [solanaAddress, walletAddress, isBiconomy, t, signMessageAsync]);
 
     return (
-        <Modal title={t('common.referral.title')} onClose={onClose} shouldCloseOnOverlayClick={true} width="auto">
-            <Container>
-                <Info>
-                    <Trans i18nKey={'common.referral.info'} components={{ bold: <BoldText /> }} />
-                </Info>
-                <RowWrapper>
-                    <TextInput
-                        value={solanaAddress}
-                        onChange={(e: any) => setSolanaAddress(e.target.value)}
-                        placeholder={t('common.referral.choose-referral-placeholder')}
-                        width="100%"
-                        height="38px"
-                    />
-                </RowWrapper>
-                <RowWrapper marginBottom="20px">
-                    <Button
-                        width="100%"
-                        disabled={isConnected && !solanaAddress}
-                        onClick={isConnected ? generateLinkHandler : openConnectModal}
-                    >
-                        {isConnected ? t('common.referral.generate.link-btn') : t('common.wallet.connect-your-wallet')}
-                    </Button>
-                </RowWrapper>
-            </Container>
+        <Modal title={t('pyth-rewards.title')} onClose={onClose} shouldCloseOnOverlayClick={true} width="auto">
+            <Wrapper>
+                <Container>
+                    <Info>
+                        <Trans i18nKey={'pyth-rewards.airdrop-info'} components={{ bold: <BoldText /> }} />
+                    </Info>
+                    <div>
+                        <InputLabel>{t('pyth-rewards.input-label')}</InputLabel>
+                        <TextInput
+                            value={solanaAddress}
+                            onChange={(e: any) => setSolanaAddress(e.target.value)}
+                            placeholder={t('pyth-rewards.input-label')}
+                            width="100%"
+                            height="38px"
+                        />
+                    </div>
+
+                    <RowWrapper marginBottom="20px">
+                        <Button
+                            width="100%"
+                            disabled={isConnected && !solanaAddress}
+                            onClick={isConnected ? generateLinkHandler : openConnectModal}
+                        >
+                            {isConnected ? t('pyth-rewards.submit') : t('common.wallet.connect-your-wallet')}
+                        </Button>
+                    </RowWrapper>
+                </Container>
+                <img src={RewardsImg} />
+            </Wrapper>
         </Modal>
     );
 };
 
-const Container = styled(FlexDivColumnCentered)`
-    width: 340px;
+const Wrapper = styled(FlexDivRowCentered)`
     @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
-        width: 325px;
+        margin-top: 20px;
+        flex-direction: column;
     }
 `;
 
+const Container = styled(FlexDivColumnCentered)`
+    max-width: 620px;
+    gap: 20px;
+`;
+
 const Info = styled.p`
-    font-size: 13px;
-    line-height: 110%;
+    font-size: 14px;
+    font-weight: 500;
     color: ${(props) => props.theme.textColor.secondary};
     text-align: justify;
-    margin-top: 20px;
 `;
 
 const RowWrapper = styled(FlexDivRowCentered)<{ marginBottom?: string }>`
-    padding-left: 44px;
     margin-bottom: ${(props) => props.marginBottom || '0px'};
+`;
+
+const InputLabel = styled.p`
+    font-family: ${(props) => props.theme.fontFamily.primary};
+    color: ${(props) => props.theme.textColor.primary};
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -0.28px;
+    line-height: normal;
+    text-transform: uppercase;
+    margin-bottom: 2px;
 `;
 
 export default ReferralModal;
