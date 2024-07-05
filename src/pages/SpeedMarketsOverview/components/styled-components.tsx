@@ -35,7 +35,7 @@ export const Title = styled.span`
 
 export const PositionsWrapper = styled.div`
     position: relative;
-    min-height: 200px;
+    min-height: 100px;
     width: 100%;
     @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         min-height: 120px;
