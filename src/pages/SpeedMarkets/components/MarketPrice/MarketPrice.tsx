@@ -55,8 +55,10 @@ const MarketPrice: React.FC<{ position: UserPosition | UserHistoryPosition; isRe
                         <Tooltip overlay={t('speed-markets.tooltips.final-price-missing')} />
                     </>
                 )
-            ) : (
+            ) : position.currentPrice > 0 ? (
                 formatCurrencyWithSign(USD_SIGN, position.currentPrice)
+            ) : (
+                <>{'. . .'}</>
             )}
         </>
     );

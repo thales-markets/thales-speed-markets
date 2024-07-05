@@ -46,8 +46,10 @@ const ChainedMarketPrice: React.FC<{ position: UserChainedPosition; isStrikePric
                     {'. . .'}
                     <Tooltip overlay={t('speed-markets.tooltips.final-price-missing')} />
                 </>
-            ) : (
+            ) : position.currentPrice > 0 ? (
                 formatCurrencyWithSign(USD_SIGN, position.currentPrice)
+            ) : (
+                <>{'. . .'}</>
             )}
         </>
     );
