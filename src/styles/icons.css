@@ -210,10 +210,6 @@
     content: '\002A';
 }
 
-.icon--pyth-rewards:before {
-    content: '\00AE';
-}
-
 .icon--market:before {
     content: '\002F';
 }
@@ -460,6 +456,10 @@
 
 .icon--caret-up-empty:before {
     content: '\007D';
+}
+
+.icon--pyth-rewards:before {
+    content: '\00AE';
 }
 
 .icon--share:before {
