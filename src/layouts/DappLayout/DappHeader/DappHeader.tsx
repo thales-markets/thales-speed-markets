@@ -26,6 +26,7 @@ import { getCollaterals, isStableCurrency } from 'utils/currency';
 import { Coins } from 'thales-utils';
 import { navigateTo } from 'utils/routes';
 import ROUTES from 'constants/routes';
+import PythModal from '../components/PythModal';
 
 const DappHeader: React.FC = () => {
     const { t } = useTranslation();
@@ -45,6 +46,7 @@ const DappHeader: React.FC = () => {
     const [openGetStarted, setOpenGetStarted] = useState(false);
     const [openUserInfo, setOpenUserInfo] = useState(false);
     const [openWithdraw, setOpenWithdraw] = useState(false);
+    const [openPythModal, setPythModalOpen] = useState(false);
 
     const burgerMenuRef = useRef<HTMLElement>(null);
 
@@ -159,13 +161,15 @@ const DappHeader: React.FC = () => {
                         setUserInfoOpen={setOpenUserInfo}
                         setOpenWithdraw={setOpenWithdraw}
                         setOpenReferralModal={setOpenReferralModal}
+                        setPythModalOpen={setPythModalOpen}
                         skipOutsideClickOnElement={burgerMenuRef}
                     />
                 )}
             </RightContainer>
             {openReferralModal && <ReferralModal onClose={() => setOpenReferralModal(false)} />}
-            {openGetStarted && <GetStarted isOpen={openGetStarted} onClose={() => setOpenGetStarted(false)} />}
-            {openWithdraw && <Withdraw isOpen={openWithdraw} onClose={() => setOpenWithdraw(false)} />}
+            {openGetStarted && <GetStarted onClose={() => setOpenGetStarted(false)} />}
+            {openWithdraw && <Withdraw onClose={() => setOpenWithdraw(false)} />}
+            {openPythModal && <PythModal onClose={() => setPythModalOpen(false)} />}
 
             <ConnectWalletModal
                 isOpen={connectWalletModalVisibility}

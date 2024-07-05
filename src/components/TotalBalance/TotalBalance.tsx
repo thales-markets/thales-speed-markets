@@ -156,7 +156,7 @@ const TotalBalance: React.FC<TotalBalanceProps> = ({ hideDepositButton }) => {
                     </TokenBalancesWrapper>
                 </BalanceWrapper>
             </GradientContainer>
-            {openWithdraw && <Withdraw isOpen={openWithdraw} onClose={() => setOpenWithdraw(false)} />}
+            {openWithdraw && <Withdraw onClose={() => setOpenWithdraw(false)} />}
         </>
     );
 };
