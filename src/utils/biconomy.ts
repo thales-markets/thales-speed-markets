@@ -4,7 +4,7 @@ import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 import { addMonths } from 'date-fns';
 import { SupportedNetwork } from 'types/network';
 import { ViemContract } from 'types/viem';
-import { Client, createWalletClient, encodeFunctionData, erc20Abi, getContract, http, maxUint256 } from 'viem';
+import { Address, Client, createWalletClient, encodeFunctionData, erc20Abi, getContract, http, maxUint256 } from 'viem';
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts';
 import biconomyConnector from './biconomyWallet';
 import { getContractAbi } from './contracts/abi';
@@ -14,6 +14,7 @@ import multipleCollateral from './contracts/multipleCollateralContract';
 import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
 import { wagmiConfig } from 'pages/Root/wagmiConfig';
 import { getPublicClient } from '@wagmi/core';
+import sessionValidationContract from './contracts/sessionValidationContract';
 
 export const executeBiconomyTransactionWithConfirmation = async (
     collateral: string,
@@ -188,7 +189,7 @@ export const executeBiconomyTransaction = async (
                         ? {
                               params: {
                                   sessionSigner: sessionSigner,
-                                  sessionValidationModule: import.meta.env['VITE_APP_SVM_ADDRESS_' + networkId],
+                                  sessionValidationModule: sessionValidationContract.addresses[networkId],
                               },
                           }
                         : {
@@ -198,7 +199,7 @@ export const executeBiconomyTransaction = async (
                               },
                               params: {
                                   sessionSigner: sessionSigner,
-                                  sessionValidationModule: import.meta.env['VITE_APP_SVM_ADDRESS_' + networkId],
+                                  sessionValidationModule: sessionValidationContract.addresses[networkId],
                               },
                           }
                 );
@@ -244,9 +245,9 @@ const getCreateSessionTxs = async (networkId: SupportedNetwork, collateralAddres
             {
                 validUntil: Math.floor(sixMonths.getTime() / 1000),
                 validAfter: Math.floor(dateAfter.getTime() / 1000),
-                sessionValidationModule: import.meta.env['VITE_APP_SVM_ADDRESS_' + networkId],
-                sessionPublicKey: sessionKeyEOA.address as `0x${string}`,
-                sessionKeyData: sessionKeyEOA.address as `0x${string}`,
+                sessionValidationModule: sessionValidationContract.addresses[networkId],
+                sessionPublicKey: sessionKeyEOA.address as Address,
+                sessionKeyData: sessionKeyEOA.address as Address,
             },
         ]);
 
