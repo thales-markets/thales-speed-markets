@@ -4,11 +4,11 @@ import { Address } from 'viem';
 
 const sessionValidationContract = {
     addresses: {
-        [NetworkId.OptimismMainnet]: '0x2Ef105720df33672120ecDD9CBaeE1D699C62085' as Address,
+        [NetworkId.OptimismMainnet]: '0x78D089FCD2308011E87B9a5b85cD309d29e9cF1e' as Address,
         [NetworkId.OptimismSepolia]: ZERO_ADDRESS,
-        [NetworkId.PolygonMainnet]: '0x2aA3952b82848112638FF5797feC22d74898f75E' as Address,
-        [NetworkId.Arbitrum]: '0x56493d33dfe1e6604F028618AaAe729bacA21AbB' as Address,
-        [NetworkId.Base]: '0x0f4B636648E0071Afdb8E3c5f97e9F40F80479f9' as Address,
+        [NetworkId.PolygonMainnet]: '0x0Cfff1E16E8956439DD33d8350949ca669dBD371' as Address,
+        [NetworkId.Arbitrum]: '0x94d06B770D41D9b3A3bb2E636F3F93F69909099f' as Address,
+        [NetworkId.Base]: '0x1E82dbfb6BefF4b4799a1a688d09B259eb173F64' as Address,
     },
     abi: [
         {
