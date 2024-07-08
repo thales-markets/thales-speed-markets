@@ -26,8 +26,6 @@ import { wagmiConfig } from 'pages/Root/wagmiConfig';
 import TradingDetailsSentence from 'pages/SpeedMarkets/components/TradingDetailsSentence';
 import useExchangeRatesQuery, { Rates } from 'queries/rates/useExchangeRatesQuery';
 import useAmmSpeedMarketsCreatorQuery from 'queries/speedMarkets/useAmmSpeedMarketsCreatorQuery';
-import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipleCollateralBalanceQuery';
-import useStableBalanceQuery from 'queries/walletBalances/useStableBalanceQuery';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
@@ -39,7 +37,6 @@ import styled from 'styled-components';
 import { FlexDivCentered, FlexDivColumn, FlexDivRow, FlexDivRowCentered, GradientContainer } from 'styles/common';
 import {
     COLLATERAL_DECIMALS,
-    NetworkId,
     bigNumberFormatter,
     ceilNumberToDecimals,
     coinParser,
@@ -61,7 +58,6 @@ import speedMarketsAMMCreatorContract from 'utils/contracts/speedMarketsAMMCreat
 import {
     convertCollateralToStable,
     convertFromStableToCollateral,
-    getCoinBalance,
     getCollateral,
     getDefaultCollateral,
     isStableCurrency,
@@ -192,39 +188,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             : null;
 
     const userAddress = (isBiconomy ? biconomyConnector.address : walletAddress) as string;
-
-    const stableBalanceQuery = useStableBalanceQuery(
-        userAddress,
-        { networkId, client },
-        {
-            enabled: isAppReady && isConnected && !isMultiCollateralSupported,
-        }
-    );
-    const multipleCollateralBalances = useMultipleCollateralBalanceQuery(
-        userAddress,
-        { networkId, client },
-        {
-            enabled: isAppReady && isConnected && isMultiCollateralSupported,
-        }
-    );
-
-    const walletBalancesMap = useMemo(() => {
-        return stableBalanceQuery.isSuccess ? stableBalanceQuery.data : null;
-    }, [stableBalanceQuery]);
-
-    const collateralBalance = useMemo(() => {
-        return isMultiCollateralSupported
-            ? multipleCollateralBalances.isSuccess
-                ? getCoinBalance(multipleCollateralBalances?.data, selectedCollateral)
-                : null
-            : (walletBalancesMap && walletBalancesMap[defaultCollateral]?.balance) || 0;
-    }, [
-        multipleCollateralBalances,
-        walletBalancesMap,
-        isMultiCollateralSupported,
-        defaultCollateral,
-        selectedCollateral,
-    ]);
 
     const exchangeRatesMarketDataQuery = useExchangeRatesQuery(
         { networkId, client },
@@ -662,59 +625,11 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         unwatch();
     };
 
-    const handleMint = async () => {
-        setIsSubmitting(true);
-        const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
-
-        const collateralWithSigner = getContract({
-            abi: erc20Contract.abi,
-            address: erc20Contract.addresses[networkId],
-            client: walletClient.data as Client,
-        }) as ViemContract;
-
-        try {
-            const hash = await collateralWithSigner.write.mintForUser([walletAddress]);
-
-            const txReceipt = await waitForTransactionReceipt(client as Client, {
-                hash,
-            });
-
-            if (txReceipt.status === 'success') {
-                toast.update(
-                    id,
-                    getSuccessToastOptions(t(`common.mint.confirmation-message`, { token: selectedCollateral }), id)
-                );
-                refetchBalances(userAddress, networkId);
-            } else {
-                console.log('Transaction status', txReceipt.status);
-                await delay(800);
-                toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
-            }
-        } catch (e) {
-            console.log(e);
-            await delay(800);
-            toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
-        }
-        setIsSubmitting(false);
-    };
-
-    const isBlastSepolia = networkId === NetworkId.BlastSepolia;
-    const isMintAvailable = isBlastSepolia && collateralBalance < paidAmount;
-
     const getSubmitButton = () => {
         if (!isConnected) {
             return (
                 <Button onClick={() => dispatch(setWalletConnectModalVisibility({ visibility: true }))}>
                     {t('common.wallet.connect-your-wallet')}
-                </Button>
-            );
-        }
-        if (isMintAvailable) {
-            return (
-                <Button onClick={handleMint}>
-                    {isSubmitting ? t('common.mint.progress-label') : t('common.mint.label')}
-                    <CollateralText>&nbsp;{selectedCollateral}</CollateralText>
-                    {isSubmitting ? '...' : ''}
                 </Button>
             );
         }

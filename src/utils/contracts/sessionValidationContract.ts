@@ -2,8 +2,6 @@ import { ZERO_ADDRESS } from 'constants/network';
 import { NetworkId } from 'thales-utils';
 import { Address } from 'viem';
 
-const ZKSYNC_ABI = [{}]; // TODO:
-
 const sessionValidationContract = {
     addresses: {
         [NetworkId.OptimismMainnet]: '0x2Ef105720df33672120ecDD9CBaeE1D699C62085' as Address,
@@ -11,9 +9,6 @@ const sessionValidationContract = {
         [NetworkId.PolygonMainnet]: '0x2aA3952b82848112638FF5797feC22d74898f75E' as Address,
         [NetworkId.Arbitrum]: '0x56493d33dfe1e6604F028618AaAe729bacA21AbB' as Address,
         [NetworkId.Base]: '0x0f4B636648E0071Afdb8E3c5f97e9F40F80479f9' as Address,
-        [NetworkId.ZkSync]: ZERO_ADDRESS, // TODO:
-        [NetworkId.ZkSyncSepolia]: ZERO_ADDRESS, // TODO:
-        [NetworkId.BlastSepolia]: ZERO_ADDRESS,
     },
     abi: [
         {
@@ -197,10 +192,6 @@ const sessionValidationContract = {
             type: 'function',
         },
     ],
-    abis: {
-        [NetworkId.ZkSync]: ZKSYNC_ABI,
-        [NetworkId.ZkSyncSepolia]: ZKSYNC_ABI,
-    },
 };
 
 export default sessionValidationContract;

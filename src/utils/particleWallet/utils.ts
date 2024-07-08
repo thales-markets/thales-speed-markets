@@ -41,10 +41,8 @@ const supportedOnramperTokens = (networkId: SupportedNetwork) => {
             return 'usdc_base,eth_base';
         case NetworkId.PolygonMainnet:
             return 'usdc_polygon';
-        case NetworkId.ZkSync:
-            return 'usdc_zksync';
         default:
-            return 'usdc_optimism, usdt_optimism, dai_optimism, op_optimism, eth_optimism, usdc_arbitrum, usdt_arbitrum, dai_arbitrum, arb_arbitrum, eth_arbitrum, usdc_base, eth_base, usdc_polygon, usdc_zksync';
+            return 'usdc_optimism, usdt_optimism, dai_optimism, op_optimism, eth_optimism, usdc_arbitrum, usdt_arbitrum, dai_arbitrum, arb_arbitrum, eth_arbitrum, usdc_base, eth_base, usdc_polygon';
     }
 };
 

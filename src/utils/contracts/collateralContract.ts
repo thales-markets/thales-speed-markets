@@ -8,9 +8,6 @@ const erc20Contract = {
         [NetworkId.PolygonMainnet]: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174' as Address, //USDCe
         [NetworkId.Arbitrum]: '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8' as Address, //USDCe
         [NetworkId.Base]: '0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA' as Address, // USDbC
-        [NetworkId.ZkSync]: '0x3355df6D4c9C3035724Fd0e3914dE96A5a83aaf4' as Address, // USDC
-        [NetworkId.ZkSyncSepolia]: '0xCa032EdCFfC65Fc5FAea69624700d61318D6f6e8' as Address, // exoticSUSD
-        [NetworkId.BlastSepolia]: '0x0E350351d27F950c92280c6B76ee49f0a64275fe' as Address, // exoticSUSD
     },
     abi: [
         { inputs: [], stateMutability: 'nonpayable', type: 'constructor' },

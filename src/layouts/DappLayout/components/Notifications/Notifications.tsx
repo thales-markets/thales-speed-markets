@@ -19,7 +19,6 @@ import { FlexDivCentered } from 'styles/common';
 import { UserChainedPosition, UserPosition } from 'types/market';
 import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
-import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { getCurrentPrices, getPriceConnection, getPriceId, getSupportedAssetsAsObject } from 'utils/pyth';
 import { buildHref } from 'utils/routes';
 import { isUserWinner } from 'utils/speedAmm';
@@ -37,8 +36,6 @@ const Notifications: React.FC = () => {
     const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
 
     const [currentPrices, setCurrentPrices] = useState<{ [key: string]: number }>(getSupportedAssetsAsObject());
-
-    const isNetworkSupportedForChained = !isOnlySpeedMarketsSupported(networkId);
 
     // SINGLE
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
@@ -85,7 +82,7 @@ const Notifications: React.FC = () => {
         { networkId, client },
         isBiconomy ? biconomyConnector.address : walletAddress || '',
         {
-            enabled: isAppReady && isConnected && isNetworkSupportedForChained,
+            enabled: isAppReady && isConnected,
         }
     );
 
