@@ -818,8 +818,8 @@ const speedMarketsAMMCreatorContract = {
         [NetworkId.PolygonMainnet]: '0xfC7105DA51017F2D990B9Fe68db343ae38060c3b' as Address,
         [NetworkId.Arbitrum]: '0x905D1732F7639a402B1E0Ffcc2CeD2270Fc16812' as Address,
         [NetworkId.Base]: '0x6B5FE966Ea9B05d8E628E772B0b745734D069983' as Address,
-        [NetworkId.ZkSync]: '0x508F31897c25C436b257E37763E157Cb53D0a6fa' as Address,
-        [NetworkId.ZkSyncSepolia]: '0xbc8A31C908c16F2958eB501Db480836AB19aCb63' as Address,
+        [NetworkId.ZkSync]: '0xecF56Fb379D35a5E04AdeBDbFB9e5AD61dFa5285' as Address,
+        [NetworkId.ZkSyncSepolia]: '0x5E20F0f124cbA651e7E26896Af656d3415862419' as Address,
         [NetworkId.BlastSepolia]: TBD_ADDRESS,
     },
     abi: [
