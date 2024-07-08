@@ -334,11 +334,7 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({
                             </Tab>
                             <Tab
                                 $active={isChainedSelected}
-                                $disabled={!isChainedSelected}
                                 onClick={() => {
-                                    if (!isChainedSelected) {
-                                        return;
-                                    }
                                     setIsChainedSelected(true);
                                     onChainedSelectedChange && onChainedSelectedChange(true);
                                 }}
