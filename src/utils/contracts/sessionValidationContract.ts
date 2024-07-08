@@ -7,7 +7,7 @@ const sessionValidationContract = {
         [NetworkId.OptimismMainnet]: '0x2Ef105720df33672120ecDD9CBaeE1D699C62085' as Address,
         [NetworkId.OptimismSepolia]: ZERO_ADDRESS,
         [NetworkId.PolygonMainnet]: '0x2aA3952b82848112638FF5797feC22d74898f75E' as Address,
-        [NetworkId.Arbitrum]: '0x56493d33dfe1e6604F028618AaAe729bacA21AbB' as Address,
+        [NetworkId.Arbitrum]: '0xeC9B4eCe0142901b853D6804BC98a5Af146F61b5' as Address,
         [NetworkId.Base]: '0x0f4B636648E0071Afdb8E3c5f97e9F40F80479f9' as Address,
     },
     abi: [
