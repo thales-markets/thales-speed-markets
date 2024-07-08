@@ -86,7 +86,4 @@ export const COLLATERALS: Record<SupportedNetwork, Coins[]> = {
         CRYPTO_CURRENCY_MAP.WETH as Coins,
         CRYPTO_CURRENCY_MAP.ETH as Coins,
     ],
-    [NetworkId.ZkSync]: [CRYPTO_CURRENCY_MAP.USDC as Coins],
-    [NetworkId.ZkSyncSepolia]: [SYNTHS_MAP.sUSD as Coins],
-    [NetworkId.BlastSepolia]: [SYNTHS_MAP.sUSD as Coins],
 };

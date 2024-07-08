@@ -7,8 +7,11 @@ import { useTheme } from 'styled-components';
 import { FlexDivColumnCentered, FlexDivSpaceBetween } from 'styles/common';
 import { formatPercentage } from 'thales-utils';
 import { ThemeInterface } from 'types/ui';
+import { getSupportedNetworksByRoute } from 'utils/network';
 import { history } from 'utils/routes';
+import { useChainId } from 'wagmi';
 import {
+    Bonus,
     ChainedPositions,
     ClearAll,
     Header,
@@ -23,8 +26,8 @@ import {
     PositionsContainer,
     PositionsSymbol,
     PositionsWrapper,
-    Bonus,
 } from './styled-components';
+import ROUTES from 'constants/routes';
 
 export type SelectedPosition = Positions.UP | Positions.DOWN | undefined;
 
@@ -50,6 +53,7 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
 }) => {
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
+    const networkId = useChainId();
 
     /*
      * Calculate ROI bonus as:
@@ -70,7 +74,12 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
                 : 0,
     };
 
+    const isChainedSupported = getSupportedNetworksByRoute(ROUTES.Markets.ChainedSpeedMarkets).includes(networkId);
+
     const onPlusMinusIconHandle = (isChained: boolean) => {
+        if (!isChainedSupported) {
+            return;
+        }
         resetData();
         setIsChained(isChained);
         history.push({
@@ -169,8 +178,10 @@ const SelectPosition: React.FC<SelectPositionProps> = ({
                                 </Bonus>
                             )}
                         </PositionWrapper>
+
                         <PlusMinusIcon
                             className="network-icon network-icon--plus"
+                            $disabled={!isChainedSupported}
                             onClick={() => onPlusMinusIconHandle(true)}
                         />
                     </>

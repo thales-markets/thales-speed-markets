@@ -19,7 +19,6 @@ import { FlexDivCentered, FlexDivStart } from 'styles/common';
 import { UserHistoryPosition } from 'types/profile';
 import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
-import { isOnlySpeedMarketsSupported } from 'utils/network';
 import { mapUserPositionToHistory } from 'utils/position';
 import { getPriceId } from 'utils/pyth';
 import { isUserWinner } from 'utils/speedAmm';
@@ -116,13 +115,12 @@ const UserHistoricalPositions: React.FC<UserHistoricalPositionsProps> = ({
     }));
 
     // CHAINED OPEN(ACTIVE)
-    const isNetworkSupportedForChained = !isOnlySpeedMarketsSupported(networkId);
 
     const userChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
         { networkId, client },
         searchAddress ? searchAddress : isBiconomy ? biconomyConnector.address : walletAddress || '',
         {
-            enabled: isAppReady && isConnected && isNetworkSupportedForChained,
+            enabled: isAppReady && isConnected,
         }
     );
 
@@ -211,7 +209,7 @@ const UserHistoricalPositions: React.FC<UserHistoricalPositionsProps> = ({
         { networkId, client },
         searchAddress ? searchAddress : isBiconomy ? biconomyConnector.address : walletAddress || '',
         {
-            enabled: isAppReady && isConnected && isNetworkSupportedForChained,
+            enabled: isAppReady && isConnected,
         }
     );
 

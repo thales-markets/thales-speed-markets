@@ -1,6 +1,7 @@
 import { HermesClient } from '@pythnetwork/hermes-client';
 import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
 import { LINKS } from 'constants/links';
+import { TEST_NETWORKS } from 'constants/network';
 import {
     CONNECTION_TIMEOUT_MS,
     PRICE_ID,
@@ -12,7 +13,7 @@ import { NetworkId, bigNumberFormatter, floorNumberToDecimals } from 'thales-uti
 import { parseUnits } from 'viem';
 
 const getPriceServiceEndpoint = (networkId: NetworkId) => {
-    if ([NetworkId.OptimismSepolia, NetworkId.ZkSyncSepolia, NetworkId.BlastSepolia].includes(networkId)) {
+    if (TEST_NETWORKS.includes(networkId)) {
         return PRICE_SERVICE_ENDPOINTS.testnet;
     } else {
         return PRICE_SERVICE_ENDPOINTS.mainnet;
@@ -24,7 +25,7 @@ export const getPriceConnection = (networkId: NetworkId) => {
 };
 
 export const getPriceId = (networkId: NetworkId, currency: typeof CRYPTO_CURRENCY_MAP[number]) => {
-    if ([NetworkId.OptimismSepolia, NetworkId.ZkSyncSepolia, NetworkId.BlastSepolia].includes(networkId)) {
+    if (TEST_NETWORKS.includes(networkId)) {
         return PRICE_ID.testnet[currency];
     } else {
         return PRICE_ID.mainnet[currency];
@@ -32,7 +33,7 @@ export const getPriceId = (networkId: NetworkId, currency: typeof CRYPTO_CURRENC
 };
 
 const getCurrencyByPriceId = (networkId: NetworkId, priceId: string) => {
-    if ([NetworkId.OptimismSepolia, NetworkId.ZkSyncSepolia, NetworkId.BlastSepolia].includes(networkId)) {
+    if (TEST_NETWORKS.includes(networkId)) {
         return (
             Object.keys(PRICE_ID.testnet).find((key) => PRICE_ID.testnet[key] === '0x' + priceId) || 'currencyNotFound'
         );

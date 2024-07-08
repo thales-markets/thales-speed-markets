@@ -1,4 +1,3 @@
-import { TBD_ADDRESS } from 'constants/network';
 import { NetworkId } from 'thales-utils';
 import { Address } from 'viem';
 
@@ -9,9 +8,6 @@ const chainedSpeedMarketsAMMContract = {
         [NetworkId.PolygonMainnet]: '0x14D2d7f64D6F10f8eF06372c2e5E36850661a537' as Address,
         [NetworkId.Arbitrum]: '0xe92B4c614b04c239d30c31A7ea1290AdDCb8217D' as Address,
         [NetworkId.Base]: '0x6848F001ddDb4442d352C495c7B4a231e3889b70' as Address,
-        [NetworkId.ZkSync]: TBD_ADDRESS,
-        [NetworkId.ZkSyncSepolia]: TBD_ADDRESS,
-        [NetworkId.BlastSepolia]: TBD_ADDRESS,
     },
     abi: [
         {

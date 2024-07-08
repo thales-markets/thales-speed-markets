@@ -7,11 +7,6 @@
             "progress-label": "Buying in progress...",
             "confirmation-message": "Successfully bought - market created"
         },
-        "mint": {
-            "label": "Get",
-            "progress-label": "Getting",
-            "confirmation-message": "Successfully received {{token}}"
-        },
         "or": "or",
         "enter-amount": "Enter amount",
         "enter-minutes": "Enter minutes",
@@ -114,9 +109,7 @@
                 "optimism": "Switch to Optimism",
                 "polygon": "Switch to Polygon",
                 "arbitrum": "Switch to Arbitrum",
-                "base": "Switch to Base",
-                "zkSync": "Switch to ZkSync",
-                "blast-sepolia": "Switch to Blast Sepolia"
+                "base": "Switch to Base"
             }
         },
         "referral": {
@@ -215,8 +208,7 @@
             "max-buyin": "The maximum buy-in is {{maxAmount}}",
             "min-time": "The minimum time is {{minTime}} {{timeUnit}}",
             "max-time": "The maximum time is {{maxTime}} {{timeUnit}}",
-            "out-of-liquidity-direction": "Out of liquidity for direction",
-            "insufficient-balance-wallet": "Get {{currencyKey}} below"
+            "out-of-liquidity-direction": "Out of liquidity for direction"
         },
         "user-positions": {
             "open-single": "Open single markets",
