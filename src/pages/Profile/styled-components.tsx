@@ -35,15 +35,13 @@ export const Tabs = styled.div`
 
 export const Tab = styled.span<{
     $active?: boolean;
-    $disabled?: boolean;
 }>`
     font-weight: 800;
     font-size: 18px;
     line-height: 40px;
     text-transform: uppercase;
     color: ${(props) => (props.$active ? props.theme.textColor.primary : props.theme.textColor.secondary)};
-    cursor: ${(props) => (props.$disabled ? 'default' : 'pointer')};
-    opacity: ${(props) => (props.$disabled ? '0.4' : '1')};
+    cursor: pointer;
     padding: 0 50px;
     white-space: pre;
     box-shadow: ${(props) => (props.$active ? `0px 2px ${props.theme.borderColor.primary};` : '')};
