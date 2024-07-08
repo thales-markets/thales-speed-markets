@@ -1,18 +1,25 @@
 import ROUTES from 'constants/routes';
 import { ScreenSizeBreakpoint } from 'enums/ui';
+import queryString from 'query-string';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
+import { getSupportedNetworksByRoute } from 'utils/network';
 import { navigateTo } from 'utils/routes';
+import { useChainId } from 'wagmi';
 
 const MobileMenu: React.FC<{ onChartClick?: () => void }> = ({ onChartClick }) => {
     const { t } = useTranslation();
     const location = useLocation();
+    const networkId = useChainId();
 
     const isSpeedMarkets = ROUTES.Markets.SpeedMarkets === location.pathname;
     const isOverview = ROUTES.Markets.SpeedMarketsOverview === location.pathname;
     const isProfile = ROUTES.Markets.Profile === location.pathname;
+
+    const isChainedSupported = getSupportedNetworksByRoute(ROUTES.Markets.ChainedSpeedMarkets).includes(networkId);
+    const isChainedMarkets = isChainedSupported && queryString.parse(location.search).isChained === 'true';
 
     return (
         <Container>
@@ -24,7 +31,13 @@ const MobileMenu: React.FC<{ onChartClick?: () => void }> = ({ onChartClick }) =
                     </Item>
                 )}
                 <Item
-                    onClick={() => navigateTo(isOverview ? ROUTES.Markets.Home : ROUTES.Markets.SpeedMarketsOverview)}
+                    onClick={() =>
+                        navigateTo(
+                            isOverview
+                                ? ROUTES.Markets.Home
+                                : `${ROUTES.Markets.SpeedMarketsOverview}?isChained=${isChainedMarkets}`
+                        )
+                    }
                 >
                     {isOverview ? t('common.home') : t('speed-markets.overview.title')}
                 </Item>
