@@ -127,11 +127,11 @@ export const executeBiconomyTransaction = async (
                         isEth
                             ? {}
                             : {
-                                paymasterServiceData: {
-                                    mode: PaymasterMode.ERC20,
-                                    preferredToken: collateral,
-                                },
-                            }
+                                  paymasterServiceData: {
+                                      mode: PaymasterMode.ERC20,
+                                      preferredToken: collateral,
+                                  },
+                              }
                     );
 
                     const {
@@ -143,19 +143,16 @@ export const executeBiconomyTransaction = async (
                     console.log('success: ', success);
 
                     if (success === 'false') {
-
                     } else {
                         console.log('Transaction receipt', transactionHash);
                         return transactionHash;
                     }
                 } catch (e) {
-                    console.log(e)
+                    console.log(e);
                     window.localStorage.removeItem(LOCAL_STORAGE_KEYS.SESSION_P_KEY[networkId]);
                     window.localStorage.removeItem(LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId]);
                     throw new Error('tx failed');
                 }
-
-
             }
         };
 
