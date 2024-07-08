@@ -11,11 +11,10 @@ export const PositionContainer = styled(FlexDivRow)`
     }
 `;
 
-export const PlusMinusIcon = styled.i<{ $disabled?: boolean }>`
+export const PlusMinusIcon = styled.i`
     font-size: 28px;
     color: ${(props) => props.theme.button.textColor.tertiary};
-    cursor: ${(props) => (props.$disabled ? 'default' : 'pointer')};
-    opacity: ${(props) => (props.$disabled ? '0.4' : '1')};
+    cursor: pointer;
 `;
 
 export const Header = styled(FlexDivColumn)`
