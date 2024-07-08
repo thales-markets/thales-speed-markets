@@ -498,14 +498,15 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
         const publicClient = getPublicClient(wagmiConfig, { chainId: networkId });
         let isMarketCreated = false;
-        const unwatch = publicClient.watchContractEvent({
+        publicClient.watchContractEvent({
             address: isChained
                 ? chainedSpeedMarketsAMMContract.addresses[networkId]
                 : speedMarketsAMMContract.addresses[networkId],
             abi: getContractAbi(isChained ? chainedSpeedMarketsAMMContract : speedMarketsAMMContract, networkId),
             eventName: isChained ? 'MarketCreated' : 'MarketCreatedWithFees',
             args: { [isChained ? 'user' : '_user']: userAddress },
-            onLogs: () => {
+            onLogs: (logs) => {
+                console.log(logs);
                 isMarketCreated = true;
                 toast.update(id, getSuccessToastOptions(t(`common.buy.confirmation-message`), id));
                 resetData();
@@ -622,7 +623,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             setSubmittedStrikePrice(0);
             setIsSubmitting(false);
         }
-        unwatch();
+        // unwatch();
     };
 
     const getSubmitButton = () => {
