@@ -23,16 +23,7 @@ import {
     particleWallet,
 } from 'utils/particleWallet';
 import { createConfig, fallback, http } from 'wagmi';
-import {
-    arbitrum,
-    base,
-    blastSepolia,
-    optimism,
-    optimismSepolia,
-    polygon,
-    zkSync,
-    zkSyncSepoliaTestnet,
-} from 'wagmi/chains';
+import { arbitrum, base, optimism, optimismSepolia, polygon } from 'wagmi/chains';
 
 const wallets = [
     metaMaskWallet,
@@ -58,7 +49,7 @@ const socialWallets = [
 !isMobile() && wallets.push(injectedWallet);
 
 export const wagmiConfig = createConfig({
-    chains: [optimism, arbitrum, base, polygon, zkSync, zkSyncSepoliaTestnet, blastSepolia, optimismSepolia],
+    chains: [optimism, arbitrum, base, polygon, optimismSepolia],
     connectors: connectorsForWallets(
         [
             {
@@ -92,9 +83,6 @@ export const wagmiConfig = createConfig({
             http(RPC_LIST.INFURA[NetworkId.PolygonMainnet]),
             http(),
         ]),
-        [zkSync.id]: http(),
-        [zkSyncSepoliaTestnet.id]: http(),
-        [blastSepolia.id]: http(),
         [optimismSepolia.id]: fallback([http(RPC_LIST.INFURA[NetworkId.OptimismSepolia]), http()]),
     },
 });

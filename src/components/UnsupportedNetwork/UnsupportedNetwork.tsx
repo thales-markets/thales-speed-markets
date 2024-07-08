@@ -1,9 +1,7 @@
 import ArbitrumLogo from 'assets/images/network/arbitrum-circle-logo.svg?react';
 import BaseLogo from 'assets/images/network/base-circle-logo.svg?react';
-import BlastSepoliaLogo from 'assets/images/network/blast-sepolia-circle-logo.svg?react';
 import OpLogo from 'assets/images/network/optimism-circle-logo.svg?react';
 import PolygonLogo from 'assets/images/network/polygon-circle-logo.svg?react';
-import ZkSyncLogo from 'assets/images/network/zksync-circle-logo.svg?react';
 import Button from 'components/Button';
 import { TEST_NETWORKS } from 'constants/network';
 import { ScreenSizeBreakpoint } from 'enums/ui';
@@ -47,18 +45,6 @@ const UnsupportedNetwork: React.FC<UnsupportedNetworkProps> = ({ supportedNetwor
             case NetworkId.Base:
                 logo = <StyledBaseLogo />;
                 text = t(`common.unsupported-network.button.base`);
-                break;
-            case NetworkId.ZkSync:
-                logo = <ZkSyncLogo />;
-                text = t(`common.unsupported-network.button.zkSync`);
-                break;
-            case NetworkId.BlastSepolia:
-                logo = (
-                    <BlastLogoWrapper>
-                        <BlastSepoliaLogo />
-                    </BlastLogoWrapper>
-                );
-                text = t(`common.unsupported-network.button.blast-sepolia`);
                 break;
         }
 
@@ -178,13 +164,6 @@ const ButtonText = styled.span`
 const StyledBaseLogo = styled(BaseLogo)`
     width: 18px;
     height: 18px;
-`;
-
-const BlastLogoWrapper = styled.div`
-    width: 18px;
-    height: 18px;
-    background: radial-gradient(${(props) => props.theme.background.primary} 60%, transparent 40%);
-    border-radius: 50%;
 `;
 
 export default UnsupportedNetwork;

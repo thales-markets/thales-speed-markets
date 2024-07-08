@@ -13,7 +13,6 @@ import { getIsAppReady } from 'redux/modules/app';
 import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
 import {
     Coins,
-    NetworkId,
     ceilNumberToDecimals,
     formatCurrencyWithKey,
     formatCurrencyWithSign,
@@ -244,10 +243,7 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
         let errorMessageKey = '';
 
         if (buyinAmount > 0 && ((isConnected && buyinAmount > collateralBalance) || collateralBalance === 0)) {
-            errorMessageKey =
-                networkId === NetworkId.BlastSepolia
-                    ? 'speed-markets.errors.insufficient-balance-wallet'
-                    : 'common.errors.insufficient-balance-wallet';
+            errorMessageKey = 'common.errors.insufficient-balance-wallet';
         }
         if (buyinAmount > 0) {
             const convertedBuyinAmount = convertToStable(buyinAmount);

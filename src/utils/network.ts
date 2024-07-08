@@ -88,14 +88,6 @@ export const SUPPORTED_NETWORK_IDS_MAP: Record<number, DropdownNetwork> = {
         },
         order: 3,
     },
-    [NetworkId.ZkSync]: {
-        name: 'ZkSync',
-        icon: 'network-icon network-icon--zk',
-        changeNetwork: async (networkId: number, callback: VoidFunction) => {
-            await changeNetwork(SUPPORTED_NETWORKS_PARAMS[networkId], callback);
-        },
-        order: 5,
-    },
 };
 
 export const getSupportedNetworksByRoute = (route: string): NetworkId[] => {
@@ -110,9 +102,6 @@ export const getSupportedNetworksByRoute = (route: string): NetworkId[] => {
                 NetworkId.Arbitrum,
                 NetworkId.Base,
                 NetworkId.PolygonMainnet,
-                NetworkId.ZkSync,
-                NetworkId.ZkSyncSepolia,
-                NetworkId.BlastSepolia,
                 NetworkId.OptimismSepolia,
             ];
         case ROUTES.Markets.ChainedSpeedMarkets:
@@ -128,9 +117,6 @@ export const getSupportedNetworksByRoute = (route: string): NetworkId[] => {
             return Object.keys(SUPPORTED_NETWORKS).map((network) => Number(network) as NetworkId);
     }
 };
-
-export const isOnlySpeedMarketsSupported = (networkId: NetworkId): boolean =>
-    [NetworkId.ZkSync, NetworkId.ZkSyncSepolia, NetworkId.BlastSepolia].includes(networkId);
 
 export const getNetworkNameByNetworkId = (networkId: NetworkId, shortName = false): string | undefined => {
     const network = SUPPORTED_NETWORKS_PARAMS[networkId];

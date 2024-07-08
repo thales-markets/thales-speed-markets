@@ -11,12 +11,9 @@ export const SUPPORTED_NETWORKS: Record<SupportedNetwork, string> = {
     [NetworkId.OptimismSepolia]: 'SEPOLIA-OPTIMISM',
     [NetworkId.Arbitrum]: 'ARBITRUM-ONE',
     [NetworkId.Base]: 'BASE',
-    [NetworkId.ZkSync]: 'ZKSYNC',
-    [NetworkId.ZkSyncSepolia]: 'ZKSYNC-SEPOLIA',
-    [NetworkId.BlastSepolia]: 'BLAST-SEPOLIA',
 };
 
-export const TEST_NETWORKS = [NetworkId.OptimismSepolia, NetworkId.ZkSyncSepolia, NetworkId.BlastSepolia];
+export const TEST_NETWORKS = [NetworkId.OptimismSepolia];
 
 export const SUPPORTED_NETWORKS_PARAMS: Record<number, NetworkParams> = {
     [NetworkId.OptimismMainnet]: {
@@ -57,17 +54,6 @@ export const SUPPORTED_NETWORKS_PARAMS: Record<number, NetworkParams> = {
         chainName: 'BASE',
         rpcUrls: ['https://mainnet.base.org'],
         blockExplorerUrls: ['https://basescan.org/'],
-        iconUrls: ['https://optimism.io/images/metamask_icon.svg', 'https://optimism.io/images/metamask_icon.png'],
-        nativeCurrency: {
-            symbol: 'ETH',
-            decimals: 18,
-        },
-    },
-    [NetworkId.ZkSync]: {
-        chainId: '0x144',
-        chainName: 'zkSync',
-        rpcUrls: ['https://mainnet.era.zksync.io'],
-        blockExplorerUrls: ['https://explorer.zksync.io/'],
         iconUrls: ['https://optimism.io/images/metamask_icon.svg', 'https://optimism.io/images/metamask_icon.png'],
         nativeCurrency: {
             symbol: 'ETH',

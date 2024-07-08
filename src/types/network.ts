@@ -18,4 +18,7 @@ export type QueryConfig = {
     client: any;
 };
 
-export type SupportedNetwork = Exclude<NetworkId, NetworkId.Mainnet>;
+export type SupportedNetwork = Exclude<
+    NetworkId,
+    NetworkId.Mainnet | NetworkId.ZkSync | NetworkId.ZkSyncSepolia | NetworkId.BlastSepolia
+>;
