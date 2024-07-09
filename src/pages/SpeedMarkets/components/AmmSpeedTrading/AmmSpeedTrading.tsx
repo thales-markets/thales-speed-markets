@@ -12,7 +12,7 @@ import { PLAUSIBLE, PLAUSIBLE_KEYS } from 'constants/analytics';
 import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
 import {
     ALLOWANCE_BUFFER_PERCENTAGE,
-    DEFAULT_PRICE_SLIPPAGE_PERCENTAGE,
+    DEFAULT_PRICE_SLIPPAGES_PERCENTAGE,
     POSITIONS_TO_SIDE_MAP,
     SPEED_MARKETS_QUOTE,
 } from 'constants/market';
@@ -133,7 +133,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     const [paidAmount, setPaidAmount] = useState(enteredBuyinAmount);
     const [potentialProfit, setPotentialProfit] = useState(0);
     const [submittedStrikePrice, setSubmittedStrikePrice] = useState(0);
-    const [priceSlippage, setPriceSlippage] = useState(lsPriceSlippage || DEFAULT_PRICE_SLIPPAGE_PERCENTAGE);
+    const [priceSlippage, setPriceSlippage] = useState(lsPriceSlippage || DEFAULT_PRICE_SLIPPAGES_PERCENTAGE[0]);
     const [isAllowing, setIsAllowing] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [outOfLiquidity, setOutOfLiquidity] = useState(false);
@@ -498,7 +498,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
         const publicClient = getPublicClient(wagmiConfig, { chainId: networkId });
         let isMarketCreated = false;
-        publicClient.watchContractEvent({
+        const unwatch = publicClient.watchContractEvent({
             address: isChained
                 ? chainedSpeedMarketsAMMContract.addresses[networkId]
                 : speedMarketsAMMContract.addresses[networkId],
@@ -623,7 +623,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             setSubmittedStrikePrice(0);
             setIsSubmitting(false);
         }
-        // unwatch();
+        unwatch();
     };
 
     const getSubmitButton = () => {
