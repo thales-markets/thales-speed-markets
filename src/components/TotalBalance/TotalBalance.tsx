@@ -218,12 +218,13 @@ const TokenBalancesWrapper = styled(FlexDiv)`
 `;
 
 const IndividualTokenBalanceWrapper = styled(FlexDiv)`
-    flex-direction: row;
-    justify-content: flex-start;
     align-items: center;
-    min-width: 200px;
+    min-width: 225px;
     margin: 0 10px;
     gap: 20px;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        gap: 100px;
+    }
 `;
 
 const IndividualBalance = styled(FlexDivStart)`
@@ -232,7 +233,7 @@ const IndividualBalance = styled(FlexDivStart)`
 
 const Token = styled(FlexDiv)`
     align-items: center;
-    width: 80px;
+    width: 65px;
 `;
 
 const TokenName = styled.span`
