@@ -13,6 +13,7 @@ import { getIsBiconomy } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { truncateAddress } from 'thales-utils';
 import { RootState } from 'types/ui';
+import biconomyConnector from 'utils/biconomyWallet';
 import { useAccount } from 'wagmi';
 import UserCollaterals from '../UserCollaterals';
 
@@ -21,15 +22,17 @@ const TRUNCATE_ADDRESS_NUMBER_OF_CHARS = 5;
 const UserWallet: React.FC = () => {
     const { t } = useTranslation();
 
-    const { address: walletAddress } = useAccount();
+    const { address } = useAccount();
     const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
 
     const [walletText, setWalletText] = useState('');
 
+    const walletAddress = isBiconomy ? biconomyConnector.address : (address as string);
+
     const handleCopy = () => {
         const id = toast.loading(t('user-info.copying-address'), getLoadingToastOptions());
         try {
-            navigator.clipboard.writeText(walletAddress as string);
+            navigator.clipboard.writeText(walletAddress);
             toast.update(id, getInfoToastOptions(t('user-info.copied'), id));
         } catch (e) {
             toast.update(id, getErrorToastOptions('Error', id));
@@ -40,22 +43,29 @@ const UserWallet: React.FC = () => {
         <Container>
             <Wrapper>
                 <WalletContainer
-                    $isAddress={!isBiconomy}
-                    onClick={() => {
-                        !isBiconomy && handleCopy();
-                    }}
-                    onMouseOver={() => !isBiconomy && setWalletText(t('common.wallet.copy-address'))}
-                    onMouseLeave={() => !isBiconomy && setWalletText('')}
+                    onClick={() => handleCopy()}
+                    onMouseOver={() =>
+                        setWalletText(
+                            isBiconomy
+                                ? (truncateAddress(
+                                      walletAddress,
+                                      TRUNCATE_ADDRESS_NUMBER_OF_CHARS,
+                                      TRUNCATE_ADDRESS_NUMBER_OF_CHARS
+                                  ) as string)
+                                : ''
+                        )
+                    }
+                    onMouseLeave={() => setWalletText('')}
                 >
                     <WalletText $isAddress={!isBiconomy}>
-                        {isBiconomy
-                            ? getUserInfo()?.name
-                            : walletText ||
-                              truncateAddress(
-                                  walletAddress as string,
-                                  TRUNCATE_ADDRESS_NUMBER_OF_CHARS,
-                                  TRUNCATE_ADDRESS_NUMBER_OF_CHARS
-                              )}
+                        {walletText ||
+                            (isBiconomy
+                                ? getUserInfo()?.name
+                                : truncateAddress(
+                                      walletAddress,
+                                      TRUNCATE_ADDRESS_NUMBER_OF_CHARS,
+                                      TRUNCATE_ADDRESS_NUMBER_OF_CHARS
+                                  ))}
                     </WalletText>
                 </WalletContainer>
                 <Separator />
@@ -66,7 +76,6 @@ const UserWallet: React.FC = () => {
 };
 
 const Container = styled.div`
-    z-index: 10000;
     @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         width: 100%;
     }
@@ -81,11 +90,11 @@ const Wrapper = styled.div`
     height: 30px;
 `;
 
-const WalletContainer = styled.div<{ $isAddress: boolean }>`
+const WalletContainer = styled.div`
     width: 120px;
     height: 100%;
     min-width: 120px;
-    cursor: ${(props) => (props.$isAddress ? 'pointer' : 'text')};
+    cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;

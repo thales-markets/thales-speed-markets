@@ -75,7 +75,7 @@ const PythModal: React.FC<PythModalProps> = ({ onClose }) => {
     }, [solanaAddress, walletAddress, isBiconomy, t, signMessageAsync]);
 
     return (
-        <Modal title={t('pyth-rewards.title')} onClose={onClose} shouldCloseOnOverlayClick={true} width="auto">
+        <Modal title={t('pyth-rewards.title')} onClose={onClose} shouldCloseOnOverlayClick width="auto">
             <Wrapper>
                 <Container>
                     <Info>

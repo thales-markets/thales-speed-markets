@@ -41,12 +41,14 @@ type StepProps = {
 const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurrentStep, hasFunds, onClose }) => {
     const networkId = useChainId();
     const dispatch = useDispatch();
-    const { isConnected: isWalletConnected, address: walletAddress } = useAccount();
+    const { isConnected: isWalletConnected, address } = useAccount();
     const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
 
     const { t } = useTranslation();
     const [showQRModal, setShowQRModal] = useState<boolean>(false);
     const [showOnramper, setShowOnramper] = useState<boolean>(false);
+
+    const walletAddress = isBiconomy ? biconomyConnector.address : (address as string);
 
     const isActive = currentStep === stepType;
     const isDisabled = !isWalletConnected && stepType !== GetStartedStep.LOG_IN;
@@ -135,7 +137,7 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
     const handleCopy = () => {
         const id = toast.loading(t('user-info.copying-address'), getLoadingToastOptions());
         try {
-            navigator.clipboard.writeText(isBiconomy ? biconomyConnector.address : (walletAddress as string));
+            navigator.clipboard.writeText(walletAddress);
             toast.update(id, getInfoToastOptions(t('user-info.copied'), id));
         } catch (e) {
             toast.update(id, getErrorToastOptions('Error', id));
@@ -177,9 +179,7 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
                         <DepositContainer isActive={isActive}>
                             <GradientContainer>
                                 <AddressContainer>
-                                    <Address>
-                                        {isBiconomy ? biconomyConnector.address : (walletAddress as string)}
-                                    </Address>
+                                    <Address>{walletAddress}</Address>
                                     <CopyText
                                         onClick={() => {
                                             if (isActive) handleCopy();
@@ -225,7 +225,7 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
             {showQRModal && (
                 <QRCodeModal
                     onClose={() => setShowQRModal(false)}
-                    walletAddress={biconomyConnector.address as string}
+                    walletAddress={walletAddress}
                     title={t('deposit.qr-modal-title')}
                 />
             )}
@@ -233,7 +233,7 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
                 <Modal
                     isOpen={showOnramper}
                     title=""
-                    shouldCloseOnOverlayClick={true}
+                    shouldCloseOnOverlayClick
                     onClose={() => setShowOnramper(false)}
                     width="auto"
                 >
