@@ -505,8 +505,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             abi: getContractAbi(isChained ? chainedSpeedMarketsAMMContract : speedMarketsAMMContract, networkId),
             eventName: isChained ? 'MarketCreated' : 'MarketCreatedWithFees',
             args: { [isChained ? 'user' : '_user']: userAddress },
-            onLogs: (logs) => {
-                console.log(logs);
+            onLogs: () => {
                 isMarketCreated = true;
                 toast.update(id, getSuccessToastOptions(t(`common.buy.confirmation-message`), id));
                 resetData();
