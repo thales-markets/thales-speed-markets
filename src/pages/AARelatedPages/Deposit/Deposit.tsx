@@ -47,7 +47,7 @@ const Tutorials = [
 const Deposit: React.FC = () => {
     const { t } = useTranslation();
     const networkId = useChainId();
-    const { address: walletAddress } = useAccount();
+    const { address } = useAccount();
     const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
     const [showQRModal, setShowQRModal] = useState<boolean>(false);
     const [showOnramper, setShowOnramper] = useState<boolean>(false);
@@ -58,10 +58,12 @@ const Deposit: React.FC = () => {
         return getOnRamperUrl(apiKey, biconomyConnector.address as string, networkId);
     }, [networkId, apiKey]);
 
+    const walletAddress = isBiconomy ? biconomyConnector.address : (address as string);
+
     const handleCopy = () => {
         const id = toast.loading(t('user-info.copying-address'), getLoadingToastOptions());
         try {
-            navigator.clipboard.writeText(isBiconomy ? biconomyConnector.address : (walletAddress as string));
+            navigator.clipboard.writeText(walletAddress);
             toast.update(id, getInfoToastOptions(t('user-info.copied'), id));
         } catch (e) {
             toast.update(id, getErrorToastOptions('Error', id));
@@ -102,7 +104,7 @@ const Deposit: React.FC = () => {
                         </Label>
                         <Label>{t('deposit.address')}</Label>
                         <AddressContainer>
-                            <Address>{isBiconomy ? biconomyConnector.address : (walletAddress as string)}</Address>
+                            <Address>{walletAddress}</Address>
                             <CopyText
                                 onClick={() => {
                                     handleCopy();
@@ -158,7 +160,7 @@ const Deposit: React.FC = () => {
             {showQRModal && (
                 <QRCodeModal
                     onClose={() => setShowQRModal(false)}
-                    walletAddress={biconomyConnector.address as string}
+                    walletAddress={walletAddress}
                     title={t('deposit.qr-modal-title')}
                 />
             )}

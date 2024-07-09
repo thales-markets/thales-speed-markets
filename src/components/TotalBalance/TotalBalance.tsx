@@ -219,7 +219,7 @@ const TokenBalancesWrapper = styled(FlexDiv)`
 
 const IndividualTokenBalanceWrapper = styled(FlexDiv)`
     align-items: center;
-    min-width: 225px;
+    min-width: 220px;
     margin: 0 10px;
     gap: 20px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
