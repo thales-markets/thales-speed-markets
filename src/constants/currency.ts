@@ -24,7 +24,6 @@ const CRYPTO_CURRENCY = [
 export const CRYPTO_CURRENCY_MAP = keyBy(CRYPTO_CURRENCY);
 
 export const STABLE_COINS = [
-    SYNTHS_MAP.sUSD,
     CRYPTO_CURRENCY_MAP.DAI,
     CRYPTO_CURRENCY_MAP.USDCe,
     CRYPTO_CURRENCY_MAP.USDbC,
@@ -61,15 +60,15 @@ export const currencyKeyToNameMap = {
 
 export const COLLATERALS: Record<SupportedNetwork, Coins[]> = {
     [NetworkId.OptimismMainnet]: [
-        SYNTHS_MAP.sUSD as Coins,
-        CRYPTO_CURRENCY_MAP.DAI as Coins,
         CRYPTO_CURRENCY_MAP.USDC as Coins,
+        CRYPTO_CURRENCY_MAP.DAI as Coins,
+        CRYPTO_CURRENCY_MAP.USDbC as Coins,
         CRYPTO_CURRENCY_MAP.USDT as Coins,
         CRYPTO_CURRENCY_MAP.OP as Coins,
         CRYPTO_CURRENCY_MAP.WETH as Coins,
         CRYPTO_CURRENCY_MAP.ETH as Coins,
     ],
-    [NetworkId.OptimismSepolia]: [SYNTHS_MAP.sUSD as Coins, CRYPTO_CURRENCY_MAP.DAI as Coins],
+    [NetworkId.OptimismSepolia]: [CRYPTO_CURRENCY_MAP.USDC as Coins, CRYPTO_CURRENCY_MAP.DAI as Coins],
     [NetworkId.PolygonMainnet]: [CRYPTO_CURRENCY_MAP.USDCe as Coins],
     [NetworkId.Base]: [
         CRYPTO_CURRENCY_MAP.USDbC as Coins,

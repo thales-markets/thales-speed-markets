@@ -1280,7 +1280,7 @@ const multipleCollateral = {
     },
     USDCe: {
         addresses: {
-            [NetworkId.OptimismMainnet]: TBD_ADDRESS,
+            [NetworkId.OptimismMainnet]: '0x7F5c764cBc14f9669B88837ca1490cCa17c31607' as Address,
             [NetworkId.OptimismSepolia]: TBD_ADDRESS,
             [NetworkId.PolygonMainnet]: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174' as Address,
             [NetworkId.Arbitrum]: '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8' as Address,
@@ -1300,8 +1300,8 @@ const multipleCollateral = {
     },
     USDC: {
         addresses: {
-            [NetworkId.OptimismMainnet]: '0x7F5c764cBc14f9669B88837ca1490cCa17c31607' as Address,
-            [NetworkId.OptimismSepolia]: TBD_ADDRESS,
+            [NetworkId.OptimismMainnet]: '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85' as Address,
+            [NetworkId.OptimismSepolia]: '0xff6535c1F971245435429A915aB9eB1713beC1C1' as Address, // exoticUSDC
             [NetworkId.PolygonMainnet]: TBD_ADDRESS,
             [NetworkId.Arbitrum]: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831' as Address,
             [NetworkId.Base]: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' as Address,
