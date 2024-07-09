@@ -66,7 +66,6 @@ const UserWallet: React.FC = () => {
 };
 
 const Container = styled.div`
-    z-index: 10000;
     @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
         width: 100%;
     }

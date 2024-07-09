@@ -168,7 +168,7 @@ const Deposit: React.FC = () => {
                 <Modal
                     isOpen={showOnramper}
                     title=""
-                    shouldCloseOnOverlayClick={true}
+                    shouldCloseOnOverlayClick
                     onClose={() => setShowOnramper(false)}
                     width="auto"
                 >

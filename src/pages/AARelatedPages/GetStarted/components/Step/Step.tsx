@@ -233,7 +233,7 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
                 <Modal
                     isOpen={showOnramper}
                     title=""
-                    shouldCloseOnOverlayClick={true}
+                    shouldCloseOnOverlayClick
                     onClose={() => setShowOnramper(false)}
                     width="auto"
                 >

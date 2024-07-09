@@ -253,7 +253,7 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
         <ReactModal
             isOpen
             onRequestClose={onModalClose}
-            shouldCloseOnOverlayClick={true}
+            shouldCloseOnOverlayClick
             style={customStyles}
             contentElement={(props, children) => (
                 <>
