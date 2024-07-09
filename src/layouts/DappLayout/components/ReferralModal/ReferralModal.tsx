@@ -131,7 +131,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ onClose }) => {
     };
 
     return (
-        <Modal title={t('common.referral.title')} onClose={onClose} shouldCloseOnOverlayClick={true} width="auto">
+        <Modal title={t('common.referral.title')} onClose={onClose} shouldCloseOnOverlayClick width="auto">
             <Container>
                 <Info>
                     <Trans i18nKey={'common.referral.info'} components={{ bold: <BoldText /> }} />

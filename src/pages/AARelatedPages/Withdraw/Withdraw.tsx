@@ -136,7 +136,7 @@ const Withdraw: React.FC<DepositProps> = ({ onClose }) => {
     };
 
     return (
-        <Modal title={t('withdraw.heading-withdraw')} onClose={onClose} shouldCloseOnOverlayClick={true}>
+        <Modal title={t('withdraw.heading-withdraw')} onClose={onClose} shouldCloseOnOverlayClick>
             <OutsideClick onOutsideClick={onClose}>
                 <Wrapper>
                     <FormContainer>

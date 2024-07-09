@@ -80,7 +80,7 @@ const GetStarted: React.FC<GetStartedProps> = ({ onClose }) => {
     }, [isWalletConnected, totalBalanceValue]);
 
     return (
-        <Modal onClose={onClose} shouldCloseOnOverlayClick={false} title={t('get-started.title')}>
+        <Modal onClose={onClose} shouldCloseOnOverlayClick title={t('get-started.title')}>
             <Container>
                 <ProgressDisplayWrapper>
                     {steps.map((step, index) => {

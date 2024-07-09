@@ -44,7 +44,7 @@ const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({ isOpen, onClose
         <Modal
             isOpen={isOpen}
             onClose={onClose}
-            shouldCloseOnOverlayClick={true}
+            shouldCloseOnOverlayClick
             title={t('common.wallet.connect-wallet-modal-title')}
             zIndex={201}
         >
