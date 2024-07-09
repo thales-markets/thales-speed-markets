@@ -1,5 +1,5 @@
 import { COLLATERALS, STABLE_COINS, SYNTHS_MAP, currencyKeyToNameMap } from 'constants/currency';
-import { COLLATERAL_DECIMALS, Coins } from 'thales-utils';
+import { COLLATERAL_DECIMALS, Coins, NetworkId } from 'thales-utils';
 import { CollateralsBalance } from 'types/collateral';
 import { SupportedNetwork } from 'types/network';
 
@@ -64,3 +64,8 @@ export const convertFromStableToCollateral = (dstCollateral: Coins, amount: numb
             : 0;
     }
 };
+
+const OPTIMISM_MARKETS_WITH_SUSD_END_TIMESTAMP = 1720526400000;
+export const isOldMarketWithSusdCollateral = (networkId: SupportedNetwork, marketCreatedAt: number) =>
+    [NetworkId.OptimismMainnet, NetworkId.OptimismSepolia].includes(networkId) &&
+    marketCreatedAt < OPTIMISM_MARKETS_WITH_SUSD_END_TIMESTAMP;

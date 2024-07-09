@@ -42,6 +42,7 @@ import {
     HeaderText,
     WalletIcon,
 } from '../SelectPosition/styled-components';
+import { BICONOMY_MAX_FEE_PERCENTAGE } from 'constants/market';
 
 type SelectBuyinProps = {
     onChange: React.Dispatch<number>;
@@ -76,7 +77,7 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
     const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
     const selectedCollateralIndex = useSelector((rootState: RootState) => getSelectedCollateralIndex(rootState));
 
-    const [buyinAmount, setBuyinAmount] = useState(0);
+    const [buyinAmount, setBuyinAmount] = useState<number | string>('');
     const [selectedStableBuyinAmount, setSelectedStableBuyinAmount] = useState(0);
     const [errorMessageKey, setErrorMessageKey] = useState('');
 
@@ -230,23 +231,25 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
                 setBuyinAmount(convertFromStable(selectedStableBuyinAmount));
             }
         } else if (isStableCurrency(selectedCollateral)) {
-            setBuyinAmount(selectedStableBuyinAmount);
+            setBuyinAmount('');
         }
     }, [selectedCollateral, selectedStableBuyinAmount, convertFromStable]);
 
     useEffect(() => {
-        onChange(buyinAmount);
+        if (buyinAmount !== '') {
+            onChange(Number(buyinAmount));
+        }
     }, [buyinAmount, onChange]);
 
     // Input field validations
     useDebouncedEffect(() => {
         let errorMessageKey = '';
 
-        if (buyinAmount > 0 && ((isConnected && buyinAmount > collateralBalance) || collateralBalance === 0)) {
+        if (buyinAmount !== '' && ((isConnected && buyinAmount > collateralBalance) || collateralBalance === 0)) {
             errorMessageKey = 'common.errors.insufficient-balance-wallet';
         }
-        if (buyinAmount > 0) {
-            const convertedBuyinAmount = convertToStable(buyinAmount);
+        if (buyinAmount !== '') {
+            const convertedBuyinAmount = convertToStable(Number(buyinAmount));
 
             if (convertedBuyinAmount < minBuyinAmount) {
                 errorMessageKey = 'speed-markets.errors.min-buyin';
@@ -274,14 +277,14 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
 
     // Reset inputs
     useEffect(() => {
-        setBuyinAmount(0);
+        setBuyinAmount('');
         setSelectedStableBuyinAmount(0);
     }, [networkId, isConnected]);
 
     // Reset inputs
     useEffect(() => {
         if (isResetTriggered) {
-            setBuyinAmount(0);
+            setBuyinAmount('');
             setSelectedStableBuyinAmount(0);
             setIsResetTriggered(false);
         }
@@ -289,9 +292,12 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
 
     const onMaxClick = () => {
         const maxWalletAmount = isConnected
-            ? isStableCurrency(selectedCollateral)
-                ? Number(truncToDecimals(collateralBalance))
-                : Number(truncToDecimals(collateralBalance, 18))
+            ? Number(
+                  truncToDecimals(
+                      isBiconomy ? collateralBalance * (1 - BICONOMY_MAX_FEE_PERCENTAGE) : collateralBalance,
+                      isStableCurrency(selectedCollateral) ? 2 : 18
+                  )
+              )
             : Number.POSITIVE_INFINITY;
 
         let maxLiquidity, maxLiquidityPerDirection: number;
@@ -364,11 +370,11 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
                 })}
             </BuyinAmountsWrapper>
             <NumericInput
-                value={ceilNumberToDecimals(buyinAmount, 8) || ''}
+                value={buyinAmount === '' ? '' : ceilNumberToDecimals(Number(buyinAmount), 8)}
                 placeholder={t('common.enter-amount')}
                 onChange={(_, value) => {
                     setSelectedStableBuyinAmount(isStableCurrency(selectedCollateral) ? Number(value) : 0);
-                    setBuyinAmount(Number(value));
+                    setBuyinAmount(value);
                 }}
                 showValidation={!!errorMessageKey}
                 validationMessage={t(errorMessageKey, {

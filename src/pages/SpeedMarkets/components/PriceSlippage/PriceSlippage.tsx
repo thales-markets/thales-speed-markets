@@ -1,11 +1,7 @@
 import OutsideClickHandler from 'components/OutsideClick';
 import Tooltip from 'components/Tooltip';
 import NumericInput from 'components/fields/NumericInput';
-import {
-    DEFAULT_PRICE_SLIPPAGE_PERCENTAGE,
-    DOUBLE_DEFAULT_PRICE_SLIPPAGE_PERCENTAGE,
-    MIN_STRIKE_PRICE_SLIPPAGE_PERCENTAGE,
-} from 'constants/market';
+import { DEFAULT_PRICE_SLIPPAGES_PERCENTAGE, MIN_STRIKE_PRICE_SLIPPAGE_PERCENTAGE } from 'constants/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -37,18 +33,15 @@ const PriceSlippage: React.FC<{ slippage: number; onChange: React.Dispatch<numbe
                                 />
                             </SlippageInfo>
                             <SlippageRow>
-                                <SlippageButton
-                                    $isSelected={slippage === DEFAULT_PRICE_SLIPPAGE_PERCENTAGE}
-                                    onClick={() => onChange(DEFAULT_PRICE_SLIPPAGE_PERCENTAGE)}
-                                >
-                                    {decimalToPercentage(DEFAULT_PRICE_SLIPPAGE_PERCENTAGE)}%
-                                </SlippageButton>
-                                <SlippageButton
-                                    $isSelected={slippage === DOUBLE_DEFAULT_PRICE_SLIPPAGE_PERCENTAGE}
-                                    onClick={() => onChange(DOUBLE_DEFAULT_PRICE_SLIPPAGE_PERCENTAGE)}
-                                >
-                                    {decimalToPercentage(DOUBLE_DEFAULT_PRICE_SLIPPAGE_PERCENTAGE)}%
-                                </SlippageButton>
+                                {DEFAULT_PRICE_SLIPPAGES_PERCENTAGE.map((slippageOption, index) => (
+                                    <SlippageButton
+                                        key={index}
+                                        $isSelected={slippage === slippageOption}
+                                        onClick={() => onChange(slippageOption)}
+                                    >
+                                        {decimalToPercentage(slippageOption)}%
+                                    </SlippageButton>
+                                ))}
                                 <NumericInput
                                     value={decimalToPercentage(slippage)}
                                     onChange={(_, value) => onChange(percentageToDecimal(Number(value)))}
