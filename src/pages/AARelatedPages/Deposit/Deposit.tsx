@@ -160,7 +160,7 @@ const Deposit: React.FC = () => {
             {showQRModal && (
                 <QRCodeModal
                     onClose={() => setShowQRModal(false)}
-                    walletAddress={walletAddress}
+                    walletAddress={biconomyConnector.address}
                     title={t('deposit.qr-modal-title')}
                 />
             )}
