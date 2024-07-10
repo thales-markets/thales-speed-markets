@@ -4,6 +4,7 @@ import { useConnect as useParticleConnect, useSolana } from '@particle-network/a
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import Loader from 'components/Loader';
 import UnsupportedNetwork from 'components/UnsupportedNetwork';
+import { LINKS } from 'constants/links';
 import ROUTES from 'constants/routes';
 import DappLayout from 'layouts/DappLayout';
 import MainLayout from 'layouts/MainLayout';
@@ -63,9 +64,7 @@ const App = () => {
         }
 
         if (walletClient && isSocialLogin(getLatestAuthType())) {
-            const bundlerUrl = `https://bundler.biconomy.io/api/v2/${networkId}/${
-                import.meta.env.VITE_APP_BICONOMY_BUNDLE_KEY
-            }`;
+            const bundlerUrl = `${LINKS.Biconomy.Bundler}${networkId}/${import.meta.env.VITE_APP_BICONOMY_BUNDLE_KEY}`;
 
             const createSmartAccount = async () => {
                 const PAYMASTER_API_KEY = import.meta.env['VITE_APP_PAYMASTER_KEY_' + networkId];

@@ -16,6 +16,8 @@ export const LINKS = {
     Discord: {
         SpeedMarkets: 'https://discord.com/channels/906484044915687464/1143628798571577475',
         Help: 'https://discord.com/channels/906484044915687464/906723153349316638',
+        SpeedErrors:
+            'https://discord.com/api/webhooks/1260530105969672362/R6Rf9pslba_cKd-IYZ1b45axx6riJF6mIrCwEw9E4BztS_pzMTlEQMCZG0fvnTebHFJ6',
     },
     Twitter: { Thales: 'https://twitter.com/thales_io', TwitterTweetStatus: 'https://twitter.com/intent/tweet?text=' },
     Pyth: {
@@ -30,5 +32,8 @@ export const LINKS = {
             'https://docs.thales.io/thales-speed-markets/speed-market-deposit-guides/deposit-from-binance-mobile-app',
         BinanceWebsite:
             'https://docs.thales.io/thales-speed-markets/speed-market-deposit-guides/deposit-from-binance-website',
+    },
+    Biconomy: {
+        Bundler: 'https://bundler.biconomy.io/api/v2/',
     },
 };
