@@ -8,7 +8,7 @@ import WalletDisclaimer from 'components/WalletDisclaimer';
 import { PLAUSIBLE } from 'constants/analytics';
 import { ThemeMap } from 'constants/ui';
 import { merge } from 'lodash';
-import React from 'react';
+import React, { ErrorInfo } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
 import { Provider } from 'react-redux';
@@ -20,6 +20,7 @@ import { WagmiProvider } from 'wagmi';
 import enTranslation from '../../i18n/en.json';
 import App from './App';
 import { wagmiConfig } from './wagmiConfig';
+import { LINKS } from 'constants/links';
 
 window.Buffer = window.Buffer || buffer;
 
@@ -45,6 +46,8 @@ const rainbowCustomTheme = merge(darkTheme(), {
 
 queryConnector.setQueryClient();
 
+const DISCORD_MESSAGE_MAX_LENGTH = 2000;
+
 const Root: React.FC<RootProps> = ({ store }) => {
     // particle context provider is overriding our i18n configuration and languages, so we need to add our localization after the initialization of particle context
     // initialization of particle context is happening in Root
@@ -52,8 +55,35 @@ const Root: React.FC<RootProps> = ({ store }) => {
     i18n.addResourceBundle('en', 'translation', enTranslation, true);
 
     PLAUSIBLE.enableAutoPageviews();
+
+    const logError = (error: Error, info: ErrorInfo) => {
+        if (import.meta.env.DEV) {
+            return;
+        }
+
+        fetch(LINKS.Discord.SpeedErrors, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ content: `Error:\n${error.stack}` }),
+        });
+
+        let errorInfoText = `ErrorInfo:\n${JSON.stringify(info)}`;
+        if (errorInfoText.length > DISCORD_MESSAGE_MAX_LENGTH) {
+            errorInfoText = errorInfoText.substring(0, DISCORD_MESSAGE_MAX_LENGTH);
+        }
+        fetch(LINKS.Discord.SpeedErrors, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ content: errorInfoText }),
+        });
+    };
+
     return (
-        <ErrorBoundary fallback={<UnexpectedError theme={ThemeMap[theme]} />} onError={() => {}}>
+        <ErrorBoundary fallback={<UnexpectedError theme={ThemeMap[theme]} />} onError={logError}>
             <QueryClientProvider client={queryConnector.queryClient}>
                 <Provider store={store}>
                     <AuthCoreContextProvider
