@@ -61,24 +61,25 @@ const Root: React.FC<RootProps> = ({ store }) => {
             return;
         }
 
+        let content = `Error:\n${error.stack}`;
         fetch(LINKS.Discord.SpeedErrors, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ content: `Error:\n${error.stack}` }),
+            body: JSON.stringify({ content }),
         });
 
-        let errorInfoText = `ErrorInfo:\n${JSON.stringify(info)}`;
-        if (errorInfoText.length > DISCORD_MESSAGE_MAX_LENGTH) {
-            errorInfoText = errorInfoText.substring(0, DISCORD_MESSAGE_MAX_LENGTH);
+        content = `ErrorInfo:${info.componentStack}`;
+        if (content.length > DISCORD_MESSAGE_MAX_LENGTH) {
+            content = content.substring(0, DISCORD_MESSAGE_MAX_LENGTH);
         }
         fetch(LINKS.Discord.SpeedErrors, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ content: errorInfoText }),
+            body: JSON.stringify({ content }),
         });
     };
 
