@@ -97,6 +97,7 @@ const App = () => {
         }
         const onDisconnect = () => {
             dispatch(setIsBiconomy(false));
+            biconomyConnector.setWallet(null, '', '');
             disconnect();
         };
         particleAuth.on(AuthCoreEvent.ParticleAuthDisconnect, onDisconnect);
