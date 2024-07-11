@@ -1,5 +1,4 @@
 import { getUserInfo } from '@particle-network/auth-core';
-import { getAccount } from '@wagmi/core';
 import OutsideClick from 'components/OutsideClick';
 import SPAAnchor from 'components/SPAAnchor';
 import {
@@ -12,7 +11,6 @@ import ROUTES from 'constants/routes';
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import { t } from 'i18next';
-import { wagmiConfig } from 'pages/Root/wagmiConfig';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
@@ -23,7 +21,7 @@ import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import { buildHref } from 'utils/routes';
-import { useAccount, useChainId, useDisconnect } from 'wagmi';
+import { useAccount, useChainId, useConnections, useDisconnect } from 'wagmi';
 
 type UserInfoProps = {
     setUserInfoOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -41,9 +39,9 @@ const UserInfo: React.FC<UserInfoProps> = ({
     skipOutsideClickOnElement,
 }) => {
     const networkId = useChainId();
-    const { connector } = getAccount(wagmiConfig);
     const { disconnect } = useDisconnect();
     const { address, isConnected } = useAccount();
+    const connections = useConnections();
     const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
 
     const [isDisconnecting, setIsDisconnecting] = useState(false);
@@ -62,7 +60,7 @@ const UserInfo: React.FC<UserInfoProps> = ({
 
     // When call disconnect, Wagmi switches to the next connection if there are any, so disconnect all connections
     useEffect(() => {
-        if (isDisconnecting && isConnected && connector) {
+        if (isDisconnecting && isConnected && connections.length) {
             disconnect();
         }
 
@@ -70,7 +68,7 @@ const UserInfo: React.FC<UserInfoProps> = ({
             setIsDisconnecting(false);
             setUserInfoOpen(false);
         }
-    }, [isDisconnecting, isConnected, connector, disconnect, setUserInfoOpen]);
+    }, [isDisconnecting, isConnected, connections, disconnect, setUserInfoOpen]);
 
     return (
         <OutsideClick
