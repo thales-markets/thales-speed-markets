@@ -1,4 +1,5 @@
 import { getUserInfo } from '@particle-network/auth-core';
+import { getAccount } from '@wagmi/core';
 import OutsideClick from 'components/OutsideClick';
 import SPAAnchor from 'components/SPAAnchor';
 import {
@@ -11,7 +12,8 @@ import ROUTES from 'constants/routes';
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import { t } from 'i18next';
-import React from 'react';
+import { wagmiConfig } from 'pages/Root/wagmiConfig';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsBiconomy } from 'redux/modules/wallet';
@@ -39,9 +41,12 @@ const UserInfo: React.FC<UserInfoProps> = ({
     skipOutsideClickOnElement,
 }) => {
     const networkId = useChainId();
+    const { connector } = getAccount(wagmiConfig);
     const { disconnect } = useDisconnect();
-    const { address } = useAccount();
+    const { address, isConnected } = useAccount();
     const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
+
+    const [isDisconnecting, setIsDisconnecting] = useState(false);
 
     const validUntil = window.localStorage.getItem(LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId]);
 
@@ -54,6 +59,18 @@ const UserInfo: React.FC<UserInfoProps> = ({
             toast.update(id, getErrorToastOptions('Error', id));
         }
     };
+
+    // When call disconnect, Wagmi switches to the next connection if there are any, so disconnect all connections
+    useEffect(() => {
+        if (isDisconnecting && isConnected && connector) {
+            disconnect();
+        }
+
+        if (!isConnected) {
+            setIsDisconnecting(false);
+            setUserInfoOpen(false);
+        }
+    }, [isDisconnecting, isConnected, connector, disconnect, setUserInfoOpen]);
 
     return (
         <OutsideClick
@@ -142,8 +159,7 @@ const UserInfo: React.FC<UserInfoProps> = ({
                 <FlexColumn>
                     <MenuItem
                         onClick={() => {
-                            setUserInfoOpen(false);
-                            disconnect();
+                            setIsDisconnecting(true);
                         }}
                     >
                         <Icon className="network-icon network-icon--logout" />
