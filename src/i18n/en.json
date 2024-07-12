@@ -288,7 +288,8 @@
             },
             "tooltips": { "liquidity": "Current available liquidity for all Assets" }
         },
-        "chart-title": "{{currencyKey}}/USD chart"
+        "chart-title": "{{currencyKey}}/USD chart",
+        "estimate-gas": "Estimated transaction cost"
     },
     "profile": {
         "title": "Profile",
