@@ -675,7 +675,13 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
         return (
             <Button disabled={isButtonDisabled} onClick={handleSubmit}>
-                {isSubmitting ? t(`common.buy.progress-label`) : t(`common.buy.label`)}
+                {isSubmitting
+                    ? isEth && !isBiconomy
+                        ? t('common.buy.wrap-eth-progress')
+                        : t('common.buy.progress-label')
+                    : isEth && !isBiconomy
+                    ? t('common.buy.wrap-eth')
+                    : t('common.buy.label')}
             </Button>
         );
     };

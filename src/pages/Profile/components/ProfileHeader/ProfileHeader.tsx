@@ -9,7 +9,7 @@ import { FlexDivRowCentered, FlexDivColumn, FlexDivSpaceBetween, FlexDiv } from 
 import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
-import { useChainId, useAccount } from 'wagmi';
+import { useChainId, useAccount, useConnections } from 'wagmi';
 import {
     getInfoToastOptions,
     getErrorToastOptions,
@@ -37,10 +37,15 @@ import avatar13 from 'assets/images/avatars/avatar2.webp';
 const ProfileHeader: React.FC = () => {
     const networkId = useChainId();
     const { address } = useAccount();
+    const connections = useConnections();
     const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const validUntil = window.localStorage.getItem(LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId]);
+
+    const particleConnections = connections.filter((connection) => connection.connector.type === 'particle');
+    const particleAccounts = particleConnections.length ? particleConnections[0].accounts : [];
+    const eoa = particleAccounts.length ? particleAccounts[0] : '';
 
     const handleCopy = () => {
         const id = toast.loading(t('user-info.copying-address'), getLoadingToastOptions());
@@ -139,7 +144,7 @@ const ProfileHeader: React.FC = () => {
                         <Tooltip overlay={t('user-info.eoa-address-tooltip')}>
                             <FlexDivColumn>
                                 <TextLabel>{t('user-info.eoa')} </TextLabel>
-                                <Value>{address?.toLowerCase()}</Value>
+                                <Value>{eoa?.toLowerCase()}</Value>
                             </FlexDivColumn>
                         </Tooltip>
                         <SessionWrapper>

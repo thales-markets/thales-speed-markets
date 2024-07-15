@@ -5,6 +5,8 @@
         "buy": {
             "label": "Buy",
             "progress-label": "Buying in progress...",
+            "wrap-eth": "Wrap ETH and buy",
+            "wrap-eth-progress": "Wrap and buy in progress...",
             "confirmation-message": "Successfully bought - market created"
         },
         "or": "or",
