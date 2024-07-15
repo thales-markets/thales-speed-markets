@@ -131,7 +131,7 @@ export const executeBiconomyTransaction = async (
                                   paymasterServiceData: {
                                       mode:
                                           networkId === NetworkId.Base ? PaymasterMode.SPONSORED : PaymasterMode.ERC20,
-                                      preferredToken: collateral,
+                                      preferredToken: networkId === NetworkId.Base ? undefined : collateral,
                                   },
                               }
                     );
@@ -201,7 +201,7 @@ export const executeBiconomyTransaction = async (
                         : {
                               paymasterServiceData: {
                                   mode: networkId === NetworkId.Base ? PaymasterMode.SPONSORED : PaymasterMode.ERC20,
-                                  preferredToken: collateral,
+                                  preferredToken: networkId === NetworkId.Base ? undefined : collateral,
                               },
                               params: {
                                   sessionSigner: sessionSigner,
