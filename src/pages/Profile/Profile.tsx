@@ -1,10 +1,12 @@
 import SPAAnchor from 'components/SPAAnchor';
 import SearchInput from 'components/SearchInput';
+import TotalBalance from 'components/TotalBalance';
 import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
 import { MARKET_DURATION_IN_DAYS } from 'constants/market';
 import { SUPPORTED_ASSETS } from 'constants/pyth';
 import ROUTES from 'constants/routes';
 import { secondsToMilliseconds } from 'date-fns';
+import useDebouncedEffect from 'hooks/useDebouncedEffect';
 import useInterval from 'hooks/useInterval';
 import MobileMenu from 'layouts/DappLayout/components/MobileMenu';
 import UserOpenPositions from 'pages/SpeedMarkets/components/UserOpenPositions';
@@ -21,8 +23,8 @@ import { getUserNotifications } from 'redux/modules/user';
 import { FlexDivEnd } from 'styles/common';
 import { RootState } from 'types/ui';
 import { getCurrentPrices, getPriceConnection, getPriceId, getSupportedAssetsAsObject } from 'utils/pyth';
-import { buildHref, history } from 'utils/routes';
-import { useChainId, useClient } from 'wagmi';
+import { buildHref, history, navigateTo } from 'utils/routes';
+import { useAccount, useChainId, useClient } from 'wagmi';
 import ProfileHeader from './components/ProfileHeader';
 import UserHistoricalPositions from './components/UserHistoricalPositions';
 import {
@@ -36,7 +38,6 @@ import {
     TabSectionTitle,
     Tabs,
 } from './styled-components';
-import TotalBalance from 'components/TotalBalance';
 
 enum TabItems {
     MY_POSITIONS = 'my-positions',
@@ -49,6 +50,7 @@ const Profile: React.FC = () => {
 
     const networkId = useChainId();
     const client = useClient();
+    const { isConnected } = useAccount();
 
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
@@ -94,6 +96,13 @@ const Profile: React.FC = () => {
             setSearchAddress('');
         }
     }, [searchText]);
+
+    // check if not connected using debounced as it changes connection from false to true on refresh
+    useDebouncedEffect(() => {
+        if (!isConnected) {
+            navigateTo(ROUTES.Markets.Home);
+        }
+    }, [isConnected]);
 
     const onTabClickHandler = (tab: TabItems) => {
         history.push({
