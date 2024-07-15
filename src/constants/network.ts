@@ -70,14 +70,15 @@ export const RPC_LIST = {
     INFURA: {
         [NetworkId.OptimismMainnet]: `https://optimism-mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
         [NetworkId.Arbitrum]: `https://arbitrum-mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
+        [NetworkId.Base]: `https://base-mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
         [NetworkId.PolygonMainnet]: `https://polygon-mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
         [NetworkId.OptimismSepolia]: `https://optimism-sepolia.infura.io/v3/${INFURA_PROJECT_ID}`,
     },
     CHAINNODE: {
         [NetworkId.OptimismMainnet]: `https://optimism-mainnet.chainnodes.org/${CHAINNODE_PROJECT_ID}`,
         [NetworkId.Arbitrum]: `https://arbitrum-one.chainnodes.org/${CHAINNODE_PROJECT_ID}`,
-        [NetworkId.PolygonMainnet]: `https://polygon-mainnet.chainnodes.org/${CHAINNODE_PROJECT_ID}`,
         [NetworkId.Base]: `https://base-mainnet.chainnodes.org/${CHAINNODE_PROJECT_ID}`,
+        [NetworkId.PolygonMainnet]: `https://polygon-mainnet.chainnodes.org/${CHAINNODE_PROJECT_ID}`,
     },
     ANKR: {
         [NetworkId.OptimismMainnet]: `https://rpc.ankr.com/optimism/${ANKR_PROJECT_ID}`,

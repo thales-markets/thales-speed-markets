@@ -62,12 +62,13 @@ const Root: React.FC<RootProps> = ({ store }) => {
         }
 
         let content = `Error:\n${error.stack}`;
+        const flags = 4; // SUPPRESS_EMBEDS
         fetch(LINKS.Discord.SpeedErrors, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ content }),
+            body: JSON.stringify({ content, flags }),
         });
 
         content = `ErrorInfo:${info.componentStack}`;
@@ -79,7 +80,7 @@ const Root: React.FC<RootProps> = ({ store }) => {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ content }),
+            body: JSON.stringify({ content, flags }),
         });
     };
 
