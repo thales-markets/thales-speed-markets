@@ -60,6 +60,11 @@ const CollateralSelector: React.FC<CollateralSelectorProps> = ({
 
     disabled = disabled || collateralArray.length === 1;
 
+    if (selectedItem > collateralArray.length - 1) {
+        dispatch(setSelectedCollateralIndex(0));
+        selectedItem = 0;
+    }
+
     return (
         <Container margin={additionalStyles?.margin?.toString()} position={additionalStyles?.position}>
             <OutsideClickHandler onOutsideClick={() => setOpen(false)}>
