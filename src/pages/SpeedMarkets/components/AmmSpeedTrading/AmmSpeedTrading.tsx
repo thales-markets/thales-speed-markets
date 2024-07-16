@@ -765,26 +765,47 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
             const skewImpactParam = positionType ? parseUnits(skewImpact[positionType].toString(), 18) : undefined;
 
-            const paymasterDataLocal = await getPaymasterData(
-                collateralAddress,
-                speedMarketsCreatorContract,
-                'addPendingSpeedMarket',
-                [
+            if (isChained) {
+                const paymasterDataLocal = await getPaymasterData(
+                    collateralAddress,
+                    speedMarketsCreatorContract,
+                    'addPendingChainedSpeedMarket',
                     [
-                        asset,
-                        0,
-                        deltaTimeSec,
-                        sides,
-                        strikePriceSlippage,
-                        sides[0],
-                        collateralAddressParam || ZERO_ADDRESS,
-                        buyInAmountParam,
-                        referral || ZERO_ADDRESS,
-                        skewImpactParam,
-                    ],
-                ]
-            );
-            setGasFee(paymasterDataLocal);
+                        [
+                            asset,
+                            deltaTimeSec,
+                            0,
+                            strikePriceSlippage,
+                            sides,
+                            collateralAddressParam || ZERO_ADDRESS,
+                            buyInAmountParam,
+                            referral || ZERO_ADDRESS,
+                        ],
+                    ]
+                );
+                setGasFee(paymasterDataLocal);
+            } else {
+                const paymasterDataLocal = await getPaymasterData(
+                    collateralAddress,
+                    speedMarketsCreatorContract,
+                    'addPendingSpeedMarket',
+                    [
+                        [
+                            asset,
+                            0,
+                            deltaTimeSec,
+                            sides,
+                            strikePriceSlippage,
+                            sides[0],
+                            collateralAddressParam || ZERO_ADDRESS,
+                            buyInAmountParam,
+                            referral || ZERO_ADDRESS,
+                            skewImpactParam,
+                        ],
+                    ]
+                );
+                setGasFee(paymasterDataLocal);
+            }
         }
     }, [
         isBiconomy,
