@@ -16,6 +16,7 @@ import {
     POSITIONS_TO_SIDE_MAP,
     SPEED_MARKETS_QUOTE,
 } from 'constants/market';
+import { ZERO_ADDRESS } from 'constants/network';
 import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 import { secondsToMilliseconds } from 'date-fns';
@@ -87,7 +88,6 @@ import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 import PriceSlippage from '../PriceSlippage';
 import { SelectedPosition } from '../SelectPosition/SelectPosition';
 import SharePosition from '../SharePosition';
-import { ZERO_ADDRESS } from 'constants/network';
 
 type AmmSpeedTradingProps = {
     isChained: boolean;
@@ -196,8 +196,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             getReferralWallet()?.toLowerCase() !== biconomyConnector.address)
             ? getReferralWallet()
             : null;
-
-    const userAddress = (isBiconomy ? biconomyConnector.address : walletAddress) as string;
 
     const exchangeRatesMarketDataQuery = useExchangeRatesQuery(
         { networkId, client },
@@ -387,6 +385,8 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         positionType,
     ]);
 
+    const userAddress = isBiconomy ? biconomyConnector.address : (walletAddress as string);
+
     // Check allowance
     useDebouncedEffect(() => {
         if (!collateralAddress) {
@@ -494,39 +494,57 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         }
     };
 
+    const onMarketCreated = useCallback(
+        (toastIdParam: string | number) => {
+            toast.update(toastIdParam, getSuccessToastOptions(t(`common.buy.confirmation-message`), toastIdParam));
+            resetData();
+            setPaidAmount(0);
+            setSubmittedStrikePrice(0);
+            setIsSubmitting(false);
+
+            refetchUserSpeedMarkets(isChained, networkId, userAddress);
+            refetchActiveSpeedMarkets(isChained, networkId);
+            refetchSpeedMarketsLimits(isChained, networkId);
+            refetchBalances(userAddress, networkId);
+        },
+        [isChained, networkId, resetData, t, userAddress]
+    );
+
     const handleSubmit = async () => {
         if (!isBiconomy && isButtonDisabled) return;
 
         setIsSubmitting(true);
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
 
-        const speedMarketsCreatorContract = getContract({
+        const speedMarketsCreatorContractWithSigner = getContract({
             abi: getContractAbi(speedMarketsAMMCreatorContract, networkId),
             address: speedMarketsAMMCreatorContract.addresses[networkId],
             client: walletClient.data as Client,
         });
 
+        const ammContract = isChained ? chainedSpeedMarketsAMMContract : speedMarketsAMMContract;
+
+        const speedMarketsAMMContractWithClient = getContract({
+            abi: getContractAbi(ammContract, networkId),
+            address: ammContract.addresses[networkId],
+            client,
+        }) as ViemContract;
+
+        const numOfActiveUserMarketsBefore = Number(
+            (await speedMarketsAMMContractWithClient.read.getLengths([userAddress]))[2]
+        );
+
         const publicClient = getPublicClient(wagmiConfig, { chainId: networkId });
         let isMarketCreated = false;
+
         const unwatch = publicClient.watchContractEvent({
-            address: isChained
-                ? chainedSpeedMarketsAMMContract.addresses[networkId]
-                : speedMarketsAMMContract.addresses[networkId],
-            abi: getContractAbi(isChained ? chainedSpeedMarketsAMMContract : speedMarketsAMMContract, networkId),
+            address: ammContract.addresses[networkId],
+            abi: getContractAbi(ammContract, networkId),
             eventName: isChained ? 'MarketCreated' : 'MarketCreatedWithFees',
             args: { [isChained ? 'user' : '_user']: userAddress },
             onLogs: () => {
                 isMarketCreated = true;
-                toast.update(id, getSuccessToastOptions(t(`common.buy.confirmation-message`), id));
-                resetData();
-                setPaidAmount(0);
-                setSubmittedStrikePrice(0);
-                setIsSubmitting(false);
-
-                refetchUserSpeedMarkets(isChained, networkId, userAddress);
-                refetchActiveSpeedMarkets(isChained, networkId);
-                refetchSpeedMarketsLimits(isChained, networkId);
-                refetchBalances(userAddress, networkId);
+                onMarketCreated(id);
             },
             onError: (error: Error) => console.log('Error on watch event MarketCreatedWithFees', error),
         });
@@ -579,7 +597,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             }
 
             const hash = await getTransactionForSpeedAMM(
-                speedMarketsCreatorContract,
+                speedMarketsCreatorContractWithSigner,
                 asset,
                 deltaTimeSec,
                 sides,
@@ -596,16 +614,24 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             const txReceipt = await waitForTransactionReceipt(client as Client, { hash });
 
             if (txReceipt.status === 'success') {
-                // if creator didn't created market for max time then assume creation failed
+                // if creator didn't created market for max time then check for total number of markets
                 await delay(
                     secondsToMilliseconds(
                         ammSpeedMarketsCreatorData?.maxCreationDelay || DEFAULT_MAX_CREATOR_DELAY_TIME_SEC
                     )
                 );
                 if (!isMarketCreated) {
-                    toast.update(id, getErrorToastOptions(t('common.errors.buy-failed'), id));
-                    setSubmittedStrikePrice(0);
-                    setIsSubmitting(false);
+                    const numOfActiveUserMarketsAfter = Number(
+                        (await speedMarketsAMMContractWithClient.read.getLengths([userAddress]))[2]
+                    );
+
+                    if (numOfActiveUserMarketsAfter - numOfActiveUserMarketsBefore > 0) {
+                        onMarketCreated(id);
+                    } else {
+                        toast.update(id, getErrorToastOptions(t('common.errors.buy-failed'), id));
+                        setSubmittedStrikePrice(0);
+                        setIsSubmitting(false);
+                    }
                 }
 
                 PLAUSIBLE.trackEvent(
