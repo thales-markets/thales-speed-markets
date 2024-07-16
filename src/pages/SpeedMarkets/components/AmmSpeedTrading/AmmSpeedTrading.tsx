@@ -751,7 +751,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     };
 
     useMemo(async () => {
-        if (isBiconomy) {
+        if (isBiconomy && !isButtonDisabled) {
             const speedMarketsCreatorContract = getContract({
                 abi: getContractAbi(speedMarketsAMMCreatorContract, networkId),
                 address: speedMarketsAMMCreatorContract.addresses[networkId],
@@ -829,6 +829,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         selectedCollateral,
         skewImpact,
         walletClient.data,
+        isButtonDisabled,
     ]);
 
     const inputWrapperRef = useRef<HTMLDivElement>(null);
