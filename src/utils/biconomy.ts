@@ -20,6 +20,7 @@ import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
 import { wagmiConfig } from 'pages/Root/wagmiConfig';
 import { getPublicClient } from '@wagmi/core';
 import sessionValidationContract from './contracts/sessionValidationContract';
+import { NetworkId } from 'thales-utils';
 
 export const executeBiconomyTransactionWithConfirmation = async (
     collateral: string,
@@ -134,8 +135,9 @@ export const executeBiconomyTransaction = async (
                             ? {}
                             : {
                                   paymasterServiceData: {
-                                      mode: PaymasterMode.ERC20,
-                                      preferredToken: collateral,
+                                      mode:
+                                          networkId === NetworkId.Base ? PaymasterMode.SPONSORED : PaymasterMode.ERC20,
+                                      preferredToken: networkId === NetworkId.Base ? undefined : collateral,
                                   },
                               }
                     );
@@ -204,8 +206,8 @@ export const executeBiconomyTransaction = async (
                           }
                         : {
                               paymasterServiceData: {
-                                  mode: PaymasterMode.ERC20,
-                                  preferredToken: collateral,
+                                  mode: networkId === NetworkId.Base ? PaymasterMode.SPONSORED : PaymasterMode.ERC20,
+                                  preferredToken: networkId === NetworkId.Base ? undefined : collateral,
                               },
                               params: {
                                   sessionSigner: sessionSigner,

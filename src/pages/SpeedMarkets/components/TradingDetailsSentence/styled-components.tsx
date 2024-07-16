@@ -1,5 +1,6 @@
+import { ScreenSizeBreakpoint } from 'enums/ui';
 import styled from 'styled-components';
-import { FlexDivColumn } from 'styles/common';
+import { FlexDivCentered, FlexDivColumn } from 'styles/common';
 
 export const Cotainer = styled(FlexDivColumn)`
     width: 100%;
@@ -11,6 +12,24 @@ export const Text = styled.span`
     line-height: 24px;
     color: ${(props) => props.theme.textColor.primary};
     text-align: center;
+`;
+
+export const Footer = styled(FlexDivCentered)<{ isRelative: boolean }>`
+    position: ${(props) => (props.isRelative ? 'relative' : 'absolute')};
+    width: 100%;
+    left: 0;
+    ${(props) => (props.isRelative ? '' : 'bottom: 12px;')}
+`;
+
+export const TextFooter = styled(Text)`
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 20px;
+
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        line-height: 100%;
+        padding-top: 5px;
+    }
 `;
 
 export const TextLabel = styled(Text)``;
