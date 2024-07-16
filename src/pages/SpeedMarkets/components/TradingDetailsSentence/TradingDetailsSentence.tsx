@@ -12,7 +12,7 @@ import { formatCurrencyWithKey, formatCurrencyWithSign, formatShortDateWithTime 
 import { RootState } from 'types/ui';
 import { getDefaultCollateral } from 'utils/currency';
 import { useChainId } from 'wagmi';
-import { Cotainer, PositionText, Text, TextLabel, TextValue } from './styled-components';
+import { Cotainer, Footer, PositionText, Text, TextFooter, TextLabel, TextValue } from './styled-components';
 
 type SpeedMarketsTrade = {
     strikePrice: number;
@@ -111,15 +111,12 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
                         })}
                     </TextLabel>
                     {isChained && (
-                        <>
-                            <br />
-                            <TextValue>
-                                {`(${t('speed-markets.chained.starting-from')} ${formatCurrencyWithSign(
-                                    USD_SIGN,
-                                    market.strikePrice
-                                )})`}
-                            </TextValue>
-                        </>
+                        <TextValue>
+                            {` (${t('speed-markets.chained.starting-from')} ${formatCurrencyWithSign(
+                                USD_SIGN,
+                                market.strikePrice
+                            )})*`}
+                        </TextValue>
                     )}
                     {!isMobile && !isChained && (
                         <TextValue $uppercase={!!positionTypeFormatted} $lowercase={!positionTypeFormatted}>
@@ -129,7 +126,7 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
                                 : `( ${t('speed-markets.amm-trading.choose-direction')} )`}
                         </TextValue>
                     )}
-                    {!isChained && <TextValue> {formatCurrencyWithSign(USD_SIGN, market.strikePrice)}</TextValue>}
+                    {!isChained && <TextValue> {formatCurrencyWithSign(USD_SIGN, market.strikePrice)}*</TextValue>}
                 </Text>
             </FlexDivCentered>
             {isChained && (
@@ -177,6 +174,14 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
                     )}
                 </Text>
             </FlexDivCentered>
+
+            <Footer isRelative={isChained || isMobile}>
+                <TextFooter>
+                    {
+                        '*price shown is provisional, actual price will be known via Pyth oracles at the transaction mining time'
+                    }
+                </TextFooter>
+            </Footer>
         </Cotainer>
     );
 };
