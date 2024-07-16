@@ -42,21 +42,31 @@ export const executeBiconomyTransactionWithConfirmation = async (
             value,
         };
 
-        const { wait } = await biconomyConnector.wallet.sendTransaction(transaction, {
-            paymasterServiceData: {
-                mode: PaymasterMode.ERC20,
-                preferredToken: collateral,
-            },
-        });
+        try {
+            const { wait } = await biconomyConnector.wallet.sendTransaction(transaction, {
+                paymasterServiceData: {
+                    mode: PaymasterMode.ERC20,
+                    preferredToken: collateral,
+                },
+            });
 
-        const {
-            receipt: { transactionHash },
-            success,
-        } = await wait();
+            const {
+                receipt: { transactionHash },
+                success,
+            } = await wait();
 
-        if (success === 'false') {
-            throw new Error('tx failed');
-        } else return transactionHash;
+            console.log('tx hash: ', transactionHash);
+            console.log('success: ', success);
+
+            if (success === 'false') {
+                throw new Error('tx failed');
+            } else {
+                console.log('Transaction receipt', transactionHash);
+                return transactionHash;
+            }
+        } catch (e) {
+            console.log(e);
+        }
     }
 };
 
