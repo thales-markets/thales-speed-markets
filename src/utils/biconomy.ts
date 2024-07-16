@@ -1,4 +1,9 @@
-import { DEFAULT_SESSION_KEY_MANAGER_MODULE, createSessionKeyManagerModule } from '@biconomy/account';
+import {
+    DEFAULT_SESSION_KEY_MANAGER_MODULE,
+    IHybridPaymaster,
+    SponsorUserOperationDto,
+    createSessionKeyManagerModule,
+} from '@biconomy/account';
 import { PaymasterMode } from '@biconomy/paymaster';
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 import { addMonths } from 'date-fns';
@@ -73,6 +78,7 @@ export const executeBiconomyTransaction = async (
         console.log('value: ', value);
         console.log('isEth: ', isEth);
         console.log('buyInAmountParam: ', buyInAmountParam);
+        console.log(data);
 
         const encodedCall = encodeFunctionData({
             abi: getContractAbi(contract, networkId),
@@ -347,4 +353,49 @@ const getSessionSigner = async (networkId: SupportedNetwork) => {
         transport: http(biconomyConnector.wallet?.rpcProvider.transport.url),
     });
     return sessionSigner;
+};
+
+export const getPaymasterData = async (
+    collateral: string,
+    contract: ViemContract | undefined,
+    methodName: string,
+    data?: ReadonlyArray<any>,
+    value?: any
+): Promise<number> => {
+    if (biconomyConnector.wallet && contract) {
+        try {
+            biconomyConnector.wallet.setActiveValidationModule(biconomyConnector.wallet.defaultValidationModule);
+            const encodedCall = encodeFunctionData({
+                abi: contract.abi,
+                functionName: methodName,
+                args: data ? data : ([] as any),
+            });
+
+            const transaction = {
+                to: contract.address,
+                data: encodedCall,
+                value,
+            };
+
+            const userOp = await biconomyConnector.wallet.buildUserOp([transaction], {
+                paymasterServiceData: {
+                    mode: PaymasterMode.ERC20,
+                    preferredToken: collateral,
+                },
+            });
+
+            const biconomyPaymaster = biconomyConnector.wallet.paymaster as IHybridPaymaster<SponsorUserOperationDto>;
+            const feeQuotesData = await biconomyPaymaster?.getPaymasterFeeQuotesOrData(userOp, {
+                mode: PaymasterMode.ERC20,
+                preferredToken: collateral,
+            });
+
+            if (feeQuotesData.feeQuotes && feeQuotesData.feeQuotes[0].maxGasFeeUSD) {
+                return feeQuotesData.feeQuotes[0].maxGasFeeUSD;
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }
+    return 0;
 };
