@@ -389,6 +389,12 @@
         "info": "*To access your Solana wallet, go to wallet.particle.network and login with the same social account as on this dApp",
         "input-label": "Input/change your solana address:",
         "submit": "Submit",
-        "success": "Successfully submitted solana address"
+        "success": "Successfully submitted solana address",
+        "eligible": "You're eligible!!!",
+        "early-users": "Allocation for early Speed Markets users",
+        "governance-voters": "Allocation for governance voters",
+        "council-nomine": "Allocation for Thales Council nominees",
+        "total-allocation": "You will receive:",
+        "not-eligible": "Your wallet is not currently eligible for PYTH retroactive airdrop. You can still get PYTH rewards via ongoing <a>Trading Competition</a> and receive potential future airdrops"
     }
 }
