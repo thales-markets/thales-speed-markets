@@ -29,7 +29,7 @@ import { particleWagmiWallet } from 'utils/particleWallet/particleWagmiWallet';
 import { isSocialLogin } from 'utils/particleWallet/utils';
 import queryConnector from 'utils/queryConnector';
 import { history } from 'utils/routes';
-import { useAccount, useChainId, useConnect, useDisconnect, useSwitchChain, useWalletClient } from 'wagmi';
+import { useChainId, useConnect, useDisconnect, useSwitchChain, useWalletClient } from 'wagmi';
 
 const App = () => {
     const dispatch = useDispatch();
@@ -38,7 +38,6 @@ const App = () => {
     const { switchChain } = useSwitchChain();
     const { disconnect } = useDisconnect();
     const { connect } = useConnect();
-    const { isConnected } = useAccount();
     const { connectionStatus } = useParticleConnect();
     const { address: solanaAddress, enable } = useSolana();
 
@@ -154,7 +153,7 @@ const App = () => {
                         </Route>
                     )}
 
-                    {isConnected && getSupportedNetworksByRoute(ROUTES.Markets.Profile).includes(networkId) && (
+                    {getSupportedNetworksByRoute(ROUTES.Markets.Profile).includes(networkId) && (
                         <Route exact path={ROUTES.Markets.Profile}>
                             <Suspense fallback={<Loader />}>
                                 <DappLayout>
