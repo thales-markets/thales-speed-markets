@@ -75,12 +75,13 @@ const App = () => {
                 const smartAddress = await smartAccount.getAccountAddress();
                 if (!solanaAddress) await enable();
 
-                biconomyConnector.setWallet(smartAccount, smartAddress, solanaAddress ?? '');
-                dispatch(setIsBiconomy(true));
+                if (!biconomyConnector.address || biconomyConnector.address === smartAddress) {
+                    biconomyConnector.setWallet(smartAccount, smartAddress, solanaAddress ?? '');
+                    dispatch(setIsBiconomy(true));
+                }
             };
-            if (!biconomyConnector.address) {
-                createSmartAccount();
-            }
+
+            createSmartAccount();
         }
     }, [dispatch, switchChain, networkId, disconnect, walletClient, enable, solanaAddress]);
 
