@@ -35,14 +35,7 @@ import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
 import { getIsBiconomy, getSelectedCollateralIndex, setWalletConnectModalVisibility } from 'redux/modules/wallet';
 import styled from 'styled-components';
-import {
-    FlexDivCentered,
-    FlexDivColumn,
-    FlexDivColumnCentered,
-    FlexDivRow,
-    FlexDivRowCentered,
-    GradientContainer,
-} from 'styles/common';
+import { FlexDivCentered, FlexDivColumn, FlexDivRow, FlexDivRowCentered, GradientContainer } from 'styles/common';
 import {
     COLLATERAL_DECIMALS,
     bigNumberFormatter,
@@ -870,7 +863,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                         <QuoteText>{potentialProfit ? `${truncToDecimals(potentialProfit)}x` : '-'}</QuoteText>
                     </QuoteContainer>
                     {isMobile && getTradingDetails()}
-                    <FlexDivColumnCentered>
+                    <ButtonWrapper>
                         {getSubmitButton()}
                         {gasFee > 0 && !isButtonDisabled && (
                             <Tooltip overlay={t('speed-markets.estimate-gas')}>
@@ -880,7 +873,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                                 </GasText>
                             </Tooltip>
                         )}
-                    </FlexDivColumnCentered>
+                    </ButtonWrapper>
                 </ColumnSpaceBetween>
             </FinalizeTrade>
 
@@ -924,6 +917,7 @@ const TradingDetailsContainer = styled(FlexDivRowCentered)<{ isChained: boolean 
 
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         width: 100%;
+        padding: 12px;
         ${(props) => (props.isChained ? '' : 'padding-bottom: 70px;')}
     }
 `;
@@ -998,6 +992,10 @@ const InfoText = styled.span`
     font-size: 13px;
     letter-spacing: 0.13px;
     color: ${(props) => props.theme.textColor.primary};
+`;
+
+const ButtonWrapper = styled(FlexDivColumn)`
+    justify-content: end;
 `;
 
 const GasIcon = styled.i`
