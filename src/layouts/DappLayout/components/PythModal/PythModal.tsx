@@ -204,7 +204,7 @@ const PythModal: React.FC<PythModalProps> = ({ onClose }) => {
 };
 
 const Wrapper = styled(FlexDivRowCentered)`
-    @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         margin-top: 20px;
         flex-direction: column;
     }
@@ -240,16 +240,29 @@ const InputLabel = styled.p`
 const AllocationWrapper = styled(FlexDivCentered)`
     margin-top: 20px;
     height: 66px;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        flex-direction: column;
+        height: auto;
+    }
 `;
 
 const EligibilityContainer = styled(FlexDivColumn)`
     gap: 20px;
     height: 100%;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-between;
+    }
 `;
 
 const AllocationContainer = styled(FlexDivColumnCentered)`
     flex: 2;
     gap: 10px;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        width: 100%;
+        margin-top: 10px;
+    }
 `;
 const Icon = styled.i`
     color: ${(props) => props.theme.dropDown.textColor.primary};
