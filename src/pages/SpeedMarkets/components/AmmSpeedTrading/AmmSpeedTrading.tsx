@@ -9,13 +9,14 @@ import {
 } from 'components/ToastMessage/ToastMessage';
 import Tooltip from 'components/Tooltip';
 import { PLAUSIBLE, PLAUSIBLE_KEYS } from 'constants/analytics';
-import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
+import { CRYPTO_CURRENCY_MAP, USD_SIGN } from 'constants/currency';
 import {
     ALLOWANCE_BUFFER_PERCENTAGE,
     DEFAULT_PRICE_SLIPPAGES_PERCENTAGE,
     POSITIONS_TO_SIDE_MAP,
     SPEED_MARKETS_QUOTE,
 } from 'constants/market';
+import { ZERO_ADDRESS } from 'constants/network';
 import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 import { secondsToMilliseconds } from 'date-fns';
@@ -34,12 +35,20 @@ import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
 import { getIsBiconomy, getSelectedCollateralIndex, setWalletConnectModalVisibility } from 'redux/modules/wallet';
 import styled from 'styled-components';
-import { FlexDivCentered, FlexDivColumn, FlexDivRow, FlexDivRowCentered, GradientContainer } from 'styles/common';
+import {
+    FlexDivCentered,
+    FlexDivColumn,
+    FlexDivColumnCentered,
+    FlexDivRow,
+    FlexDivRowCentered,
+    GradientContainer,
+} from 'styles/common';
 import {
     COLLATERAL_DECIMALS,
     bigNumberFormatter,
     ceilNumberToDecimals,
     coinParser,
+    formatCurrencyWithSign,
     localStore,
     truncToDecimals,
 } from 'thales-utils';
@@ -47,7 +56,7 @@ import { AmmChainedSpeedMarketsLimits, AmmSpeedMarketsLimits } from 'types/marke
 import { SupportedNetwork } from 'types/network';
 import { RootState } from 'types/ui';
 import { ViemContract } from 'types/viem';
-import { executeBiconomyTransaction } from 'utils/biconomy';
+import { executeBiconomyTransaction, getPaymasterData } from 'utils/biconomy';
 import biconomyConnector from 'utils/biconomyWallet';
 import { getContractAbi } from 'utils/contracts/abi';
 import chainedSpeedMarketsAMMContract from 'utils/contracts/chainedSpeedMarketsAMMContract';
@@ -141,6 +150,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     const [hasAllowance, setAllowance] = useState(false);
     const [openApprovalModal, setOpenApprovalModal] = useState(false);
     const [openTwitterShareModal, setOpenTwitterShareModal] = useState(false);
+    const [gasFee, setGasFee] = useState(0);
 
     const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
 
@@ -186,8 +196,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             getReferralWallet()?.toLowerCase() !== biconomyConnector.address)
             ? getReferralWallet()
             : null;
-
-    const userAddress = (isBiconomy ? biconomyConnector.address : walletAddress) as string;
 
     const exchangeRatesMarketDataQuery = useExchangeRatesQuery(
         { networkId, client },
@@ -377,6 +385,8 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         positionType,
     ]);
 
+    const userAddress = isBiconomy ? biconomyConnector.address : (walletAddress as string);
+
     // Check allowance
     useDebouncedEffect(() => {
         if (!collateralAddress) {
@@ -484,39 +494,57 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         }
     };
 
+    const onMarketCreated = useCallback(
+        (toastIdParam: string | number) => {
+            toast.update(toastIdParam, getSuccessToastOptions(t(`common.buy.confirmation-message`), toastIdParam));
+            resetData();
+            setPaidAmount(0);
+            setSubmittedStrikePrice(0);
+            setIsSubmitting(false);
+
+            refetchUserSpeedMarkets(isChained, networkId, userAddress);
+            refetchActiveSpeedMarkets(isChained, networkId);
+            refetchSpeedMarketsLimits(isChained, networkId);
+            refetchBalances(userAddress, networkId);
+        },
+        [isChained, networkId, resetData, t, userAddress]
+    );
+
     const handleSubmit = async () => {
         if (!isBiconomy && isButtonDisabled) return;
 
         setIsSubmitting(true);
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
 
-        const speedMarketsAMMContractWithSigner = getContract({
+        const speedMarketsCreatorContractWithSigner = getContract({
             abi: getContractAbi(speedMarketsAMMCreatorContract, networkId),
             address: speedMarketsAMMCreatorContract.addresses[networkId],
             client: walletClient.data as Client,
         });
 
+        const ammContract = isChained ? chainedSpeedMarketsAMMContract : speedMarketsAMMContract;
+
+        const speedMarketsAMMContractWithClient = getContract({
+            abi: getContractAbi(ammContract, networkId),
+            address: ammContract.addresses[networkId],
+            client,
+        }) as ViemContract;
+
+        const numOfActiveUserMarketsBefore = Number(
+            (await speedMarketsAMMContractWithClient.read.getLengths([userAddress]))[2]
+        );
+
         const publicClient = getPublicClient(wagmiConfig, { chainId: networkId });
         let isMarketCreated = false;
+
         const unwatch = publicClient.watchContractEvent({
-            address: isChained
-                ? chainedSpeedMarketsAMMContract.addresses[networkId]
-                : speedMarketsAMMContract.addresses[networkId],
-            abi: getContractAbi(isChained ? chainedSpeedMarketsAMMContract : speedMarketsAMMContract, networkId),
+            address: ammContract.addresses[networkId],
+            abi: getContractAbi(ammContract, networkId),
             eventName: isChained ? 'MarketCreated' : 'MarketCreatedWithFees',
             args: { [isChained ? 'user' : '_user']: userAddress },
             onLogs: () => {
                 isMarketCreated = true;
-                toast.update(id, getSuccessToastOptions(t(`common.buy.confirmation-message`), id));
-                resetData();
-                setPaidAmount(0);
-                setSubmittedStrikePrice(0);
-                setIsSubmitting(false);
-
-                refetchUserSpeedMarkets(isChained, networkId, userAddress);
-                refetchActiveSpeedMarkets(isChained, networkId);
-                refetchSpeedMarketsLimits(isChained, networkId);
-                refetchBalances(userAddress, networkId);
+                onMarketCreated(id);
             },
             onError: (error: Error) => console.log('Error on watch event MarketCreatedWithFees', error),
         });
@@ -569,7 +597,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             }
 
             const hash = await getTransactionForSpeedAMM(
-                speedMarketsAMMContractWithSigner,
+                speedMarketsCreatorContractWithSigner,
                 asset,
                 deltaTimeSec,
                 sides,
@@ -586,16 +614,24 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             const txReceipt = await waitForTransactionReceipt(client as Client, { hash });
 
             if (txReceipt.status === 'success') {
-                // if creator didn't created market for max time then assume creation failed
+                // if creator didn't created market for max time then check for total number of markets
                 await delay(
                     secondsToMilliseconds(
                         ammSpeedMarketsCreatorData?.maxCreationDelay || DEFAULT_MAX_CREATOR_DELAY_TIME_SEC
                     )
                 );
                 if (!isMarketCreated) {
-                    toast.update(id, getErrorToastOptions(t('common.errors.buy-failed'), id));
-                    setSubmittedStrikePrice(0);
-                    setIsSubmitting(false);
+                    const numOfActiveUserMarketsAfter = Number(
+                        (await speedMarketsAMMContractWithClient.read.getLengths([userAddress]))[2]
+                    );
+
+                    if (numOfActiveUserMarketsAfter - numOfActiveUserMarketsBefore > 0) {
+                        onMarketCreated(id);
+                    } else {
+                        toast.update(id, getErrorToastOptions(t('common.errors.buy-failed'), id));
+                        setSubmittedStrikePrice(0);
+                        setIsSubmitting(false);
+                    }
                 }
 
                 PLAUSIBLE.trackEvent(
@@ -740,6 +776,87 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         );
     };
 
+    useMemo(async () => {
+        if (isBiconomy) {
+            const speedMarketsCreatorContract = getContract({
+                abi: getContractAbi(speedMarketsAMMCreatorContract, networkId),
+                address: speedMarketsAMMCreatorContract.addresses[networkId],
+                client: walletClient.data as Client,
+            });
+            const asset = stringToHex(currencyKey, { size: 32 });
+            const chainedSides = chainedPositions.map((pos) => (pos !== undefined ? POSITIONS_TO_SIDE_MAP[pos] : -1));
+            const singleSides = positionType !== undefined ? [POSITIONS_TO_SIDE_MAP[positionType]] : [];
+            const sides = isChained ? chainedSides : singleSides;
+            const strikePriceSlippage = parseUnits(priceSlippage.toString(), 18);
+            const collateralAddressParam = selectedCollateral !== defaultCollateral ? collateralAddress : '';
+            const buyInAmountParam = coinParser(
+                truncToDecimals(buyinAmount, COLLATERAL_DECIMALS[selectedCollateral]),
+                networkId,
+                selectedCollateral
+            );
+
+            const skewImpactParam = positionType ? parseUnits(skewImpact[positionType].toString(), 18) : undefined;
+
+            if (isChained) {
+                const paymasterDataLocal = await getPaymasterData(
+                    collateralAddress,
+                    speedMarketsCreatorContract,
+                    'addPendingChainedSpeedMarket',
+                    [
+                        [
+                            asset,
+                            deltaTimeSec,
+                            0,
+                            strikePriceSlippage,
+                            sides,
+                            collateralAddressParam || ZERO_ADDRESS,
+                            buyInAmountParam,
+                            referral || ZERO_ADDRESS,
+                        ],
+                    ]
+                );
+                setGasFee(paymasterDataLocal);
+            } else {
+                const paymasterDataLocal = await getPaymasterData(
+                    collateralAddress,
+                    speedMarketsCreatorContract,
+                    'addPendingSpeedMarket',
+                    [
+                        [
+                            asset,
+                            0,
+                            deltaTimeSec,
+                            sides,
+                            strikePriceSlippage,
+                            sides[0],
+                            collateralAddressParam || ZERO_ADDRESS,
+                            buyInAmountParam,
+                            referral || ZERO_ADDRESS,
+                            skewImpactParam,
+                        ],
+                    ]
+                );
+                setGasFee(paymasterDataLocal);
+            }
+        }
+    }, [
+        isBiconomy,
+        collateralAddress,
+        currencyKey,
+        priceSlippage,
+        buyinAmount,
+        chainedPositions,
+        defaultCollateral,
+        deltaTimeSec,
+        isChained,
+        networkId,
+        positionType,
+        referral,
+        selectedCollateral,
+        skewImpact,
+        walletClient.data,
+    ]);
+
     const inputWrapperRef = useRef<HTMLDivElement>(null);
 
     return (
@@ -752,10 +869,20 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                         <QuoteText>{potentialProfit ? `${truncToDecimals(potentialProfit)}x` : '-'}</QuoteText>
                     </QuoteContainer>
                     {isMobile && getTradingDetails()}
-
-                    {getSubmitButton()}
+                    <FlexDivColumnCentered>
+                        {getSubmitButton()}
+                        {gasFee > 0 && !isButtonDisabled && (
+                            <Tooltip overlay={t('speed-markets.estimate-gas')}>
+                                <GasText>
+                                    <GasIcon className={`network-icon network-icon--gas`} />
+                                    {formatCurrencyWithSign(USD_SIGN, gasFee, 2)}
+                                </GasText>
+                            </Tooltip>
+                        )}
+                    </FlexDivColumnCentered>
                 </ColumnSpaceBetween>
             </FinalizeTrade>
+
             {openApprovalModal && (
                 <ApprovalModal
                     defaultAmount={
@@ -870,6 +997,20 @@ const InfoText = styled.span`
     font-size: 13px;
     letter-spacing: 0.13px;
     color: ${(props) => props.theme.textColor.primary};
+`;
+
+const GasIcon = styled.i`
+    font-size: 20px;
+    color: ${(props) => props.theme.textColor.primary};
+    margin-right: 2px;
+`;
+
+const GasText = styled.span`
+    display: flex;
+    font-size: 18px;
+    color: ${(props) => props.theme.textColor.primary};
+    position: absolute;
+    right: 16px;
 `;
 
 export default AmmSpeedTrading;

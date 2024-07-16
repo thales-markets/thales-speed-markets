@@ -77,3 +77,7 @@
 .network-icon--plus:before {
     content: '\006A';
 }
+
+.network-icon--gas:before {
+    content: '\006D';
+}
