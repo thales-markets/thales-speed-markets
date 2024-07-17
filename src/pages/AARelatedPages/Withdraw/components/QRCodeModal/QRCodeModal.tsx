@@ -12,7 +12,7 @@ type QRCodeModalProps = {
 
 const QRCodeModal: React.FC<QRCodeModalProps> = ({ onClose, walletAddress, title }) => {
     return (
-        <Modal title={title} onClose={() => onClose()}>
+        <Modal width="100%" title={title} onClose={() => onClose()}>
             <Wrapper>
                 <QRCode value={walletAddress || ''} style={{ padding: '10px', background: 'white' }} />
             </Wrapper>

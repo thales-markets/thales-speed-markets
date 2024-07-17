@@ -223,6 +223,10 @@ const GlobalStyle = createGlobalStyle`
         background: ${(props) => props.theme.background.primary};
     }
 
+    .ReactModal__Body--open {
+        overflow-y: hidden;
+    }
+
     .rc-tooltip-placement-top .rc-tooltip-arrow,
     .rc-tooltip-placement-topLeft .rc-tooltip-arrow,
     .rc-tooltip-placement-topRight .rc-tooltip-arrow {
