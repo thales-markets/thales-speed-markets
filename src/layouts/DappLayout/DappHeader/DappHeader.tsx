@@ -4,7 +4,7 @@ import NetworkSwitch from 'components/NetworkSwitch';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import GetStarted from 'pages/AARelatedPages/GetStarted';
 import Withdraw from 'pages/AARelatedPages/Withdraw';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { getIsMobile } from 'redux/modules/ui';
@@ -27,6 +27,7 @@ import { Coins } from 'thales-utils';
 import { navigateTo } from 'utils/routes';
 import ROUTES from 'constants/routes';
 import PythModal from '../components/PythModal';
+import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 
 const DappHeader: React.FC = () => {
     const { t } = useTranslation();
@@ -89,6 +90,16 @@ const DappHeader: React.FC = () => {
             return 0;
         }
     }, [exchangeRates, multipleCollateralBalances.data, networkId, getUSDForCollateral]);
+
+    useEffect(() => {
+        if (isConnected) {
+            const showPyth = window.localStorage.getItem(LOCAL_STORAGE_KEYS.SHOW_PYTH_MODAL);
+            if (!showPyth) {
+                window.localStorage.setItem(LOCAL_STORAGE_KEYS.SHOW_PYTH_MODAL, 'true');
+                setPythModalOpen(true);
+            }
+        }
+    }, [isConnected]);
 
     return (
         <Container>
