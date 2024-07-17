@@ -33,6 +33,7 @@ import avatar10 from 'assets/images/avatars/avatar2.webp';
 import avatar11 from 'assets/images/avatars/avatar3.webp';
 import avatar12 from 'assets/images/avatars/avatar4.webp';
 import avatar13 from 'assets/images/avatars/avatar2.webp';
+import { localStore } from 'thales-utils';
 
 const ProfileHeader: React.FC = () => {
     const networkId = useChainId();
@@ -41,7 +42,7 @@ const ProfileHeader: React.FC = () => {
     const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
-    const validUntil = window.localStorage.getItem(LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId]);
+    const validUntil = localStore.get(LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId]);
 
     const particleConnections = connections.filter((connection) => connection.connector.type === 'particle');
     const particleAccounts = particleConnections.length ? particleConnections[0].accounts : [];

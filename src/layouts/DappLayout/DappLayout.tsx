@@ -14,6 +14,7 @@ import { setReferralWallet } from 'utils/referral';
 import { ScreenSizeBreakpoint } from '../../enums/ui';
 import DappFooter from './DappFooter';
 import DappHeader from './DappHeader';
+import Banner from 'components/Banner';
 
 type DappLayoutProps = {
     children: React.ReactNode;
@@ -63,6 +64,7 @@ const DappLayout: React.FC<DappLayoutProps> = ({ children }) => {
 
     return (
         <Background id="main-content">
+            <Banner />
             <Wrapper>
                 <DappHeader />
                 {children}
