@@ -81,7 +81,9 @@ const Container = styled.div`
     padding: 20px;
     max-height: 100vh;
     height: fit-content;
-    overflow-y: scroll;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        overflow-y: scroll;
+    }
 `;
 
 const PrimaryHeading = styled.h1`
