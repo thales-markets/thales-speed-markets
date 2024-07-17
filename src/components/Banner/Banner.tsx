@@ -33,6 +33,7 @@ const Banner: React.FC = () => {
 const Container = styled.div`
     width: 100vw;
     height: 25px;
+    padding: 0 20px;
     margin-bottom: -15px;
     background: ${(props) => props.theme.background.secondary};
     display: flex;
@@ -68,6 +69,9 @@ const CloseIcon = styled.i`
     font-weight: 900;
     cursor: pointer;
     color: ${(props) => props.theme.toastMessages.error.textColor.primary};
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        right: 5px;
+    }
 `;
 
 export default Banner;
