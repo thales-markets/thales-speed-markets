@@ -114,8 +114,6 @@ const PythModal: React.FC<PythModalProps> = ({ onClose }) => {
         };
     }, [walletAddress]);
 
-    console.log(pythAllocation);
-
     return (
         <Modal title={t('pyth-rewards.title')} onClose={onClose} shouldCloseOnOverlayClick width="auto">
             <Wrapper>
@@ -125,7 +123,7 @@ const PythModal: React.FC<PythModalProps> = ({ onClose }) => {
                             <EligibilityContainer>
                                 <Info>{t('pyth-rewards.eligible')}</Info>
                                 <Info>
-                                    {t('pyth-rewards.total-allocation')} {pythAllocation.totalAllocation}
+                                    {t('pyth-rewards.total-allocation')} {pythAllocation.totalAllocation.toFixed(2)}
                                     <Icon className="icon icon--pyth-rewards" />
                                 </Info>
                             </EligibilityContainer>
@@ -267,6 +265,7 @@ const AllocationContainer = styled(FlexDivColumnCentered)`
 const Icon = styled.i`
     color: ${(props) => props.theme.dropDown.textColor.primary};
     font-size: 14px;
+    margin-left: 4px;
 `;
 
 const Link = styled.a`
