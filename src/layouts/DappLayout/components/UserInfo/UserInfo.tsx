@@ -47,7 +47,6 @@ const UserInfo: React.FC<UserInfoProps> = ({
     const [isDisconnecting, setIsDisconnecting] = useState(false);
 
     const validUntil = window.localStorage.getItem(LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId]);
-    console.log(validUntil);
 
     const handleCopy = () => {
         const id = toast.loading(t('user-info.copying-address'), getLoadingToastOptions());
