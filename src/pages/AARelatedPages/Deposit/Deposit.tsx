@@ -8,8 +8,10 @@ import {
     getLoadingToastOptions,
 } from 'components/ToastMessage/ToastMessage';
 import TotalBalance from 'components/TotalBalance';
+import { LINKS } from 'constants/links';
 import ROUTES from 'constants/routes';
 import { ScreenSizeBreakpoint } from 'enums/ui';
+import MobileMenu from 'layouts/DappLayout/components/MobileMenu';
 import { LinkContainer, LinkWrapper, NavigationIcon } from 'pages/SpeedMarketsOverview/SpeedMarketsOverview';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -27,7 +29,6 @@ import { getOnRamperUrl } from 'utils/particleWallet/utils';
 import { buildHref } from 'utils/routes';
 import { useAccount, useChainId } from 'wagmi';
 import QRCodeModal from '../Withdraw/components/QRCodeModal';
-import { LINKS } from 'constants/links';
 
 const Tutorials = [
     {
@@ -155,6 +156,7 @@ const Deposit: React.FC = () => {
                         ))}
                     </TutorialsWrapper>
                 </SidesWrapper>
+                <MobileMenu />
             </Container>
 
             {showQRModal && (
