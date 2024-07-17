@@ -23,7 +23,7 @@ import useExchangeRatesQuery, { Rates } from 'queries/rates/useExchangeRatesQuer
 import { getIsAppReady } from 'redux/modules/app';
 import biconomyConnector from 'utils/biconomyWallet';
 import { getCollaterals, isStableCurrency } from 'utils/currency';
-import { Coins } from 'thales-utils';
+import { Coins, localStore } from 'thales-utils';
 import { navigateTo } from 'utils/routes';
 import ROUTES from 'constants/routes';
 import PythModal from '../components/PythModal';
@@ -93,9 +93,9 @@ const DappHeader: React.FC = () => {
 
     useEffect(() => {
         if (isConnected) {
-            const showPyth = window.localStorage.getItem(LOCAL_STORAGE_KEYS.SHOW_PYTH_MODAL);
+            const showPyth = localStore.get(LOCAL_STORAGE_KEYS.SHOW_PYTH_MODAL);
             if (!showPyth) {
-                window.localStorage.setItem(LOCAL_STORAGE_KEYS.SHOW_PYTH_MODAL, 'true');
+                localStore.set(LOCAL_STORAGE_KEYS.SHOW_PYTH_MODAL, 'true');
                 setPythModalOpen(true);
             }
         }
