@@ -7,12 +7,13 @@ import styled from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
 import { getSupportedNetworksByRoute } from 'utils/network';
 import { navigateTo } from 'utils/routes';
-import { useChainId } from 'wagmi';
+import { useAccount, useChainId } from 'wagmi';
 
 const MobileMenu: React.FC<{ onChartClick?: () => void }> = ({ onChartClick }) => {
     const { t } = useTranslation();
     const location = useLocation();
     const networkId = useChainId();
+    const { isConnected } = useAccount();
 
     const isSpeedMarkets = ROUTES.Markets.SpeedMarkets === location.pathname;
     const isOverview = ROUTES.Markets.SpeedMarketsOverview === location.pathname;
@@ -24,26 +25,22 @@ const MobileMenu: React.FC<{ onChartClick?: () => void }> = ({ onChartClick }) =
     return (
         <Container>
             <Items>
-                {isSpeedMarkets && (
-                    <Item onClick={onChartClick}>
-                        <Icon className="icon icon--market" />
-                        {t('common.chart')}
+                <Item onClick={isSpeedMarkets ? onChartClick : () => navigateTo(ROUTES.Markets.Home)}>
+                    {isSpeedMarkets && <Icon className="icon icon--market" />}
+                    {isSpeedMarkets ? t('common.chart') : t('common.home')}
+                </Item>
+                {!isOverview && (
+                    <Item
+                        onClick={() =>
+                            navigateTo(`${ROUTES.Markets.SpeedMarketsOverview}?isChained=${isChainedMarkets}`)
+                        }
+                    >
+                        {t('speed-markets.overview.title')}
                     </Item>
                 )}
-                <Item
-                    onClick={() =>
-                        navigateTo(
-                            isOverview
-                                ? ROUTES.Markets.Home
-                                : `${ROUTES.Markets.SpeedMarketsOverview}?isChained=${isChainedMarkets}`
-                        )
-                    }
-                >
-                    {isOverview ? t('common.home') : t('speed-markets.overview.title')}
-                </Item>
-                <Item onClick={() => navigateTo(isProfile ? ROUTES.Markets.Home : ROUTES.Markets.Profile)}>
-                    {isProfile ? t('common.home') : t('profile.title')}
-                </Item>
+                {isConnected && !isProfile && (
+                    <Item onClick={() => navigateTo(ROUTES.Markets.Profile)}>{t('profile.title')}</Item>
+                )}
             </Items>
         </Container>
     );

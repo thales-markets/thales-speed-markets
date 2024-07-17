@@ -1,22 +1,46 @@
 import OutsideClickHandler from 'components/OutsideClick';
-import React, { useState } from 'react';
+import { USD_SIGN } from 'constants/currency';
+import { Rates } from 'queries/rates/useExchangeRatesQuery';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setSelectedCollateralIndex } from 'redux/modules/wallet';
 import styled from 'styled-components';
+import { FlexDivSpaceBetween } from 'styles/common';
+import { Coins, formatCurrencyWithSign } from 'thales-utils';
+import { isStableCurrency } from 'utils/currency';
 
 type CollateralDropDownProps = {
     collateralArray: Array<string>;
     selectedItem: number;
+    collateralBalances?: any;
+    exchangeRates?: Rates | null;
     onChangeCollateral: (index: number) => void;
 };
 
 const CollateralDropdown: React.FC<CollateralDropDownProps> = ({
     collateralArray,
     selectedItem,
+    collateralBalances,
+    exchangeRates,
     onChangeCollateral,
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const dispatch = useDispatch();
+
+    const getUSDForCollateral = useCallback(
+        (collateral: Coins) =>
+            (collateralBalances ? collateralBalances[collateral] : 0) *
+            (isStableCurrency(collateral) ? 1 : exchangeRates?.[collateral] || 0),
+        [collateralBalances, exchangeRates]
+    );
+
+    const collateralsDetailsSorted = useMemo(() => {
+        const mappedCollaterals = collateralArray.map((collateral, index) => ({ name: collateral, index }));
+        return mappedCollaterals.sort(
+            (collateralA, collateralB) =>
+                getUSDForCollateral(collateralB.name as any) - getUSDForCollateral(collateralA.name as any)
+        );
+    }, [collateralArray, getUSDForCollateral]);
 
     return (
         <OutsideClickHandler
@@ -36,16 +60,35 @@ const CollateralDropdown: React.FC<CollateralDropDownProps> = ({
                 )}
                 {isOpen && (
                     <DropdownContainer>
-                        {collateralArray.map((collateral: any, index) => (
-                            <CollateralName
-                                onClick={() => {
-                                    onChangeCollateral(index);
-                                    dispatch(setSelectedCollateralIndex(index));
-                                }}
-                                key={index}
-                            >
-                                {collateral}
-                            </CollateralName>
+                        {collateralsDetailsSorted.map((collateral: any, index) => (
+                            <CoinsWrapper key={index}>
+                                <div>
+                                    <CollateralName
+                                        onClick={() => {
+                                            onChangeCollateral(index);
+                                            dispatch(setSelectedCollateralIndex(index));
+                                        }}
+                                    >
+                                        {collateral.name}
+                                    </CollateralName>
+                                </div>
+                                <div>
+                                    <CollateralName>
+                                        {formatCurrencyWithSign(
+                                            null,
+                                            collateralBalances ? collateralBalances[collateral.name] : 0
+                                        )}
+                                    </CollateralName>
+                                    <CollateralName>
+                                        {!exchangeRates?.[collateral.name] && !isStableCurrency(collateral.name)
+                                            ? '...'
+                                            : ` (${formatCurrencyWithSign(
+                                                  USD_SIGN,
+                                                  getUSDForCollateral(collateral.name)
+                                              )})`}
+                                    </CollateralName>
+                                </div>
+                            </CoinsWrapper>
                         ))}
                     </DropdownContainer>
                 )}
@@ -109,4 +152,7 @@ const CollateralName = styled.span`
     }
 `;
 
+const CoinsWrapper = styled(FlexDivSpaceBetween)`
+    width: 100%;
+`;
 export default CollateralDropdown;

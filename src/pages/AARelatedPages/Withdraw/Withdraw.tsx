@@ -41,6 +41,7 @@ import {
 import CollateralDropdown from './components/CollateralDropdown';
 import { ZERO_ADDRESS } from 'constants/network';
 import Tooltip from 'components/Tooltip';
+import useExchangeRatesQuery, { Rates } from 'queries/rates/useExchangeRatesQuery';
 
 type FormValidation = {
     walletAddress: boolean;
@@ -63,7 +64,8 @@ const Withdraw: React.FC<DepositProps> = ({ onClose }) => {
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
 
     const [withdrawalWalletAddress, setWithdrawalWalletAddress] = useState<string>('');
-    const [amount, setAmount] = useState<number>(0);
+    const [amount, setAmount] = useState<number | undefined>();
+
     const [validation, setValidation] = useState<FormValidation>({ walletAddress: false, amount: false });
 
     const selectedTokenFromUrl = queryString.parse(location.search)['coin-index'];
@@ -93,6 +95,17 @@ const Withdraw: React.FC<DepositProps> = ({ onClose }) => {
         return 0;
     }, [multipleCollateralBalances.data, multipleCollateralBalances.isSuccess, networkId, selectedToken]);
 
+    const exchangeRatesMarketDataQuery = useExchangeRatesQuery(
+        { networkId, client },
+        {
+            enabled: isAppReady,
+        }
+    );
+    const exchangeRates: Rates | null =
+        exchangeRatesMarketDataQuery.isSuccess && exchangeRatesMarketDataQuery.data
+            ? exchangeRatesMarketDataQuery.data
+            : null;
+
     useEffect(() => {
         let walletValidation = false;
         let amountValidation = false;
@@ -101,7 +114,7 @@ const Withdraw: React.FC<DepositProps> = ({ onClose }) => {
             walletValidation = true;
         }
 
-        if (amount > 0 && !(amount > paymentTokenBalance)) {
+        if (amount && amount > 0 && !(amount > paymentTokenBalance)) {
             amountValidation = true;
         }
 
@@ -181,6 +194,8 @@ const Withdraw: React.FC<DepositProps> = ({ onClose }) => {
                                 onChangeCollateral={handleChangeCollateral}
                                 collateralArray={COLLATERALS[networkId]}
                                 selectedItem={selectedToken}
+                                collateralBalances={multipleCollateralBalances.data}
+                                exchangeRates={exchangeRates}
                             />
                         </div>
 
@@ -207,13 +222,13 @@ const Withdraw: React.FC<DepositProps> = ({ onClose }) => {
                             <InputLabel>{t('withdraw.amount')}</InputLabel>
                             <InputContainer>
                                 <NumericInput
-                                    value={amount}
+                                    value={amount && amount > 0 ? amount : ''}
                                     width="100%"
                                     onChange={(el) => setAmount(Number(el.target.value))}
-                                    placeholder={t('withdraw.paste-address')}
+                                    placeholder={t('withdraw.amount')}
                                     onMaxButton={async () => await onMaxButton()}
                                     currencyLabel={getCollaterals(networkId)[selectedToken]}
-                                    showValidation={!validation.amount && amount > 0}
+                                    showValidation={amount !== undefined && !validation.amount}
                                     validationMessage={t('withdraw.validation.amount')}
                                 />
                             </InputContainer>
