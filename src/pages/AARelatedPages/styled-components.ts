@@ -67,3 +67,22 @@ export const WarningIcon = styled.i`
     color: ${(props) => props.theme.background.primary};
     text-transform: uppercase;
 `;
+
+export const GasIcon = styled.i`
+    font-size: 20px;
+    color: ${(props) => props.theme.textColor.primary};
+    margin-right: 2px;
+`;
+
+export const GasText = styled.span`
+    display: flex;
+    font-size: 18px;
+    color: ${(props) => props.theme.textColor.primary};
+    position: absolute;
+    right: 16px;
+    bottom: 10px;
+`;
+
+export const ButtonWrapper = styled.div`
+    position: relative;
+`;

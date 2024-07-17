@@ -3,6 +3,7 @@ import {
     IHybridPaymaster,
     SponsorUserOperationDto,
     createSessionKeyManagerModule,
+    PaymasterFeeQuote,
 } from '@biconomy/account';
 import { PaymasterMode } from '@biconomy/paymaster';
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
@@ -371,7 +372,7 @@ export const getPaymasterData = async (
     methodName: string,
     data?: ReadonlyArray<any>,
     value?: any
-): Promise<number> => {
+): Promise<PaymasterFeeQuote | undefined> => {
     if (biconomyConnector.wallet && contract) {
         try {
             biconomyConnector.wallet.setActiveValidationModule(biconomyConnector.wallet.defaultValidationModule);
@@ -401,11 +402,10 @@ export const getPaymasterData = async (
             });
 
             if (feeQuotesData.feeQuotes && feeQuotesData.feeQuotes[0].maxGasFeeUSD) {
-                return feeQuotesData.feeQuotes[0].maxGasFeeUSD;
+                return feeQuotesData.feeQuotes[0];
             }
         } catch (e) {
             console.log(e);
         }
     }
-    return 0;
 };

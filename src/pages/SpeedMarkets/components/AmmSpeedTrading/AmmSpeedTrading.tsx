@@ -143,7 +143,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     const [hasAllowance, setAllowance] = useState(false);
     const [openApprovalModal, setOpenApprovalModal] = useState(false);
     const [openTwitterShareModal, setOpenTwitterShareModal] = useState(false);
-    const [gasFee, setGasFee] = useState(0);
+    const [gasFee, setGasFee] = useState<number>(0);
 
     const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
 
@@ -808,7 +808,9 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                         ],
                     ]
                 );
-                setGasFee(paymasterDataLocal);
+                if (paymasterDataLocal && paymasterDataLocal.maxGasFeeUSD) {
+                    setGasFee(paymasterDataLocal.maxGasFeeUSD);
+                }
             } else {
                 const paymasterDataLocal = await getPaymasterData(
                     collateralAddress,
@@ -829,7 +831,9 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                         ],
                     ]
                 );
-                setGasFee(paymasterDataLocal);
+                if (paymasterDataLocal && paymasterDataLocal.maxGasFeeUSD) {
+                    setGasFee(paymasterDataLocal.maxGasFeeUSD);
+                }
             }
         }
     }, [
