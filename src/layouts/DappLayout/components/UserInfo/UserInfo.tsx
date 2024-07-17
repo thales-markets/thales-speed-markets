@@ -17,6 +17,7 @@ import { toast } from 'react-toastify';
 import { getIsBiconomy } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivColumn, FlexDivRowCentered, FlexDivStart } from 'styles/common';
+import { localStore } from 'thales-utils';
 import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
@@ -46,7 +47,7 @@ const UserInfo: React.FC<UserInfoProps> = ({
 
     const [isDisconnecting, setIsDisconnecting] = useState(false);
 
-    const validUntil = window.localStorage.getItem(LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId]);
+    const validUntil = localStore.get(LOCAL_STORAGE_KEYS.SESSION_VALID_UNTIL[networkId]);
 
     const handleCopy = () => {
         const id = toast.loading(t('user-info.copying-address'), getLoadingToastOptions());
