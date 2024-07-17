@@ -1,13 +1,16 @@
 import {
+    createSessionKeyManagerModule,
     DEFAULT_SESSION_KEY_MANAGER_MODULE,
     IHybridPaymaster,
-    SponsorUserOperationDto,
-    createSessionKeyManagerModule,
     PaymasterFeeQuote,
+    SponsorUserOperationDto,
 } from '@biconomy/account';
 import { PaymasterMode } from '@biconomy/paymaster';
+import { getPublicClient } from '@wagmi/core';
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 import { addMonths } from 'date-fns';
+import { wagmiConfig } from 'pages/Root/wagmiConfig';
+import { localStore } from 'thales-utils';
 import { SupportedNetwork } from 'types/network';
 import { ViemContract } from 'types/viem';
 import { Address, Client, createWalletClient, encodeFunctionData, erc20Abi, getContract, http, maxUint256 } from 'viem';
@@ -17,11 +20,8 @@ import { getContractAbi } from './contracts/abi';
 import chainedSpeedMarketsAMMContract from './contracts/chainedSpeedMarketsAMMContract';
 import erc20Contract from './contracts/collateralContract';
 import multipleCollateral from './contracts/multipleCollateralContract';
-import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
-import { wagmiConfig } from 'pages/Root/wagmiConfig';
-import { getPublicClient } from '@wagmi/core';
 import sessionValidationContract from './contracts/sessionValidationContract';
-import { localStore, NetworkId } from 'thales-utils';
+import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
 
 export const executeBiconomyTransactionWithConfirmation = async (
     collateral: string,
@@ -145,10 +145,14 @@ export const executeBiconomyTransaction = async (
                         isEth
                             ? {}
                             : {
+                                  //   paymasterServiceData: {
+                                  //       mode:
+                                  //           networkId === NetworkId.Base ? PaymasterMode.SPONSORED : PaymasterMode.ERC20,
+                                  //       preferredToken: networkId === NetworkId.Base ? undefined : collateral,
+                                  //   },
                                   paymasterServiceData: {
-                                      mode:
-                                          networkId === NetworkId.Base ? PaymasterMode.SPONSORED : PaymasterMode.ERC20,
-                                      preferredToken: networkId === NetworkId.Base ? undefined : collateral,
+                                      mode: PaymasterMode.ERC20,
+                                      preferredToken: collateral,
                                   },
                               }
                     );
@@ -216,9 +220,13 @@ export const executeBiconomyTransaction = async (
                               },
                           }
                         : {
+                              //   paymasterServiceData: {
+                              //       mode: networkId === NetworkId.Base ? PaymasterMode.SPONSORED : PaymasterMode.ERC20,
+                              //       preferredToken: networkId === NetworkId.Base ? undefined : collateral,
+                              //   },
                               paymasterServiceData: {
-                                  mode: networkId === NetworkId.Base ? PaymasterMode.SPONSORED : PaymasterMode.ERC20,
-                                  preferredToken: networkId === NetworkId.Base ? undefined : collateral,
+                                  mode: PaymasterMode.ERC20,
+                                  preferredToken: collateral,
                               },
                               params: {
                                   sessionSigner: sessionSigner,
