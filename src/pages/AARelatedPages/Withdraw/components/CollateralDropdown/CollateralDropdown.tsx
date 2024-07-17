@@ -82,7 +82,7 @@ const DropdownContainer = styled.div`
 
     border-radius: 8px;
     border: 2px solid ${(props) => props.theme.dropDown.background.secondary};
-    width: 400px;
+    width: min(400px, 100%);
     background: ${(props) => props.theme.dropDown.background.primary};
 `;
 
