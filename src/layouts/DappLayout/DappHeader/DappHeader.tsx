@@ -188,7 +188,7 @@ const DappHeader: React.FC = () => {
 const Container = styled(FlexDivRowCentered)`
     width: 100%;
     max-width: ${PAGE_MAX_WIDTH};
-    margin: 40px auto 16px auto; // revert to 30px when removing banner
+    margin: 30px auto 16px auto;
     max-height: 40px;
 `;
 

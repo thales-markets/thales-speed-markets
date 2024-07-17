@@ -4,7 +4,13 @@ import { Trans } from 'react-i18next';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import styled from 'styled-components';
 
+const IS_VISIBLE = true;
+
 const Banner: React.FC = () => {
+    if (!IS_VISIBLE) {
+        return <></>;
+    }
+
     return (
         <Container>
             <BannerText>
@@ -24,11 +30,9 @@ const Banner: React.FC = () => {
 };
 
 const Container = styled.div`
-    position: absolute;
-    top: 0;
-    left: 0;
     width: 100vw;
     height: 25px;
+    margin-bottom: -15px;
     background: ${(props) => props.theme.background.secondary};
     display: flex;
     justify-content: center;
