@@ -112,16 +112,18 @@ const TotalBalance: React.FC<TotalBalanceProps> = ({ hideDepositButton }) => {
                                 </Button>
                             )}
 
-                            <Button
-                                onClick={() => {
-                                    setOpenWithdraw(true);
-                                }}
-                                width={isMobile ? '100px' : '120px'}
-                                fontSize="13px"
-                                height="30px"
-                            >
-                                {t('profile.withdraw')}
-                            </Button>
+                            {isBiconomy && (
+                                <Button
+                                    onClick={() => {
+                                        setOpenWithdraw(true);
+                                    }}
+                                    width={isMobile ? '100px' : '120px'}
+                                    fontSize="13px"
+                                    height="30px"
+                                >
+                                    {t('profile.withdraw')}
+                                </Button>
+                            )}
                         </ColumnWrapper>
                     </TotalBalanceWrapper>
 
