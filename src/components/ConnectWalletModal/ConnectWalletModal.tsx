@@ -172,7 +172,6 @@ const Container = styled.div`
     background-color: ${(props) => props.theme.background.primary};
     border-radius: 15px;
     padding: 40px 90px;
-    overflow-y: scroll;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         padding: 0;
         padding-top: 30px;

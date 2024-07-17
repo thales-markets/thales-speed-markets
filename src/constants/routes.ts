@@ -9,7 +9,5 @@ const ROUTES = {
         Profile: '/profile',
     },
     Deposit: '/deposit',
-    Withdraw: '/withdraw',
-    Wizard: '/wizard',
 };
 export default ROUTES;

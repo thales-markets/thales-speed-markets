@@ -75,11 +75,13 @@ const Modal: React.FC<ModalProps> = ({
 };
 
 const Container = styled.div`
+    position: relative;
     border-radius: 15px;
     background: ${(props) => props.theme.background.primary};
     padding: 20px;
     max-height: 100vh;
     height: fit-content;
+    overflow-y: scroll;
 `;
 
 const PrimaryHeading = styled.h1`
