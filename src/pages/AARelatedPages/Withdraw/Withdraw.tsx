@@ -2,7 +2,7 @@ import Button from 'components/Button';
 import OutsideClick from 'components/OutsideClick';
 import NumericInput from 'components/fields/NumericInput';
 import TextInput from 'components/fields/TextInput';
-import { COLLATERALS } from 'constants/currency';
+import { COLLATERALS, USD_SIGN } from 'constants/currency';
 import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipleCollateralBalanceQuery';
 import queryString from 'query-string';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -17,10 +17,10 @@ import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsBiconomy } from 'redux/modules/wallet';
-import { coinParser } from 'thales-utils';
+import { coinParser, formatCurrencyWithSign } from 'thales-utils';
 import { RootState } from 'types/ui';
 import { ViemContract } from 'types/viem';
-import { executeBiconomyTransactionWithConfirmation } from 'utils/biconomy';
+import { executeBiconomyTransactionWithConfirmation, getPaymasterData } from 'utils/biconomy';
 import biconomyConnector from 'utils/biconomyWallet';
 import multipleCollateral from 'utils/contracts/multipleCollateralContract';
 import { getCollaterals } from 'utils/currency';
@@ -28,7 +28,10 @@ import { getNetworkNameByNetworkId } from 'utils/network';
 import { getContract, isAddress } from 'viem';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 import {
+    ButtonWrapper,
     FormContainer,
+    GasIcon,
+    GasText,
     InputContainer,
     InputLabel,
     WarningContainer,
@@ -36,6 +39,8 @@ import {
     Wrapper,
 } from '../styled-components';
 import CollateralDropdown from './components/CollateralDropdown';
+import { ZERO_ADDRESS } from 'constants/network';
+import Tooltip from 'components/Tooltip';
 
 type FormValidation = {
     walletAddress: boolean;
@@ -63,6 +68,7 @@ const Withdraw: React.FC<DepositProps> = ({ onClose }) => {
 
     const selectedTokenFromUrl = queryString.parse(location.search)['coin-index'];
     const [selectedToken, setSelectedToken] = useState<number>(selectedTokenFromUrl || 0);
+    const [gasFee, setGasFee] = useState(0);
 
     useEffect(() => {
         if (selectedTokenFromUrl && selectedTokenFromUrl != selectedToken.toString()) {
@@ -135,6 +141,35 @@ const Withdraw: React.FC<DepositProps> = ({ onClose }) => {
         }
     };
 
+    const onMaxButton = async () => {
+        if (multipleCollateral && walletClient.data) {
+            const collateralContractWithSigner = getContract({
+                abi: multipleCollateral[getCollaterals(networkId)[selectedToken]].abi,
+                address: multipleCollateral[getCollaterals(networkId)[selectedToken]].addresses[networkId] as any,
+                client: walletClient.data as any,
+            }) as ViemContract;
+
+            const gasFees = await getPaymasterData(
+                collateralContractWithSigner?.address as string,
+                collateralContractWithSigner,
+                'transfer',
+                [
+                    isAddress(withdrawalWalletAddress) ? withdrawalWalletAddress : ZERO_ADDRESS,
+                    coinParser(
+                        '' + Number(0.9 * paymentTokenBalance),
+                        networkId,
+                        getCollaterals(networkId)[selectedToken]
+                    ),
+                ]
+            );
+
+            if (gasFees) {
+                if (gasFees.maxGasFeeUSD) setGasFee(gasFees?.maxGasFeeUSD);
+                if (gasFees.maxGasFee) setAmount(paymentTokenBalance - gasFees?.maxGasFee);
+            }
+        }
+    };
+
     return (
         <Modal title={t('withdraw.heading-withdraw')} onClose={onClose} shouldCloseOnOverlayClick>
             <OutsideClick onOutsideClick={onClose}>
@@ -176,7 +211,7 @@ const Withdraw: React.FC<DepositProps> = ({ onClose }) => {
                                     width="100%"
                                     onChange={(el) => setAmount(Number(el.target.value))}
                                     placeholder={t('withdraw.paste-address')}
-                                    onMaxButton={() => setAmount(paymentTokenBalance)}
+                                    onMaxButton={async () => await onMaxButton()}
                                     currencyLabel={getCollaterals(networkId)[selectedToken]}
                                     showValidation={!validation.amount && amount > 0}
                                     validationMessage={t('withdraw.validation.amount')}
@@ -190,15 +225,25 @@ const Withdraw: React.FC<DepositProps> = ({ onClose }) => {
                                 })}
                             </WarningContainer>
                         </div>
-                        <Button
-                            disabled={!validation.amount || !validation.walletAddress}
-                            fontSize={'22px'}
-                            width="220px"
-                            additionalStyles={{ alignSelf: 'center' }}
-                            onClick={() => handleSubmit()}
-                        >
-                            {t('withdraw.button-label-withdraw')}
-                        </Button>
+                        <ButtonWrapper>
+                            <Button
+                                disabled={!validation.amount || !validation.walletAddress}
+                                fontSize={'22px'}
+                                width="100%"
+                                additionalStyles={{ alignSelf: 'center' }}
+                                onClick={() => handleSubmit()}
+                            >
+                                {t('withdraw.button-label-withdraw')}
+                            </Button>
+                            {gasFee > 0 && (
+                                <Tooltip overlay={t('speed-markets.estimate-gas')}>
+                                    <GasText>
+                                        <GasIcon className={`network-icon network-icon--gas`} />
+                                        {formatCurrencyWithSign(USD_SIGN, gasFee, 2)}
+                                    </GasText>
+                                </Tooltip>
+                            )}
+                        </ButtonWrapper>
                     </FormContainer>
                 </Wrapper>
             </OutsideClick>
