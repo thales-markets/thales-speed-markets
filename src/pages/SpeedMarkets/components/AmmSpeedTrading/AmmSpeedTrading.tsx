@@ -1014,6 +1014,7 @@ const GasText = styled.span`
     color: ${(props) => props.theme.textColor.primary};
     position: absolute;
     right: 16px;
+    bottom: 10px;
 `;
 
 export default AmmSpeedTrading;
