@@ -118,7 +118,7 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
                             )})*`}
                         </TextValue>
                     )}
-                    {!isMobile && !isChained && (
+                    {!isChained && (
                         <TextValue $uppercase={!!positionTypeFormatted} $lowercase={!positionTypeFormatted}>
                             {' '}
                             {positionTypeFormatted
