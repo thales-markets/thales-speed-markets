@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getIsMobile } from 'redux/modules/ui';
 import { getIsBiconomy, getWalletConnectModalVisibility, setWalletConnectModalVisibility } from 'redux/modules/wallet';
 import styled from 'styled-components';
-import { FlexDivRow, FlexDivRowCentered, PAGE_MAX_WIDTH } from 'styles/common';
+import { Colors, FlexDivRow, FlexDivRowCentered, PAGE_MAX_WIDTH } from 'styles/common';
 import { RootState } from 'types/ui';
 import { useAccount, useChainId, useClient } from 'wagmi';
 import Logo from '../components/Logo';
@@ -28,6 +28,8 @@ import { navigateTo } from 'utils/routes';
 import ROUTES from 'constants/routes';
 import PythModal from '../components/PythModal';
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
+import useSolanaAddressForWalletQuery from 'queries/solana/useSolanaAddressForWalletQuery';
+import { isValidSolanaAddress } from 'utils/solana';
 
 const DappHeader: React.FC = () => {
     const { t } = useTranslation();
@@ -101,6 +103,20 @@ const DappHeader: React.FC = () => {
         }
     }, [isConnected]);
 
+    const solanaAddressQuery = useSolanaAddressForWalletQuery(
+        (isBiconomy ? biconomyConnector.address : walletAddress) as string,
+        {
+            enabled: isConnected,
+        }
+    );
+
+    const hideSolanaButton = useMemo(() => {
+        if (solanaAddressQuery.isSuccess && solanaAddressQuery.data) {
+            return isValidSolanaAddress(solanaAddressQuery.data);
+        }
+        return false;
+    }, [solanaAddressQuery.isSuccess, solanaAddressQuery.data]);
+
     return (
         <Container>
             <LeftContainer>
@@ -117,6 +133,18 @@ const DappHeader: React.FC = () => {
                             }
                         >
                             {t(totalBalanceValue > 0 ? 'deposit.title' : 'common.header.get-started')}
+                        </Button>
+                    )}
+                    {!isMobile && isConnected && !hideSolanaButton && (
+                        <Button
+                            width="240px"
+                            height="30px"
+                            margin="10px"
+                            fontSize="12px"
+                            borderColor={Colors.RED}
+                            onClick={() => setPythModalOpen(true)}
+                        >
+                            {t('common.header.submit-solana')}
                         </Button>
                     )}
                 </FlexDivRow>
@@ -141,7 +169,7 @@ const DappHeader: React.FC = () => {
                         {t('common.wallet.connect-your-wallet')}
                     </Button>
                 )}
-                {isMobile && isConnected && (
+                {isMobile && isConnected && hideSolanaButton && (
                     <Button
                         width="140px"
                         height="30px"
@@ -152,13 +180,25 @@ const DappHeader: React.FC = () => {
                         {t(totalBalanceValue > 0 ? 'deposit.title' : 'common.header.get-started')}
                     </Button>
                 )}
+                {isMobile && isConnected && !hideSolanaButton && (
+                    <Button
+                        width="200px"
+                        height="30px"
+                        margin="10px 4px"
+                        fontSize="12px"
+                        borderColor={Colors.RED}
+                        onClick={() => setPythModalOpen(true)}
+                    >
+                        {t('common.header.submit-solana')}
+                    </Button>
+                )}
 
                 <NetworkSwitch />
 
                 {isConnected && (
                     <>
                         {!isMobile && <UserWallet />}
-                        <Notifications />
+                        {!isMobile && <Notifications />}
                         <HeaderIcons
                             ref={burgerMenuRef}
                             onClick={() => setOpenUserInfo(!openUserInfo)}
