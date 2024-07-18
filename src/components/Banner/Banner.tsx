@@ -19,6 +19,8 @@ const Banner: React.FC = () => {
                         components={{
                             a: (
                                 <Link
+                                    target="_blank"
+                                    rel="noreferrer"
                                     href={'https://dune.com/leifu/thales-speed-markets-competition-17-july-17-aug-2024'}
                                 />
                             ),
