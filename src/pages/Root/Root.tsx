@@ -21,6 +21,7 @@ import enTranslation from '../../i18n/en.json';
 import App from './App';
 import { wagmiConfig } from './wagmiConfig';
 import { LINKS } from 'constants/links';
+import { isMobile } from 'utils/device';
 
 window.Buffer = window.Buffer || buffer;
 
@@ -61,7 +62,7 @@ const Root: React.FC<RootProps> = ({ store }) => {
             return;
         }
 
-        let content = `Error:\n${error.stack}`;
+        let content = `IsMobile:${isMobile()}\nError:\n${error.stack}`;
         const flags = 4; // SUPPRESS_EMBEDS
         fetch(LINKS.Discord.SpeedErrors, {
             method: 'POST',
