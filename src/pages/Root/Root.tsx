@@ -62,7 +62,7 @@ const Root: React.FC<RootProps> = ({ store }) => {
             return;
         }
 
-        let content = `IsMobile:${isMobile()}\nError:\n${error.stack}`;
+        let content = `IsMobile:${isMobile()}\nError:\n${error.stack || error.message}`;
         const flags = 4; // SUPPRESS_EMBEDS
         fetch(LINKS.Discord.SpeedErrors, {
             method: 'POST',
