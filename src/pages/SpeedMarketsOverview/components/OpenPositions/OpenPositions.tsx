@@ -130,7 +130,7 @@ const OpenPositions: React.FC = () => {
         .filter((marketData) => !marketData.isClaimable && !marketData.finalPrice)
         .sort((a, b) => b.maturityDate - a.maturityDate);
 
-    const openSpeedMarketsData = activeSpeedNotMatured.sort((a, b) => b.maturityDate - a.maturityDate);
+    const openSpeedMarketsData = activeSpeedNotMatured.sort((a, b) => a.maturityDate - b.maturityDate);
 
     const isLoading =
         isLoadingEnabled &&

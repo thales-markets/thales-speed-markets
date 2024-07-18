@@ -59,6 +59,7 @@ const SpeedMarkets: React.FC = () => {
     const [chainedPositions, setChainedPositions] = useState<SelectedPosition[]>([undefined, undefined]);
     const [deltaTimeSec, setDeltaTimeSec] = useState(0);
     const [buyinAmount, setBuyinAmount] = useState(0);
+    const [buyinGasFee, setBuyinGasFee] = useState(0);
     const [isResetTriggered, setIsResetTriggered] = useState(false);
     const [profitAndSkewPerPosition, setProfitAndSkewPerPosition] = useState({
         profit: { [Positions.UP]: 0, [Positions.DOWN]: 0 },
@@ -209,6 +210,7 @@ const SpeedMarkets: React.FC = () => {
                         ammSpeedMarketsLimits={ammSpeedMarketsLimitsData}
                         ammChainedSpeedMarketsLimits={ammChainedSpeedMarketsLimitsData}
                         currencyKey={currencyKey}
+                        buyinGasFee={buyinGasFee}
                         isResetTriggered={isResetTriggered}
                         setIsResetTriggered={setIsResetTriggered}
                         setHasError={setHasError}
@@ -285,6 +287,7 @@ const SpeedMarkets: React.FC = () => {
                         ammChainedSpeedMarketsLimits={ammChainedSpeedMarketsLimitsData}
                         currentPrice={currentPrices[currencyKey]}
                         setProfitAndSkewPerPosition={setProfitAndSkewPerPosition}
+                        setBuyinGasFee={setBuyinGasFee}
                         resetData={resetData}
                         hasError={hasError}
                     />

@@ -1,6 +1,6 @@
 import { ConnectParam, EIP1193Provider } from '@particle-network/auth-core';
 import type { EVMProvider } from '@particle-network/auth-core-modal/dist/context/evmProvider';
-import { ChainNotConfiguredError, createConnector, normalizeChainId } from '@wagmi/core';
+import { ChainNotConfiguredError, createConnector } from '@wagmi/core';
 import { ProviderRpcErrorType, SwitchChainError, UserRejectedRequestError, getAddress, numberToHex } from 'viem';
 
 particleWagmiWallet.type = 'particleWallet' as const;
@@ -58,7 +58,7 @@ export function particleWagmiWallet(param: ConnectParam & { socialType: string; 
             async getChainId() {
                 const provider = await this.getProvider();
                 const chainId = await provider.request({ method: 'eth_chainId' });
-                return normalizeChainId(chainId);
+                return Number(chainId);
             },
             async getProvider() {
                 if (typeof window === 'undefined') {
@@ -124,7 +124,7 @@ export function particleWagmiWallet(param: ConnectParam & { socialType: string; 
                     });
             },
             onChainChanged(chain: string) {
-                const chainId = normalizeChainId(chain);
+                const chainId = Number(chain);
                 config.emitter.emit('change', { chainId });
             },
             async onDisconnect(_error: any) {
