@@ -51,6 +51,7 @@ type SelectBuyinProps = {
     ammSpeedMarketsLimits: AmmSpeedMarketsLimits | null;
     ammChainedSpeedMarketsLimits: AmmChainedSpeedMarketsLimits | null;
     currencyKey: string;
+    buyinGasFee: number;
     isResetTriggered: boolean;
     setIsResetTriggered: React.Dispatch<boolean>;
     setHasError: React.Dispatch<boolean>;
@@ -65,6 +66,7 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
     ammSpeedMarketsLimits,
     ammChainedSpeedMarketsLimits,
     currencyKey,
+    buyinGasFee,
     isResetTriggered,
     setIsResetTriggered,
     setHasError,
@@ -106,7 +108,7 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
         return stableBalanceQuery.isSuccess ? stableBalanceQuery.data : null;
     }, [stableBalanceQuery]);
 
-    const collateralBalance = useMemo(() => {
+    const collateralBalance: number = useMemo(() => {
         return isMultiCollateralSupported
             ? multipleCollateralBalances.isSuccess
                 ? getCoinBalance(multipleCollateralBalances?.data, selectedCollateral)
@@ -245,8 +247,11 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
     useDebouncedEffect(() => {
         let errorMessageKey = '';
 
-        if (buyinAmount !== '' && ((isConnected && buyinAmount > collateralBalance) || collateralBalance === 0)) {
-            errorMessageKey = 'common.errors.insufficient-balance-wallet';
+        if (buyinAmount !== '') {
+            const buyinAmountWithGas = isBiconomy ? Number(buyinAmount) + buyinGasFee : Number(buyinAmount);
+            if ((isConnected && buyinAmountWithGas > collateralBalance) || collateralBalance === 0) {
+                errorMessageKey = 'common.errors.insufficient-balance-wallet';
+            }
         }
         if (buyinAmount !== '') {
             const convertedBuyinAmount = convertToStable(Number(buyinAmount));
@@ -273,6 +278,7 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
         convertToStable,
         networkId,
         setHasError,
+        buyinGasFee,
     ]);
 
     // Reset inputs
