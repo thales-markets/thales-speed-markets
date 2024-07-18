@@ -620,7 +620,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                         (await speedMarketsAMMContractWithClient.read.getLengths([userAddress]))[2]
                     );
 
-                    if (numOfActiveUserMarketsAfter - numOfActiveUserMarketsBefore > 0) {
+                    if (!isMarketCreated && numOfActiveUserMarketsAfter - numOfActiveUserMarketsBefore > 0) {
                         unwatch();
                         isMarketCreated = true;
                         onMarketCreated(id);
