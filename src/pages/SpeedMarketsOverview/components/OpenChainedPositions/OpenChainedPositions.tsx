@@ -176,7 +176,7 @@ const OpenChainedPositions: React.FC = () => {
 
     const openSpeedMarketsData = chainedWithoutMaturedPositions
         .filter((marketData) => !marketData.canResolve && !marketData.isMatured)
-        .sort((a, b) => b.maturityDate - a.maturityDate);
+        .sort((a, b) => a.maturityDate - b.maturityDate);
 
     const isLoading =
         isLoadingEnabled &&
