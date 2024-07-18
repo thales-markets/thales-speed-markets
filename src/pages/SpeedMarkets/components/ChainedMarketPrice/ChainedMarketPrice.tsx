@@ -30,7 +30,7 @@ const ChainedMarketPrice: React.FC<{ position: UserChainedPosition; isStrikePric
     }, [position.maturityDate]);
 
     return (
-        <>
+        <span>
             {isStrikePrice ? (
                 position.resolveIndex !== undefined ? (
                     formatCurrencyWithSign(USD_SIGN, position.strikePrices[position.resolveIndex])
@@ -42,16 +42,16 @@ const ChainedMarketPrice: React.FC<{ position: UserChainedPosition; isStrikePric
             ) : position.resolveIndex !== undefined ? (
                 formatCurrencyWithSign(USD_SIGN, position.finalPrices[position.resolveIndex])
             ) : isMatured ? (
-                <>
+                <span>
                     {'. . .'}
                     <Tooltip overlay={t('speed-markets.tooltips.final-price-missing')} />
-                </>
+                </span>
             ) : position.currentPrice > 0 ? (
                 formatCurrencyWithSign(USD_SIGN, position.currentPrice)
             ) : (
-                <>{'. . .'}</>
+                <span>{'. . .'}</span>
             )}
-        </>
+        </span>
     );
 };
 
