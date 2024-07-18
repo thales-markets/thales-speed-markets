@@ -45,22 +45,22 @@ const MarketPrice: React.FC<{ position: UserPosition | UserHistoryPosition; isRe
     }, [position.maturityDate]);
 
     return (
-        <>
+        <span>
             {isMatured ? (
                 finalPrice > 0 ? (
                     formatCurrencyWithSign(USD_SIGN, finalPrice)
                 ) : (
-                    <>
+                    <span>
                         {'. . .'}
                         <Tooltip overlay={t('speed-markets.tooltips.final-price-missing')} />
-                    </>
+                    </span>
                 )
             ) : position.currentPrice > 0 ? (
                 formatCurrencyWithSign(USD_SIGN, position.currentPrice)
             ) : (
-                <>{'. . .'}</>
+                <span>{'. . .'}</span>
             )}
-        </>
+        </span>
     );
 };
 
