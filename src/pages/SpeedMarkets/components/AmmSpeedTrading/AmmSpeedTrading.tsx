@@ -96,6 +96,7 @@ type AmmSpeedTradingProps = {
         profit: { [Positions.UP]: number; [Positions.DOWN]: number };
         skew: { [Positions.UP]: number; [Positions.DOWN]: number };
     }>;
+    setBuyinGasFee: React.Dispatch<number>;
     resetData: React.Dispatch<void>;
     hasError: boolean;
 };
@@ -113,6 +114,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     ammChainedSpeedMarketsLimits,
     currentPrice,
     setProfitAndSkewPerPosition,
+    setBuyinGasFee,
     resetData,
     hasError,
 }) => {
@@ -143,7 +145,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     const [hasAllowance, setAllowance] = useState(false);
     const [openApprovalModal, setOpenApprovalModal] = useState(false);
     const [openTwitterShareModal, setOpenTwitterShareModal] = useState(false);
-    const [gasFee, setGasFee] = useState<number>(0);
+    const [gasFee, setGasFee] = useState(0);
 
     const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
 
@@ -539,7 +541,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 isMarketCreated = true;
                 onMarketCreated(id);
             },
-            onError: (error: Error) => console.log('Error on watch event MarketCreatedWithFees', error),
         });
 
         try {
@@ -608,23 +609,29 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
             if (txReceipt.status === 'success') {
                 // if creator didn't created market for max time then check for total number of markets
-                await delay(
-                    secondsToMilliseconds(
-                        ammSpeedMarketsCreatorData?.maxCreationDelay || DEFAULT_MAX_CREATOR_DELAY_TIME_SEC
-                    )
+                const maxCreationTime = secondsToMilliseconds(
+                    ammSpeedMarketsCreatorData?.maxCreationDelay || DEFAULT_MAX_CREATOR_DELAY_TIME_SEC
                 );
-                if (!isMarketCreated) {
+                let checkDelay = 2000; // check on every 2s is market created
+                while (!isMarketCreated && checkDelay < maxCreationTime) {
+                    await delay(checkDelay);
+
                     const numOfActiveUserMarketsAfter = Number(
                         (await speedMarketsAMMContractWithClient.read.getLengths([userAddress]))[2]
                     );
 
                     if (numOfActiveUserMarketsAfter - numOfActiveUserMarketsBefore > 0) {
+                        unwatch();
+                        isMarketCreated = true;
                         onMarketCreated(id);
-                    } else {
-                        toast.update(id, getErrorToastOptions(t('common.errors.buy-failed'), id));
-                        setSubmittedStrikePrice(0);
-                        setIsSubmitting(false);
                     }
+
+                    checkDelay += checkDelay;
+                }
+                if (!isMarketCreated) {
+                    toast.update(id, getErrorToastOptions(t('common.errors.buy-failed'), id));
+                    setSubmittedStrikePrice(0);
+                    setIsSubmitting(false);
                 }
 
                 PLAUSIBLE.trackEvent(
@@ -810,6 +817,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 );
                 if (paymasterDataLocal && paymasterDataLocal.maxGasFeeUSD) {
                     setGasFee(paymasterDataLocal.maxGasFeeUSD);
+                    setBuyinGasFee(paymasterDataLocal.maxGasFeeUSD);
                 }
             } else {
                 const paymasterDataLocal = await getPaymasterData(
@@ -833,6 +841,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 );
                 if (paymasterDataLocal && paymasterDataLocal.maxGasFeeUSD) {
                     setGasFee(paymasterDataLocal.maxGasFeeUSD);
+                    setBuyinGasFee(paymasterDataLocal.maxGasFeeUSD);
                 }
             }
         }
@@ -853,6 +862,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         skewImpact,
         walletClient.data,
         isButtonDisabled,
+        setBuyinGasFee,
     ]);
 
     const inputWrapperRef = useRef<HTMLDivElement>(null);
