@@ -46,8 +46,8 @@ const UserHistoricalPositions: React.FC<UserHistoricalPositionsProps> = ({
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
-    const [isFilterSingleSelected, setIsFilterSingleSelected] = useState<boolean>(false);
-    const [isFilterChainedSelected, setIsFilterChainedSelected] = useState<boolean>(false);
+    const [isFilterSingleSelected, setIsFilterSingleSelected] = useState(false);
+    const [isFilterChainedSelected, setIsFilterChainedSelected] = useState(false);
 
     // SINGLE OPEN(ACTIVE)
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
@@ -227,24 +227,23 @@ const UserHistoricalPositions: React.FC<UserHistoricalPositionsProps> = ({
         maturedUserSpeedMarketsWithPrices,
         userResolvedSpeedMarketsHistoryData
     );
-    const allUserOpenSpeedMarketsData = isFilterChainedSelected ? [] : allSingle;
+    const allUserSingleFiltered = isFilterChainedSelected ? [] : allSingle;
 
     const allChained = chainedWithoutMaturedPositions.concat(
         partiallyMaturedWithPrices,
         userResolvedChainedSpeedMarketsData
     );
-    const allUserOpenChainedMarketsData = isFilterSingleSelected ? [] : allChained;
+    const allUserChainedFiltered = isFilterSingleSelected ? [] : allChained;
 
-    const sortedUserMarketsData = allUserOpenSpeedMarketsData
-        .concat(allUserOpenChainedMarketsData)
+    const sortedUserMarketsData = allUserSingleFiltered
+        .concat(allUserChainedFiltered)
         .sort((a, b) => b.createdAt - a.createdAt);
 
     const isLoading = userActiveSpeedMarketsDataQuery.isLoading || userResolvedSpeedMarketsDataQuery.isLoading;
     userChainedSpeedMarketsDataQuery.isLoading || userResolvedChainedSpeedMarketsDataQuery.isLoading;
     pythPricesQueries.filter((query) => query.isLoading).length > 1;
 
-    const noPositions =
-        !isLoading && allUserOpenChainedMarketsData.length === 0 && allUserOpenSpeedMarketsData.length === 0;
+    const noPositions = !isLoading && allUserChainedFiltered.length === 0 && allUserSingleFiltered.length === 0;
 
     const hasSomePositions = allSingle.length > 0 || allChained.length > 0;
 

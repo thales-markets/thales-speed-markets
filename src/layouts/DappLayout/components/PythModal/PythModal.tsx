@@ -28,6 +28,7 @@ import { LINKS } from 'constants/links';
 import earlyUsers from 'constants/AirdropList/early-users.json';
 import govParticipants from 'constants/AirdropList/governance-participation.json';
 import councilNominations from 'constants/AirdropList/council-participation.json';
+import { isValidSolanaAddress } from 'utils/solana';
 
 type PythModalProps = {
     onClose: () => void;
@@ -41,6 +42,7 @@ const PythModal: React.FC<PythModalProps> = ({ onClose }) => {
     const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
     const { signMessageAsync } = useSignMessage();
     const [solanaAddress, setSolanaAddress] = useState('');
+    const [solanaAddressFromAPI, setSolanaAddressFromAPI] = useState('');
 
     const solanaAddressQuery = useSolanaAddressForWalletQuery(
         (isBiconomy ? biconomyConnector.address : walletAddress) as string,
@@ -52,8 +54,10 @@ const PythModal: React.FC<PythModalProps> = ({ onClose }) => {
     useEffect(() => {
         if (solanaAddressQuery.isSuccess && solanaAddressQuery.data) {
             setSolanaAddress(solanaAddressQuery.data);
+            setSolanaAddressFromAPI(solanaAddressQuery.data);
         } else {
             setSolanaAddress('');
+            setSolanaAddressFromAPI('');
         }
     }, [solanaAddressQuery.isSuccess, solanaAddressQuery.data]);
 
@@ -188,7 +192,10 @@ const PythModal: React.FC<PythModalProps> = ({ onClose }) => {
                     <RowWrapper marginBottom="20px">
                         <Button
                             width="100%"
-                            disabled={isConnected && !solanaAddress}
+                            disabled={
+                                isConnected &&
+                                (!isValidSolanaAddress(solanaAddress) || solanaAddress === solanaAddressFromAPI)
+                            }
                             onClick={isConnected ? generateLinkHandler : openConnectModal}
                         >
                             {isConnected ? t('pyth-rewards.submit') : t('common.wallet.connect-your-wallet')}
