@@ -16,7 +16,7 @@ import { UserChainedPosition, UserPosition } from 'types/market';
 import { QueryConfig, SupportedNetwork } from 'types/network';
 import { ViemContract } from 'types/viem';
 import { getPriceConnection, getPriceId, priceParser } from 'utils/pyth';
-import { refetchActiveSpeedMarkets } from 'utils/queryConnector';
+import { refetchActiveSpeedMarkets, refetchUserSpeedMarkets } from 'utils/queryConnector';
 import { delay } from 'utils/timer';
 import { Client, getContract } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
@@ -280,6 +280,13 @@ export const resolveAllSpeedPositions = async (
             if (txReceipt.status === 'success') {
                 toast.update(id, getSuccessToastOptions(i18n.t(`speed-markets.overview.confirmation-message`), id));
                 await delay(2000);
+
+                const walletAddress = isBiconomy
+                    ? biconomyConnector.address
+                    : (queryConfig.client as Client)?.account?.address;
+                if (walletAddress) {
+                    refetchUserSpeedMarkets(false, queryConfig.networkId, walletAddress);
+                }
                 refetchActiveSpeedMarkets(false, queryConfig.networkId);
             } else {
                 console.log('Transaction status', txReceipt.status);
@@ -413,6 +420,13 @@ export const resolveAllChainedMarkets = async (
             if (txReceipt.status === 'success') {
                 toast.update(id, getSuccessToastOptions(i18n.t(`speed-markets.overview.confirmation-message`), id));
                 await delay(2000);
+
+                const walletAddress = isBiconomy
+                    ? biconomyConnector.address
+                    : (queryConfig.client as Client)?.account?.address;
+                if (walletAddress) {
+                    refetchUserSpeedMarkets(true, queryConfig.networkId, walletAddress);
+                }
                 refetchActiveSpeedMarkets(true, queryConfig.networkId);
             } else {
                 console.log('Transaction status', txReceipt.status);
