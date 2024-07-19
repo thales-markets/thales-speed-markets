@@ -90,7 +90,8 @@
         },
         "header": {
             "get-started": "Get started",
-            "notification": { "tooltip": "You have {{count}} claimable position(s)" }
+            "notification": { "tooltip": "You have {{count}} claimable position(s)" },
+            "submit-solana": "Submit Solana address"
         },
         "footer": {
             "github": "GitHub",
