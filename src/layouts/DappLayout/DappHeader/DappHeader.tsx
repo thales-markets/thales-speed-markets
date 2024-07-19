@@ -50,6 +50,7 @@ const DappHeader: React.FC = () => {
     const [openUserInfo, setOpenUserInfo] = useState(false);
     const [openWithdraw, setOpenWithdraw] = useState(false);
     const [openPythModal, setPythModalOpen] = useState(false);
+    const [hideSolanaButton, setHideSolanaButton] = useState(true);
 
     const burgerMenuRef = useRef<HTMLElement>(null);
 
@@ -110,12 +111,11 @@ const DappHeader: React.FC = () => {
         }
     );
 
-    const hideSolanaButton = useMemo(() => {
-        if (solanaAddressQuery.isSuccess && solanaAddressQuery.data) {
-            return isValidSolanaAddress(solanaAddressQuery.data);
+    useEffect(() => {
+        if (solanaAddressQuery.isSuccess) {
+            setHideSolanaButton(isValidSolanaAddress(solanaAddressQuery.data));
         }
-        return false;
-    }, [solanaAddressQuery.isSuccess, solanaAddressQuery.data]);
+    }, [solanaAddressQuery, solanaAddressQuery.isSuccess, solanaAddressQuery.data]);
 
     return (
         <Container>
