@@ -169,7 +169,7 @@ const DappHeader: React.FC = () => {
                         {t('common.wallet.connect-your-wallet')}
                     </Button>
                 )}
-                {isMobile && isConnected && hideSolanaButton && (
+                {isMobile && isConnected && (
                     <Button
                         width="140px"
                         height="30px"
@@ -180,25 +180,13 @@ const DappHeader: React.FC = () => {
                         {t(totalBalanceValue > 0 ? 'deposit.title' : 'common.header.get-started')}
                     </Button>
                 )}
-                {isMobile && isConnected && !hideSolanaButton && (
-                    <Button
-                        width="200px"
-                        height="30px"
-                        margin="10px 4px"
-                        fontSize="12px"
-                        borderColor={Colors.RED}
-                        onClick={() => setPythModalOpen(true)}
-                    >
-                        {t('common.header.submit-solana')}
-                    </Button>
-                )}
 
                 <NetworkSwitch />
 
                 {isConnected && (
                     <>
                         {!isMobile && <UserWallet />}
-                        {!isMobile && <Notifications />}
+                        <Notifications />
                         <HeaderIcons
                             ref={burgerMenuRef}
                             onClick={() => setOpenUserInfo(!openUserInfo)}
