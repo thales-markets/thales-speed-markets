@@ -296,9 +296,7 @@ const SpeedMarkets: React.FC = () => {
                         <UserOpenPositions
                             isChained={isChained}
                             currentPrices={currentPrices}
-                            maxPriceDelayForResolvingSec={ammSpeedMarketsLimitsData?.maxPriceDelayForResolvingSec}
                             onChainedSelectedChange={setIsChainedLinkSelected}
-                            showTabs
                         />
                     )}
                     <OverviewLinkWrapper>

@@ -1,6 +1,6 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { SIDE_TO_POSITION_MAP, SPEED_MARKETS_QUOTE } from 'constants/market';
-import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
+import { PYTH_CURRENCY_DECIMALS, SUPPORTED_ASSETS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
 import { bigNumberFormatter, coinFormatter, parseBytes32String } from 'thales-utils';
@@ -10,6 +10,7 @@ import { ViemContract } from 'types/viem';
 import { getContractAbi } from 'utils/contracts/abi';
 import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
 import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
+import { getCurrentPrices, getPriceConnection, getPriceId } from 'utils/pyth';
 import { getFeesFromHistory } from 'utils/speedAmm';
 import { getContract } from 'viem';
 
@@ -53,8 +54,22 @@ const useUserActiveSpeedMarketsDataQuery = (
                     market: activeMarkets[index],
                 }));
 
+                const openMarkets: any = marketsDataArray
+                    .map((marketData: any, index: number) => ({ ...marketData, market: activeMarkets[index] }))
+                    .filter((market: any) => secondsToMilliseconds(Number(market.strikeTime)) > Date.now());
+
+                // Fetch current prices
+                let prices: { [key: string]: number } = {};
+                if (openMarkets.length) {
+                    const priceConnection = getPriceConnection(queryConfig.networkId);
+                    const priceIds = SUPPORTED_ASSETS.map((asset) => getPriceId(queryConfig.networkId, asset));
+                    prices = await getCurrentPrices(priceConnection, queryConfig.networkId, priceIds);
+                }
+
                 for (let i = 0; i < userActiveMarkets.length; i++) {
                     const marketData = userActiveMarkets[i];
+
+                    const currencyKey = parseBytes32String(marketData.asset);
                     const side = SIDE_TO_POSITION_MAP[marketData.direction];
                     const payout = coinFormatter(marketData.buyinAmount, queryConfig.networkId) * SPEED_MARKETS_QUOTE;
 
@@ -82,7 +97,7 @@ const useUserActiveSpeedMarketsDataQuery = (
                         maturityDate,
                         paid: coinFormatter(marketData.buyinAmount, queryConfig.networkId) * (1 + fees),
                         payout: payout,
-                        currentPrice: 0,
+                        currentPrice: prices[currencyKey],
                         finalPrice: 0,
                         isClaimable: false,
                         isResolved: false,
