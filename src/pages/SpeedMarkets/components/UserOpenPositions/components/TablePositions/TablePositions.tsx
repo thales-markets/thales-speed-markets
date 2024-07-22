@@ -33,6 +33,9 @@ const TablePositions: React.FC<TablePositionsProps> = ({ data }) => {
                     </Wrapper>
                 );
             },
+            enableSorting: true,
+            sortDescFirst: false,
+            sortingFn: 'alphanumeric',
         },
         {
             header: <Header>{t('speed-markets.user-positions.direction')}</Header>,
@@ -67,6 +70,9 @@ const TablePositions: React.FC<TablePositionsProps> = ({ data }) => {
                 </Wrapper>
             ),
             size: 180,
+            enableSorting: true,
+            sortDescFirst: false,
+            sortingFn: 'datetime',
         },
         {
             header: <Header>{t('speed-markets.user-positions.paid')}</Header>,

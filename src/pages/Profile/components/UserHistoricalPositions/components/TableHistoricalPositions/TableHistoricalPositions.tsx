@@ -136,6 +136,9 @@ const TableHistoricalPositions: React.FC<{ data: UserHistoryPosition[] }> = ({ d
                 </Wrapper>
             ),
             size: 180,
+            enableSorting: true,
+            sortDescFirst: true,
+            sortingFn: 'datetime',
         },
         {
             header: <Header>{t('speed-markets.user-positions.end-time')}</Header>,
@@ -162,6 +165,9 @@ const TableHistoricalPositions: React.FC<{ data: UserHistoryPosition[] }> = ({ d
                 );
             },
             size: 180,
+            enableSorting: true,
+            sortDescFirst: false,
+            sortingFn: 'datetime',
         },
         {
             header: <Header>{t('speed-markets.user-positions.paid')}</Header>,
@@ -231,6 +237,14 @@ const TableHistoricalPositions: React.FC<{ data: UserHistoryPosition[] }> = ({ d
             }}
             rowsPerPage={rowsPerPage}
             tableRowCellStyles={{ paddingRight: '0' }}
+            initialState={{
+                sorting: [
+                    {
+                        id: 'createdAt',
+                        desc: true,
+                    },
+                ],
+            }}
         ></Table>
     );
 };

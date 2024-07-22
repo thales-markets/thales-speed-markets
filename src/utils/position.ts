@@ -1,7 +1,23 @@
-import { UserPosition } from 'types/market';
+import { UserChainedPosition, UserPosition } from 'types/market';
 import { UserHistoryPosition } from 'types/profile';
 import { isUserWinner } from './speedAmm';
 import { HistoryStatus } from 'enums/market';
+
+export const sortSpeedMarkets = (positions: (UserPosition | UserChainedPosition)[]) =>
+    positions
+        // 1. sort open by maturity asc
+        .filter((position) => position.maturityDate > Date.now())
+        .sort((a, b) => a.maturityDate - b.maturityDate)
+        .concat(
+            // 2. sort claimable by maturity desc
+            positions.filter((position) => position.isClaimable).sort((a, b) => b.maturityDate - a.maturityDate)
+        )
+        .concat(
+            positions
+                // 3. sort lost by maturity desc
+                .filter((position) => position.maturityDate < Date.now() && !position.isClaimable)
+                .sort((a, b) => b.maturityDate - a.maturityDate)
+        );
 
 export const mapUserPositionToHistory = (userPosition: UserPosition): UserHistoryPosition => {
     const isMatured = userPosition.maturityDate < Date.now();

@@ -48,6 +48,9 @@ const TableActivePositions: React.FC<{ data: (UserPosition | UserChainedPosition
                     </Wrapper>
                 );
             },
+            enableSorting: true,
+            sortDescFirst: false,
+            sortingFn: 'alphanumeric',
         },
         {
             header: <Header>{t('speed-markets.chained.directions')}</Header>,

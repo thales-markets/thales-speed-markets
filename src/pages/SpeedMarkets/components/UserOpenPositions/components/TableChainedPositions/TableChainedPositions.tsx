@@ -40,6 +40,9 @@ const TableChainedPositions: React.FC<{ data: UserChainedPosition[] }> = ({ data
                     </Wrapper>
                 );
             },
+            enableSorting: true,
+            sortDescFirst: false,
+            sortingFn: 'alphanumeric',
         },
         {
             header: <Header>{t('speed-markets.chained.directions')}</Header>,

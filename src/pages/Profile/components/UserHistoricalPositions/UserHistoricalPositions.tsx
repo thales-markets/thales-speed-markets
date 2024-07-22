@@ -68,10 +68,13 @@ const UserHistoricalPositions: React.FC<UserHistoricalPositionsProps> = ({
 
     const activeSpeedNotMatured: UserHistoryPosition[] = userOpenSpeedMarketsData
         .filter((marketData) => marketData.maturityDate >= Date.now())
-        .map((marketData) => ({
-            ...mapUserPositionToHistory(marketData),
-            currentPrice: currentPrices[marketData.currencyKey],
-        }));
+        .map((marketData) => {
+            const fetchedCurrentPrice = currentPrices[marketData.currencyKey];
+            return {
+                ...mapUserPositionToHistory(marketData),
+                currentPrice: fetchedCurrentPrice ? fetchedCurrentPrice : marketData.currentPrice,
+            };
+        });
     const activeSpeedMatured = userOpenSpeedMarketsData.filter((marketData) => marketData.maturityDate < Date.now());
 
     const priceRequests = activeSpeedMatured.map((marketData) => ({
@@ -134,10 +137,13 @@ const UserHistoricalPositions: React.FC<UserHistoricalPositionsProps> = ({
 
     const chainedWithoutMaturedPositions: UserHistoryPosition[] = userOpenChainedSpeedMarketsData
         .filter((marketData) => marketData.strikeTimes[0] >= Date.now())
-        .map((marketData) => ({
-            ...marketData,
-            currentPrice: currentPrices[marketData.currencyKey],
-        }));
+        .map((marketData) => {
+            const fetchedCurrentPrice = currentPrices[marketData.currencyKey];
+            return {
+                ...marketData,
+                currentPrice: fetchedCurrentPrice ? fetchedCurrentPrice : marketData.currentPrice,
+            };
+        });
     // Prepare chained speed markets that are partially matured to fetch Pyth prices
     const partiallyMaturedChainedMarkets = userOpenChainedSpeedMarketsData
         .filter((marketData) => marketData.strikeTimes.some((strikeTime) => strikeTime < Date.now()))
