@@ -149,6 +149,12 @@ const CardPosition: React.FC<CardPositionProps> = ({
                     )}
                 </InfoColumn>
             </Info>
+            {isOverview && (
+                <SingleInfoRow>
+                    <Label>{t('speed-markets.overview.user')}:</Label>
+                    <Value $hideText>{position.user}</Value>
+                </SingleInfoRow>
+            )}
             <Action>
                 {historyStatus ? (
                     <Value
@@ -201,6 +207,12 @@ export const InfoRow = styled(FlexDivStart)`
     align-items: center;
 `;
 
+export const SingleInfoRow = styled(FlexDivStart)`
+    align-items: center;
+    padding-top: 6px;
+    padding-bottom: 13px;
+`;
+
 export const Action = styled(FlexDivSpaceBetween)``;
 
 export const Text = styled.span`
@@ -216,12 +228,19 @@ export const Label = styled(Text)`
     margin-right: 5px;
 `;
 
-export const Value = styled(Text)<{ $color?: string; $alignCenter?: boolean; $hasShare?: boolean }>`
+export const Value = styled(Text)<{
+    $color?: string;
+    $alignCenter?: boolean;
+    $hasShare?: boolean;
+    $hideText?: boolean;
+}>`
     ${(props) => (props.$color ? `color: ${props.$color};` : '')}
     ${(props) => (props.$alignCenter ? 'width: 100%;;' : '')}
     ${(props) => (props.$alignCenter ? 'text-align: center;' : '')}
     ${(props) => (props.$alignCenter ? 'text-align: center;' : '')}
     ${(props) => (props.$hasShare ? 'padding-left: 20px;' : '')}
+    ${(props) => (props.$hideText ? 'overflow: hidden;' : '')}
+    ${(props) => (props.$hideText ? 'text-overflow: ellipsis;' : '')}
 `;
 
 export default CardPosition;
