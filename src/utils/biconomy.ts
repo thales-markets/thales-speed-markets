@@ -10,7 +10,7 @@ import { getPublicClient } from '@wagmi/core';
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 import { addMonths } from 'date-fns';
 import { wagmiConfig } from 'pages/Root/wagmiConfig';
-import { localStore } from 'thales-utils';
+import { localStore, NetworkId } from 'thales-utils';
 import { SupportedNetwork } from 'types/network';
 import { ViemContract } from 'types/viem';
 import { Address, Client, createWalletClient, encodeFunctionData, erc20Abi, getContract, http, maxUint256 } from 'viem';
@@ -145,15 +145,15 @@ export const executeBiconomyTransaction = async (
                         isEth
                             ? {}
                             : {
-                                  //   paymasterServiceData: {
-                                  //       mode:
-                                  //           networkId === NetworkId.Base ? PaymasterMode.SPONSORED : PaymasterMode.ERC20,
-                                  //       preferredToken: networkId === NetworkId.Base ? undefined : collateral,
-                                  //   },
                                   paymasterServiceData: {
-                                      mode: PaymasterMode.ERC20,
-                                      preferredToken: collateral,
+                                      mode:
+                                          networkId === NetworkId.Base ? PaymasterMode.SPONSORED : PaymasterMode.ERC20,
+                                      preferredToken: networkId === NetworkId.Base ? undefined : collateral,
                                   },
+                                  //   paymasterServiceData: {
+                                  //       mode: PaymasterMode.ERC20,
+                                  //       preferredToken: collateral,
+                                  //   },
                               }
                     );
 
@@ -220,14 +220,14 @@ export const executeBiconomyTransaction = async (
                               },
                           }
                         : {
-                              //   paymasterServiceData: {
-                              //       mode: networkId === NetworkId.Base ? PaymasterMode.SPONSORED : PaymasterMode.ERC20,
-                              //       preferredToken: networkId === NetworkId.Base ? undefined : collateral,
-                              //   },
                               paymasterServiceData: {
-                                  mode: PaymasterMode.ERC20,
-                                  preferredToken: collateral,
+                                  mode: networkId === NetworkId.Base ? PaymasterMode.SPONSORED : PaymasterMode.ERC20,
+                                  preferredToken: networkId === NetworkId.Base ? undefined : collateral,
                               },
+                              //   paymasterServiceData: {
+                              //       mode: PaymasterMode.ERC20,
+                              //       preferredToken: collateral,
+                              //   },
                               params: {
                                   sessionSigner: sessionSigner,
                                   sessionValidationModule: sessionValidationContract.addresses[networkId],
