@@ -124,12 +124,7 @@ const Container = styled(FlexDivCentered)<{
             transform: scale(1);
         }
     }
-    ${(props) =>
-        props.$pulsate
-            ? `
-            animation: pulse 1s infinite;
-            `
-            : ''};
+    ${(props) => (props.$pulsate ? 'animation: pulse 1s infinite;' : '')};
 `;
 
 const ButtonWrapper = styled.button<{
