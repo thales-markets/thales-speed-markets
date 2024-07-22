@@ -21,7 +21,7 @@ import ChainedMarketPrice from '../../../ChainedMarketPrice';
 import ChainedPositionAction from '../../../ChainedPositionAction';
 import SharePosition from '../../../SharePosition';
 import { DirectionIcon } from '../../../UserOpenPositions/components/TablePositions/TablePositions';
-import { Action, Info, InfoColumn, InfoRow, Label, Value } from '../CardPosition/CardPosition';
+import { Action, Info, InfoColumn, InfoRow, Label, SingleInfoRow, Value } from '../CardPosition/CardPosition';
 
 type CardChainedPositionProps = {
     position: UserChainedPosition;
@@ -194,6 +194,12 @@ const CardChainedPosition: React.FC<CardChainedPositionProps> = ({
                     )}
                 </InfoColumn>
             </Info>
+            {isOverview && (
+                <SingleInfoRow>
+                    <Label>{t('speed-markets.overview.user')}:</Label>
+                    <Value $hideText>{position.user}</Value>
+                </SingleInfoRow>
+            )}
             <Action>
                 {historyStatus ? (
                     <Value $alignCenter $hasShare={position.canResolve} $color={getStatusColor(historyStatus, theme)}>
