@@ -390,6 +390,7 @@
         "your-address": "Your solana address for receiving pyth rewards:",
         "info": "*To access your Solana wallet, go to wallet.particle.network and login with the same social account as on this dApp",
         "input-label": "Input/change your solana address:",
+        "invalid-solana-address": "Invalid Solana address",
         "submit": "Submit",
         "success": "Successfully submitted solana address",
         "eligible": "You're eligible!!!",

@@ -198,7 +198,13 @@ const PythModal: React.FC<PythModalProps> = ({ onClose }) => {
                             }
                             onClick={isConnected ? generateLinkHandler : openConnectModal}
                         >
-                            {isConnected ? t('pyth-rewards.submit') : t('common.wallet.connect-your-wallet')}
+                            {isConnected
+                                ? solanaAddress === ''
+                                    ? t('pyth-rewards.submit')
+                                    : !isValidSolanaAddress(solanaAddress)
+                                    ? t('pyth-rewards.invalid-solana-address')
+                                    : t('pyth-rewards.submit')
+                                : t('common.wallet.connect-your-wallet')}
                         </Button>
                     </RowWrapper>
                 </Container>
