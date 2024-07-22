@@ -29,6 +29,7 @@ import earlyUsers from 'constants/AirdropList/early-users.json';
 import govParticipants from 'constants/AirdropList/governance-participation.json';
 import councilNominations from 'constants/AirdropList/council-participation.json';
 import { isValidSolanaAddress } from 'utils/solana';
+import { refetchSolanaAddress } from 'utils/queryConnector';
 
 type PythModalProps = {
     onClose: () => void;
@@ -85,8 +86,10 @@ const PythModal: React.FC<PythModalProps> = ({ onClose }) => {
                 <ToastMessage id="customId" type="success" message={t('pyth-rewards.success')} />,
                 getSuccessToastOptions('', 'customId')
             );
+            refetchSolanaAddress((isBiconomy ? biconomyConnector.address : walletAddress) as string);
+            onClose();
         }
-    }, [solanaAddress, walletAddress, isBiconomy, t, signMessageAsync]);
+    }, [solanaAddress, walletAddress, isBiconomy, t, signMessageAsync, onClose]);
 
     const pythAllocation = useMemo(() => {
         if (walletAddress) {
