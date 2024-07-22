@@ -25,19 +25,31 @@ const MobileMenu: React.FC<{ onChartClick?: () => void }> = ({ onChartClick }) =
     return (
         <Container>
             <Items>
-                <Item onClick={isSpeedMarkets ? onChartClick : () => navigateTo(ROUTES.Markets.Home)}>
+                <Item
+                    onClick={
+                        isSpeedMarkets
+                            ? onChartClick
+                            : () => navigateTo(`${ROUTES.Markets.Home}?isChained=${isChainedMarkets}`)
+                    }
+                >
                     {isSpeedMarkets && <Icon className="icon icon--market" />}
                     {isSpeedMarkets ? t('common.chart') : t('common.home')}
                 </Item>
-                {!isOverview && (
-                    <Item
-                        onClick={() =>
-                            navigateTo(`${ROUTES.Markets.SpeedMarketsOverview}?isChained=${isChainedMarkets}`)
-                        }
-                    >
-                        {t('speed-markets.overview.title')}
-                    </Item>
-                )}
+                <Item
+                    onClick={() =>
+                        navigateTo(
+                            `${ROUTES.Markets.SpeedMarketsOverview}?isChained=${
+                                isOverview ? !isChainedMarkets : isChainedMarkets
+                            }`
+                        )
+                    }
+                >
+                    {isOverview
+                        ? isChainedMarkets
+                            ? t('speed-markets.single')
+                            : t('speed-markets.chained.label')
+                        : t('speed-markets.overview.title')}
+                </Item>
                 {isConnected && !isProfile && (
                     <Item onClick={() => navigateTo(ROUTES.Markets.Profile)}>{t('profile.title')}</Item>
                 )}

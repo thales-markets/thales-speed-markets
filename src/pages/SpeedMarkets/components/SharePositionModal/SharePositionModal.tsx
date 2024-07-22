@@ -25,9 +25,9 @@ type SharePositionModalProps = SharePositionData & {
     onClose: () => void;
 };
 
-const PARLAY_IMAGE_NAME = 'ParlayImage.png';
+const SPEED_IMAGE_NAME = 'SpeedImage.png';
 const TWITTER_MESSAGE_PASTE = '%0A<PASTE YOUR IMAGE>';
-const TWITTER_MESSAGE_UPLOAD = `%0A<UPLOAD YOUR ${PARLAY_IMAGE_NAME}>`;
+const TWITTER_MESSAGE_UPLOAD = `%0A<UPLOAD YOUR ${SPEED_IMAGE_NAME}>`;
 const TWITTER_MESSAGE_CHECKOUT = `Check out my position on%0A`;
 
 const SharePositionModal: React.FC<SharePositionModalProps> = ({
@@ -109,7 +109,7 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
                         // Download image
                         const link = document.createElement('a');
                         link.href = base64Image;
-                        link.download = PARLAY_IMAGE_NAME;
+                        link.download = SPEED_IMAGE_NAME;
                         document.body.appendChild(link);
                         setTimeout(
                             () => {
