@@ -142,6 +142,7 @@ const DappHeader: React.FC = () => {
                             margin="10px"
                             fontSize="12px"
                             borderColor={Colors.RED}
+                            pulsate
                             onClick={() => setPythModalOpen(true)}
                         >
                             {t('common.header.submit-solana')}
