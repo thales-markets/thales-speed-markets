@@ -38,6 +38,7 @@ import styled from 'styled-components';
 import { FlexDivCentered, FlexDivColumn, FlexDivRow, FlexDivRowCentered, GradientContainer } from 'styles/common';
 import {
     COLLATERAL_DECIMALS,
+    NetworkId,
     bigNumberFormatter,
     ceilNumberToDecimals,
     coinParser,
@@ -881,7 +882,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                         {getSubmitButton()}
                         {gasFee > 0 && !isButtonDisabled && (
                             <Tooltip overlay={t('speed-markets.estimate-gas')}>
-                                <GasText>
+                                <GasText $isBase={networkId === NetworkId.Base}>
                                     <GasIcon className={`network-icon network-icon--gas`} />
                                     {formatCurrencyWithSign(USD_SIGN, gasFee, 2)}
                                 </GasText>
@@ -1018,13 +1019,14 @@ const GasIcon = styled.i`
     margin-right: 2px;
 `;
 
-const GasText = styled.span`
+const GasText = styled.span<{ $isBase?: boolean }>`
     display: flex;
     font-size: 18px;
     color: ${(props) => props.theme.textColor.primary};
     position: absolute;
     right: 16px;
     bottom: 10px;
+    text-decoration: ${(props) => (props.$isBase ? 'line-through' : '')};
 `;
 
 export default AmmSpeedTrading;

@@ -19,6 +19,7 @@ type ButtonProps = {
     disabled?: boolean;
     additionalStyles?: CSSProperties;
     children?: any;
+    pulsate?: boolean;
     onClick?: () => void;
 };
 
@@ -39,6 +40,7 @@ const Button: React.FC<ButtonProps> = ({
     fontSize,
     fontWeight,
     children,
+    pulsate,
     onClick,
 }) => {
     return (
@@ -53,6 +55,7 @@ const Button: React.FC<ButtonProps> = ({
             $borderWidth={borderWidth}
             $disabled={disabled}
             style={additionalStyles}
+            $pulsate={pulsate}
         >
             <ButtonWrapper
                 minWidth={minWidth}
@@ -89,6 +92,7 @@ const Container = styled(FlexDivCentered)<{
     $borderRadius?: string;
     $borderWidth?: string;
     $disabled?: boolean;
+    $pulsate?: boolean;
 }>`
     width: ${(props) => props.width || 'auto'};
     ${(props) => (props.minWidth ? `min-width: ${props.minWidth};` : '')};
@@ -108,6 +112,19 @@ const Container = styled(FlexDivCentered)<{
                 opacity: 0.4;
             `
             : ''};
+
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.02);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+    ${(props) => (props.$pulsate ? 'animation: pulse 1s infinite;' : '')};
 `;
 
 const ButtonWrapper = styled.button<{
