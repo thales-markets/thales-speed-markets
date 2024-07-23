@@ -3,22 +3,6 @@ import { UserHistoryPosition } from 'types/profile';
 import { isUserWinner } from './speedAmm';
 import { HistoryStatus } from 'enums/market';
 
-export const sortSpeedMarkets = (positions: (UserPosition | UserChainedPosition)[]) =>
-    positions
-        // 1. sort open by maturity asc
-        .filter((position) => position.maturityDate > Date.now())
-        .sort((a, b) => a.maturityDate - b.maturityDate)
-        .concat(
-            // 2. sort claimable by maturity desc
-            positions.filter((position) => position.isClaimable).sort((a, b) => b.maturityDate - a.maturityDate)
-        )
-        .concat(
-            positions
-                // 3. sort lost by maturity desc
-                .filter((position) => position.maturityDate < Date.now() && !position.isClaimable)
-                .sort((a, b) => b.maturityDate - a.maturityDate)
-        );
-
 export const mapUserPositionToHistory = (userPosition: UserPosition): UserHistoryPosition => {
     const isMatured = userPosition.maturityDate < Date.now();
 
@@ -88,4 +72,60 @@ export const getHistoryStatus = (position: UserHistoryPosition) => {
     }
 
     return status;
+};
+
+export const getChainedEndTime = (position: UserChainedPosition) => {
+    const strikeTimeIndex = position.strikeTimes.findIndex((t) => t > Date.now());
+
+    return position.resolveIndex !== undefined
+        ? position.strikeTimes[position.resolveIndex]
+        : strikeTimeIndex > -1
+        ? position.strikeTimes[strikeTimeIndex]
+        : position.maturityDate;
+};
+
+export const sortSpeedMarkets = (positions: (UserPosition | UserChainedPosition)[]) =>
+    positions
+        // 1. sort open by maturity asc
+        .filter((position) => position.maturityDate > Date.now())
+        .sort((a, b) => a.maturityDate - b.maturityDate)
+        .concat(
+            // 2. sort claimable by maturity desc
+            positions.filter((position) => position.isClaimable).sort((a, b) => b.maturityDate - a.maturityDate)
+        )
+        .concat(
+            positions
+                // 3. sort lost by maturity desc
+                .filter((position) => position.maturityDate < Date.now() && !position.isClaimable)
+                .sort((a, b) => b.maturityDate - a.maturityDate)
+        );
+
+export const tableSortByEndTime = (rowA: any, rowB: any) => {
+    const aEndTime = rowA.original.sides !== undefined ? getChainedEndTime(rowA.original) : rowA.original.maturityDate;
+    const bEndTime = rowB.original.sides !== undefined ? getChainedEndTime(rowB.original) : rowB.original.maturityDate;
+    return aEndTime < bEndTime ? -1 : aEndTime > bEndTime ? 1 : 0;
+};
+
+export const tableSortByStatus = (rowA: any, rowB: any) => {
+    const aStatus = getHistoryStatus(
+        rowA.original.sides !== undefined ? rowA.original : mapUserPositionToHistory(rowA.original)
+    );
+    const bStatus = getHistoryStatus(
+        rowB.original.sides !== undefined ? rowB.original : mapUserPositionToHistory(rowB.original)
+    );
+    if (
+        (aStatus === HistoryStatus.OPEN && bStatus !== HistoryStatus.OPEN) ||
+        (aStatus === HistoryStatus.CLAIMABLE && [HistoryStatus.WON, HistoryStatus.LOSS].includes(bStatus)) ||
+        (aStatus === HistoryStatus.WON && bStatus === HistoryStatus.LOSS)
+    ) {
+        return -1;
+    }
+    if (
+        (aStatus === HistoryStatus.CLAIMABLE && bStatus === HistoryStatus.OPEN) ||
+        (aStatus === HistoryStatus.WON && [HistoryStatus.OPEN, HistoryStatus.CLAIMABLE].includes(bStatus)) ||
+        (aStatus === HistoryStatus.LOSS && bStatus !== HistoryStatus.LOSS)
+    ) {
+        return 1;
+    }
+    return 0;
 };

@@ -12,6 +12,7 @@ import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import MarketPrice from '../../../MarketPrice';
 import { Icon } from '../../../SelectPosition/styled-components';
 import SharePosition from '../../../SharePosition';
+import { tableSortByStatus } from 'utils/position';
 
 type TablePositionsProps = {
     data: UserPosition[];
@@ -103,6 +104,9 @@ const TablePositions: React.FC<TablePositionsProps> = ({ data }) => {
                 </Wrapper>
             ),
             size: 300,
+            enableSorting: true,
+            sortDescFirst: false,
+            sortingFn: tableSortByStatus,
         },
         {
             header: <></>,

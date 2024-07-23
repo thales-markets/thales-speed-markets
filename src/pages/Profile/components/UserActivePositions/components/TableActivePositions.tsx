@@ -22,6 +22,7 @@ import {
 import { formatCurrencyWithSign, localStore } from 'thales-utils';
 import { UserChainedPosition, UserPosition } from 'types/market';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
+import { getChainedEndTime, tableSortByEndTime, tableSortByStatus } from 'utils/position';
 
 const TableActivePositions: React.FC<{ data: (UserPosition | UserChainedPosition)[] }> = ({ data }) => {
     const columns = [
@@ -135,13 +136,7 @@ const TableActivePositions: React.FC<{ data: (UserPosition | UserChainedPosition
 
                 let endTime = position.maturityDate;
                 if (isChained) {
-                    const strikeTimeIndex = position.strikeTimes.findIndex((t) => t > Date.now());
-                    endTime =
-                        position.resolveIndex !== undefined
-                            ? position.strikeTimes[position.resolveIndex]
-                            : strikeTimeIndex > -1
-                            ? position.strikeTimes[strikeTimeIndex]
-                            : cellProps.cell.getValue();
+                    endTime = getChainedEndTime(position);
                 }
 
                 return (
@@ -151,6 +146,9 @@ const TableActivePositions: React.FC<{ data: (UserPosition | UserChainedPosition
                 );
             },
             size: 180,
+            enableSorting: true,
+            sortDescFirst: false,
+            sortingFn: tableSortByEndTime,
         },
         {
             header: <Header>{t('speed-markets.user-positions.paid')}</Header>,
@@ -189,6 +187,9 @@ const TableActivePositions: React.FC<{ data: (UserPosition | UserChainedPosition
                 );
             },
             size: 300,
+            enableSorting: true,
+            sortDescFirst: false,
+            sortingFn: tableSortByStatus,
         },
         {
             header: <></>,
