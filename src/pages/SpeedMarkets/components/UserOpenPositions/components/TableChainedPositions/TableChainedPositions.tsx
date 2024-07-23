@@ -172,6 +172,14 @@ const TableChainedPositions: React.FC<{ data: UserChainedPosition[] }> = ({ data
                 return <ChainedPosition position={row.original} />;
             }}
             rowsPerPage={rowsPerPage}
+            initialState={{
+                sorting: [
+                    {
+                        id: 'action',
+                        desc: false,
+                    },
+                ],
+            }}
         ></Table>
     );
 };

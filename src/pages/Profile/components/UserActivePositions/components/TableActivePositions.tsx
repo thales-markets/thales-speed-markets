@@ -213,6 +213,8 @@ const TableActivePositions: React.FC<{ data: (UserPosition | UserChainedPosition
     const foundPagination = PAGINATION_SIZE.filter((obj) => obj.value === Number(rowsPerPageLS));
     const rowsPerPage = foundPagination.length ? foundPagination[0].value : undefined;
 
+    const isActiveClaimable = data.length && data[0].isClaimable;
+
     return (
         <Table
             data={data}
@@ -223,6 +225,14 @@ const TableActivePositions: React.FC<{ data: (UserPosition | UserChainedPosition
             }}
             rowsPerPage={rowsPerPage}
             tableRowCellStyles={{ paddingRight: '0' }}
+            initialState={{
+                sorting: [
+                    {
+                        id: 'maturityDate',
+                        desc: isActiveClaimable,
+                    },
+                ],
+            }}
         ></Table>
     );
 };

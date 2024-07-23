@@ -126,7 +126,21 @@ const TablePositions: React.FC<TablePositionsProps> = ({ data }) => {
     const foundPagination = PAGINATION_SIZE.filter((obj) => obj.value === Number(rowsPerPageLS));
     const rowsPerPage = foundPagination.length ? foundPagination[0].value : undefined;
 
-    return <Table data={data} columns={columns as any} rowsPerPage={rowsPerPage} />;
+    return (
+        <Table
+            data={data}
+            columns={columns as any}
+            rowsPerPage={rowsPerPage}
+            initialState={{
+                sorting: [
+                    {
+                        id: 'action',
+                        desc: false,
+                    },
+                ],
+            }}
+        />
+    );
 };
 
 export const Header = styled.p`
