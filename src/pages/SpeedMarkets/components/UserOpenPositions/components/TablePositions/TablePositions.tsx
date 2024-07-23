@@ -12,6 +12,7 @@ import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import MarketPrice from '../../../MarketPrice';
 import { Icon } from '../../../SelectPosition/styled-components';
 import SharePosition from '../../../SharePosition';
+import { tableSortByStatus } from 'utils/position';
 
 type TablePositionsProps = {
     data: UserPosition[];
@@ -33,6 +34,9 @@ const TablePositions: React.FC<TablePositionsProps> = ({ data }) => {
                     </Wrapper>
                 );
             },
+            enableSorting: true,
+            sortDescFirst: false,
+            sortingFn: 'alphanumeric',
         },
         {
             header: <Header>{t('speed-markets.user-positions.direction')}</Header>,
@@ -67,6 +71,9 @@ const TablePositions: React.FC<TablePositionsProps> = ({ data }) => {
                 </Wrapper>
             ),
             size: 180,
+            enableSorting: true,
+            sortDescFirst: false,
+            sortingFn: 'datetime',
         },
         {
             header: <Header>{t('speed-markets.user-positions.paid')}</Header>,
@@ -97,6 +104,9 @@ const TablePositions: React.FC<TablePositionsProps> = ({ data }) => {
                 </Wrapper>
             ),
             size: 300,
+            enableSorting: true,
+            sortDescFirst: false,
+            sortingFn: tableSortByStatus,
         },
         {
             header: <></>,
@@ -116,7 +126,21 @@ const TablePositions: React.FC<TablePositionsProps> = ({ data }) => {
     const foundPagination = PAGINATION_SIZE.filter((obj) => obj.value === Number(rowsPerPageLS));
     const rowsPerPage = foundPagination.length ? foundPagination[0].value : undefined;
 
-    return <Table data={data} columns={columns as any} rowsPerPage={rowsPerPage} />;
+    return (
+        <Table
+            data={data}
+            columns={columns as any}
+            rowsPerPage={rowsPerPage}
+            initialState={{
+                sorting: [
+                    {
+                        id: 'action',
+                        desc: false,
+                    },
+                ],
+            }}
+        />
+    );
 };
 
 export const Header = styled.p`

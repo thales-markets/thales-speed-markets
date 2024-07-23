@@ -23,7 +23,13 @@ import { UserChainedPosition } from 'types/market';
 import { UserHistoryPosition } from 'types/profile';
 import { ThemeInterface } from 'types/ui';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
-import { getHistoryStatus, mapUserHistoryToPosition } from 'utils/position';
+import {
+    getChainedEndTime,
+    getHistoryStatus,
+    mapUserHistoryToPosition,
+    tableSortByEndTime,
+    tableSortByStatus,
+} from 'utils/position';
 import { getStatusColor } from 'utils/style';
 
 const TableHistoricalPositions: React.FC<{ data: UserHistoryPosition[] }> = ({ data }) => {
@@ -136,6 +142,9 @@ const TableHistoricalPositions: React.FC<{ data: UserHistoryPosition[] }> = ({ d
                 </Wrapper>
             ),
             size: 180,
+            enableSorting: true,
+            sortDescFirst: true,
+            sortingFn: 'datetime',
         },
         {
             header: <Header>{t('speed-markets.user-positions.end-time')}</Header>,
@@ -146,13 +155,7 @@ const TableHistoricalPositions: React.FC<{ data: UserHistoryPosition[] }> = ({ d
 
                 let endTime = position.maturityDate;
                 if (isChained) {
-                    const strikeTimeIndex = position.strikeTimes.findIndex((t) => t > Date.now());
-                    endTime =
-                        position.resolveIndex !== undefined
-                            ? position.strikeTimes[position.resolveIndex]
-                            : strikeTimeIndex > -1
-                            ? position.strikeTimes[strikeTimeIndex]
-                            : cellProps.cell.getValue();
+                    endTime = getChainedEndTime(position);
                 }
 
                 return (
@@ -162,6 +165,9 @@ const TableHistoricalPositions: React.FC<{ data: UserHistoryPosition[] }> = ({ d
                 );
             },
             size: 180,
+            enableSorting: true,
+            sortDescFirst: false,
+            sortingFn: tableSortByEndTime,
         },
         {
             header: <Header>{t('speed-markets.user-positions.paid')}</Header>,
@@ -195,6 +201,9 @@ const TableHistoricalPositions: React.FC<{ data: UserHistoryPosition[] }> = ({ d
                 );
             },
             size: 120,
+            enableSorting: true,
+            sortDescFirst: false,
+            sortingFn: tableSortByStatus,
         },
         {
             header: <></>,
@@ -231,6 +240,14 @@ const TableHistoricalPositions: React.FC<{ data: UserHistoryPosition[] }> = ({ d
             }}
             rowsPerPage={rowsPerPage}
             tableRowCellStyles={{ paddingRight: '0' }}
+            initialState={{
+                sorting: [
+                    {
+                        id: 'createdAt',
+                        desc: true,
+                    },
+                ],
+            }}
         ></Table>
     );
 };

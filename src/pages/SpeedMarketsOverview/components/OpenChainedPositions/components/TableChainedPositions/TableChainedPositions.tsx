@@ -17,6 +17,7 @@ import {
     Value,
     Wrapper,
 } from '../../../OpenPositions/components/TablePositions/TablePositions';
+import { getChainedEndTime } from 'utils/position';
 
 type TablePositionsProps = {
     data: UserChainedPosition[];
@@ -104,14 +105,7 @@ const TableChainedPositions: React.FC<TablePositionsProps> = ({
             accessorKey: 'maturityDate',
             cell: (cellProps: any) => {
                 const position = cellProps.row.original as UserChainedPosition;
-
-                const strikeTimeIndex = position.strikeTimes.findIndex((t) => t > Date.now());
-                const endTime =
-                    position.resolveIndex !== undefined
-                        ? position.strikeTimes[position.resolveIndex]
-                        : strikeTimeIndex > -1
-                        ? position.strikeTimes[strikeTimeIndex]
-                        : cellProps.cell.getValue();
+                const endTime = getChainedEndTime(position);
 
                 return (
                     <Wrapper>

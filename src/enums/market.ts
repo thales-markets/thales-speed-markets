@@ -11,9 +11,9 @@ export enum TradingSteps {
 }
 
 export enum SortDirection {
-    NONE,
-    ASC,
-    DESC,
+    NONE = 'none',
+    ASC = 'asc',
+    DESC = 'desc',
 }
 
 export enum HistoryStatus {

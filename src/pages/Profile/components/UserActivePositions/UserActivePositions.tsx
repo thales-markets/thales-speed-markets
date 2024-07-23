@@ -26,6 +26,7 @@ import erc20Contract from 'utils/contracts/collateralContract';
 import multipleCollateral from 'utils/contracts/multipleCollateralContract';
 import { getCollateral, getDefaultCollateral } from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
+import { sortSpeedMarkets } from 'utils/position';
 import { getPriceId } from 'utils/pyth';
 import { isUserWinner, resolveAllChainedMarkets, resolveAllSpeedPositions } from 'utils/speedAmm';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
@@ -381,22 +382,6 @@ const UserActivePositions: React.FC<UserActivePositionsProps> = ({
         </Container>
     );
 };
-
-const sortSpeedMarkets = (markets: (UserPosition | UserChainedPosition)[]) =>
-    markets
-        // 1. sort open by maturity asc
-        .filter((position) => position.maturityDate > Date.now())
-        .sort((a, b) => a.maturityDate - b.maturityDate)
-        .concat(
-            // 2. sort claimable by maturity desc
-            markets.filter((position) => position.isClaimable).sort((a, b) => b.maturityDate - a.maturityDate)
-        )
-        .concat(
-            markets
-                // 3. sort lost by maturity desc
-                .filter((position) => position.maturityDate < Date.now() && !position.isClaimable)
-                .sort((a, b) => b.maturityDate - a.maturityDate)
-        );
 
 const Container = styled.div`
     position: relative;
