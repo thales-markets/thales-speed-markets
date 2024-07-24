@@ -21,6 +21,7 @@ import {
     Wrapper,
 } from '../TablePositions/TablePositions';
 import { Positions } from 'enums/market';
+import { getChainedEndTime, tableSortByEndTime, tableSortByStatus } from 'utils/position';
 
 const TableChainedPositions: React.FC<{ data: UserChainedPosition[] }> = ({ data }) => {
     const columns = [
@@ -40,6 +41,9 @@ const TableChainedPositions: React.FC<{ data: UserChainedPosition[] }> = ({ data
                     </Wrapper>
                 );
             },
+            enableSorting: true,
+            sortDescFirst: false,
+            sortingFn: 'alphanumeric',
         },
         {
             header: <Header>{t('speed-markets.chained.directions')}</Header>,
@@ -96,14 +100,7 @@ const TableChainedPositions: React.FC<{ data: UserChainedPosition[] }> = ({ data
             accessorKey: 'maturityDate',
             cell: (cellProps: any) => {
                 const position = cellProps.row.original as UserChainedPosition;
-
-                const strikeTimeIndex = position.strikeTimes.findIndex((t) => t > Date.now());
-                const endTime =
-                    position.resolveIndex !== undefined
-                        ? position.strikeTimes[position.resolveIndex]
-                        : strikeTimeIndex > -1
-                        ? position.strikeTimes[strikeTimeIndex]
-                        : cellProps.cell.getValue();
+                const endTime = getChainedEndTime(position);
 
                 return (
                     <Wrapper>
@@ -112,6 +109,9 @@ const TableChainedPositions: React.FC<{ data: UserChainedPosition[] }> = ({ data
                 );
             },
             size: 180,
+            enableSorting: true,
+            sortDescFirst: false,
+            sortingFn: tableSortByEndTime,
         },
         {
             header: <Header>{t('speed-markets.user-positions.paid')}</Header>,
@@ -142,6 +142,9 @@ const TableChainedPositions: React.FC<{ data: UserChainedPosition[] }> = ({ data
                 </Wrapper>
             ),
             size: 300,
+            enableSorting: true,
+            sortDescFirst: false,
+            sortingFn: tableSortByStatus,
         },
         {
             header: <></>,
@@ -169,6 +172,14 @@ const TableChainedPositions: React.FC<{ data: UserChainedPosition[] }> = ({ data
                 return <ChainedPosition position={row.original} />;
             }}
             rowsPerPage={rowsPerPage}
+            initialState={{
+                sorting: [
+                    {
+                        id: 'action',
+                        desc: false,
+                    },
+                ],
+            }}
         ></Table>
     );
 };

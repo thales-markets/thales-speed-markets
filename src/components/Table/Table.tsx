@@ -2,6 +2,7 @@ import {
     Cell,
     Column,
     Row,
+    SortingState,
     flexRender,
     getCoreRowModel,
     getPaginationRowModel,
@@ -12,7 +13,6 @@ import SelectInput from 'components/SelectInput';
 import SimpleLoader from 'components/SimpleLoader';
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 import { SortDirection } from 'enums/market';
-import { ScreenSizeBreakpoint } from 'enums/ui';
 import React, { CSSProperties, DependencyList, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -30,8 +30,8 @@ export const PAGINATION_SIZE = [
 type CSSPropertiesWithMedia = { cssProperties: CSSProperties } & { mediaMaxWidth: string };
 
 type ColumnWithSorting<D extends Record<string, unknown>> = Column<D> & {
-    sortType?: string | ((rowA: any, rowB: any, columnId?: string, desc?: boolean) => number);
-    sortable?: boolean;
+    sortingFn?: string | ((rowA: any, rowB: any, columnId?: string, desc?: boolean) => number);
+    enableSorting?: boolean;
     headStyle?: CSSPropertiesWithMedia;
     headTitleStyle?: CSSPropertiesWithMedia;
 };
@@ -77,6 +77,7 @@ const Table: React.FC<TableProps> = ({
 }) => {
     const { t } = useTranslation();
 
+    const [sorting, setSorting] = React.useState<SortingState>(initialState.sorting ? initialState.sorting : []);
     const [pagination, setPagination] = useState({
         pageIndex: 0, //initial page index
         pageSize: rowsPerPage || PAGINATION_SIZE[0].value, //default page size
@@ -89,14 +90,15 @@ const Table: React.FC<TableProps> = ({
         columns: memoizedColumns,
         data,
         ...options,
-        initialState,
         autoResetSortBy: false,
         autoResetPageIndex: false, // turn off auto reset of pageIndex
         getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        onSortingChange: setSorting, //optionally control sorting state in your own scope for easy access
         onPaginationChange: setPagination, // update the pagination state when internal APIs mutate the pagination state
         state: {
+            sorting,
             pagination,
         },
     });
@@ -114,36 +116,41 @@ const Table: React.FC<TableProps> = ({
         <>
             {tableInstance.getHeaderGroups().map((headerGroup: any, headerGroupIndex: any) => (
                 <TableRowHead style={tableRowHeadStyles} key={headerGroupIndex}>
-                    {headerGroup.headers.map((header: any, headerIndex: any) => (
-                        <TableCellHead
-                            cssProp={header.headStyle}
-                            key={headerIndex}
-                            style={
-                                header.sortable
-                                    ? { cursor: 'pointer', ...tableHeadCellStyles }
-                                    : { ...tableHeadCellStyles }
-                            }
-                            width={header.getSize()}
-                            id={header.id}
-                        >
-                            <HeaderTitle cssProp={header.headTitleStyle}>
-                                {flexRender(header.column.columnDef.header, header.getContext())}{' '}
-                            </HeaderTitle>
-                            {header.sortable && (
-                                <SortIconContainer>
-                                    {header.isSorted ? (
-                                        header.isSortedDesc ? (
-                                            <SortIcon selected sortDirection={SortDirection.DESC} />
+                    {headerGroup.headers.map((header: any, headerIndex: any) => {
+                        const isSortEnabled = header.column.columnDef.enableSorting;
+
+                        return (
+                            <TableCellHead
+                                {...{ onClick: isSortEnabled ? header.column.getToggleSortingHandler() : undefined }}
+                                cssProp={header.headStyle}
+                                key={headerIndex}
+                                style={
+                                    isSortEnabled
+                                        ? { cursor: 'pointer', ...tableHeadCellStyles }
+                                        : { ...tableHeadCellStyles }
+                                }
+                                width={header.getSize()}
+                                id={header.id}
+                            >
+                                <HeaderTitle cssProp={header.headTitleStyle}>
+                                    {flexRender(header.column.columnDef.header, header.getContext())}{' '}
+                                </HeaderTitle>
+                                {isSortEnabled && (
+                                    <SortIconContainer>
+                                        {header.column.getIsSorted() ? (
+                                            header.column.getIsSorted() === SortDirection.DESC ? (
+                                                <SortIcon $isSorted className="icon icon--caret-down" />
+                                            ) : (
+                                                <SortIcon $isSorted className="icon icon--caret-up" />
+                                            )
                                         ) : (
-                                            <SortIcon selected sortDirection={SortDirection.ASC} />
-                                        )
-                                    ) : (
-                                        <SortIcon selected={false} sortDirection={SortDirection.NONE} />
-                                    )}
-                                </SortIconContainer>
-                            )}
-                        </TableCellHead>
-                    ))}
+                                            <SortIcon className="icon icon--double-arrow" />
+                                        )}
+                                    </SortIconContainer>
+                                )}
+                            </TableCellHead>
+                        );
+                    })}
                 </TableRowHead>
             ))}
             <ReactTable height={tableHeight}>
@@ -354,22 +361,10 @@ const NoResultContainer = styled(TableRow)`
     margin: auto;
 `;
 
-const SortIcon = styled.i<{ selected: boolean; sortDirection: SortDirection }>`
-    font-size: ${(props) => (props.selected && props.sortDirection !== SortDirection.NONE ? 22 : 19)}px;
-    &:before {
-        font-family: Icons !important;
-        content: ${(props) =>
-            props.selected
-                ? props.sortDirection === SortDirection.ASC
-                    ? "'\\0068'"
-                    : props.sortDirection === SortDirection.DESC
-                    ? "'\\006B'"
-                    : "'\\006A'"
-                : "'\\006A'"};
-    }
-    @media (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
-        font-size: ${(props) => (props.selected && props.sortDirection !== SortDirection.NONE ? 17 : 14)}px;
-    }
+const SortIcon = styled.i<{ $isSorted?: boolean }>`
+    color: ${(props) => props.theme.icon.textColor.primary};
+    font-size: ${(props) => (props.$isSorted ? '11px' : '13px')};
+    padding-left: 5px;
 `;
 
 const ExpandableRow = styled.div`

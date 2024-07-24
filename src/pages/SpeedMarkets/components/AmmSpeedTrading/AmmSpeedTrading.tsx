@@ -882,7 +882,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                         {getSubmitButton()}
                         {gasFee > 0 && !isButtonDisabled && (
                             <Tooltip overlay={t('speed-markets.estimate-gas')}>
-                                <GasText $isBase={networkId === NetworkId.Base}>
+                                <GasText $isStrikeThrough={networkId === NetworkId.Base}>
                                     <GasIcon className={`network-icon network-icon--gas`} />
                                     {formatCurrencyWithSign(USD_SIGN, gasFee, 2)}
                                 </GasText>
@@ -1019,14 +1019,14 @@ const GasIcon = styled.i`
     margin-right: 2px;
 `;
 
-const GasText = styled.span<{ $isBase?: boolean }>`
+const GasText = styled.span<{ $isStrikeThrough?: boolean }>`
     display: flex;
     font-size: 18px;
     color: ${(props) => props.theme.textColor.primary};
     position: absolute;
     right: 16px;
     bottom: 10px;
-    text-decoration: ${(props) => (props.$isBase ? 'line-through' : '')};
+    text-decoration: ${(props) => (props.$isStrikeThrough ? 'line-through' : '')};
 `;
 
 export default AmmSpeedTrading;
