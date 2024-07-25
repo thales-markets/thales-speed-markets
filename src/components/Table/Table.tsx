@@ -231,7 +231,10 @@ const Table: React.FC<TableProps> = ({
                 </SelectWrapper>
 
                 <SelectWrapper>
-                    <ArrowWrapper onClick={() => tableInstance.nextPage()} disabled={!tableInstance.getCanNextPage()}>
+                    <ArrowWrapper
+                        onClick={() => tableInstance.getCanNextPage() && tableInstance.nextPage()}
+                        disabled={!tableInstance.getCanNextPage()}
+                    >
                         {'>'}
                     </ArrowWrapper>
                     <ArrowWrapper onClick={() => tableInstance.lastPage()} disabled={!tableInstance.getCanNextPage()}>
