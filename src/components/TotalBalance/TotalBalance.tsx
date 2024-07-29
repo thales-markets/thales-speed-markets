@@ -13,7 +13,7 @@ import { getIsMobile } from 'redux/modules/ui';
 import { getIsBiconomy } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDiv, FlexDivCentered, FlexDivColumnCentered, FlexDivStart, GradientContainer } from 'styles/common';
-import { Coins, formatCurrency, formatCurrencyWithSign } from 'thales-utils';
+import { Coins, formatCurrencyWithPrecision, formatCurrencyWithSign } from 'thales-utils';
 import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
 import { getCollaterals, isStableCurrency } from 'utils/currency';
@@ -140,7 +140,9 @@ const TotalBalance: React.FC<TotalBalanceProps> = ({ hideDepositButton }) => {
                                     <IndividualBalance>
                                         <IndividualTokenBalance>
                                             {multipleCollateralBalances.data
-                                                ? formatCurrency(multipleCollateralBalances.data[token.name])
+                                                ? formatCurrencyWithPrecision(
+                                                      multipleCollateralBalances.data[token.name]
+                                                  )
                                                 : 0}
                                         </IndividualTokenBalance>
                                         <IndividualTokenBalance>
