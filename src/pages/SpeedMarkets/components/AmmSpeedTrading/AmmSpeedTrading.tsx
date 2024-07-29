@@ -726,8 +726,8 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     const getTradingDetails = () => {
         return (
             <GradientContainer width={isMobile ? 0 : 780}>
-                <TradingDetailsContainer isChained={isChained}>
-                    {!isChained && <PriceSlippage slippage={priceSlippage} onChange={setPriceSlippage} />}
+                <TradingDetailsContainer>
+                    <PriceSlippage slippage={priceSlippage} onChange={setPriceSlippage} />
                     <TradingDetailsSentence
                         currencyKey={currencyKey}
                         deltaTimeSec={deltaTimeSec}
@@ -923,17 +923,17 @@ const Container = styled(FlexDivRow)`
     }
 `;
 
-const TradingDetailsContainer = styled(FlexDivRowCentered)<{ isChained: boolean }>`
+const TradingDetailsContainer = styled(FlexDivRowCentered)`
     position: relative;
     height: 100%;
     background: ${(props) => props.theme.background.primary};
     border-radius: 8px;
-    padding: 20px;
+    padding: 20px 30px 20px 20px;
 
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         width: 100%;
         padding: 12px;
-        ${(props) => (props.isChained ? '' : 'padding-bottom: 70px;')}
+        padding-bottom: 70px;
     }
 `;
 
