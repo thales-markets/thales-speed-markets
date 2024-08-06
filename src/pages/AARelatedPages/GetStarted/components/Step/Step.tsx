@@ -21,7 +21,6 @@ import styled from 'styled-components';
 import { FlexDiv, FlexDivCentered, FlexDivColumn, GradientContainer } from 'styles/common';
 import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
-import { getDefaultCollateral } from 'utils/currency';
 import { getNetworkNameByNetworkId } from 'utils/network';
 import { getOnRamperUrl } from 'utils/particleWallet/utils';
 import { buildHref, navigateTo } from 'utils/routes';
@@ -88,7 +87,6 @@ const Step: React.FC<StepProps> = ({ stepNumber, stepType, currentStep, setCurre
                 i18nKey={transKey}
                 values={{
                     network: getNetworkNameByNetworkId(networkId, true),
-                    collateral: getDefaultCollateral(networkId),
                 }}
                 components={{ a: <Link target="_blank" href={LINKS.Tutorials.Root} /> }}
             ></Trans>

@@ -12,7 +12,8 @@ export const getSynthName = (currencyKey: string) =>
 export const getSynthAsset = (currencyKey: string) =>
     SYNTHS_MAP[currencyKey] ? synthToAsset(SYNTHS_MAP[currencyKey]) : currencyKey;
 
-export const getDefaultCollateral = (networkId: SupportedNetwork) => COLLATERALS[networkId][0];
+export const getDefaultCollateral = (networkId: SupportedNetwork) =>
+    COLLATERALS[networkId] ? COLLATERALS[networkId][0] : COLLATERALS[NetworkId.OptimismMainnet][0];
 
 export const getCollateral = (networkId: SupportedNetwork, index: number) =>
     index < COLLATERALS[networkId].length ? COLLATERALS[networkId][index] : getDefaultCollateral(networkId);
