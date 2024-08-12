@@ -63,8 +63,6 @@ export const SUPPORTED_NETWORKS_PARAMS: Record<number, NetworkParams> = {
 };
 
 const INFURA_PROJECT_ID = import.meta.env.VITE_APP_INFURA_PROJECT_ID;
-const CHAINNODE_PROJECT_ID = import.meta.env.VITE_APP_CHAINNODE_PROJECT_ID;
-const ANKR_PROJECT_ID = import.meta.env.VITE_APP_ANKR_PROJECT_ID;
 
 export const RPC_LIST = {
     INFURA: {
@@ -73,16 +71,5 @@ export const RPC_LIST = {
         [NetworkId.Base]: `https://base-mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
         [NetworkId.PolygonMainnet]: `https://polygon-mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
         [NetworkId.OptimismSepolia]: `https://optimism-sepolia.infura.io/v3/${INFURA_PROJECT_ID}`,
-    },
-    CHAINNODE: {
-        [NetworkId.OptimismMainnet]: `https://optimism-mainnet.chainnodes.org/${CHAINNODE_PROJECT_ID}`,
-        [NetworkId.Arbitrum]: `https://arbitrum-one.chainnodes.org/${CHAINNODE_PROJECT_ID}`,
-        [NetworkId.Base]: `https://base-mainnet.chainnodes.org/${CHAINNODE_PROJECT_ID}`,
-        [NetworkId.PolygonMainnet]: `https://polygon-mainnet.chainnodes.org/${CHAINNODE_PROJECT_ID}`,
-    },
-    ANKR: {
-        [NetworkId.OptimismMainnet]: `https://rpc.ankr.com/optimism/${ANKR_PROJECT_ID}`,
-        [NetworkId.Arbitrum]: `https://rpc.ankr.com/arbitrum/${ANKR_PROJECT_ID}`,
-        [NetworkId.Base]: `https://rpc.ankr.com/base/${ANKR_PROJECT_ID}`,
     },
 };

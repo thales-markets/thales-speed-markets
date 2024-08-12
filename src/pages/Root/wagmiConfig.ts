@@ -48,8 +48,6 @@ const socialWallets = [
 
 !isMobile() && wallets.push(injectedWallet);
 
-const isInfuraPrimary = import.meta.env.VITE_APP_PRIMARY_PROVIDER_ID === 'INFURA';
-
 export const wagmiConfig = createConfig({
     chains: [optimism, arbitrum, base, polygon, optimismSepolia],
     connectors: connectorsForWallets(
@@ -69,31 +67,10 @@ export const wagmiConfig = createConfig({
         }
     ),
     transports: {
-        [optimism.id]: fallback([
-            isInfuraPrimary
-                ? http(RPC_LIST.INFURA[NetworkId.OptimismMainnet])
-                : http(RPC_LIST.CHAINNODE[NetworkId.OptimismMainnet]),
-            isInfuraPrimary
-                ? http(RPC_LIST.CHAINNODE[NetworkId.OptimismMainnet])
-                : http(RPC_LIST.INFURA[NetworkId.OptimismMainnet]),
-            http(),
-        ]),
-        [arbitrum.id]: fallback([
-            isInfuraPrimary ? http(RPC_LIST.INFURA[NetworkId.Arbitrum]) : http(RPC_LIST.CHAINNODE[NetworkId.Arbitrum]),
-            isInfuraPrimary ? http(RPC_LIST.CHAINNODE[NetworkId.Arbitrum]) : http(RPC_LIST.INFURA[NetworkId.Arbitrum]),
-            http(),
-        ]),
-        [base.id]: fallback([
-            isInfuraPrimary ? http(RPC_LIST.INFURA[NetworkId.Base]) : http(RPC_LIST.CHAINNODE[NetworkId.Base]),
-            isInfuraPrimary ? http(RPC_LIST.CHAINNODE[NetworkId.Base]) : http(RPC_LIST.INFURA[NetworkId.Base]),
-            http(),
-        ]),
-        // on Polygon Infura is always primary as Chainnode has issue
-        [polygon.id]: fallback([
-            http(RPC_LIST.INFURA[NetworkId.PolygonMainnet]),
-            http(RPC_LIST.CHAINNODE[NetworkId.PolygonMainnet]),
-            http(),
-        ]),
+        [optimism.id]: fallback([http(RPC_LIST.INFURA[NetworkId.OptimismMainnet]), http()]),
+        [arbitrum.id]: fallback([http(RPC_LIST.INFURA[NetworkId.Arbitrum]), http()]),
+        [base.id]: fallback([http(RPC_LIST.INFURA[NetworkId.Base]), http()]),
+        [polygon.id]: fallback([http(RPC_LIST.INFURA[NetworkId.PolygonMainnet]), http()]),
         [optimismSepolia.id]: fallback([http(RPC_LIST.INFURA[NetworkId.OptimismSepolia]), http()]),
     },
 });
