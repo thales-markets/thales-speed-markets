@@ -407,6 +407,9 @@ const Container = styled.div`
     position: relative;
     display: flex;
     flex-direction: column;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        gap: 15px;
+    }
 `;
 
 const Header = styled(FlexDivColumn)`
@@ -472,7 +475,6 @@ const ButtonWrapper = styled(FlexDivEnd)<{ $isChained?: boolean }>`
         justify-content: space-between;
         gap: unset;
         padding-right: 0;
-        margin-bottom: 13px;
     }
 `;
 

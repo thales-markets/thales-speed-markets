@@ -239,7 +239,8 @@ const OpenChainedPositions: React.FC = () => {
             isAdmin,
             { networkId, client: walletClient.data },
             isBiconomy,
-            collateralAddress
+            collateralAddress,
+            true
         );
         if (!mountedRef.current) return null;
         setIsSubmitting(false);

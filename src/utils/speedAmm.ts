@@ -188,7 +188,8 @@ export const resolveAllSpeedPositions = async (
     isAdmin: boolean,
     queryConfig: QueryConfig,
     isBiconomy?: boolean,
-    collateralAddress?: string
+    collateralAddress?: string,
+    isOverview?: boolean
 ) => {
     if (!positions.length) {
         return;
@@ -278,7 +279,15 @@ export const resolveAllSpeedPositions = async (
             const txReceipt = await waitForTransactionReceipt(queryConfig.client as Client, { hash });
 
             if (txReceipt.status === 'success') {
-                toast.update(id, getSuccessToastOptions(i18n.t(`speed-markets.overview.confirmation-message`), id));
+                toast.update(
+                    id,
+                    getSuccessToastOptions(
+                        isOverview
+                            ? i18n.t('speed-markets.overview.confirmation-message')
+                            : i18n.t('speed-markets.user-positions.confirmation-message'),
+                        id
+                    )
+                );
                 await delay(2000);
 
                 const walletAddress = isBiconomy
@@ -308,7 +317,8 @@ export const resolveAllChainedMarkets = async (
     isAdmin: boolean,
     queryConfig: QueryConfig,
     isBiconomy?: boolean,
-    collateralAddress?: string
+    collateralAddress?: string,
+    isOverview?: boolean
 ) => {
     if (!positions.length) {
         return;
@@ -418,7 +428,15 @@ export const resolveAllChainedMarkets = async (
             const txReceipt = await waitForTransactionReceipt(queryConfig.client as Client, { hash });
 
             if (txReceipt.status === 'success') {
-                toast.update(id, getSuccessToastOptions(i18n.t(`speed-markets.overview.confirmation-message`), id));
+                toast.update(
+                    id,
+                    getSuccessToastOptions(
+                        isOverview
+                            ? i18n.t('speed-markets.overview.confirmation-message')
+                            : i18n.t('speed-markets.user-positions.confirmation-message'),
+                        id
+                    )
+                );
                 await delay(2000);
 
                 const walletAddress = isBiconomy
