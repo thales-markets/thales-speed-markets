@@ -451,9 +451,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 const strikeTimeIndex =
                     firstHigherTimeIndex > -1 ? firstHigherTimeIndex : position.strikeTimes.length - 1;
 
-                return isOverview ? (
-                    getResolveButton()
-                ) : (
+                return (
                     <ResultsContainer>
                         <TimeRemaining end={position.strikeTimes[strikeTimeIndex]} showFullCounter showSecondsCounter>
                             <Label>
