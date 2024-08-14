@@ -123,7 +123,7 @@ const CardChainedPosition: React.FC<CardChainedPositionProps> = ({
                     <InfoRow>
                         <Label>
                             {resolveIndex !== undefined || isMatured
-                                ? t('speed-markets.user-positions.price')
+                                ? t('speed-markets.user-positions.final-price')
                                 : t('speed-markets.user-positions.current-price')}
                             :
                         </Label>

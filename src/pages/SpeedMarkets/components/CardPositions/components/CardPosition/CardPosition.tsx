@@ -105,7 +105,7 @@ const CardPosition: React.FC<CardPositionProps> = ({
                     <InfoRow>
                         <Label>
                             {isMatured
-                                ? t('speed-markets.user-positions.price')
+                                ? t('speed-markets.user-positions.final-price')
                                 : t('speed-markets.user-positions.current-price')}
                             :
                         </Label>
