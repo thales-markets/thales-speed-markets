@@ -130,7 +130,8 @@ const OpenChainedPositions: React.FC = () => {
 
     // Based on Pyth prices set finalPrices, strikePrices, canResolve, isMatured, isClaimable, isUserWinner
     const partiallyMaturedWithPrices: UserChainedPosition[] = partiallyMaturedChainedMarkets.map((marketData) => {
-        const currentPrice = currentPrices[marketData.currencyKey];
+        const fetchedCurrentPrice = currentPrices[marketData.currencyKey];
+        const currentPrice = fetchedCurrentPrice ? fetchedCurrentPrice : marketData.currentPrice;
         const finalPrices = marketData.strikeTimes.map(
             (_, i) =>
                 chainedPythPricesWithMarket.filter((pythPrice) => pythPrice.market === marketData.market)[i]?.price || 0
