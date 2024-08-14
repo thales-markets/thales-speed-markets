@@ -61,27 +61,32 @@ const TimeRemaining: React.FC<TimeRemainingProps> = ({ end, showFullCounter, sho
 
     return (
         <Container duration={duration}>
-            {children}
-            <Time duration={duration}>
-                {timeElapsed
-                    ? t('common.time-remaining.ended')
-                    : showRemainingInWeeks
-                    ? `${weeksDiff} ${t('common.time-remaining.weeks')}`
-                    : showFullCounter
-                    ? formattedDurationFull(duration, undefined, undefined, showSecondsCounter)
-                    : formattedDuration(duration)}
-            </Time>
+            {timeElapsed ? (
+                <Message>{t('speed-markets.user-positions.waiting-price')}</Message>
+            ) : (
+                <>
+                    {children}
+                    <Time duration={duration}>
+                        {showRemainingInWeeks
+                            ? `${weeksDiff} ${t('common.time-remaining.weeks')}`
+                            : showFullCounter
+                            ? formattedDurationFull(duration, undefined, undefined, showSecondsCounter)
+                            : formattedDuration(duration)}
+                    </Time>
+                </>
+            )}
         </Container>
     );
 };
 
+const MINUTES_COLOR_THRESHOLD = 2;
 const getColor = (duration: Duration, theme: ThemeInterface) => {
     if (
         duration.years ||
         duration.months ||
         duration.days ||
         duration.hours ||
-        (duration.minutes && duration.minutes >= 2)
+        (duration.minutes && duration.minutes >= MINUTES_COLOR_THRESHOLD)
     ) {
         return theme.textColor.primary;
     }
@@ -98,7 +103,6 @@ const Container = styled.span<{ duration: Duration }>`
 
 const Time = styled.span<{
     duration: Duration;
-    fontSize?: number;
 }>`
     display: inline-block;
     ${(props) => (props.duration.minutes === 0 ? 'min-width: 23px;' : '')}
@@ -107,6 +111,18 @@ const Time = styled.span<{
     border: none;
     text-align: center;
     white-space: pre;
+`;
+
+const Message = styled.span`
+    display: inline-block;
+    min-width: 23px;
+    text-transform: uppercase;
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 100%;
+    text-align: center;
+    white-space: pre;
+    color: ${(props) => props.theme.textColor.secondary};
 `;
 
 export default TimeRemaining;
