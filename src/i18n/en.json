@@ -40,7 +40,6 @@
         "chart": "Chart",
         "page": "Page",
         "time-remaining": {
-            "ended": "ended",
             "years": "years",
             "year": "year",
             "months": "months",
