@@ -381,7 +381,7 @@ const PositionAction: React.FC<PositionActionProps> = ({
             });
 
             if (txReceipt.status === 'success') {
-                toast.update(id, getSuccessToastOptions(t(`speed-markets.user-positions.confirmation-message`), id));
+                toast.update(id, getSuccessToastOptions(t(`speed-markets.overview.confirmation-message`), id));
                 refetchActiveSpeedMarkets(false, networkId);
             } else {
                 console.log('Transaction status', txReceipt.status);

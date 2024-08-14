@@ -100,13 +100,13 @@ const CardChainedPosition: React.FC<CardChainedPositionProps> = ({
 
     const strikeTimeIndex = position.strikeTimes.findIndex((t) => t > Date.now());
     const endTime =
-        position.isResolved && position.resolveIndex !== undefined
+        (position.isResolved && position.resolveIndex !== undefined
             ? position.strikeTimes[position.resolveIndex]
             : resolveIndex !== undefined
             ? position.strikeTimes[resolveIndex]
             : strikeTimeIndex > -1
             ? position.strikeTimes[strikeTimeIndex]
-            : position.maturityDate;
+            : position.maturityDate) || position.maturityDate; // make sure endTime is never undefined
 
     const historyStatus = isHistory ? getHistoryStatus(position) : undefined;
 

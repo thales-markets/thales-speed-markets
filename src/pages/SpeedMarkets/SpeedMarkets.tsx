@@ -417,6 +417,7 @@ const OverviewLinkText = styled.span`
         text-decoration: underline;
     }
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        font-size: 16px;
         font-weight: 500;
     }
 `;

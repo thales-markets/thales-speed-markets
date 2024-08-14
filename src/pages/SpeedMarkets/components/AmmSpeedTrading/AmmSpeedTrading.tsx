@@ -492,7 +492,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
     const onMarketCreated = useCallback(
         (toastIdParam: string | number) => {
-            toast.update(toastIdParam, getSuccessToastOptions(t(`common.buy.confirmation-message`), toastIdParam));
+            toast.update(toastIdParam, getSuccessToastOptions(t('common.buy.confirmation-message'), toastIdParam));
             resetData();
             setPaidAmount(0);
             setSubmittedStrikePrice(0);

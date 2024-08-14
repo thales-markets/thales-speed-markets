@@ -178,7 +178,8 @@ const OpenPositions: React.FC = () => {
             isAdmin,
             { networkId, client: walletClient.data },
             isBiconomy,
-            collateralAddress
+            collateralAddress,
+            true
         );
         setIsSubmitting(false);
         setIsSubmittingSection('');
