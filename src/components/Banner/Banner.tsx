@@ -4,7 +4,7 @@ import { Trans } from 'react-i18next';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import styled from 'styled-components';
 
-const IS_VISIBLE = true;
+const IS_VISIBLE = false;
 
 const Banner: React.FC = () => {
     const [showBanner, setShowBanner] = useState(IS_VISIBLE);
