@@ -1,6 +1,6 @@
 import { createSmartAccountClient } from '@biconomy/account';
 import { AuthCoreEvent, SocialAuthType, getLatestAuthType, particleAuth } from '@particle-network/auth-core';
-import { useConnect as useParticleConnect, useSolana } from '@particle-network/auth-core-modal';
+import { useConnect as useParticleConnect } from '@particle-network/auth-core-modal';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import Loader from 'components/Loader';
 import UnsupportedNetwork from 'components/UnsupportedNetwork';
@@ -39,7 +39,6 @@ const App = () => {
     const { disconnect } = useDisconnect();
     const { connect } = useConnect();
     const { connectionStatus } = useParticleConnect();
-    const { address: solanaAddress, enable } = useSolana();
 
     queryConnector.setQueryClient();
 
@@ -73,17 +72,16 @@ const App = () => {
                     biconomyPaymasterApiKey: PAYMASTER_API_KEY,
                 });
                 const smartAddress = await smartAccount.getAccountAddress();
-                if (!solanaAddress) await enable();
 
                 if (!biconomyConnector.address || biconomyConnector.address === smartAddress) {
-                    biconomyConnector.setWallet(smartAccount, smartAddress, solanaAddress ?? '');
+                    biconomyConnector.setWallet(smartAccount, smartAddress);
                     dispatch(setIsBiconomy(true));
                 }
             };
 
             createSmartAccount();
         }
-    }, [dispatch, switchChain, networkId, disconnect, walletClient, enable, solanaAddress]);
+    }, [dispatch, switchChain, networkId, disconnect, walletClient]);
 
     useEffect(() => {
         if (connectionStatus === 'connected' && isSocialLogin(getLatestAuthType())) {

@@ -28,7 +28,6 @@ type UserInfoProps = {
     setUserInfoOpen: React.Dispatch<React.SetStateAction<boolean>>;
     setOpenWithdraw: React.Dispatch<React.SetStateAction<boolean>>;
     setOpenReferralModal: React.Dispatch<React.SetStateAction<boolean>>;
-    setPythModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
     skipOutsideClickOnElement?: React.RefObject<HTMLElement>;
 };
 
@@ -36,7 +35,6 @@ const UserInfo: React.FC<UserInfoProps> = ({
     setUserInfoOpen,
     setOpenWithdraw,
     setOpenReferralModal,
-    setPythModalOpen,
     skipOutsideClickOnElement,
 }) => {
     const networkId = useChainId();
@@ -138,15 +136,6 @@ const UserInfo: React.FC<UserInfoProps> = ({
                     >
                         <Icon className="icon icon--referral" />
                         <Label>{t('user-info.referral')}</Label>
-                    </MenuItem>
-                    <MenuItem
-                        onClick={() => {
-                            setPythModalOpen(true);
-                            setUserInfoOpen(false);
-                        }}
-                    >
-                        <Icon className="icon icon--pyth-rewards" />
-                        <Label>{t('user-info.pyth')}</Label>
                     </MenuItem>
                     <MenuItem>
                         <SPAAnchor href={LINKS.ThalesIo.Docs}>

@@ -1,35 +1,31 @@
 import Button from 'components/Button';
 import ConnectWalletModal from 'components/ConnectWalletModal';
 import NetworkSwitch from 'components/NetworkSwitch';
+import ROUTES from 'constants/routes';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import GetStarted from 'pages/AARelatedPages/GetStarted';
 import Withdraw from 'pages/AARelatedPages/Withdraw';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import useExchangeRatesQuery, { Rates } from 'queries/rates/useExchangeRatesQuery';
+import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipleCollateralBalanceQuery';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
+import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
 import { getIsBiconomy, getWalletConnectModalVisibility, setWalletConnectModalVisibility } from 'redux/modules/wallet';
 import styled from 'styled-components';
-import { Colors, FlexDivRow, FlexDivRowCentered, PAGE_MAX_WIDTH } from 'styles/common';
+import { FlexDivRow, FlexDivRowCentered, PAGE_MAX_WIDTH } from 'styles/common';
+import { Coins } from 'thales-utils';
 import { RootState } from 'types/ui';
+import biconomyConnector from 'utils/biconomyWallet';
+import { getCollaterals, isStableCurrency } from 'utils/currency';
+import { navigateTo } from 'utils/routes';
 import { useAccount, useChainId, useClient } from 'wagmi';
 import Logo from '../components/Logo';
 import Notifications from '../components/Notifications';
 import ReferralModal from '../components/ReferralModal';
 import UserInfo from '../components/UserInfo';
 import UserWallet from '../components/UserWallet';
-import useMultipleCollateralBalanceQuery from 'queries/walletBalances/useMultipleCollateralBalanceQuery';
-import useExchangeRatesQuery, { Rates } from 'queries/rates/useExchangeRatesQuery';
-import { getIsAppReady } from 'redux/modules/app';
-import biconomyConnector from 'utils/biconomyWallet';
-import { getCollaterals, isStableCurrency } from 'utils/currency';
-import { Coins, localStore } from 'thales-utils';
-import { navigateTo } from 'utils/routes';
-import ROUTES from 'constants/routes';
-import PythModal from '../components/PythModal';
-import { LOCAL_STORAGE_KEYS } from 'constants/storage';
-import useSolanaAddressForWalletQuery from 'queries/solana/useSolanaAddressForWalletQuery';
-import { isValidSolanaAddress } from 'utils/solana';
 
 const DappHeader: React.FC = () => {
     const { t } = useTranslation();
@@ -49,8 +45,6 @@ const DappHeader: React.FC = () => {
     const [openGetStarted, setOpenGetStarted] = useState(false);
     const [openUserInfo, setOpenUserInfo] = useState(false);
     const [openWithdraw, setOpenWithdraw] = useState(false);
-    const [openPythModal, setPythModalOpen] = useState(false);
-    const [hideSolanaButton, setHideSolanaButton] = useState(true);
 
     const burgerMenuRef = useRef<HTMLElement>(null);
 
@@ -94,29 +88,6 @@ const DappHeader: React.FC = () => {
         }
     }, [exchangeRates, multipleCollateralBalances.data, networkId, getUSDForCollateral]);
 
-    useEffect(() => {
-        if (isConnected) {
-            const showPyth = localStore.get(LOCAL_STORAGE_KEYS.SHOW_PYTH_MODAL);
-            if (!showPyth) {
-                localStore.set(LOCAL_STORAGE_KEYS.SHOW_PYTH_MODAL, 'true');
-                setPythModalOpen(true);
-            }
-        }
-    }, [isConnected]);
-
-    const solanaAddressQuery = useSolanaAddressForWalletQuery(
-        (isBiconomy ? biconomyConnector.address : walletAddress) as string,
-        {
-            enabled: isConnected,
-        }
-    );
-
-    useEffect(() => {
-        if (solanaAddressQuery.isSuccess) {
-            setHideSolanaButton(isValidSolanaAddress(solanaAddressQuery.data));
-        }
-    }, [solanaAddressQuery, solanaAddressQuery.isSuccess, solanaAddressQuery.data]);
-
     return (
         <Container>
             <LeftContainer>
@@ -133,19 +104,6 @@ const DappHeader: React.FC = () => {
                             }
                         >
                             {t(totalBalanceValue > 0 ? 'deposit.title' : 'common.header.get-started')}
-                        </Button>
-                    )}
-                    {!isMobile && isConnected && !hideSolanaButton && (
-                        <Button
-                            width="240px"
-                            height="30px"
-                            margin="10px"
-                            fontSize="12px"
-                            borderColor={Colors.RED}
-                            pulsate
-                            onClick={() => setPythModalOpen(true)}
-                        >
-                            {t('common.header.submit-solana')}
                         </Button>
                     )}
                 </FlexDivRow>
@@ -201,7 +159,6 @@ const DappHeader: React.FC = () => {
                         setUserInfoOpen={setOpenUserInfo}
                         setOpenWithdraw={setOpenWithdraw}
                         setOpenReferralModal={setOpenReferralModal}
-                        setPythModalOpen={setPythModalOpen}
                         skipOutsideClickOnElement={burgerMenuRef}
                     />
                 )}
@@ -209,7 +166,6 @@ const DappHeader: React.FC = () => {
             {openReferralModal && <ReferralModal onClose={() => setOpenReferralModal(false)} />}
             {openGetStarted && <GetStarted onClose={() => setOpenGetStarted(false)} />}
             {openWithdraw && <Withdraw onClose={() => setOpenWithdraw(false)} />}
-            {openPythModal && <PythModal onClose={() => setPythModalOpen(false)} />}
 
             <ConnectWalletModal
                 isOpen={connectWalletModalVisibility}
