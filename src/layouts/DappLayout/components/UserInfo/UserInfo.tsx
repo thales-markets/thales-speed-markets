@@ -27,16 +27,10 @@ import { useAccount, useChainId, useConnections, useDisconnect } from 'wagmi';
 type UserInfoProps = {
     setUserInfoOpen: React.Dispatch<React.SetStateAction<boolean>>;
     setOpenWithdraw: React.Dispatch<React.SetStateAction<boolean>>;
-    setOpenReferralModal: React.Dispatch<React.SetStateAction<boolean>>;
     skipOutsideClickOnElement?: React.RefObject<HTMLElement>;
 };
 
-const UserInfo: React.FC<UserInfoProps> = ({
-    setUserInfoOpen,
-    setOpenWithdraw,
-    setOpenReferralModal,
-    skipOutsideClickOnElement,
-}) => {
+const UserInfo: React.FC<UserInfoProps> = ({ setUserInfoOpen, setOpenWithdraw, skipOutsideClickOnElement }) => {
     const networkId = useChainId();
     const { disconnect } = useDisconnect();
     const { address, isConnected } = useAccount();
@@ -127,15 +121,6 @@ const UserInfo: React.FC<UserInfoProps> = ({
                             <Icon className="network-icon network-icon--avatar" />
                             <Label>{t('user-info.trading-profile')}</Label>
                         </SPAAnchor>
-                    </MenuItem>
-                    <MenuItem
-                        onClick={() => {
-                            setOpenReferralModal(true);
-                            setUserInfoOpen(false);
-                        }}
-                    >
-                        <Icon className="icon icon--referral" />
-                        <Label>{t('user-info.referral')}</Label>
                     </MenuItem>
                     <MenuItem>
                         <SPAAnchor href={LINKS.ThalesIo.Docs}>

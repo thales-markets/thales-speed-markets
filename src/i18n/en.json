@@ -112,23 +112,6 @@
                 "base": "Switch to Base"
             }
         },
-        "referral": {
-            "title": "Refer and earn",
-            "info": "As a person sharing your personal Referral Link, you <bold>earn up to 50% of the trading fee</bold> (0.5% of total volume) from each trade the new user you onboarded executes.",
-            "choose-page": "Choose page you want to refer",
-            "referral-id": "Create your referral ID",
-            "choose-referral-placeholder": "Enter Referral ID",
-            "copied": "Copied!",
-            "pages": {
-                "speed-market-page": "Speed markets page",
-                "landing-page": "Landing page"
-            },
-            "generate": {
-                "id-exists": "Referral ID already exists",
-                "id-create-success": "Successfully set referral ID",
-                "link-btn": "Generate link"
-            }
-        },
         "status": {
             "success": "Success",
             "info": "Info",
@@ -376,7 +359,6 @@
         "copying-address": "Copying Address",
         "docs": "Docs and Tutorials",
         "withdraw": "Withdraw",
-        "referral": "Referral",
         "trading-profile": "Trading Profile",
         "logout": "Logout",
         "session-valid": "Session valid until"

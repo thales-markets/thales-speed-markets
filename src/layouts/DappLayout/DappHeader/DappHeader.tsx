@@ -23,7 +23,6 @@ import { navigateTo } from 'utils/routes';
 import { useAccount, useChainId, useClient } from 'wagmi';
 import Logo from '../components/Logo';
 import Notifications from '../components/Notifications';
-import ReferralModal from '../components/ReferralModal';
 import UserInfo from '../components/UserInfo';
 import UserWallet from '../components/UserWallet';
 
@@ -41,7 +40,6 @@ const DappHeader: React.FC = () => {
     const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
     const walletAddress = isBiconomy ? biconomyConnector.address : address;
 
-    const [openReferralModal, setOpenReferralModal] = useState(false);
     const [openGetStarted, setOpenGetStarted] = useState(false);
     const [openUserInfo, setOpenUserInfo] = useState(false);
     const [openWithdraw, setOpenWithdraw] = useState(false);
@@ -158,12 +156,10 @@ const DappHeader: React.FC = () => {
                     <UserInfo
                         setUserInfoOpen={setOpenUserInfo}
                         setOpenWithdraw={setOpenWithdraw}
-                        setOpenReferralModal={setOpenReferralModal}
                         skipOutsideClickOnElement={burgerMenuRef}
                     />
                 )}
             </RightContainer>
-            {openReferralModal && <ReferralModal onClose={() => setOpenReferralModal(false)} />}
             {openGetStarted && <GetStarted onClose={() => setOpenGetStarted(false)} />}
             {openWithdraw && <Withdraw onClose={() => setOpenWithdraw(false)} />}
 
