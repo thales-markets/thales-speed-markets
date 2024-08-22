@@ -12,9 +12,10 @@ import { formatCurrencyWithSign, truncToDecimals } from 'thales-utils';
 import { SharePositionData } from 'types/flexCards';
 import { RootState, ThemeInterface } from 'types/ui';
 import { isUserWinner } from 'utils/speedAmm';
-import LogoWithQR from '../LogoWithQR';
 import {
     ContainerBorder,
+    LogoIcon,
+    LogoWrapper,
     LossWatermark,
     Status,
     StatusContainer,
@@ -49,7 +50,9 @@ const ChainedSpeedMarketFlexCard: React.FC<SharePositionData> = ({
         <ContainerBorder $isWon={isWonType}>
             <Container $isWon={isWonType}>
                 <FlexDivColumn>
-                    <LogoWithQR color={textColor} />
+                    <LogoWrapper>
+                        <LogoIcon $color={textColor} className="network-icon  network-icon--speed-full-logo" />
+                    </LogoWrapper>
                     {isWonType && (
                         <StatusContainer>
                             <StatusHeading color={textColor}>{t('common.flex-card.won')}</StatusHeading>

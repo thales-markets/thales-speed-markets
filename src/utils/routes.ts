@@ -10,12 +10,6 @@ export const navigateTo = (path: string, replacePath = false, scrollToTop = fals
     replacePath ? history.replace(path, state) : history.push(path, state);
 };
 
-export const buildReferrerLink = (route: string, referralId: string) => {
-    return `${location.protocol}//${location.host ? location.host : ''}${route}?referrerId=${encodeURIComponent(
-        referralId
-    )}`;
-};
-
 export const buildHref = (route: string) => `${ifIpfsDeployment ? '#' : ''}${route}`;
 
 export { history };

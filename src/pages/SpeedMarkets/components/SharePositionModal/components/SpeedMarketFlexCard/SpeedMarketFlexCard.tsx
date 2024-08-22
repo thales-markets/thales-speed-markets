@@ -17,7 +17,6 @@ import { formatCurrencyWithSign } from 'thales-utils';
 import { SharePositionData, SharePositionType } from 'types/flexCards';
 import { ThemeInterface } from 'types/ui';
 import { getSynthName } from 'utils/currency';
-import LogoWithQR from '../LogoWithQR';
 
 const SpeedMarketFlexCard: React.FC<SharePositionData> = ({
     type,
@@ -46,7 +45,9 @@ const SpeedMarketFlexCard: React.FC<SharePositionData> = ({
         <ContainerBorder $isWon={type === 'speed-won'}>
             <Container currencyKey={currencyKey} type={type}>
                 <FlexDivColumn>
-                    <LogoWithQR color={textColor} />
+                    <LogoWrapper>
+                        <LogoIcon $color={textColor} className="network-icon  network-icon--speed-full-logo" />
+                    </LogoWrapper>
                     {type !== 'speed-loss' && (
                         <StatusContainer>
                             <StatusHeading color={textColor}>
@@ -251,6 +252,20 @@ export const LossWatermark = styled(FlexDivCentered)`
     letter-spacing: 16px;
     text-transform: uppercase;
     color: ${(props) => props.theme.flexCard.background.loss};
+`;
+
+export const LogoWrapper = styled.div`
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 63px;
+`;
+
+export const LogoIcon = styled.i<{ $color: string }>`
+    font-size: 130px;
+    color: ${(props) => props.$color};
 `;
 
 export default SpeedMarketFlexCard;
