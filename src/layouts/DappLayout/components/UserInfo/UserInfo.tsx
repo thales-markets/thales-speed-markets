@@ -27,10 +27,16 @@ import { useAccount, useChainId, useConnections, useDisconnect } from 'wagmi';
 type UserInfoProps = {
     setUserInfoOpen: React.Dispatch<React.SetStateAction<boolean>>;
     setOpenWithdraw: React.Dispatch<React.SetStateAction<boolean>>;
+    setPythModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
     skipOutsideClickOnElement?: React.RefObject<HTMLElement>;
 };
 
-const UserInfo: React.FC<UserInfoProps> = ({ setUserInfoOpen, setOpenWithdraw, skipOutsideClickOnElement }) => {
+const UserInfo: React.FC<UserInfoProps> = ({
+    setUserInfoOpen,
+    setOpenWithdraw,
+    setPythModalOpen,
+    skipOutsideClickOnElement,
+}) => {
     const networkId = useChainId();
     const { disconnect } = useDisconnect();
     const { address, isConnected } = useAccount();
@@ -121,6 +127,15 @@ const UserInfo: React.FC<UserInfoProps> = ({ setUserInfoOpen, setOpenWithdraw, s
                             <Icon className="network-icon network-icon--avatar" />
                             <Label>{t('user-info.trading-profile')}</Label>
                         </SPAAnchor>
+                    </MenuItem>
+                    <MenuItem
+                        onClick={() => {
+                            setPythModalOpen(true);
+                            setUserInfoOpen(false);
+                        }}
+                    >
+                        <Icon className="icon icon--pyth-rewards" />
+                        <Label>{t('user-info.pyth')}</Label>
                     </MenuItem>
                     <MenuItem>
                         <SPAAnchor href={LINKS.ThalesIo.Docs}>

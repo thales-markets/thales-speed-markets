@@ -26,4 +26,5 @@ export const LOCAL_STORAGE_KEYS = {
         168587773: 'sessionValidUntil_168587773',
     },
     AVATAR_URL: 'avatar-url',
+    SHOW_PYTH_MODAL: 'show-pyth-modal',
 };
