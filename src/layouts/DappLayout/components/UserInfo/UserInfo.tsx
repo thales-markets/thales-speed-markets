@@ -27,7 +27,6 @@ import { useAccount, useChainId, useConnections, useDisconnect } from 'wagmi';
 type UserInfoProps = {
     setUserInfoOpen: React.Dispatch<React.SetStateAction<boolean>>;
     setOpenWithdraw: React.Dispatch<React.SetStateAction<boolean>>;
-    setOpenReferralModal: React.Dispatch<React.SetStateAction<boolean>>;
     setPythModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
     skipOutsideClickOnElement?: React.RefObject<HTMLElement>;
 };
@@ -35,7 +34,6 @@ type UserInfoProps = {
 const UserInfo: React.FC<UserInfoProps> = ({
     setUserInfoOpen,
     setOpenWithdraw,
-    setOpenReferralModal,
     setPythModalOpen,
     skipOutsideClickOnElement,
 }) => {
@@ -129,15 +127,6 @@ const UserInfo: React.FC<UserInfoProps> = ({
                             <Icon className="network-icon network-icon--avatar" />
                             <Label>{t('user-info.trading-profile')}</Label>
                         </SPAAnchor>
-                    </MenuItem>
-                    <MenuItem
-                        onClick={() => {
-                            setOpenReferralModal(true);
-                            setUserInfoOpen(false);
-                        }}
-                    >
-                        <Icon className="icon icon--referral" />
-                        <Label>{t('user-info.referral')}</Label>
                     </MenuItem>
                     <MenuItem
                         onClick={() => {
