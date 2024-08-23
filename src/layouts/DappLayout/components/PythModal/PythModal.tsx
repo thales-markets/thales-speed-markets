@@ -1,35 +1,25 @@
 import { useConnectModal } from '@rainbow-me/rainbowkit';
+import RewardsImg from 'assets/images/pyth/pyth-rewards.png';
 import Button from 'components/Button';
 import Modal from 'components/Modal';
 import ToastMessage from 'components/ToastMessage';
 import { getErrorToastOptions, getSuccessToastOptions } from 'components/ToastMessage/ToastMessage';
 import TextInput from 'components/fields/TextInput';
+import { LINKS } from 'constants/links';
+import { ScreenSizeBreakpoint } from 'enums/ui';
 import useSolanaAddressForWalletQuery from 'queries/solana/useSolanaAddressForWalletQuery';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsBiconomy } from 'redux/modules/wallet';
 import styled from 'styled-components';
-import {
-    BoldText,
-    FlexDivCentered,
-    FlexDivColumn,
-    FlexDivColumnCentered,
-    FlexDivRowCentered,
-    FlexDivSpaceBetween,
-} from 'styles/common';
+import { BoldText, FlexDivColumnCentered, FlexDivRowCentered } from 'styles/common';
 import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
-import { useAccount, useSignMessage } from 'wagmi';
-import RewardsImg from 'assets/images/pyth/pyth-rewards.png';
-import { ScreenSizeBreakpoint } from 'enums/ui';
-import { LINKS } from 'constants/links';
-import earlyUsers from 'constants/AirdropList/early-users.json';
-import govParticipants from 'constants/AirdropList/governance-participation.json';
-import councilNominations from 'constants/AirdropList/council-participation.json';
-import { isValidSolanaAddress } from 'utils/solana';
 import { refetchSolanaAddress } from 'utils/queryConnector';
+import { isValidSolanaAddress } from 'utils/solana';
+import { useAccount, useSignMessage } from 'wagmi';
 
 type PythModalProps = {
     onClose: () => void;
@@ -91,94 +81,12 @@ const PythModal: React.FC<PythModalProps> = ({ onClose }) => {
         }
     }, [solanaAddress, walletAddress, isBiconomy, t, signMessageAsync, onClose]);
 
-    const pythAllocation = useMemo(() => {
-        if (walletAddress) {
-            const earlyUser = earlyUsers.find(({ address }) => {
-                return address.toLowerCase() === walletAddress.toLowerCase();
-            });
-            const govParticipant = govParticipants.find(({ address }) => {
-                return address.toLowerCase() === walletAddress.toLowerCase();
-            });
-            const councilNomine = councilNominations.find(({ address }) => {
-                return address.toLowerCase() === walletAddress.toLowerCase();
-            });
-            const totalAllocation =
-                (earlyUser ? earlyUser.amount : 0) +
-                (govParticipant ? govParticipant.amount : 0) +
-                (councilNomine ? councilNomine.amount : 0);
-            return {
-                earlyUserAllocation: earlyUser ? earlyUser.amount : 0,
-                govParticipantAllocation: govParticipant ? govParticipant.amount : 0,
-                councilNomineAllocation: councilNomine ? councilNomine.amount : 0,
-                totalAllocation,
-            };
-        }
-        return {
-            earlyUserAllocation: 0,
-            govParticipantAllocation: 0,
-            councilNomineAllocation: 0,
-            totalAllocation: 0,
-        };
-    }, [walletAddress]);
-
     return (
         <Modal title={t('pyth-rewards.title')} onClose={onClose} shouldCloseOnOverlayClick width="auto">
             <Wrapper>
                 <Container>
-                    {pythAllocation.totalAllocation > 0 ? (
-                        <AllocationWrapper>
-                            <EligibilityContainer>
-                                <Info>{t('pyth-rewards.eligible')}</Info>
-                                <Info>
-                                    {t('pyth-rewards.total-allocation')} {pythAllocation.totalAllocation.toFixed(2)}
-                                    <Icon className="icon icon--pyth-rewards" />
-                                </Info>
-                            </EligibilityContainer>
-                            <AllocationContainer>
-                                <FlexDivSpaceBetween>
-                                    <Info>{t('pyth-rewards.early-users')}:</Info>
-                                    <Info>
-                                        {pythAllocation.earlyUserAllocation}{' '}
-                                        <Icon className="icon icon--pyth-rewards" />
-                                    </Info>
-                                </FlexDivSpaceBetween>
-
-                                <FlexDivSpaceBetween>
-                                    <Info>{t('pyth-rewards.governance-voters')}:</Info>
-                                    <Info>
-                                        {pythAllocation.govParticipantAllocation}
-                                        <Icon className="icon icon--pyth-rewards" />
-                                    </Info>
-                                </FlexDivSpaceBetween>
-
-                                <FlexDivSpaceBetween>
-                                    <Info>{t('pyth-rewards.council-nomine')}:</Info>
-                                    <Info>
-                                        {pythAllocation.councilNomineAllocation}
-                                        <Icon className="icon icon--pyth-rewards" />
-                                    </Info>
-                                </FlexDivSpaceBetween>
-                            </AllocationContainer>
-                        </AllocationWrapper>
-                    ) : (
-                        <Info>
-                            <Trans
-                                i18nKey={'pyth-rewards.not-eligible'}
-                                components={{
-                                    a: (
-                                        <Link
-                                            href={
-                                                'https://dune.com/leifu/thales-speed-markets-competition-17-july-17-aug-2024'
-                                            }
-                                        />
-                                    ),
-                                }}
-                            />
-                        </Info>
-                    )}
-
                     <Info>
-                        <Trans i18nKey={'pyth-rewards.airdrop-info'} components={{ bold: <BoldText /> }} />
+                        <Trans i18nKey={'pyth-rewards.rewards-info'} components={{ bold: <BoldText /> }} />
                     </Info>
 
                     <div>
@@ -249,44 +157,6 @@ const InputLabel = styled.p`
     line-height: normal;
     text-transform: uppercase;
     margin-bottom: 2px;
-`;
-
-const AllocationWrapper = styled(FlexDivCentered)`
-    margin-top: 20px;
-    height: 66px;
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        flex-direction: column;
-        height: auto;
-    }
-`;
-
-const EligibilityContainer = styled(FlexDivColumn)`
-    gap: 20px;
-    height: 100%;
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        flex-direction: row;
-        width: 100%;
-        justify-content: space-between;
-    }
-`;
-
-const AllocationContainer = styled(FlexDivColumnCentered)`
-    flex: 2;
-    gap: 10px;
-    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
-        width: 100%;
-        margin-top: 10px;
-    }
-`;
-const Icon = styled.i`
-    color: ${(props) => props.theme.dropDown.textColor.primary};
-    font-size: 14px;
-    margin-left: 4px;
-`;
-
-const Link = styled.a`
-    color: ${(props) => props.theme.textColor.primary};
-    text-decoration: underline;
 `;
 
 export default PythModal;
