@@ -6,9 +6,10 @@ import ToastMessage from 'components/ToastMessage';
 import { getErrorToastOptions, getSuccessToastOptions } from 'components/ToastMessage/ToastMessage';
 import TextInput from 'components/fields/TextInput';
 import { LINKS } from 'constants/links';
+import totalRewardsByAddress from 'constants/pythRewards/total-rewards.json';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import useSolanaAddressForWalletQuery from 'queries/solana/useSolanaAddressForWalletQuery';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
@@ -81,10 +82,27 @@ const PythModal: React.FC<PythModalProps> = ({ onClose }) => {
         }
     }, [solanaAddress, walletAddress, isBiconomy, t, signMessageAsync, onClose]);
 
+    const pythRewards = useMemo(
+        () =>
+            walletAddress
+                ? totalRewardsByAddress.find(({ address }) => address.toLowerCase() === walletAddress.toLowerCase())
+                      ?.amount || 0
+                : 0,
+
+        [walletAddress]
+    );
+
     return (
         <Modal title={t('pyth-rewards.title')} onClose={onClose} shouldCloseOnOverlayClick width="auto">
             <Wrapper>
                 <Container>
+                    <TotalReceived>
+                        <Info>
+                            {t('pyth-rewards.total-received')} {pythRewards.toFixed(2)}
+                            <Icon className="icon icon--pyth-rewards" />
+                        </Info>
+                    </TotalReceived>
+
                     <Info>
                         <Trans i18nKey={'pyth-rewards.rewards-info'} components={{ bold: <BoldText /> }} />
                     </Info>
@@ -157,6 +175,16 @@ const InputLabel = styled.p`
     line-height: normal;
     text-transform: uppercase;
     margin-bottom: 2px;
+`;
+
+const TotalReceived = styled(FlexDivRowCentered)`
+    height: 50px;
+`;
+
+const Icon = styled.i`
+    color: ${(props) => props.theme.dropDown.textColor.primary};
+    font-size: 14px;
+    margin-left: 4px;
 `;
 
 export default PythModal;

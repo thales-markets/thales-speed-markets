@@ -371,6 +371,7 @@
         "input-label": "Input/change your solana address:",
         "invalid-solana-address": "Invalid Solana address",
         "submit": "Submit",
-        "success": "Successfully submitted solana address"
+        "success": "Successfully submitted solana address",
+        "total-received": "Total received:"
     }
 }
