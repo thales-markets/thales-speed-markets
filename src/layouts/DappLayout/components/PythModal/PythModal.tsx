@@ -6,7 +6,8 @@ import ToastMessage from 'components/ToastMessage';
 import { getErrorToastOptions, getSuccessToastOptions } from 'components/ToastMessage/ToastMessage';
 import TextInput from 'components/fields/TextInput';
 import { LINKS } from 'constants/links';
-import totalRewardsByAddress from 'constants/pythRewards/total-rewards.json';
+import totalRewardsByAddress from 'constants/pythRewards/total-rewards-1.json';
+import missingSolanaAddress from 'constants/pythRewards/without-solana-address-1.json';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import useSolanaAddressForWalletQuery from 'queries/solana/useSolanaAddressForWalletQuery';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -85,8 +86,13 @@ const PythModal: React.FC<PythModalProps> = ({ onClose }) => {
     const pythRewards = useMemo(
         () =>
             walletAddress
-                ? totalRewardsByAddress.find(({ address }) => address.toLowerCase() === walletAddress.toLowerCase())
-                      ?.amount || 0
+                ? totalRewardsByAddress.find(
+                      ({ address }) =>
+                          address.toLowerCase() === walletAddress.toLowerCase() &&
+                          missingSolanaAddress.filter(
+                              ({ address }) => address.toLowerCase() === walletAddress.toLowerCase()
+                          ).length === 0
+                  )?.amount || 0
                 : 0,
 
         [walletAddress]
