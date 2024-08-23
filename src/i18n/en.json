@@ -366,19 +366,12 @@
         "session-valid": "Session valid until"
     },
     "pyth-rewards": {
-        "title": "PYTH airdrop for governance participants & early tester",
-        "airdrop-info": "Input your Solana address to receive the airdrop. Address input will be open until August 17th after which the rewards will be distributed.",
-        "your-address": "Your solana address for receiving pyth rewards:",
-        "info": "*To access your Solana wallet, go to wallet.particle.network and login with the same social account as on this dApp",
+        "title": "PYTH rewards",
+        "rewards-info": "Input your Solana address to receive the future Pyth rewards.",
         "input-label": "Input/change your solana address:",
         "invalid-solana-address": "Invalid Solana address",
         "submit": "Submit",
         "success": "Successfully submitted solana address",
-        "eligible": "You're eligible!!!",
-        "early-users": "Allocation for early Speed Markets users",
-        "governance-voters": "Allocation for governance voters",
-        "council-nomine": "Allocation for Thales Council nominees",
-        "total-allocation": "You will receive:",
-        "not-eligible": "Your wallet is not currently eligible for PYTH retroactive airdrop. You can still get PYTH rewards via ongoing <a>Trading Competition</a> and receive potential future airdrops"
+        "total-received": "Total received:"
     }
 }
