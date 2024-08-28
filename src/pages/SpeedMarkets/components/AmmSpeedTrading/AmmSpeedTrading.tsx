@@ -1007,6 +1007,7 @@ const InfoText = styled.span`
     font-size: 13px;
     letter-spacing: 0.13px;
     color: ${(props) => props.theme.textColor.primary};
+    padding: 5px 10px;
 `;
 
 const ButtonWrapper = styled(FlexDivColumn)`
