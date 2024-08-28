@@ -47,7 +47,7 @@ const SpeedMarketsToggleButtons = [
     { label: '15m', resolution: '15', value: 2, startDate: Number(subDays(now, 2)) },
     { label: '30m', resolution: '30', value: 4, startDate: Number(subDays(now, 4)) },
     { label: '1H', resolution: '60', value: 30, startDate: Number(subDays(now, 30)) },
-    { label: '1D', resolution: '1D', value: 364, startDate: Number(subDays(now, 364)) },
+    { label: '1D', resolution: '1D', value: 365, startDate: Number(subDays(now, 365)) },
 ];
 
 const SPEED_DEFAULT_TOGGLE_BUTTON_INDEX = 0;
@@ -87,7 +87,7 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
         }
     );
 
-    const pythQuery = usePythCandlestickQuery(asset, dateRange.startDate, dateRange.resolution, {
+    const pythQuery = usePythCandlestickQuery(asset, dateRange.startDate, Number(now), dateRange.resolution, {
         enabled: isAppReady,
         refetchInterval: 30 * 1000,
     });
