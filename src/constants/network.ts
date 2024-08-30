@@ -31,10 +31,10 @@ export const SUPPORTED_NETWORKS_PARAMS: Record<number, NetworkParams> = {
         chainId: '0x89',
         chainName: 'Polygon Mainnet',
         rpcUrls: ['https://polygon-rpc.com'],
-        blockExplorerUrls: ['https://explorer.matic.network/'],
+        blockExplorerUrls: ['https://polygonscan.com/'],
         iconUrls: ['https://optimism.io/images/metamask_icon.svg', 'https://optimism.io/images/metamask_icon.png'],
         nativeCurrency: {
-            symbol: 'MATIC',
+            symbol: 'POL',
             decimals: 18,
         },
     },
