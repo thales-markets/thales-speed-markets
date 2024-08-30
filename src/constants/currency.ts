@@ -10,7 +10,6 @@ const CRYPTO_CURRENCY = [
     'ETH',
     'ARB',
     'OP',
-    'MATIC',
     'BNB',
     'DAI',
     'USDCe',

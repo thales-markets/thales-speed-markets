@@ -6,8 +6,8 @@ import ToastMessage from 'components/ToastMessage';
 import { getErrorToastOptions, getSuccessToastOptions } from 'components/ToastMessage/ToastMessage';
 import TextInput from 'components/fields/TextInput';
 import { LINKS } from 'constants/links';
-import totalRewardsByAddress from 'constants/pythRewards/total-rewards-1.json';
-import missingSolanaAddress from 'constants/pythRewards/without-solana-address-1.json';
+import totalRewardsByAddressAndRound from 'constants/pythRewards/total-rewards.json';
+import missingSolanaAddressByRound from 'constants/pythRewards/without-solana-address.json';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import useSolanaAddressForWalletQuery from 'queries/solana/useSolanaAddressForWalletQuery';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -83,20 +83,29 @@ const PythModal: React.FC<PythModalProps> = ({ onClose }) => {
         }
     }, [solanaAddress, walletAddress, isBiconomy, t, signMessageAsync, onClose]);
 
-    const pythRewards = useMemo(
-        () =>
-            walletAddress
-                ? totalRewardsByAddress.find(
-                      ({ address }) =>
-                          address.toLowerCase() === walletAddress.toLowerCase() &&
-                          missingSolanaAddress.filter(
-                              ({ address }) => address.toLowerCase() === walletAddress.toLowerCase()
-                          ).length === 0
-                  )?.amount || 0
-                : 0,
+    // Get total rewards for all rounds by address, excluding those addresses which are missing solana address at the end of each round
+    const pythRewards = useMemo(() => {
+        let totalRewards = 0;
+        if (walletAddress) {
+            totalRewardsByAddressAndRound.forEach((rewardsByRound, i) => {
+                const currentRoundMissingSolanaAddresses: { address: string }[] = Object.values(
+                    missingSolanaAddressByRound[i]
+                )[0];
+                const hasSolanaAddress =
+                    currentRoundMissingSolanaAddresses.filter(
+                        ({ address }) => address.toLowerCase() === walletAddress.toLowerCase()
+                    ).length === 0;
 
-        [walletAddress]
-    );
+                const currentRoundRewards: { address: string; amount: number }[] = Object.values(rewardsByRound)[0];
+
+                totalRewards +=
+                    currentRoundRewards.find(
+                        ({ address }) => address.toLowerCase() === walletAddress.toLowerCase() && hasSolanaAddress
+                    )?.amount || 0;
+            });
+        }
+        return totalRewards;
+    }, [walletAddress]);
 
     return (
         <Modal title={t('pyth-rewards.title')} onClose={onClose} shouldCloseOnOverlayClick width="auto">
