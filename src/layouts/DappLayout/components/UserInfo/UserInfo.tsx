@@ -59,7 +59,7 @@ const UserInfo: React.FC<UserInfoProps> = ({
 
     // When call disconnect, Wagmi switches to the next connection if there are any, so disconnect all connections
     useEffect(() => {
-        if (isDisconnecting && isConnected && connections.length) {
+        if (isDisconnecting && isConnected) {
             disconnect();
         }
 
