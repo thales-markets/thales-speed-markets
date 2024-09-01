@@ -4,7 +4,7 @@ import { Trans } from 'react-i18next';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import styled from 'styled-components';
 
-const IS_VISIBLE = false;
+const IS_VISIBLE = true;
 
 const Banner: React.FC = () => {
     const [showBanner, setShowBanner] = useState(IS_VISIBLE);
@@ -15,13 +15,13 @@ const Banner: React.FC = () => {
                 <CloseIcon className="icon icon--x-sign" onClick={() => setShowBanner(false)} />
                 <BannerText>
                     <Trans
-                        i18nKey={'common.banner.trading-competition'}
+                        i18nKey={'common.banner.header'}
                         components={{
                             a: (
                                 <Link
                                     target="_blank"
                                     rel="noreferrer"
-                                    href={'https://dune.com/leifu/thales-speed-markets-competition-17-july-17-aug-2024'}
+                                    href={'https://dune.com/leifu/thales-speed-markets-competition-24'}
                                 />
                             ),
                         }}
@@ -60,7 +60,12 @@ const Link = styled.a`
     font-size: 13px;
     font-weight: 900;
     line-height: normal;
-    text-decoration: underline;
+    &:hover {
+        text-decoration: underline;
+    }
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        text-decoration: underline;
+    }
 `;
 
 const CloseIcon = styled.i`
