@@ -43,6 +43,7 @@ const Container = styled.div`
     align-items: center;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         height: 34px;
+        padding: 0 20px 0 5px;
     }
 `;
 
