@@ -68,15 +68,7 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
     const networkId = useChainId();
     const client = useClient();
 
-    const now = useMemo(() => new Date(), [
-        asset,
-        selectedPrice,
-        position,
-        selectedDate,
-        explicitCurrentPrice,
-        deltaTimeSec,
-    ]);
-
+    const [now, setNow] = useState(new Date());
     const [dateRange, setDateRange] = useState(getSpeedMarketsToggleButtons(now)[SPEED_DEFAULT_TOGGLE_BUTTON_INDEX]);
     const [selectedToggleIndex, setToggleIndex] = useState(SPEED_DEFAULT_TOGGLE_BUTTON_INDEX);
 
@@ -117,6 +109,10 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
             setCandleData(cloneData);
         }
     }, [currentPrice, candleStickData]);
+
+    useEffect(() => {
+        setNow(new Date());
+    }, [asset, selectedPrice, position, selectedDate, explicitCurrentPrice, deltaTimeSec]);
 
     const handleDateRangeChange = useCallback(
         (value: number) => {
