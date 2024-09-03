@@ -1,30 +1,25 @@
+import SimpleLoader from 'components/SimpleLoader';
 import TooltipInfo from 'components/Tooltip';
 import { USD_SIGN } from 'constants/currency';
 import { LINKS } from 'constants/links';
+import { hoursToSeconds, minutesToSeconds, secondsToMilliseconds, subDays } from 'date-fns';
 import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
-
 import usePythCandlestickQuery from 'queries/prices/usePythCandlestickQuery';
 import useExchangeRatesQuery from 'queries/rates/useExchangeRatesQuery';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { FlexDiv, FlexDivRowCentered, FlexDivSpaceBetween } from 'styles/common';
 import { formatCurrencyWithSign } from 'thales-utils';
 import { Risk, RiskPerAsset, RiskPerAssetAndPosition } from 'types/market';
 import { RootState, ThemeInterface } from 'types/ui';
-
-import SimpleLoader from 'components/SimpleLoader';
-import { hoursToSeconds, minutesToSeconds, subDays } from 'date-fns';
-import { useTheme } from 'styled-components';
 import { useChainId, useClient } from 'wagmi';
 import { ChartComponent } from './components/Chart/ChartContext';
 import CurrentPrice from './components/CurrentPrice';
 import Toggle from './components/DateToggle';
-
-const now = new Date();
 
 type LightweightChartProps = {
     asset: string;
@@ -41,7 +36,7 @@ type LightweightChartProps = {
     hideLiquidity?: boolean;
 };
 
-const SpeedMarketsToggleButtons = [
+const getSpeedMarketsToggleButtons = (now: Date) => [
     { label: '1m', resolution: '1', value: 1, startDate: Number(subDays(now, 1)) },
     { label: '5m', resolution: '5', value: 1, startDate: Number(subDays(now, 1)) },
     { label: '15m', resolution: '15', value: 2, startDate: Number(subDays(now, 2)) },
@@ -73,7 +68,8 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
     const networkId = useChainId();
     const client = useClient();
 
-    const [dateRange, setDateRange] = useState(SpeedMarketsToggleButtons[SPEED_DEFAULT_TOGGLE_BUTTON_INDEX]);
+    const [now, setNow] = useState(new Date());
+    const [dateRange, setDateRange] = useState(getSpeedMarketsToggleButtons(now)[SPEED_DEFAULT_TOGGLE_BUTTON_INDEX]);
     const [selectedToggleIndex, setToggleIndex] = useState(SPEED_DEFAULT_TOGGLE_BUTTON_INDEX);
 
     const [candleData, setCandleData] = useState<any>();
@@ -89,7 +85,7 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
 
     const pythQuery = usePythCandlestickQuery(asset, dateRange.startDate, Number(now), dateRange.resolution, {
         enabled: isAppReady,
-        refetchInterval: 30 * 1000,
+        refetchInterval: secondsToMilliseconds(30),
     });
 
     const candleStickData = useMemo(() => {
@@ -114,10 +110,17 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
         }
     }, [currentPrice, candleStickData]);
 
-    const handleDateRangeChange = useCallback((value: number) => {
-        setDateRange(SpeedMarketsToggleButtons[value]);
-        setToggleIndex(value);
-    }, []);
+    useEffect(() => {
+        setNow(new Date());
+    }, [asset, selectedPrice, position, selectedDate, explicitCurrentPrice, deltaTimeSec]);
+
+    const handleDateRangeChange = useCallback(
+        (value: number) => {
+            setDateRange(getSpeedMarketsToggleButtons(now)[value]);
+            setToggleIndex(value);
+        },
+        [now]
+    );
 
     // save previous deltaTimeSec
     const prevDeltaTimeSecRef = useRef<number | undefined>(currentDeltaTimeSec);
@@ -130,22 +133,22 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
     useEffect(() => {
         if (deltaTimeSec && deltaTimeSec !== prevDeltaTimeSecRef.current) {
             if (deltaTimeSec >= hoursToSeconds(10)) {
-                if (dateRange.resolution !== SpeedMarketsToggleButtons[4].resolution) {
+                if (dateRange.resolution !== getSpeedMarketsToggleButtons(now)[4].resolution) {
                     handleDateRangeChange(4);
                 }
             } else {
                 if (deltaTimeSec >= hoursToSeconds(4)) {
-                    if (dateRange.resolution !== SpeedMarketsToggleButtons[3].resolution) {
+                    if (dateRange.resolution !== getSpeedMarketsToggleButtons(now)[3].resolution) {
                         handleDateRangeChange(3);
                     }
                 } else {
                     if (deltaTimeSec >= hoursToSeconds(1)) {
-                        if (dateRange.resolution !== SpeedMarketsToggleButtons[2].resolution) {
+                        if (dateRange.resolution !== getSpeedMarketsToggleButtons(now)[2].resolution) {
                             handleDateRangeChange(2);
                         }
                     } else {
                         if (deltaTimeSec >= minutesToSeconds(30)) {
-                            if (dateRange.resolution !== SpeedMarketsToggleButtons[1].resolution) {
+                            if (dateRange.resolution !== getSpeedMarketsToggleButtons(now)[1].resolution) {
                                 handleDateRangeChange(1);
                             }
                         }
@@ -153,7 +156,7 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
                 }
             }
         }
-    }, [deltaTimeSec, dateRange.resolution, handleDateRangeChange]);
+    }, [deltaTimeSec, dateRange.resolution, handleDateRangeChange, now]);
 
     const risk = chainedRisk
         ? chainedRisk
@@ -235,7 +238,7 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
                     </ChartContainer>
 
                     <Toggle
-                        options={SpeedMarketsToggleButtons}
+                        options={getSpeedMarketsToggleButtons(now)}
                         selectedIndex={selectedToggleIndex}
                         onChange={handleDateRangeChange}
                     />
