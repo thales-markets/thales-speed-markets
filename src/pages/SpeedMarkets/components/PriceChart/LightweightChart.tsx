@@ -20,6 +20,7 @@ import { useChainId, useClient } from 'wagmi';
 import { ChartComponent } from './components/Chart/ChartContext';
 import CurrentPrice from './components/CurrentPrice';
 import Toggle from './components/DateToggle';
+import useInterval from 'hooks/useInterval';
 
 type LightweightChartProps = {
     asset: string;
@@ -46,6 +47,7 @@ const getSpeedMarketsToggleButtons = (now: Date) => [
 ];
 
 const SPEED_DEFAULT_TOGGLE_BUTTON_INDEX = 0;
+const CHART_REFRESH_INTERVAL_SEC = 30;
 
 const LightweightChart: React.FC<LightweightChartProps> = ({
     asset,
@@ -85,7 +87,7 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
 
     const pythQuery = usePythCandlestickQuery(asset, dateRange.startDate, Number(now), dateRange.resolution, {
         enabled: isAppReady,
-        refetchInterval: secondsToMilliseconds(30),
+        refetchInterval: secondsToMilliseconds(CHART_REFRESH_INTERVAL_SEC),
     });
 
     const candleStickData = useMemo(() => {
@@ -110,9 +112,9 @@ const LightweightChart: React.FC<LightweightChartProps> = ({
         }
     }, [currentPrice, candleStickData]);
 
-    useEffect(() => {
+    useInterval(() => {
         setNow(new Date());
-    }, [asset, selectedPrice, position, selectedDate, explicitCurrentPrice, deltaTimeSec]);
+    }, secondsToMilliseconds(CHART_REFRESH_INTERVAL_SEC));
 
     const handleDateRangeChange = useCallback(
         (value: number) => {
