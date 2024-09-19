@@ -8,23 +8,23 @@ import {
     secondsToHours,
     secondsToMinutes,
 } from 'date-fns';
-
+import { ScreenSizeBreakpoint } from 'enums/ui';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsMobile } from 'redux/modules/ui';
 import styled, { useTheme } from 'styled-components';
 import { FlexDivCentered, FlexDivColumnCentered, FlexDivRow, FlexDivStart } from 'styles/common';
-import { AmmSpeedMarketsLimits } from 'types/market';
+import { AmmChainedSpeedMarketsLimits, AmmSpeedMarketsLimits } from 'types/market';
 import { RootState, ThemeInterface } from 'types/ui';
 import { useAccount } from 'wagmi';
 import { Header, HeaderText, PlusMinusIcon } from '../SelectPosition/styled-components';
-import { ScreenSizeBreakpoint } from 'enums/ui';
 
 type SelectTimeProps = {
     selectedDeltaSec: number;
     onDeltaChange: React.Dispatch<number>;
     ammSpeedMarketsLimits: AmmSpeedMarketsLimits | null;
+    ammChainedSpeedMarketsLimits: AmmChainedSpeedMarketsLimits | null;
     isResetTriggered: boolean;
     setIsResetTriggered: React.Dispatch<boolean>;
     isChained: boolean;
@@ -38,6 +38,7 @@ const SelectTime: React.FC<SelectTimeProps> = ({
     selectedDeltaSec,
     onDeltaChange,
     ammSpeedMarketsLimits,
+    ammChainedSpeedMarketsLimits,
     isResetTriggered,
     setIsResetTriggered,
     isChained,
@@ -57,6 +58,11 @@ const SelectTime: React.FC<SelectTimeProps> = ({
     const deltaTimesMinutes: number[] = useMemo(() => {
         let times: number[] = [];
         if (isChained) {
+            const minTime =
+                ammChainedSpeedMarketsLimits && secondsToMinutes(ammChainedSpeedMarketsLimits?.minTimeFrame);
+            if (minTime && !CHAINED_TIMEFRAMES_MINUTES.includes(minTime)) {
+                CHAINED_TIMEFRAMES_MINUTES.unshift(minTime);
+            }
             times = CHAINED_TIMEFRAMES_MINUTES;
         } else {
             if (ammSpeedMarketsLimits && secondsToHours(ammSpeedMarketsLimits?.minimalTimeToMaturity) === 0) {
@@ -70,7 +76,7 @@ const SelectTime: React.FC<SelectTimeProps> = ({
         }
 
         return times;
-    }, [ammSpeedMarketsLimits, isChained]);
+    }, [ammSpeedMarketsLimits, ammChainedSpeedMarketsLimits, isChained]);
 
     const deltaTimesHours: number[] = useMemo(() => {
         let times: number[] = [];
@@ -328,7 +334,6 @@ const InputWrapper = styled.div`
 
 const Time = styled(FlexDivCentered)<{ $isChained: boolean; $isSelected: boolean }>`
     min-width: 60px;
-
     height: 40px;
     border-radius: 8px;
     font-size: 13px;
