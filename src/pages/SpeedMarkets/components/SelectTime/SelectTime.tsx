@@ -66,7 +66,6 @@ const SelectTime: React.FC<SelectTimeProps> = ({
             times = CHAINED_TIMEFRAMES_MINUTES;
         } else {
             if (ammSpeedMarketsLimits && secondsToHours(ammSpeedMarketsLimits?.minimalTimeToMaturity) === 0) {
-                ammSpeedMarketsLimits.timeThresholdsForFees.shift();
                 times = ammSpeedMarketsLimits.timeThresholdsForFees
                     .filter((time: number) => time < hoursToMinutes(1))
                     .slice(0, SPEED_NUMBER_OF_BUTTONS);
