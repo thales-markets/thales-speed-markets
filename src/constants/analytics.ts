@@ -9,4 +9,7 @@ export const PLAUSIBLE = Plausible({
 export const PLAUSIBLE_KEYS = {
     speedMarketsBuy: 'speed-markets-buy',
     chainedSpeedMarketsBuy: 'chained-speed-markets-buy',
+    connectWallet: 'connect-wallet',
+    connectWalletSocial: 'connect-wallet-social',
+    fundWithCardButtonClick: 'fund-with-card-click',
 };

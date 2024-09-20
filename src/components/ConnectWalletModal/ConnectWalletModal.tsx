@@ -12,11 +12,12 @@ import SimpleLoader from 'components/SimpleLoader';
 import Checkbox from 'components/fields/Checkbox';
 import { SUPPORTED_PARTICAL_CONNECTORS } from 'constants/wallet';
 
-import { Connector, useConnect } from 'wagmi';
-import { getClassNameForParticalLogin, getSpecificConnectorFromConnectorsArray } from 'utils/particleWallet/utils';
 import Button from 'components/Button';
 import Modal from 'components/Modal';
+import { PLAUSIBLE, PLAUSIBLE_KEYS } from 'constants/analytics';
 import { ScreenSizeBreakpoint } from 'enums/ui';
+import { getClassNameForParticalLogin, getSpecificConnectorFromConnectorsArray } from 'utils/particleWallet/utils';
+import { Connector, useConnect } from 'wagmi';
 
 ReactModal.setAppElement('#root');
 
@@ -34,6 +35,7 @@ const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({ isOpen, onClose
 
     const handleConnect = (connector: Connector) => {
         try {
+            PLAUSIBLE.trackEvent(PLAUSIBLE_KEYS.connectWalletSocial);
             connect({ connector });
         } catch (e) {
             console.log('Error occurred');
@@ -130,6 +132,7 @@ const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({ isOpen, onClose
                                     borderRadius="8px"
                                     onClick={() => {
                                         onClose();
+                                        PLAUSIBLE.trackEvent(PLAUSIBLE_KEYS.connectWallet);
                                         openConnectModal?.();
                                     }}
                                 >

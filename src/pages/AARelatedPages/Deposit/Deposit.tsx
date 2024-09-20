@@ -8,6 +8,7 @@ import {
     getLoadingToastOptions,
 } from 'components/ToastMessage/ToastMessage';
 import TotalBalance from 'components/TotalBalance';
+import { PLAUSIBLE, PLAUSIBLE_KEYS } from 'constants/analytics';
 import { LINKS } from 'constants/links';
 import ROUTES from 'constants/routes';
 import { ScreenSizeBreakpoint } from 'enums/ui';
@@ -130,6 +131,7 @@ const Deposit: React.FC = () => {
                         <Separator />
                         <OnRampWrapper
                             onClick={() => {
+                                PLAUSIBLE.trackEvent(PLAUSIBLE_KEYS.fundWithCardButtonClick);
                                 setShowOnramper(true);
                             }}
                         >
