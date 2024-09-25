@@ -8,6 +8,7 @@ import {
     metaMaskWallet,
     rabbyWallet,
     rainbowWallet,
+    safeWallet,
     trustWallet,
     walletConnectWallet,
 } from '@rainbow-me/rainbowkit/wallets';
@@ -35,6 +36,7 @@ const wallets = [
     coinbaseWallet,
     rainbowWallet,
     imTokenWallet,
+    safeWallet,
 ];
 
 const socialWallets = [
