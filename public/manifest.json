@@ -1,6 +1,6 @@
 {
     "name": "Speed Markets by THALES",
-    "description": "Speed Markets by THALES is a decentralized prediction market platform that allows users to trade on the outcome of real-world events.",
+    "description": "Speed Markets by THALES is an app which allows users to trade on short timeframes in a decentralized way.",
     "icon_path": "maskable-icon.png",
     "short_name": "Speed Markets",
     "start_url": "./speed-markets",
