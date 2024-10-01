@@ -166,7 +166,6 @@
             { "address": "0xCac3aBE628AFBf0353D509E6194a26B1f2844EAc" },
             { "address": "0x856C3dcAE9D9c60475653F504663F94b1136b5F5" },
             { "address": "0x1891B41864387F858684686c9fD6F9A647700DD2" },
-            { "address": "0xf70a78b2aee201bdddb0255c1938cce53ac85b05" },
             { "address": "0x4026b3da349c2952255ca9db4f055ea57f4e037c" },
             { "address": "0x88ca98958a97a139884d49336fbc8d588fdb5af1" },
             { "address": "0x8af0a5658776b68912b22ec954a91b9c20d3f8aa" },
@@ -328,7 +327,6 @@
     },
     {
         "round2": [
-            { "address": "0xf70a78b2aee201bdddb0255c1938cce53ac85b05" },
             { "address": "0xdb90ae6d0c9259f06eaeab6310443f83e67f92da" },
             { "address": "0x9bbc502058450392fb6a40f6a82bcfe450a389cf" },
             { "address": "0xd459cdb197400fd7fbd9cd3a42a6442611294261" },
