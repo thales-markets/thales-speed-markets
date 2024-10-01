@@ -173,6 +173,7 @@ const Container = styled(FlexDivColumnCentered)`
 const Info = styled.p`
     font-size: 14px;
     font-weight: 500;
+    line-height: 16px;
     color: ${(props) => props.theme.textColor.secondary};
     text-align: justify;
 `;
