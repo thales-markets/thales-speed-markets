@@ -1,6 +1,6 @@
 {
     "name": "Speed Markets by THALES",
-    "description": "Speed Markets by THALES is an app which allows users to trade on short timeframes in a decentralized way.",
+    "description": "Speed Markets is a dynamic crypto trading platform where users predict the immediate UP or DOWN price movements of ETH or BTC within customizable time frames starting from 5 minutes. With the ability to chain predictions for up to 47x payouts, it offers thrilling high-risk, high-reward opportunities in short-term trading.",
     "icon_path": "maskable-icon.png",
     "short_name": "Speed Markets",
     "start_url": "./speed-markets",
