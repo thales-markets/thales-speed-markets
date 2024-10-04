@@ -473,6 +473,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             setOpenApprovalModal(false);
             const txReceipt = await waitForTransactionReceipt(client as Client, {
                 hash,
+                timeout: 5_000,
             });
             if (txReceipt.status === 'success') {
                 toast.update(id, getSuccessToastOptions(t(`common.transaction.successful`), id));
