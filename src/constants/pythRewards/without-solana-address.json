@@ -349,5 +349,20 @@
             { "address": "0x5ff2d223644e4c41ef1dbc3324825a26705526e2" }
         ]
     },
-    { "round3": [{ "address": "" }] }
+    {
+        "round3": [
+            { "address": "0xbab6643ee9c4d95955abbfb59c12a4eab0316f37" },
+            { "address": "0xed47e1f7fd024e35f5db9d1f53c1abbc855ff06e" },
+            { "address": "0xf73902ef5075107da6c0f21982bd6b82d182beda" },
+            { "address": "0x38b1767720c0c1aecc98206b4b7818e11380165e" },
+            { "address": "0xd02191adb62a9950909a70ad02bf9076d9601738" },
+            { "address": "0xf6c1f2a362f84c2101a707da4a3f2268dc89dcc6" },
+            { "address": "0xa1813f62e41a8e3eb5029f07e01791bf7b2439ab" },
+            { "address": "0x5e014aa0649102e07c074f498845f01bcd520317" },
+            { "address": "0xa1aaa143add0afc056ad50f115cac2a4128adf21" },
+            { "address": "0x94c46ef85e3b224e9ee10d597dd47cbd24de8145" },
+            { "address": "0x0b9e8a0370f22a2e46183a72bb7d5e698512db23" },
+            { "address": "0x57abe0943931938ae15c9ebb2cb09ec1096da77e" }
+        ]
+    }
 ]
