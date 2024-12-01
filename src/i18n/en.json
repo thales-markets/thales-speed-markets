@@ -367,7 +367,7 @@
     },
     "pyth-rewards": {
         "title": "PYTH rewards",
-        "rewards-info": "Input your Solana address to receive the airdrop. Address input will be open until November 30th after which the rewards will be distributed.",
+        "rewards-info": "Input your Solana address to receive the airdrop. Address input will be open until December 31st after which the rewards will be distributed.",
         "input-label": "Input/change your solana address:",
         "invalid-solana-address": "Invalid Solana address",
         "submit": "Submit",
