@@ -15,13 +15,15 @@ const Banner: React.FC = () => {
                 <CloseIcon className="icon icon--x-sign" onClick={() => setShowBanner(false)} />
                 <BannerText>
                     <Trans
-                        i18nKey={'common.banner.header'}
+                        i18nKey={'common.banner.elections-text'}
                         components={{
                             a: (
                                 <Link
                                     target="_blank"
                                     rel="noreferrer"
-                                    href={'https://dune.com/leifu/thales-speed-markets-competition-24'}
+                                    href={
+                                        'https://www.thales.io/dao/thalescouncil.eth/0x34ab2c92431fe877985edd3bd525d23d6927029e30f3a7b759464b12e2980ec7'
+                                    }
                                 />
                             ),
                         }}
