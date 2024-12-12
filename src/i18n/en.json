@@ -124,7 +124,8 @@
                 "thales-markets": "Looking for markets with longer time frames (days, weeks, or months)?",
                 "try": "Try <bold>{{value}}</bold>"
             },
-            "header": "Win up to 10.000 PYTH in Speed Markets December campaign. Track your results <a>here</a>."
+            "header": "Win up to 10.000 PYTH in Speed Markets December campaign. Track your results <a>here</a>.",
+            "elections-text": "Elections for Thales Council are now live, exercise your voting power <a>here</a>."
         },
         "flex-card": {
             "strike-price": "Strike price",
