@@ -18,10 +18,10 @@ export const getDefaultCollateral = (networkId: SupportedNetwork) =>
 export const getCollateral = (networkId: SupportedNetwork, index: number) =>
     index < COLLATERALS[networkId].length ? COLLATERALS[networkId][index] : getDefaultCollateral(networkId);
 
-export const getCollaterals = (networkId: SupportedNetwork) => COLLATERALS[networkId];
+export const getCollaterals = (networkId: SupportedNetwork) => COLLATERALS[networkId] || [];
 
 export const getCollateralIndexForNetwork = (networkId: SupportedNetwork, currencyKey: Coins) =>
-    COLLATERALS[networkId].indexOf(currencyKey);
+    Math.max(0, getCollaterals(networkId).indexOf(currencyKey));
 
 export const isStableCurrency = (currencyKey: Coins) => {
     return STABLE_COINS.includes(currencyKey);
