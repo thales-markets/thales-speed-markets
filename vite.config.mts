@@ -27,6 +27,7 @@ const particleWasmPlugin: Plugin | undefined = {
 };
 
 const plugins = (mode: string): PluginOption[] => {
+    console.log(mode);
     return [
         react(),
         tsconfigPaths(),
