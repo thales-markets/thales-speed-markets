@@ -124,7 +124,7 @@
                 "thales-markets": "Looking for markets with longer time frames (days, weeks, or months)?",
                 "try": "Try <bold>{{value}}</bold>"
             },
-            "header": "Win up to 10.000 PYTH in Speed Markets December campaign. Track your results <a>here</a>."
+            "header": "Win up to 10.000 PYTH in Speed Markets January campaign. Track your results <a>here</a>."
         },
         "flex-card": {
             "strike-price": "Strike price",
@@ -367,7 +367,7 @@
     },
     "pyth-rewards": {
         "title": "PYTH rewards",
-        "rewards-info": "Input your Solana address to receive the airdrop. Address input will be open until December 31st after which the rewards will be distributed.",
+        "rewards-info": "Input your Solana address to receive the airdrop. Address input will be open until January 31st after which the rewards will be distributed.",
         "input-label": "Input/change your solana address:",
         "invalid-solana-address": "Invalid Solana address",
         "submit": "Submit",
