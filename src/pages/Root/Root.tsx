@@ -6,13 +6,15 @@ import { Buffer as buffer } from 'buffer';
 import UnexpectedError from 'components/UnexpectedError';
 import WalletDisclaimer from 'components/WalletDisclaimer';
 import { PLAUSIBLE } from 'constants/analytics';
+import { LINKS } from 'constants/links';
 import { ThemeMap } from 'constants/ui';
 import { merge } from 'lodash';
 import React, { ErrorInfo } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
+import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
 import { Provider } from 'react-redux';
 import { Store } from 'redux';
+import { isMobile } from 'utils/device';
 import { PARTICLE_STYLE } from 'utils/particleWallet/utils';
 import queryConnector from 'utils/queryConnector';
 import { getDefaultTheme } from 'utils/style';
@@ -20,8 +22,6 @@ import { WagmiProvider } from 'wagmi';
 import enTranslation from '../../i18n/en.json';
 import App from './App';
 import { wagmiConfig } from './wagmiConfig';
-import { LINKS } from 'constants/links';
-import { isMobile } from 'utils/device';
 
 window.Buffer = window.Buffer || buffer;
 
@@ -49,6 +49,10 @@ queryConnector.setQueryClient();
 
 const DISCORD_MESSAGE_MAX_LENGTH = 2000;
 
+const isDeployError = (errorMessage: string) =>
+    errorMessage.includes('Failed to fetch dynamically imported module') ||
+    errorMessage.includes('Importing a module script failed');
+
 const Root: React.FC<RootProps> = ({ store }) => {
     // particle context provider is overriding our i18n configuration and languages, so we need to add our localization after the initialization of particle context
     // initialization of particle context is happening in Root
@@ -58,11 +62,7 @@ const Root: React.FC<RootProps> = ({ store }) => {
     PLAUSIBLE.enableAutoPageviews();
 
     const logError = (error: Error, info: ErrorInfo) => {
-        if (import.meta.env.DEV) {
-            return;
-        }
-
-        let content = `IsMobile:${isMobile()}\nError:\n${error.stack || error.message}`;
+        let content = `IsMobile: ${isMobile()}\nError:\n${error.stack || error.message}`;
         const flags = 4; // SUPPRESS_EMBEDS
         fetch(LINKS.Discord.SpeedErrors, {
             method: 'POST',
@@ -85,8 +85,31 @@ const Root: React.FC<RootProps> = ({ store }) => {
         });
     };
 
+    const onErrorHandler = (error: Error, info: ErrorInfo) => {
+        if (import.meta.env.DEV) {
+            return;
+        }
+
+        if (isDeployError(error.message)) {
+            console.log('Deployment error', error, info);
+            return;
+        }
+
+        logError(error, info);
+    };
+
+    const fallbackRender = ({ error, resetErrorBoundary }: FallbackProps) => {
+        if (isDeployError(error.message)) {
+            resetErrorBoundary();
+            window.location.reload();
+            return;
+        }
+
+        return <UnexpectedError theme={ThemeMap[theme]} />;
+    };
+
     return (
-        <ErrorBoundary fallback={<UnexpectedError theme={ThemeMap[theme]} />} onError={logError}>
+        <ErrorBoundary fallbackRender={fallbackRender} onError={onErrorHandler}>
             <QueryClientProvider client={queryConnector.queryClient}>
                 <Provider store={store}>
                     <AuthCoreContextProvider
