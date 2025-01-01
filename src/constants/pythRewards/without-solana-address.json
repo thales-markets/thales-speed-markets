@@ -391,6 +391,15 @@
         ]
     },
     {
-        "round5": []
+        "round5": [
+            { "address": "0x665f3e692985a4cc0db10df56b86eca07067e540" },
+            { "address": "0xe39fc0c58ef554f08b02bdf5b337393d2402f5e3" },
+            { "address": "0x0fd24c65c33afcc11224da603b5ee55ff8bf7c3e" },
+            { "address": "0xbacfb0fbe0d529940d9448c7b9c827af98bd1a56" },
+            { "address": "0x08888ce68d8de3d2616f96270f06b1b6fb3a18f6" },
+            { "address": "0xf6c1f2a362f84c2101a707da4a3f2268dc89dcc6" },
+            { "address": "0xa9671432f8459d5c18f4f4aefddd05d40ae3fb75" },
+            { "address": "0xe282b7766a0ddc2bc70c1ec50029a3ab5909716f" }
+        ]
     }
 ]
