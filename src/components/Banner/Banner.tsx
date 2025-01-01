@@ -21,7 +21,7 @@ const Banner: React.FC = () => {
                                 <Link
                                     target="_blank"
                                     rel="noreferrer"
-                                    href={'https://dune.com/leifu/thales-speed-markets-competition-24'}
+                                    href={'https://dune.com/leifu/thales-speed-markets-competition-25'}
                                 />
                             ),
                         }}
