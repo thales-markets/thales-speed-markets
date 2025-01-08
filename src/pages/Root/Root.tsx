@@ -47,11 +47,10 @@ const rainbowCustomTheme = merge(darkTheme(), {
 
 queryConnector.setQueryClient();
 
-const DISCORD_MESSAGE_MAX_LENGTH = 2000;
-
 const isDeployError = (errorMessage: string) =>
     errorMessage.includes('Failed to fetch dynamically imported module') ||
-    errorMessage.includes('Importing a module script failed');
+    errorMessage.includes('Importing a module script failed') ||
+    errorMessage.includes("'text/html' is not a valid JavaScript MIME type");
 
 const Root: React.FC<RootProps> = ({ store }) => {
     // particle context provider is overriding our i18n configuration and languages, so we need to add our localization after the initialization of particle context
@@ -62,27 +61,17 @@ const Root: React.FC<RootProps> = ({ store }) => {
     PLAUSIBLE.enableAutoPageviews();
 
     const logError = (error: Error, info: ErrorInfo) => {
-        let content = `IsMobile: ${isMobile()}\nError:\n${error.stack || error.message}`;
-        const flags = 4; // SUPPRESS_EMBEDS
-        fetch(LINKS.Discord.SpeedErrors, {
+        const content = `IsMobile: ${isMobile()}\nError:\n${error.stack || error.message}\nErrorInfo:${
+            info.componentStack
+        }`;
+
+        fetch(`${LINKS.API}/discord/log-error`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ content, flags }),
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content }),
         });
 
-        content = `ErrorInfo:${info.componentStack}`;
-        if (content.length > DISCORD_MESSAGE_MAX_LENGTH) {
-            content = content.substring(0, DISCORD_MESSAGE_MAX_LENGTH);
-        }
-        fetch(LINKS.Discord.SpeedErrors, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ content, flags }),
-        });
+        console.error(error, info);
     };
 
     const onErrorHandler = (error: Error, info: ErrorInfo) => {
@@ -91,7 +80,7 @@ const Root: React.FC<RootProps> = ({ store }) => {
         }
 
         if (isDeployError(error.message)) {
-            console.log('Deployment error', error, info);
+            console.error('Deployment error', error, info);
             return;
         }
 
