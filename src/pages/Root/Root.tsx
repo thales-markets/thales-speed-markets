@@ -7,13 +7,16 @@ import UnexpectedError from 'components/UnexpectedError';
 import WalletDisclaimer from 'components/WalletDisclaimer';
 import { PLAUSIBLE } from 'constants/analytics';
 import { LINKS } from 'constants/links';
+import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 import { ThemeMap } from 'constants/ui';
+import { differenceInSeconds } from 'date-fns';
 import { merge } from 'lodash';
 import React, { ErrorInfo } from 'react';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
 import { Provider } from 'react-redux';
 import { Store } from 'redux';
+import { localStore } from 'thales-utils';
 import { isMobile } from 'utils/device';
 import { PARTICLE_STYLE } from 'utils/particleWallet/utils';
 import queryConnector from 'utils/queryConnector';
@@ -53,6 +56,8 @@ const isDeployError = (errorMessage: string) =>
         errorMessage.includes('Importing a module script failed') ||
         errorMessage.includes("'text/html' is not a valid JavaScript MIME type"));
 
+const PREVENT_ERROR_RELOAD_THRESHOLD_SECONDS = 10;
+
 const Root: React.FC<RootProps> = ({ store }) => {
     // particle context provider is overriding our i18n configuration and languages, so we need to add our localization after the initialization of particle context
     // initialization of particle context is happening in Root
@@ -61,7 +66,7 @@ const Root: React.FC<RootProps> = ({ store }) => {
 
     PLAUSIBLE.enableAutoPageviews();
 
-    const logError = (error: Error, info: ErrorInfo) => {
+    const logErrorToDiscord = (error: Error, info: ErrorInfo) => {
         const content = `IsMobile: ${isMobile()}\nError:\n${error.stack || error.message}\nErrorInfo:${
             info.componentStack
         }`;
@@ -85,12 +90,18 @@ const Root: React.FC<RootProps> = ({ store }) => {
             return;
         }
 
-        logError(error, info);
+        logErrorToDiscord(error, info);
     };
 
     const fallbackRender = ({ error, resetErrorBoundary }: FallbackProps) => {
-        if (isDeployError(error.message)) {
+        const reloadedTimeSec = Number(localStore.get(LOCAL_STORAGE_KEYS.ERROR_RELOAD_TIME) || 0);
+        const preventReload = differenceInSeconds(Date.now(), reloadedTimeSec) < PREVENT_ERROR_RELOAD_THRESHOLD_SECONDS;
+
+        if (preventReload) {
+            logErrorToDiscord(error, { componentStack: 'Reload loop prevented!' });
+        } else if (isDeployError(error.stack || error.message)) {
             resetErrorBoundary();
+            localStore.set(LOCAL_STORAGE_KEYS.ERROR_RELOAD_TIME, Date.now());
             window.location.reload();
             return;
         }
