@@ -16,7 +16,7 @@ export const getDefaultCollateral = (networkId: SupportedNetwork) =>
     COLLATERALS[networkId] ? COLLATERALS[networkId][0] : COLLATERALS[NetworkId.OptimismMainnet][0];
 
 export const getCollateral = (networkId: SupportedNetwork, index: number) =>
-    index < COLLATERALS[networkId].length ? COLLATERALS[networkId][index] : getDefaultCollateral(networkId);
+    index < COLLATERALS[networkId]?.length ? COLLATERALS[networkId][index] : getDefaultCollateral(networkId);
 
 export const getCollaterals = (networkId: SupportedNetwork) => COLLATERALS[networkId] || [];
 

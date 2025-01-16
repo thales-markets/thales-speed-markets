@@ -27,4 +27,5 @@ export const LOCAL_STORAGE_KEYS = {
     },
     AVATAR_URL: 'avatar-url',
     SHOW_PYTH_MODAL: 'show-pyth-modal',
+    ERROR_RELOAD_TIME: 'errorReloadTime',
 };
