@@ -37,13 +37,13 @@ import { getIsBiconomy, getSelectedCollateralIndex, setWalletConnectModalVisibil
 import styled from 'styled-components';
 import { FlexDivCentered, FlexDivColumn, FlexDivRow, FlexDivRowCentered, GradientContainer } from 'styles/common';
 import {
-    COLLATERAL_DECIMALS,
-    NetworkId,
     bigNumberFormatter,
     ceilNumberToDecimals,
     coinParser,
+    COLLATERAL_DECIMALS,
     formatCurrencyWithSign,
     localStore,
+    NetworkId,
     truncToDecimals,
 } from 'thales-utils';
 import { AmmChainedSpeedMarketsLimits, AmmSpeedMarketsLimits } from 'types/market';

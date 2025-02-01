@@ -403,6 +403,13 @@
         ]
     },
     {
-        "round6": []
+        "round6": [
+            { "address": "0x665f3e692985a4cc0db10df56b86eca07067e540" },
+            { "address": "0x1e60ae150f10a3a1881d17a9f749595030897ce9" },
+            { "address": "0x6efb15f5b16b49a76fe392dc9e9d50bea5e34669" },
+            { "address": "0xf6c1f2a362f84c2101a707da4a3f2268dc89dcc6" },
+            { "address": "0x341578c8c2c5f8c403b4433eb605a7ccaa655cda" },
+            { "address": "0xde96f38588b96dbb1c1e85010abf86ed744ad2e6" }
+        ]
     }
 ]
