@@ -872,7 +872,7 @@ const PythModal: React.FC<PythModalProps> = ({ onClose }) => {
         ['0x08d0cD29852ADFe0144A7472d8E698D037931c1D', 'HKHf5uXN1HSoNt4Zc8BPEoCBeJ41GPw5ZsJfPs7ABvQu'],
     ];
 
-    // FROM https://dune.com/queries/4116515?round_t6c1ea=6
+    // FROM https://dune.com/queries/4116515?round_t6c1ea=7
     const rewardAddresses = [
         '0xd216eeba0f34feba9ec15e8d087a50e0f8fd10c3',
         '0xf70a78b2aee201bdddb0255c1938cce53ac85b05',
@@ -951,8 +951,8 @@ const PythModal: React.FC<PythModalProps> = ({ onClose }) => {
         '0x4f6a5174c6caa5be5b6596ff0ca1ac273d33f69a',
     ];
 
-    // Generate data for CSV round_6_pyth_rewards.csv and round_6_missing_solana_address.csv
-    const ROUND = 6;
+    // Generate data for CSV round_7_pyth_rewards.csv and round_7_missing_solana_address.csv
+    const ROUND = 7;
     rewardAddresses.forEach((address) => {
         const found = solanaAddresses.find((innerArray) => {
             // if (index === 1 && index2 === 29) {

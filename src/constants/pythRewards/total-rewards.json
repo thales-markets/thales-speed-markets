@@ -974,5 +974,8 @@
             { "address": "0x00ce049d0624a087473a4bd5078ac90ad25175e8", "amount": 2.6 },
             { "address": "0xde96f38588b96dbb1c1e85010abf86ed744ad2e6", "amount": 2.6 }
         ]
+    },
+    {
+        "round7": []
     }
 ]

@@ -411,5 +411,8 @@
             { "address": "0x341578c8c2c5f8c403b4433eb605a7ccaa655cda" },
             { "address": "0xde96f38588b96dbb1c1e85010abf86ed744ad2e6" }
         ]
+    },
+    {
+        "round7": []
     }
 ]
