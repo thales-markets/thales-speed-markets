@@ -250,6 +250,10 @@
     content: '\0038';
 }
 
+.icon--overtime:before {
+    content: '\003B';
+}
+
 .icon--time:before {
     content: '\003C';
 }
@@ -344,10 +348,6 @@
 
 .icon--arrow:before {
     content: '\005C';
-}
-
-.icon--overtime:before {
-    content: '\005E';
 }
 
 .icon--external:before {

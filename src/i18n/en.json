@@ -33,7 +33,7 @@
         "loss": "Loss",
         "admin": "Admin",
         "liquidity": "Liquidity",
-        "support-contact": "Please contact <anchor>Thales support</anchor>",
+        "support-contact": "Please contact <anchor>Speed Markets support</anchor>",
         "try-again": "Try again",
         "bonus": "Bonus",
         "home": "Home",
@@ -65,7 +65,7 @@
         },
         "wallet": {
             "connect-your-wallet": "Login",
-            "disclaimer-info": "By Signing Up to Speed Markets  <terms>Terms of Use</terms> and Privacy Policy you acknowledge that you have read and understand the Thales DAO protocol <disclaimer>disclaimer</disclaimer>.",
+            "disclaimer-info": "By Signing Up to Speed Markets  <terms>Terms of Use</terms> and Privacy Policy you acknowledge that you have read and understand the Overtime DAO protocol <disclaimer>disclaimer</disclaimer>.",
             "connect-wallet-modal-title": "Sign Up to speed markets",
             "connect-with-wallet": "Connect with wallet",
             "or-connect-with": "Or"
@@ -98,7 +98,7 @@
             "medium": "Medium",
             "twitter": "X",
             "docs": "Documentation",
-            "description": "This frontend is hosted decentrally on IPFS (InterPlanetary File System). It serves to visualise the blockchain data and help users interact with the Thales Speed Market contracts that belong to Thales DAO. By doing so it helps users understand the risks of using those smart contracts and what the specific interactions entail. The frontend does not facilitate anything else apart from interacting with those contracts in a visually comprehensive way. In doing so, it is no different than the functionality provided by Etherscan or RPCs (Remote Procedure Calls). The frontend itself does not belong to Thales DAO or any individual. It stores no user data and has no dedicated backend or database. All code is uploaded statically directly to the IPFS. Just as the blockchain does no geo-fencing and no KYC, neither can this frontend do so. However, by interacting with Thales DAO contracts, you commit to have read, understood and accepted Thales DAO’s terms of use and you take full liability in case you have not adhered to those terms."
+            "description": "This frontend is hosted decentrally on IPFS (InterPlanetary File System). It serves to visualise the blockchain data and help users interact with the Speed Market contracts that belong to Overtime DAO. By doing so it helps users understand the risks of using those smart contracts and what the specific interactions entail. The frontend does not facilitate anything else apart from interacting with those contracts in a visually comprehensive way. In doing so, it is no different than the functionality provided by Etherscan or RPCs (Remote Procedure Calls). The frontend itself does not belong to Overtime DAO or any individual. It stores no user data and has no dedicated backend or database. All code is uploaded statically directly to the IPFS. Just as the blockchain does no geo-fencing and no KYC, neither can this frontend do so. However, by interacting with Overtime DAO contracts, you commit to have read, understood and accepted Overtime DAO’s terms of use and you take full liability in case you have not adhered to those terms."
         },
         "pagination": {
             "rows-per-page": "Rows per page:"
@@ -147,7 +147,7 @@
             "about": "About",
             "community": "Community",
             "devs": "For developers",
-            "thales": "Thales protocol",
+            "protocol": "Overtime protocol",
             "dapp": "Open dapp"
         },
         "title": "Trade Faster,<br>Win Bigger<br>and Have Fun With Speed Markets!!",
@@ -164,7 +164,7 @@
             "text-4": "Our <bold>automated permissionless smart contracts</bold> allow you to claim your winnings to your wallet as soon as your position ends. No person can stop you from trading and no person can stop you from winning!",
             "title-5": "Curious about the accuracy of prices?",
             "text-5": "<bold>Pyth Benchmark oracles</bold> provide presteen accurate historical price information accessible by anyone, that helps traders verify trades quickly.<br><br>Pyth price data are pulled every second and are used by 300+ projects on 50+ blockchains with top of the line security and track record!",
-            "text-6": "Within the underlying <bold>Thales Protocol's Speed Markets</bold> architecture, solvency is not just a possibility—it's a guarantee. All your trades are 100% collateralized at all times from the moment you open them.<br><br>This essential assurance fosters a <bold>seamless and secure trading journey</bold> for all participants, instilling confidence and reliability in each transaction.",
+            "text-6": "Within the underlying <bold>Overtime Protocol's Speed Markets</bold> architecture, solvency is not just a possibility—it's a guarantee. All your trades are 100% collateralized at all times from the moment you open them.<br><br>This essential assurance fosters a <bold>seamless and secure trading journey</bold> for all participants, instilling confidence and reliability in each transaction.",
             "title-7": "Easy onboarding",
             "text-7": "No <bold>sign-up is required</bold>, meaning anyone with a Web3 wallet can participate. Additionally, you can enjoy <bold>Speed Markets</bold> with a seamless Social Login onboarding (Google, Twitter, Discord, Github, Apple, etc.), a user-friendly <bold>Deposit/Withdrawal</bold> mechanism, and a cutting edge Credit Card on-ramp aggregator enabled.<br><br>With a full implementation of Account Abstraction, all your transactions are confirmed with a single click without worrying about gas or external wallet interactions! Pay gas with buy-in collateral or even have gas paid by the platform via various gas sponsorship campaigns!"
         },
