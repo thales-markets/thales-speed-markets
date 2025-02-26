@@ -342,7 +342,7 @@ export const CloseIcon = styled.i`
 
 export const Logo = styled.i`
     font-size: 250px;
-    line-height: 200px;
+    line-height: 180px;
     margin-top: -58px;
     margin-bottom: -84px;
     z-index: -1;
