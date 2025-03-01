@@ -69,8 +69,4 @@ export const refetchPythPrice = (priceId: string, publishTime: number) => {
     queryConnector.queryClient.invalidateQueries({ queryKey: QUERY_KEYS.Prices.PythPrices(priceId, publishTime) });
 };
 
-export const refetchSolanaAddress = (walletAddress: string) => {
-    queryConnector.queryClient.invalidateQueries({ queryKey: QUERY_KEYS.User.Solana(walletAddress) });
-};
-
 export default queryConnector;
