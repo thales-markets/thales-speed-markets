@@ -89,8 +89,7 @@
         },
         "header": {
             "get-started": "Get started",
-            "notification": { "tooltip": "You have {{count}} claimable position(s)" },
-            "submit-solana": "Submit Solana address"
+            "notification": { "tooltip": "You have {{count}} claimable position(s)" }
         },
         "footer": {
             "github": "GitHub",
@@ -360,18 +359,8 @@
         "copying-address": "Copying Address",
         "docs": "Docs and Tutorials",
         "withdraw": "Withdraw",
-        "pyth": "Pyth Rewards",
         "trading-profile": "Trading Profile",
         "logout": "Logout",
         "session-valid": "Session valid until"
-    },
-    "pyth-rewards": {
-        "title": "PYTH rewards",
-        "rewards-info": "Input your Solana address to receive the airdrop. Address input will be open until February 28th after which the rewards will be distributed.",
-        "input-label": "Input/change your solana address:",
-        "invalid-solana-address": "Invalid Solana address",
-        "submit": "Submit",
-        "success": "Successfully submitted solana address",
-        "total-received": "Total received:"
     }
 }
