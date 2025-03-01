@@ -413,6 +413,19 @@
         ]
     },
     {
-        "round7": []
+        "round7": [
+            { "address": "0x28760304ef5db524765e5ff46b7b23538098d043" },
+            { "address": "0x665f3e692985a4cc0db10df56b86eca07067e540" },
+            { "address": "0x1e60ae150f10a3a1881d17a9f749595030897ce9" },
+            { "address": "0x274d70d3974b9d8cf5d6a5671c019f7f60f4d16b" },
+            { "address": "0x9d05082b47c7b8af93ac80fcb56a418103073fa9" },
+            { "address": "0x97734ccb83481839061fa7cf74374a702d870f03" },
+            { "address": "0xcdba38ce3e9e35db329308151087903ed77b54e0" },
+            { "address": "0x184f36eb3344584e7bae0d25c9b15f50ecf6c343" },
+            { "address": "0x6377e8cfca79cdb0261c2701110c25422892ce3c" },
+            { "address": "0x2db7076f011505a534ecfa7e45513edba2fb651d" },
+            { "address": "0x10dd04129a8dd0411a8a715fa34e550c7d9b4933" },
+            { "address": "0xbb7a99151b7a13e03b60b4412d40eaf2845a209f" }
+        ]
     }
 ]
