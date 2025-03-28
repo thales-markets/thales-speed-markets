@@ -1,16 +1,15 @@
+import { useConnectModal } from '@rainbow-me/rainbowkit';
+import disclaimer from 'assets/docs/overtime-disclaimer.pdf';
+import privacyPolicy from 'assets/docs/overtime-privacy-policy.pdf';
+import termsOfUse from 'assets/docs/overtime-terms-of-use.pdf';
+import SimpleLoader from 'components/SimpleLoader';
+import Checkbox from 'components/fields/Checkbox';
+import { SUPPORTED_PARTICAL_CONNECTORS } from 'constants/wallet';
 import React, { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import ReactModal from 'react-modal';
 import styled from 'styled-components';
 import { FlexDivCentered, FlexDivRow } from 'styles/common';
-
-import disclaimer from 'assets/docs/thales-protocol-disclaimer.pdf';
-import termsOfUse from 'assets/docs/thales-terms-of-use.pdf';
-
-import { useConnectModal } from '@rainbow-me/rainbowkit';
-import SimpleLoader from 'components/SimpleLoader';
-import Checkbox from 'components/fields/Checkbox';
-import { SUPPORTED_PARTICAL_CONNECTORS } from 'constants/wallet';
 
 import Button from 'components/Button';
 import Modal from 'components/Modal';
@@ -147,6 +146,7 @@ const ConnectWalletModal: React.FC<ConnectWalletModalProps> = ({ isOpen, onClose
                                     i18nKey="common.wallet.disclaimer-info"
                                     components={{
                                         disclaimer: <Link href={disclaimer} target="_blank" rel="noreferrer" />,
+                                        privacyPolicy: <Link href={privacyPolicy} target="_blank" rel="noreferrer" />,
                                         terms: <Link href={termsOfUse} target="_blank" rel="noreferrer" />,
                                     }}
                                 />
