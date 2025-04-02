@@ -5,6 +5,7 @@ import PurpleTriangle from 'assets/images/landing/purple-triangle.png';
 import Rocket from 'assets/images/landing/rocket.png';
 import Zeus from 'assets/images/landing/zeus-hero.webp';
 import SPAAnchor from 'components/SPAAnchor';
+import YouTubeVideo from 'components/YouTubeVideo';
 import { LINKS } from 'constants/links';
 import ROUTES from 'constants/routes';
 import { useState } from 'react';
@@ -41,6 +42,7 @@ import {
     HeaderRow,
     HeaderText,
     Link,
+    Logo,
     LogoText,
     MediumBlurImg,
     MenuHeaderLinks,
@@ -56,7 +58,6 @@ import {
     SecureContentIcon,
     SpedeContentIcon,
     SpeedLogo,
-    ThalesLogo,
     Title,
     TitleDesc,
     TitleWrapper,
@@ -66,7 +67,6 @@ import {
     ZeusImg,
     ZeusImgWrapper,
 } from './styled-components';
-import YouTubeVideo from 'components/YouTubeVideo';
 
 const LandingPage: React.FC = () => {
     const { t } = useTranslation();
@@ -80,7 +80,7 @@ const LandingPage: React.FC = () => {
                     <LogoText>{t('landing.powered-by')}</LogoText>
                 </FlexDivCentered>
                 <FlexDivCentered>
-                    <ThalesLogo className="icon-home icon-home--thales" />
+                    <Logo className="icon icon--overtime" />
                 </FlexDivCentered>
             </a>
         </FlexDivColumn>
@@ -100,7 +100,7 @@ const LandingPage: React.FC = () => {
                     <HeaderText>{t('landing.header.devs')}</HeaderText>
                 </Link>
                 <Link href={LINKS.ThalesIo.Home} target="_blank" rel="noreferrer">
-                    <HeaderText>{t('landing.header.thales')}</HeaderText>
+                    <HeaderText>{t('landing.header.protocol')}</HeaderText>
                 </Link>
             </MenuHeaderLinks>
             <MobileDappButtonWrapper>
@@ -145,7 +145,7 @@ const LandingPage: React.FC = () => {
                             <HeaderText>{t('landing.header.devs')}</HeaderText>
                         </Link>
                         <Link href={LINKS.ThalesIo.Home} target="_blank" rel="noreferrer">
-                            <HeaderText>{t('landing.header.thales')}</HeaderText>
+                            <HeaderText>{t('landing.header.protocol')}</HeaderText>
                         </Link>
                     </HeaderLinks>
                     <SPAAnchor href={ROUTES.Markets.Home}>
