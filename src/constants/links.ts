@@ -7,29 +7,30 @@ export const LINKS = {
         ChainedSpeed: 'https://speedmarkets.xyz/speed-markets?isChained=true',
     },
     ThalesIo: {
-        Home: 'https://thales.io/',
-        Docs: 'https://docs.thales.io/thales-speed-markets/introduction-to-speed-markets',
-        Devs: 'https://docs.thales.io/thales-speed-markets/speed-markets-integration',
+        Home: 'https://overtime.io/',
+        Docs: 'https://docs.overtime.io/introduction-to-speed-markets',
+        Devs: 'https://docs.overtime.io/build-your-own-speed-markets-app',
     },
     GitHub: 'https://github.com/thales-markets/thales-speed-markets',
-    Medium: 'https://thalesmarket.medium.com/',
+    Medium: 'https://medium.com/@OvertimeMarkets.xyz',
     Discord: {
         SpeedMarkets: 'https://discord.com/channels/906484044915687464/1143628798571577475',
         Help: 'https://discord.com/channels/906484044915687464/906723153349316638',
     },
-    Twitter: { Thales: 'https://twitter.com/thales_io', TwitterTweetStatus: 'https://twitter.com/intent/tweet?text=' },
+    Twitter: {
+        Thales: 'https://x.com/overtime_io',
+        TwitterTweetStatus: 'https://twitter.com/intent/tweet?text=',
+    },
     Pyth: {
         Benchmarks: 'https://pyth.network/benchmarks',
         BenchmarksPrice: 'https://benchmarks.pyth.network/v1/updates/price/',
         BenchmarksTradingViewHistory: 'https://benchmarks.pyth.network/v1/shims/tradingview/history',
     },
     Tutorials: {
-        Root: 'https://docs.thales.io/thales-speed-markets/speed-market-deposit-guides',
-        Coinbase: 'https://docs.thales.io/thales-speed-markets/speed-market-deposit-guides/deposit-usdc-from-coinbase',
-        BinanceMobile:
-            'https://docs.thales.io/thales-speed-markets/speed-market-deposit-guides/deposit-from-binance-mobile-app',
-        BinanceWebsite:
-            'https://docs.thales.io/thales-speed-markets/speed-market-deposit-guides/deposit-from-binance-website',
+        Root: 'https://docs.overtime.io/speed-market-deposit-guides',
+        Coinbase: 'https://docs.overtime.io/speed-market-deposit-guides/deposit-usdc-from-coinbase',
+        BinanceMobile: 'https://docs.overtime.io/speed-market-deposit-guides/deposit-from-binance-mobile-app',
+        BinanceWebsite: 'https://docs.overtime.io/speed-market-deposit-guides/deposit-from-binance-website',
     },
     Biconomy: {
         Bundler: 'https://bundler.biconomy.io/api/v2/',

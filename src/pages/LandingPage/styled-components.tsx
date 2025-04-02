@@ -340,16 +340,16 @@ export const CloseIcon = styled.i`
     font-size: 20px;
 `;
 
-export const ThalesLogo = styled.i`
-    font-size: 200px;
-    line-height: 100%;
+export const Logo = styled.i`
+    font-size: 250px;
+    line-height: 180px;
     margin-top: -58px;
     margin-bottom: -84px;
     z-index: -1;
 
     @media screen and (max-width: ${ScreenSizeBreakpoint.EXTRA_SMALL}px) {
-        font-size: 120px;
-        line-height: 100%;
+        font-size: 150px;
+        line-height: 120px;
         margin-top: -38px;
         margin-bottom: -52px;
     }

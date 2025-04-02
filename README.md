@@ -1,2 +1,3 @@
-# thales-speed-markets
-Thales Speed markets dApp
+# speed-markets
+
+Speed Markets dApp
