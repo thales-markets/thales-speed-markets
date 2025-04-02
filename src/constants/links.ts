@@ -18,7 +18,7 @@ export const LINKS = {
         Help: 'https://discord.com/channels/906484044915687464/906723153349316638',
     },
     Twitter: {
-        Thales: 'https://twitter.com/OvertimeMarkets',
+        Thales: 'https://x.com/overtime_io',
         TwitterTweetStatus: 'https://twitter.com/intent/tweet?text=',
     },
     Pyth: {
