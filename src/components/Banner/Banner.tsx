@@ -1,10 +1,11 @@
+import SPAAnchor from 'components/SPAAnchor';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import React, { useState } from 'react';
 import { Trans } from 'react-i18next';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import styled from 'styled-components';
 
-const IS_VISIBLE = false;
+const IS_VISIBLE = true;
 
 const Banner: React.FC = () => {
     const [showBanner, setShowBanner] = useState(IS_VISIBLE);
@@ -13,20 +14,16 @@ const Banner: React.FC = () => {
         showBanner && (
             <Container>
                 <CloseIcon className="icon icon--x-sign" onClick={() => setShowBanner(false)} />
-                <BannerText>
-                    <Trans
-                        i18nKey={'common.banner.header'}
-                        components={{
-                            a: (
-                                <Link
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    href={'https://dune.com/leifu/thales-speed-markets-competition-25'}
-                                />
-                            ),
-                        }}
-                    />
-                </BannerText>
+                <SPAAnchor href={'https://overtime.io'}>
+                    <BannerText>
+                        <Trans
+                            i18nKey={'common.banner.migration-message'}
+                            components={{
+                                a: <Link target="_blank" rel="noreferrer" href={'https://overtime.io'} />,
+                            }}
+                        />
+                    </BannerText>
+                </SPAAnchor>
             </Container>
         )
     );
@@ -49,6 +46,7 @@ const Container = styled.div`
 
 const BannerText = styled.span`
     font-family: ${(props) => props.theme.fontFamily.secondary};
+    color: ${(props) => props.theme.background.primary};
     font-size: 13px;
     font-weight: 800;
     line-height: normal;
