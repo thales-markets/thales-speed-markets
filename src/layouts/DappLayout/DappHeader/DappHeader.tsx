@@ -182,6 +182,9 @@ const Container = styled(FlexDivRowCentered)`
     max-width: ${PAGE_MAX_WIDTH};
     margin: 30px auto 16px auto;
     max-height: 40px;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        margin-top: 16px;
+    }
 `;
 
 const LeftContainer = styled(FlexDivRowCentered)`
