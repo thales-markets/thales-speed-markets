@@ -1,28 +1,32 @@
-import Banner from 'components/Banner';
 import { LINKS } from 'constants/links';
+import useWidgetBotScript from 'hooks/useWidgetBotScript';
 import queryString from 'query-string';
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { PAGE_MAX_WIDTH } from 'styles/common';
 import { isAndroid, isMetamask } from 'thales-utils';
+import { ThemeInterface } from 'types/ui';
 import { isMobile } from 'utils/device';
 import { setReferralWallet } from 'utils/referral';
 import { ScreenSizeBreakpoint } from '../../enums/ui';
 import DappFooter from './DappFooter';
 import DappHeader from './DappHeader';
+import Banner from 'components/Banner';
 
 type DappLayoutProps = {
     children: React.ReactNode;
 };
 
 const DappLayout: React.FC<DappLayoutProps> = ({ children }) => {
+    const theme: ThemeInterface = useTheme();
+
     const rawParams = useLocation();
     const queryParams = queryString.parse(rawParams?.search);
 
-    const [, setPreventDiscordWidgetLoad] = useState(true);
+    const [preventDiscordWidgetLoad, setPreventDiscordWidgetLoad] = useState(true);
 
     useEffect(() => {
         if (queryParams?.referralId) {
@@ -56,7 +60,7 @@ const DappLayout: React.FC<DappLayoutProps> = ({ children }) => {
         checkMetamaskBrowser();
     }, []);
 
-    // useWidgetBotScript(preventDiscordWidgetLoad, theme);
+    useWidgetBotScript(preventDiscordWidgetLoad, theme);
 
     return (
         <Background id="main-content">
