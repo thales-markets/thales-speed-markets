@@ -1,5 +1,5 @@
 export const LINKS = {
-    API: 'https://overtimemarketsv2.xyz',
+    API: 'https://api.overtime.io',
     Markets: {
         Sport: 'https://overtimemarkets.xyz/',
         Thales: 'https://thalesmarket.io/markets',
