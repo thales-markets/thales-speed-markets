@@ -14,12 +14,24 @@ const Banner: React.FC = () => {
         showBanner && (
             <Container>
                 <CloseIcon className="icon icon--x-sign" onClick={() => setShowBanner(false)} />
-                <SPAAnchor href={'https://overtime.io'}>
+                <SPAAnchor
+                    href={
+                        'https://www.overtime.io/dao/thalescouncil.eth/0x3ab392fdc7d84df10cef6fd8e275263c88cdbdcdd15cec4352c92b2dc6518813'
+                    }
+                >
                     <BannerText>
                         <Trans
-                            i18nKey={'common.banner.migration-message'}
+                            i18nKey={'common.banner.elections-text'}
                             components={{
-                                a: <Link target="_blank" rel="noreferrer" href={'https://overtime.io'} />,
+                                a: (
+                                    <Link
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        href={
+                                            'https://www.overtime.io/dao/thalescouncil.eth/0x3ab392fdc7d84df10cef6fd8e275263c88cdbdcdd15cec4352c92b2dc6518813'
+                                        }
+                                    />
+                                ),
                             }}
                         />
                     </BannerText>
