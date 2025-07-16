@@ -5,13 +5,15 @@ import {
     MIN_BUYIN_COLLATERAL_CONVERSION_BUFFER_PERCENTAGE,
     SIDE_TO_POSITION_MAP,
 } from 'constants/market';
-import { ZERO_ADDRESS } from 'constants/network';
+import { TBD_ADDRESS, ZERO_ADDRESS } from 'constants/network';
 import QUERY_KEYS from 'constants/queryKeys';
 import { bigNumberFormatter, coinFormatter } from 'thales-utils';
 import { AmmSpeedMarketsLimits } from 'types/market';
 import { QueryConfig } from 'types/network';
 import { ViemContract } from 'types/viem';
 import { getContractAbi } from 'utils/contracts/abi';
+import multipleCollateral from 'utils/contracts/multipleCollateralContract';
+import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
 import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
 import { getContract, stringToHex } from 'viem';
 
@@ -38,6 +40,18 @@ const useAmmSpeedMarketsLimitsQuery = (
                 maxSkewImpact: 0,
                 safeBoxImpact: 0,
                 whitelistedAddress: false,
+                bonusPerCollateral: {
+                    sUSD: 0,
+                    DAI: 0,
+                    USDCe: 0,
+                    USDbC: 0,
+                    USDC: 0,
+                    USDT: 0,
+                    OP: 0,
+                    WETH: 0,
+                    ETH: 0,
+                    ARB: 0,
+                },
             };
 
             try {
@@ -115,6 +129,20 @@ const useAmmSpeedMarketsLimitsQuery = (
                 ammSpeedMarketsLimits.maxSkewImpact = bigNumberFormatter(ammParams.maxSkewImpact);
                 ammSpeedMarketsLimits.safeBoxImpact = bigNumberFormatter(ammParams.safeBoxImpact);
                 ammSpeedMarketsLimits.whitelistedAddress = ammParams.isAddressWhitelisted;
+
+                const speedMarketsAmmContractLocal = getContract({
+                    abi: getContractAbi(speedMarketsAMMContract, queryConfig.networkId),
+                    address: speedMarketsAMMContract.addresses[queryConfig.networkId],
+                    client: queryConfig.client,
+                }) as ViemContract;
+
+                // TODO: change sUSD with OVER
+                // For now get bonus only for OVER, later it can be moved to Data contract to get for array of collaterals
+                const overAddress = multipleCollateral.sUSD.addresses[queryConfig.networkId];
+                if (overAddress !== TBD_ADDRESS) {
+                    const overBonus = await speedMarketsAmmContractLocal.read.bonusPerCollateral([overAddress]);
+                    ammSpeedMarketsLimits.bonusPerCollateral.sUSD = bigNumberFormatter(overBonus);
+                }
             } catch (e) {
                 console.log(e);
             }

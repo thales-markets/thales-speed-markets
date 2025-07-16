@@ -1,4 +1,5 @@
 import { Positions } from 'enums/market';
+import { Coins } from 'thales-utils';
 
 export type UserPosition = {
     user: string;
@@ -57,6 +58,7 @@ export type AmmSpeedMarketsLimits = {
     maxSkewImpact: number;
     safeBoxImpact: number;
     whitelistedAddress: boolean;
+    bonusPerCollateral: Record<Coins, number>;
 };
 
 export type AmmChainedSpeedMarketsLimits = {
