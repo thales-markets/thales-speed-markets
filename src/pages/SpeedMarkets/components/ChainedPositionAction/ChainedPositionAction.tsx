@@ -51,6 +51,7 @@ import { getContractAbi } from 'utils/contracts/abi';
 import chainedSpeedMarketsAMMContract from 'utils/contracts/chainedSpeedMarketsAMMContract';
 import erc20Contract from 'utils/contracts/collateralContract';
 import multipleCollateral from 'utils/contracts/multipleCollateralContract';
+import speedMarketsAMMResolverContract from 'utils/contracts/speedMarketsAMMResolverContract';
 import { getUserLostAtSideIndex } from 'utils/speedAmm';
 import { delay } from 'utils/timer';
 import { Client, getContract } from 'viem';
@@ -211,9 +212,9 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
         setIsSubmitting(true);
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
 
-        const chainedSpeedMarketsAMMContractWithSigner = getContract({
-            abi: getContractAbi(chainedSpeedMarketsAMMContract, networkId),
-            address: chainedSpeedMarketsAMMContract.addresses[networkId],
+        const speedMarketsAMMResolverContractWithSigner = getContract({
+            abi: getContractAbi(speedMarketsAMMResolverContract, networkId),
+            address: speedMarketsAMMResolverContract.addresses[networkId],
             client: walletClient.data as Client,
         }) as ViemContract;
         try {
@@ -227,12 +228,12 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                     hash = executeBiconomyTransaction(
                         networkId,
                         collateralAddress,
-                        chainedSpeedMarketsAMMContractWithSigner,
-                        'resolveMarketManually',
+                        speedMarketsAMMResolverContractWithSigner,
+                        'resolveChainedMarketManually',
                         [position.market, manualFinalPrices]
                     );
                 } else {
-                    hash = await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarketManually([
+                    hash = await speedMarketsAMMResolverContractWithSigner.write.resolveChainedMarketManually([
                         position.market,
                         manualFinalPrices,
                     ]);
@@ -295,16 +296,16 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                         hash = await executeBiconomyTransaction(
                             networkId,
                             collateralAddress,
-                            chainedSpeedMarketsAMMContractWithSigner,
-                            'resolveMarket',
+                            speedMarketsAMMResolverContractWithSigner,
+                            'resolveChainedMarket',
                             [position.market, priceUpdateDataArray]
                         );
                     } else {
                         hash = await executeBiconomyTransaction(
                             networkId,
                             collateralAddress,
-                            chainedSpeedMarketsAMMContractWithSigner,
-                            'resolveMarketWithOfframp',
+                            speedMarketsAMMResolverContractWithSigner,
+                            'resolveChainedMarketWithOfframp',
                             [position.market, priceUpdateDataArray, collateralAddress, isEth],
                             undefined,
                             isEth
@@ -312,13 +313,13 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                     }
                 } else {
                     hash = isDefaultCollateral
-                        ? await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarket(
+                        ? await speedMarketsAMMResolverContractWithSigner.write.resolveChainedMarket(
                               [position.market, priceUpdateDataArray],
                               {
                                   value: totalUpdateFee,
                               }
                           )
-                        : await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarketWithOfframp(
+                        : await speedMarketsAMMResolverContractWithSigner.write.resolveChainedMarketWithOfframp(
                               [position.market, priceUpdateDataArray, collateralAddress, isEth],
                               { value: totalUpdateFee }
                           );
@@ -399,10 +400,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                       }${isOverview ? '' : ' ' + formatCurrencyWithSign(USD_SIGN, position.payout, 2)}`
                     : isAllowing
                     ? `${t('common.enable-wallet-access.approve-progress')} ${defaultCollateral}...`
-                    : t('common.enable-wallet-access.approve-swap', {
-                          currencyKey: selectedCollateral,
-                          defaultCurrency: defaultCollateral,
-                      })}{' '}
+                    : t('common.enable-wallet-access.approve-swap', { currencyKey: selectedCollateral })}
             </Button>
         );
     };

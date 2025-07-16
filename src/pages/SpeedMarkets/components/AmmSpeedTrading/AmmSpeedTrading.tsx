@@ -866,13 +866,11 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         setBuyinGasFee,
     ]);
 
-    const inputWrapperRef = useRef<HTMLDivElement>(null);
-
     return (
         <Container>
             {!isMobile && getTradingDetails()}
             <FinalizeTrade>
-                <ColumnSpaceBetween ref={inputWrapperRef}>
+                <ColumnSpaceBetween>
                     <QuoteContainer>
                         <QuoteLabel>{t('speed-markets.potential-profit')}</QuoteLabel>
                         <QuoteText>{potentialProfit ? `${truncToDecimals(potentialProfit)}x` : '-'}</QuoteText>

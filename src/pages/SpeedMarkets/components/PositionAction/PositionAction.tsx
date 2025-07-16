@@ -34,6 +34,7 @@ import { getContractAbi } from 'utils/contracts/abi';
 import erc20Contract from 'utils/contracts/collateralContract';
 import multipleCollateral from 'utils/contracts/multipleCollateralContract';
 import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
+import speedMarketsAMMResolverContract from 'utils/contracts/speedMarketsAMMResolverContract';
 import { getCollateral, getCollaterals, getDefaultCollateral } from 'utils/currency';
 import { checkAllowance, getIsMultiCollateralSupported } from 'utils/network';
 import { getPriceConnection, getPriceId, priceParser } from 'utils/pyth';
@@ -231,9 +232,9 @@ const PositionAction: React.FC<PositionActionProps> = ({
 
             const isEth = collateralAddress === ZERO_ADDRESS;
 
-            const speedMarketsAMMContractWithSigner = getContract({
-                abi: getContractAbi(speedMarketsAMMContract, networkId),
-                address: speedMarketsAMMContract.addresses[networkId],
+            const speedMarketsAMMResolverContractWithSigner = getContract({
+                abi: getContractAbi(speedMarketsAMMResolverContract, networkId),
+                address: speedMarketsAMMResolverContract.addresses[networkId],
                 client: walletClient.data as Client,
             }) as ViemContract;
 
@@ -243,14 +244,14 @@ const PositionAction: React.FC<PositionActionProps> = ({
                     ? await executeBiconomyTransaction(
                           networkId,
                           collateralAddress,
-                          speedMarketsAMMContractWithSigner,
+                          speedMarketsAMMResolverContractWithSigner,
                           'resolveMarket',
                           [position.market, priceUpdateData]
                       )
                     : await executeBiconomyTransaction(
                           networkId,
                           collateralAddress,
-                          speedMarketsAMMContractWithSigner,
+                          speedMarketsAMMResolverContractWithSigner,
                           'resolveMarketWithOfframp',
                           [position.market, priceUpdateData, collateralAddress, isEth],
                           undefined,
@@ -258,10 +259,11 @@ const PositionAction: React.FC<PositionActionProps> = ({
                       );
             } else {
                 hash = isDefaultCollateral
-                    ? await speedMarketsAMMContractWithSigner.write.resolveMarket([position.market, priceUpdateData], {
-                          value: updateFee,
-                      })
-                    : await speedMarketsAMMContractWithSigner.write.resolveMarketWithOfframp(
+                    ? await speedMarketsAMMResolverContractWithSigner.write.resolveMarket(
+                          [position.market, priceUpdateData],
+                          { value: updateFee }
+                      )
+                    : await speedMarketsAMMResolverContractWithSigner.write.resolveMarketWithOfframp(
                           [position.market, priceUpdateData, collateralAddress, isEth],
                           { value: updateFee }
                       );
@@ -306,11 +308,12 @@ const PositionAction: React.FC<PositionActionProps> = ({
         setIsSubmitting(true);
         const id = toast.loading(getDefaultToastContent(t('common.progress')), getLoadingToastOptions());
 
-        const speedMarketsAMMContractWithSigner = getContract({
-            abi: getContractAbi(speedMarketsAMMContract, networkId),
-            address: speedMarketsAMMContract.addresses[networkId],
+        const speedMarketsAMMResolverContractWithSigner = getContract({
+            abi: getContractAbi(speedMarketsAMMResolverContract, networkId),
+            address: speedMarketsAMMResolverContract.addresses[networkId],
             client: walletClient.data as Client,
         }) as ViemContract;
+
         try {
             let hash;
             if (isAdmin) {
@@ -318,12 +321,12 @@ const PositionAction: React.FC<PositionActionProps> = ({
                     hash = await executeBiconomyTransaction(
                         networkId,
                         collateralAddress,
-                        speedMarketsAMMContractWithSigner,
+                        speedMarketsAMMResolverContractWithSigner,
                         'resolveMarketManually',
                         [position.market, Number(priceParser(position.finalPrice || 0))]
                     );
                 } else {
-                    hash = await speedMarketsAMMContractWithSigner.write.resolveMarketManually([
+                    hash = await speedMarketsAMMResolverContractWithSigner.write.resolveMarketManually([
                         position.market,
                         Number(priceParser(position.finalPrice || 0)),
                     ]);
@@ -362,12 +365,12 @@ const PositionAction: React.FC<PositionActionProps> = ({
                     hash = await executeBiconomyTransaction(
                         networkId,
                         collateralAddress,
-                        speedMarketsAMMContractWithSigner,
+                        speedMarketsAMMResolverContractWithSigner,
                         'resolveMarket',
                         [position.market, priceUpdateData]
                     );
                 } else {
-                    hash = await speedMarketsAMMContractWithSigner.write.resolveMarket(
+                    hash = await speedMarketsAMMResolverContractWithSigner.write.resolveMarket(
                         [position.market, priceUpdateData],
                         {
                             value: updateFee,
@@ -411,10 +414,7 @@ const PositionAction: React.FC<PositionActionProps> = ({
                   } ${formatCurrencyWithSign(USD_SIGN, position.payout, 2)}`
                 : isAllowing
                 ? `${t('common.enable-wallet-access.approve-progress')} ${defaultCollateral}...`
-                : t('common.enable-wallet-access.approve-swap', {
-                      currencyKey: selectedCollateral,
-                      defaultCurrency: defaultCollateral,
-                  })}{' '}
+                : t('common.enable-wallet-access.approve-swap', { currencyKey: selectedCollateral })}
         </Button>
     );
 

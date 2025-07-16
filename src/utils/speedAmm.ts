@@ -23,9 +23,8 @@ import { waitForTransactionReceipt } from 'viem/actions';
 import { executeBiconomyTransaction } from './biconomy';
 import biconomyConnector from './biconomyWallet';
 import { getContractAbi } from './contracts/abi';
-import chainedSpeedMarketsAMMContract from './contracts/chainedSpeedMarketsAMMContract';
 import erc20Contract from './contracts/collateralContract';
-import speedMarketsAMMContract from './contracts/speedMarketsAMMContract';
+import speedMarketsAMMResolverContract from './contracts/speedMarketsAMMResolverContract';
 
 export const getTransactionForSpeedAMM = async (
     creatorContractWithSigner: any,
@@ -199,9 +198,9 @@ export const resolveAllSpeedPositions = async (
 
     const id = toast.loading(getDefaultToastContent(i18n.t('common.progress')), getLoadingToastOptions());
 
-    const speedMarketsAMMContractWithSigner = getContract({
-        abi: getContractAbi(speedMarketsAMMContract, queryConfig.networkId),
-        address: speedMarketsAMMContract.addresses[queryConfig.networkId],
+    const speedMarketsAMMResolverContractWithSigner = getContract({
+        abi: getContractAbi(speedMarketsAMMResolverContract, queryConfig.networkId),
+        address: speedMarketsAMMResolverContract.addresses[queryConfig.networkId],
         client: queryConfig.client,
     }) as ViemContract;
 
@@ -251,24 +250,24 @@ export const resolveAllSpeedPositions = async (
                     ? await executeBiconomyTransaction(
                           queryConfig.networkId,
                           collateralAddress,
-                          speedMarketsAMMContractWithSigner,
+                          speedMarketsAMMResolverContractWithSigner,
                           'resolveMarketManuallyBatch',
                           [marketsToResolve, manualFinalPrices]
                       )
                     : await executeBiconomyTransaction(
                           queryConfig.networkId,
                           collateralAddress,
-                          speedMarketsAMMContractWithSigner,
+                          speedMarketsAMMResolverContractWithSigner,
                           'resolveMarketsBatch',
                           [marketsToResolve, priceUpdateDataArray]
                       );
             } else {
                 hash = isAdmin
-                    ? await speedMarketsAMMContractWithSigner.write.resolveMarketManuallyBatch([
+                    ? await speedMarketsAMMResolverContractWithSigner.write.resolveMarketManuallyBatch([
                           marketsToResolve,
                           manualFinalPrices,
                       ])
-                    : await speedMarketsAMMContractWithSigner.write.resolveMarketsBatch(
+                    : await speedMarketsAMMResolverContractWithSigner.write.resolveMarketsBatch(
                           [marketsToResolve, priceUpdateDataArray],
                           {
                               value: totalUpdateFee,
@@ -328,9 +327,9 @@ export const resolveAllChainedMarkets = async (
 
     const id = toast.loading(getDefaultToastContent(i18n.t('common.progress')), getLoadingToastOptions());
 
-    const chainedSpeedMarketsAMMContractWithSigner = getContract({
-        abi: chainedSpeedMarketsAMMContract.abi,
-        address: chainedSpeedMarketsAMMContract.addresses[queryConfig.networkId],
+    const speedMarketsAMMResolverContractWithSigner = getContract({
+        abi: speedMarketsAMMResolverContract.abi,
+        address: speedMarketsAMMResolverContract.addresses[queryConfig.networkId],
         client: queryConfig.client,
     }) as ViemContract;
 
@@ -402,24 +401,24 @@ export const resolveAllChainedMarkets = async (
                     ? await executeBiconomyTransaction(
                           queryConfig.networkId,
                           collateralAddress,
-                          chainedSpeedMarketsAMMContractWithSigner,
-                          'resolveMarketManuallyBatch',
+                          speedMarketsAMMResolverContractWithSigner,
+                          'resolveChainedMarketManuallyBatch',
                           [marketsToResolve, manualFinalPrices]
                       )
                     : await executeBiconomyTransaction(
                           queryConfig.networkId,
                           collateralAddress,
-                          chainedSpeedMarketsAMMContractWithSigner,
-                          'resolveMarketsBatch',
+                          speedMarketsAMMResolverContractWithSigner,
+                          'resolveChainedMarketsBatch',
                           [marketsToResolve, priceUpdateDataArray]
                       );
             } else {
                 hash = isAdmin
-                    ? await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarketManuallyBatch([
+                    ? await speedMarketsAMMResolverContractWithSigner.write.resolveChainedMarketManuallyBatch([
                           marketsToResolve,
                           manualFinalPrices,
                       ])
-                    : await chainedSpeedMarketsAMMContractWithSigner.write.resolveMarketsBatch(
+                    : await speedMarketsAMMResolverContractWithSigner.write.resolveChainedMarketsBatch(
                           [marketsToResolve, priceUpdateDataArray],
                           { value: totalUpdateFee }
                       );
