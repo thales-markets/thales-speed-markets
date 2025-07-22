@@ -1,6 +1,7 @@
 import CollateralSelector from 'components/CollateralSelector';
 import NumericInput from 'components/fields/NumericInput';
 import { USD_SIGN } from 'constants/currency';
+import { BICONOMY_MAX_FEE_PERCENTAGE } from 'constants/market';
 import { Positions } from 'enums/market';
 import useDebouncedEffect from 'hooks/useDebouncedEffect';
 import { t } from 'i18next';
@@ -42,7 +43,6 @@ import {
     HeaderText,
     WalletIcon,
 } from '../SelectPosition/styled-components';
-import { BICONOMY_MAX_FEE_PERCENTAGE } from 'constants/market';
 
 type SelectBuyinProps = {
     onChange: React.Dispatch<number>;
@@ -58,6 +58,8 @@ type SelectBuyinProps = {
 };
 
 const roundMaxBuyin = (maxBuyin: number) => Math.floor(maxBuyin / 10) * 10;
+
+const BUYIN_AMOUNTS = [3, 10, 50, 100, 500];
 
 const SelectBuyin: React.FC<SelectBuyinProps> = ({
     onChange,
@@ -200,7 +202,7 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
             fourth = third + step;
         }
 
-        return [first, second, third, fourth, fifth];
+        return BUYIN_AMOUNTS.length > 0 ? BUYIN_AMOUNTS : [first, second, third, fourth, fifth];
     }, [
         isChained,
         chainedQuote,
