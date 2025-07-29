@@ -124,12 +124,7 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
         selectedCollateral,
     ]);
 
-    const exchangeRatesMarketDataQuery = useExchangeRatesQuery(
-        { networkId, client },
-        {
-            enabled: isAppReady,
-        }
-    );
+    const exchangeRatesMarketDataQuery = useExchangeRatesQuery({ networkId, client }, { enabled: isAppReady });
     const exchangeRates: Rates | null =
         exchangeRatesMarketDataQuery.isSuccess && exchangeRatesMarketDataQuery.data
             ? exchangeRatesMarketDataQuery.data

@@ -16,9 +16,11 @@ import { getIsMobile } from 'redux/modules/ui';
 import { getIsBiconomy } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDivCentered, FlexDivStart } from 'styles/common';
+import { SupportedNetwork } from 'types/network';
 import { UserHistoryPosition } from 'types/profile';
 import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
+import { getCollateralAddress } from 'utils/currency';
 import { mapUserPositionToHistory } from 'utils/position';
 import { getPriceId } from 'utils/pyth';
 import { isUserWinner } from 'utils/speedAmm';
@@ -53,9 +55,7 @@ const UserHistoricalPositions: React.FC<UserHistoricalPositionsProps> = ({
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
         { networkId, client },
         searchAddress ? searchAddress : isBiconomy ? biconomyConnector.address : walletAddress || '',
-        {
-            enabled: isAppReady && isConnected,
-        }
+        { enabled: isAppReady && isConnected }
     );
 
     const userOpenSpeedMarketsData = useMemo(
@@ -100,9 +100,7 @@ const UserHistoricalPositions: React.FC<UserHistoricalPositionsProps> = ({
     const userResolvedSpeedMarketsDataQuery = useUserResolvedSpeedMarketsQuery(
         { networkId, client },
         searchAddress ? searchAddress : isBiconomy ? biconomyConnector.address : walletAddress || '',
-        {
-            enabled: isAppReady && isConnected,
-        }
+        { enabled: isAppReady && isConnected }
     );
 
     const userResolvedSpeedMarketsData = useMemo(
@@ -122,9 +120,7 @@ const UserHistoricalPositions: React.FC<UserHistoricalPositionsProps> = ({
     const userChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
         { networkId, client },
         searchAddress ? searchAddress : isBiconomy ? biconomyConnector.address : walletAddress || '',
-        {
-            enabled: isAppReady && isConnected,
-        }
+        { enabled: isAppReady && isConnected }
     );
 
     const userOpenChainedSpeedMarketsData = useMemo(
@@ -253,7 +249,7 @@ const UserHistoricalPositions: React.FC<UserHistoricalPositionsProps> = ({
 
     const hasSomePositions = allSingle.length > 0 || allChained.length > 0;
 
-    const positions = noPositions ? dummyPositions : sortedUserMarketsData;
+    const positions = noPositions ? getDummyPositions(networkId) : sortedUserMarketsData;
 
     // Update number of positions
     useEffect(() => {
@@ -308,7 +304,7 @@ const UserHistoricalPositions: React.FC<UserHistoricalPositionsProps> = ({
     );
 };
 
-const dummyPositions: UserHistoryPosition[] = [
+const getDummyPositions = (networkId: SupportedNetwork): UserHistoryPosition[] => [
     {
         user: '',
         market: '0x1',
@@ -320,6 +316,8 @@ const dummyPositions: UserHistoryPosition[] = [
         paid: 100,
         payout: 15,
         payoutMultiplier: 0,
+        collateralAddress: getCollateralAddress(networkId, 0),
+        isDefaultCollateral: true,
         currentPrice: 0,
         finalPrices: [3000],
         canResolve: false,
@@ -341,6 +339,8 @@ const dummyPositions: UserHistoryPosition[] = [
         paid: 200,
         payout: 10,
         payoutMultiplier: 0,
+        collateralAddress: getCollateralAddress(networkId, 0),
+        isDefaultCollateral: true,
         currentPrice: 0,
         finalPrices: [3000],
         canResolve: false,

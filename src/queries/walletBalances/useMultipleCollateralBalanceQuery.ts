@@ -2,6 +2,7 @@ import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { getBalance } from '@wagmi/core';
 import { TBD_ADDRESS } from 'constants/network';
 import QUERY_KEYS from 'constants/queryKeys';
+import { BALANCE_THRESHOLD } from 'constants/wallet';
 import { wagmiConfig } from 'pages/Root/wagmiConfig';
 import { COLLATERAL_DECIMALS, bigNumberFormatter } from 'thales-utils';
 import { CollateralsBalance } from 'types/collateral';
@@ -19,7 +20,6 @@ const useMultipleCollateralBalanceQuery = (
         queryKey: QUERY_KEYS.WalletBalances.MultipleCollateral(walletAddress, queryConfig.networkId),
         queryFn: async () => {
             let collaterasBalance: CollateralsBalance = {
-                sUSD: 0,
                 DAI: 0,
                 USDCe: 0,
                 USDbC: 0,
@@ -29,14 +29,14 @@ const useMultipleCollateralBalanceQuery = (
                 ETH: 0,
                 ARB: 0,
                 USDC: 0,
+                THALES: 0,
+                sTHALES: 0,
+                OVER: 0,
+                cbBTC: 0,
+                wBTC: 0,
             };
             try {
                 const multipleCollateralObject = {
-                    sUSD: getContract({
-                        abi: multipleCollateral.sUSD.abi,
-                        address: multipleCollateral.sUSD.addresses[queryConfig.networkId],
-                        client: queryConfig.client,
-                    }) as ViemContract,
                     DAI: getContract({
                         abi: multipleCollateral.DAI.abi,
                         address: multipleCollateral.DAI.addresses[queryConfig.networkId],
@@ -82,6 +82,21 @@ const useMultipleCollateralBalanceQuery = (
                         address: multipleCollateral.ARB.addresses[queryConfig.networkId],
                         client: queryConfig.client,
                     }) as ViemContract,
+                    OVER: getContract({
+                        abi: multipleCollateral.OVER.abi,
+                        address: multipleCollateral.OVER.addresses[queryConfig.networkId],
+                        client: queryConfig.client,
+                    }) as ViemContract,
+                    cbBTC: getContract({
+                        abi: multipleCollateral.cbBTC.abi,
+                        address: multipleCollateral.cbBTC.addresses[queryConfig.networkId],
+                        client: queryConfig.client,
+                    }) as ViemContract,
+                    wBTC: getContract({
+                        abi: multipleCollateral.wBTC.abi,
+                        address: multipleCollateral.wBTC.addresses[queryConfig.networkId],
+                        client: queryConfig.client,
+                    }) as ViemContract,
                 };
 
                 if (!walletAddress || !queryConfig.networkId) {
@@ -89,7 +104,6 @@ const useMultipleCollateralBalanceQuery = (
                 }
 
                 const [
-                    sUSDBalance,
                     DAIBalance,
                     USDCBalance,
                     USDCeBalance,
@@ -99,10 +113,10 @@ const useMultipleCollateralBalanceQuery = (
                     WETHBalance,
                     ETHBalance,
                     ARBBalance,
+                    OVERBalance,
+                    cbBTCBalance,
+                    wBTCBalance,
                 ] = await Promise.all([
-                    multipleCollateralObject.sUSD.address !== TBD_ADDRESS
-                        ? multipleCollateralObject.sUSD.read.balanceOf([walletAddress])
-                        : 0,
                     multipleCollateralObject.DAI.address !== TBD_ADDRESS
                         ? multipleCollateralObject.DAI.read.balanceOf([walletAddress])
                         : 0,
@@ -128,9 +142,17 @@ const useMultipleCollateralBalanceQuery = (
                     multipleCollateralObject.ARB.address !== TBD_ADDRESS
                         ? multipleCollateralObject.ARB.read.balanceOf([walletAddress])
                         : 0,
+                    multipleCollateralObject?.OVER && multipleCollateralObject?.OVER?.address !== TBD_ADDRESS
+                        ? multipleCollateralObject.OVER.read.balanceOf([walletAddress])
+                        : 0,
+                    multipleCollateralObject?.cbBTC && multipleCollateralObject?.cbBTC?.address !== TBD_ADDRESS
+                        ? multipleCollateralObject.cbBTC.read.balanceOf([walletAddress])
+                        : 0,
+                    multipleCollateralObject?.wBTC && multipleCollateralObject?.wBTC?.address !== TBD_ADDRESS
+                        ? multipleCollateralObject.wBTC.read.balanceOf([walletAddress])
+                        : 0,
                 ]);
                 collaterasBalance = {
-                    sUSD: sUSDBalance ? bigNumberFormatter(sUSDBalance, COLLATERAL_DECIMALS.sUSD) : 0,
                     DAI: DAIBalance ? bigNumberFormatter(DAIBalance, COLLATERAL_DECIMALS.DAI) : 0,
                     USDC: USDCBalance ? bigNumberFormatter(USDCBalance, COLLATERAL_DECIMALS.USDC) : 0,
                     USDCe: USDCeBalance ? bigNumberFormatter(USDCeBalance, COLLATERAL_DECIMALS.USDCe) : 0,
@@ -140,6 +162,15 @@ const useMultipleCollateralBalanceQuery = (
                     WETH: WETHBalance ? bigNumberFormatter(WETHBalance, COLLATERAL_DECIMALS.WETH) : 0,
                     ETH: ETHBalance ? bigNumberFormatter(ETHBalance.value, COLLATERAL_DECIMALS.ETH) : 0,
                     ARB: ARBBalance ? bigNumberFormatter(ARBBalance, COLLATERAL_DECIMALS.ARB) : 0,
+                    THALES: 0,
+                    sTHALES: 0,
+                    OVER: OVERBalance
+                        ? bigNumberFormatter(OVERBalance, COLLATERAL_DECIMALS.OVER) < BALANCE_THRESHOLD
+                            ? 0
+                            : bigNumberFormatter(OVERBalance, COLLATERAL_DECIMALS.OVER)
+                        : 0,
+                    cbBTC: cbBTCBalance ? bigNumberFormatter(cbBTCBalance, COLLATERAL_DECIMALS.cbBTC) : 0,
+                    wBTC: wBTCBalance ? bigNumberFormatter(wBTCBalance, COLLATERAL_DECIMALS.cbBTC) : 0,
                 };
             } catch (e) {
                 console.log('e ', e);

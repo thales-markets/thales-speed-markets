@@ -217,6 +217,7 @@
             "claim-all": "Claim all wins",
             "claim-all-progress": "Claiming all wins",
             "claim-all-in": "Claim all in",
+            "claim-all-in-progress": "Claiming all in",
             "claim-all-win-in": "Claim all winnings in",
             "confirmation-message": "Market(s) successfully claimed",
             "waiting-price": "Waiting for price",
@@ -236,7 +237,8 @@
             "bonus-unknown": "This direction offers bonus return. Exact bonus depends on selected Duration.",
             "bonus-info": "Bonus return for {{bonusDirection}} is +{{bonusPerc}}",
             "slippage": "Your trade will revert if the live price changes more than this percentage from your chosen Strike Price during trade execution.",
-            "eth-to-weth": "Your ETH will be wrapped to WETH before executing the trade."
+            "eth-to-weth": "Your ETH will be wrapped to WETH before executing the trade.",
+            "claim-all-except-over": "Claim all markets except those with $OVER collateral"
         },
         "overview": {
             "title": "Overview",

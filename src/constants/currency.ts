@@ -6,19 +6,21 @@ const SYNTHS = ['sBTC', 'sETH', 'sBNB', 'sUSD'];
 export const SYNTHS_MAP = keyBy(SYNTHS);
 
 const CRYPTO_CURRENCY = [
-    'BTC',
-    'ETH',
-    'ARB',
-    'OP',
-    'BNB',
     'DAI',
     'USDCe',
-    'USDbC',
     'USDC',
     'USDT',
-    'THALES',
-    'ETC',
+    'OP',
     'WETH',
+    'ETH',
+    'ARB',
+    'USDbC',
+    'THALES',
+    'sTHALES',
+    'OVER',
+    'cbBTC',
+    'BTC',
+    'wBTC',
 ];
 export const CRYPTO_CURRENCY_MAP = keyBy(CRYPTO_CURRENCY);
 
@@ -60,6 +62,7 @@ export const currencyKeyToNameMap = {
 export const COLLATERALS: Record<SupportedNetwork, Coins[]> = {
     [NetworkId.OptimismMainnet]: [
         CRYPTO_CURRENCY_MAP.USDC as Coins,
+        // CRYPTO_CURRENCY_MAP.OVER as Coins,
         CRYPTO_CURRENCY_MAP.USDCe as Coins,
         CRYPTO_CURRENCY_MAP.DAI as Coins,
         CRYPTO_CURRENCY_MAP.USDT as Coins,
@@ -89,5 +92,17 @@ export const COLLATERALS: Record<SupportedNetwork, Coins[]> = {
         // CRYPTO_CURRENCY_MAP.cbBTC as Coins,
     ],
     [NetworkId.PolygonMainnet]: [CRYPTO_CURRENCY_MAP.USDCe as Coins],
-    [NetworkId.OptimismSepolia]: [CRYPTO_CURRENCY_MAP.USDC as Coins, CRYPTO_CURRENCY_MAP.DAI as Coins],
+    [NetworkId.OptimismSepolia]: [
+        CRYPTO_CURRENCY_MAP.USDC as Coins,
+        CRYPTO_CURRENCY_MAP.OVER as Coins,
+        CRYPTO_CURRENCY_MAP.DAI as Coins,
+    ],
+};
+
+export const OFFRAMP_UNSUPPORTED_COLLATERALS: Record<SupportedNetwork, Coins[]> = {
+    [NetworkId.OptimismMainnet]: [CRYPTO_CURRENCY_MAP.OVER as Coins],
+    [NetworkId.Arbitrum]: [CRYPTO_CURRENCY_MAP.OVER as Coins, CRYPTO_CURRENCY_MAP.wBTC as Coins],
+    [NetworkId.Base]: [CRYPTO_CURRENCY_MAP.OVER as Coins, CRYPTO_CURRENCY_MAP.cbBTC as Coins],
+    [NetworkId.PolygonMainnet]: [],
+    [NetworkId.OptimismSepolia]: [CRYPTO_CURRENCY_MAP.OVER as Coins],
 };

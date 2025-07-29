@@ -6,12 +6,14 @@ import 'styles/tooltip.css';
 
 type TooltipProps = {
     overlay: any;
-    children?: React.ReactNode;
+    children?: React.ReactElement;
     customIconStyling?: CSSProperties;
 };
 
 const Tooltip: React.FC<TooltipProps> = ({ overlay, children, customIconStyling }) => {
-    return (
+    return !overlay ? (
+        <>{children}</>
+    ) : (
         <ReactTooltip
             overlay={
                 <Container>
@@ -20,7 +22,7 @@ const Tooltip: React.FC<TooltipProps> = ({ overlay, children, customIconStyling 
             }
             placement="top"
         >
-            {children ? (children as any) : <InfoIcon style={customIconStyling} />}
+            {children ? children : <InfoIcon style={customIconStyling} />}
         </ReactTooltip>
     );
 };

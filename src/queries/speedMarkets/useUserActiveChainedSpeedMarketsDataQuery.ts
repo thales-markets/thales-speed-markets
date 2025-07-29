@@ -3,13 +3,14 @@ import { SIDE_TO_POSITION_MAP } from 'constants/market';
 import { PYTH_CURRENCY_DECIMALS, SUPPORTED_ASSETS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { secondsToMilliseconds } from 'date-fns';
-import { bigNumberFormatter, coinFormatter, parseBytes32String, roundNumberToDecimals } from 'thales-utils';
+import { bigNumberFormatter, coinFormatter, parseBytes32String } from 'thales-utils';
 import { UserChainedPosition } from 'types/market';
 import { QueryConfig } from 'types/network';
 import { ViemContract } from 'types/viem';
 import { getContractAbi } from 'utils/contracts/abi';
 import chainedSpeedMarketsAMMContract from 'utils/contracts/chainedSpeedMarketsAMMContract';
 import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
+import { getCollateralByAddress } from 'utils/currency';
 import { getCurrentPrices, getPriceConnection, getPriceId } from 'utils/pyth';
 import { getContract } from 'viem';
 
@@ -81,12 +82,8 @@ const useUserActiveChainedSpeedMarketsDataQuery = (
                         );
                     const strikePrices = Array(sides.length).fill(0);
                     strikePrices[0] = bigNumberFormatter(marketData.initialStrikePrice, PYTH_CURRENCY_DECIMALS);
-                    const buyinAmount = coinFormatter(marketData.buyinAmount, queryConfig.networkId);
                     const fee = bigNumberFormatter(marketData.safeBoxImpact);
-                    const payout = roundNumberToDecimals(
-                        buyinAmount * bigNumberFormatter(marketData.payoutMultiplier) ** sides.length,
-                        8
-                    );
+                    const collateral = getCollateralByAddress(marketData.collateral, queryConfig.networkId);
 
                     const userData: UserChainedPosition = {
                         user: marketData.user,
@@ -96,9 +93,11 @@ const useUserActiveChainedSpeedMarketsDataQuery = (
                         strikePrices,
                         strikeTimes,
                         maturityDate,
-                        paid: buyinAmount * (1 + fee),
-                        payout: payout,
+                        paid: coinFormatter(marketData.buyinAmount, queryConfig.networkId, collateral) * (1 + fee),
+                        payout: coinFormatter(marketData.payout, queryConfig.networkId, collateral),
                         payoutMultiplier: bigNumberFormatter(marketData.payoutMultiplier),
+                        collateralAddress: marketData.collateral,
+                        isDefaultCollateral: marketData.isDefaultCollateral,
                         currentPrice: prices[currencyKey],
                         finalPrices: Array(sides.length).fill(0),
                         canResolve: false,

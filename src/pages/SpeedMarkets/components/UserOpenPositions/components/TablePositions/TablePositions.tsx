@@ -6,13 +6,14 @@ import { t } from 'i18next';
 import PositionAction from 'pages/SpeedMarkets/components/PositionAction';
 import React from 'react';
 import styled from 'styled-components';
-import { formatCurrencyWithSign, localStore } from 'thales-utils';
+import { formatCurrencyWithKey, formatCurrencyWithSign, localStore } from 'thales-utils';
 import { UserPosition } from 'types/market';
+import { getCollateralByAddress, isOverCurrency } from 'utils/currency';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
+import { tableSortByStatus } from 'utils/position';
 import MarketPrice from '../../../MarketPrice';
 import { Icon } from '../../../SelectPosition/styled-components';
 import SharePosition from '../../../SharePosition';
-import { tableSortByStatus } from 'utils/position';
 
 type TablePositionsProps = {
     data: UserPosition[];
@@ -78,21 +79,39 @@ const TablePositions: React.FC<TablePositionsProps> = ({ data }) => {
         {
             header: <Header>{t('speed-markets.user-positions.paid')}</Header>,
             accessorKey: 'paid',
-            cell: (cellProps: any) => (
-                <Wrapper>
-                    <Value>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())}</Value>
-                </Wrapper>
-            ),
+            cell: (cellProps: any) => {
+                const position = cellProps.row.original;
+                const collateralByAddress = getCollateralByAddress(position.collateralAddress, position.networkId);
+                const collateral = `${isOverCurrency(collateralByAddress) ? '$' : ''}${collateralByAddress}`;
+                return (
+                    <Wrapper>
+                        <Value>
+                            {position.isDefaultCollateral
+                                ? formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())
+                                : formatCurrencyWithKey(collateral, cellProps.cell.getValue())}
+                        </Value>
+                    </Wrapper>
+                );
+            },
             size: 100,
         },
         {
             header: <Header>{t('speed-markets.user-positions.payout')}</Header>,
             accessorKey: 'payout',
-            cell: (cellProps: any) => (
-                <Wrapper>
-                    <Value>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())}</Value>
-                </Wrapper>
-            ),
+            cell: (cellProps: any) => {
+                const position = cellProps.row.original;
+                const collateralByAddress = getCollateralByAddress(position.collateralAddress, position.networkId);
+                const collateral = `${isOverCurrency(collateralByAddress) ? '$' : ''}${collateralByAddress}`;
+                return (
+                    <Wrapper>
+                        <Value>
+                            {position.isDefaultCollateral
+                                ? formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())
+                                : formatCurrencyWithKey(collateral, cellProps.cell.getValue())}
+                        </Value>
+                    </Wrapper>
+                );
+            },
             size: 120,
         },
         {

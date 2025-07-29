@@ -1,12 +1,13 @@
 import Button from 'components/Button';
 import CollateralSelector from 'components/CollateralSelector';
 import SimpleLoader from 'components/SimpleLoader/SimpleLoader';
-import { USD_SIGN } from 'constants/currency';
+import Tooltip from 'components/Tooltip';
+import { CRYPTO_CURRENCY_MAP, USD_SIGN } from 'constants/currency';
 import { millisecondsToSeconds } from 'date-fns';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import CardPositions from 'pages/SpeedMarkets/components/CardPositions';
 import { CollateralSelectorContainer } from 'pages/SpeedMarkets/components/PositionAction/PositionAction';
-import { dummyPositions } from 'pages/SpeedMarkets/components/UserOpenPositions/UserOpenPositions';
+import { getDummyPositions } from 'pages/SpeedMarkets/components/UserOpenPositions/UserOpenPositions';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
 import useUserActiveChainedSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveChainedSpeedMarketsDataQuery';
 import useUserActiveSpeedMarketsDataQuery from 'queries/speedMarkets/useUserActiveSpeedMarketsDataQuery';
@@ -15,20 +16,18 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
-import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
+import { getIsBiconomy } from 'redux/modules/wallet';
 import styled from 'styled-components';
-import { FlexDiv, FlexDivCentered, FlexDivColumn, FlexDivEnd, FlexDivStart } from 'styles/common';
-import { formatCurrencyWithSign } from 'thales-utils';
+import { FlexDiv, FlexDivCentered, FlexDivColumn, FlexDivRow, FlexDivStart } from 'styles/common';
+import { Coins, formatCurrencyWithSign } from 'thales-utils';
 import { UserChainedPosition, UserPosition } from 'types/market';
-import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
-import erc20Contract from 'utils/contracts/collateralContract';
-import multipleCollateral from 'utils/contracts/multipleCollateralContract';
-import { getCollateral, getDefaultCollateral } from 'utils/currency';
+import { getDefaultCollateral } from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
 import { sortSpeedMarkets } from 'utils/position';
 import { getPriceId } from 'utils/pyth';
 import { isUserWinner, resolveAllChainedMarkets, resolveAllSpeedPositions } from 'utils/speedAmm';
+import { Address } from 'viem';
 import { useAccount, useChainId, useClient, useWalletClient } from 'wagmi';
 import TableActivePositions from './components';
 
@@ -52,16 +51,11 @@ const UserActivePositions: React.FC<UserActivePositionsProps> = ({
     const walletClient = useWalletClient();
     const { isConnected, address: walletAddress } = useAccount();
 
-    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
-    const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const isMobile = useSelector((state: RootState) => getIsMobile(state));
+    const isBiconomy = useSelector(getIsBiconomy);
+    const isAppReady = useSelector(getIsAppReady);
+    const isMobile = useSelector(getIsMobile);
 
     const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
-    const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
-    const selectedCollateral = useMemo(() => getCollateral(networkId, selectedCollateralIndex), [
-        networkId,
-        selectedCollateralIndex,
-    ]);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isFilterSingleSelected, setIsFilterSingleSelected] = useState(false);
@@ -71,9 +65,7 @@ const UserActivePositions: React.FC<UserActivePositionsProps> = ({
     const userActiveSpeedMarketsDataQuery = useUserActiveSpeedMarketsDataQuery(
         { networkId, client },
         searchAddress ? searchAddress : isBiconomy ? biconomyConnector.address : walletAddress || '',
-        {
-            enabled: isAppReady && isConnected,
-        }
+        { enabled: isAppReady && isConnected }
     );
 
     const userOpenSpeedMarketsData = useMemo(
@@ -126,9 +118,7 @@ const UserActivePositions: React.FC<UserActivePositionsProps> = ({
     const userChainedSpeedMarketsDataQuery = useUserActiveChainedSpeedMarketsDataQuery(
         { networkId, client },
         searchAddress ? searchAddress : isBiconomy ? biconomyConnector.address : walletAddress || '',
-        {
-            enabled: isAppReady && isConnected,
-        }
+        { enabled: isAppReady && isConnected }
     );
 
     const userOpenChainedSpeedMarketsData = useMemo(
@@ -239,23 +229,54 @@ const UserActivePositions: React.FC<UserActivePositionsProps> = ({
 
     const hasSomePositions = allSingle.length > 0 || allChained.length > 0;
 
-    const positions = noPositions ? dummyPositions : sortedUserMarketsData;
+    const positions = noPositions ? getDummyPositions(networkId) : sortedUserMarketsData;
 
-    const claimableSpeedPositions = allUserActiveSingleFiltered.filter((p) => p.isClaimable);
+    // SINGLE
+    const claimableUserSinglePositions = allUserActiveSingleFiltered.filter((p) => p.isClaimable);
+    const isClaimableSpeedPositionsInSameCollateral =
+        claimableUserSinglePositions.every((marketData) => marketData.isDefaultCollateral) ||
+        claimableUserSinglePositions.every((marketData) => !marketData.isDefaultCollateral);
+
+    const claimableSpeedPositions = isClaimableSpeedPositionsInSameCollateral
+        ? claimableUserSinglePositions
+        : claimableUserSinglePositions.filter((marketData) => marketData.isDefaultCollateral);
     const claimableSpeedPositionsSum = claimableSpeedPositions.reduce((acc, pos) => acc + pos.payout, 0);
 
-    const claimableChainedPositions = allUserActiveChainedFiltered.filter((p) => p.isClaimable);
+    const isSpeedClaimInOver =
+        isFilterSingleSelected &&
+        isClaimableSpeedPositionsInSameCollateral &&
+        !!claimableSpeedPositions.length &&
+        !claimableSpeedPositions[0].isDefaultCollateral;
+
+    // CHAINED
+    const claimableUserChainedPositions = allUserActiveChainedFiltered.filter((p) => p.isClaimable);
+    const isClaimableChainedPositionsInSameCollateral =
+        claimableUserChainedPositions.every((marketData) => marketData.isDefaultCollateral) ||
+        claimableUserChainedPositions.every((marketData) => !marketData.isDefaultCollateral);
+
+    const claimableChainedPositions = isClaimableChainedPositionsInSameCollateral
+        ? claimableUserChainedPositions
+        : claimableUserChainedPositions.filter((marketData) => marketData.isDefaultCollateral);
     const claimableChainedPositionsSum = claimableChainedPositions.reduce((acc, pos) => acc + pos.payout, 0);
+
+    const isChainedClaimInOver =
+        isFilterChainedSelected &&
+        isClaimableChainedPositionsInSameCollateral &&
+        !!claimableChainedPositions.length &&
+        !claimableChainedPositions[0].isDefaultCollateral;
+
+    const claimableAllPositionsPayout = claimableChainedPositionsSum + claimableSpeedPositionsSum;
+    const isAllClaimablePositionsInSameCollateral =
+        (isFilterChainedSelected && isClaimableChainedPositionsInSameCollateral) ||
+        (isFilterSingleSelected && isClaimableSpeedPositionsInSameCollateral) ||
+        (isClaimableChainedPositionsInSameCollateral && isClaimableSpeedPositionsInSameCollateral);
+    const isClaimInOver = isSpeedClaimInOver || isChainedClaimInOver;
 
     const hasClaimableSpeedPositions = isFilterChainedSelected
         ? !!claimableChainedPositions.length
         : isFilterSingleSelected
         ? !!claimableSpeedPositions.length
         : !!claimableChainedPositions.length || !!claimableSpeedPositions.length;
-
-    const collateralAddress = isMultiCollateralSupported
-        ? multipleCollateral[selectedCollateral].addresses[networkId]
-        : erc20Contract.addresses[networkId];
 
     const handleSubmit = async () => {
         setIsSubmitting(true);
@@ -265,7 +286,7 @@ const UserActivePositions: React.FC<UserActivePositionsProps> = ({
                 false,
                 { networkId, client: walletClient.data },
                 isBiconomy,
-                collateralAddress
+                claimableChainedPositions[0].collateralAddress as Address
             );
         } else if (isFilterSingleSelected) {
             await resolveAllSpeedPositions(
@@ -273,7 +294,7 @@ const UserActivePositions: React.FC<UserActivePositionsProps> = ({
                 false,
                 { networkId, client: walletClient.data },
                 isBiconomy,
-                collateralAddress
+                claimableSpeedPositions[0].collateralAddress as Address
             );
         } else {
             await Promise.all([
@@ -282,14 +303,14 @@ const UserActivePositions: React.FC<UserActivePositionsProps> = ({
                     false,
                     { networkId, client: walletClient.data },
                     isBiconomy,
-                    collateralAddress
+                    claimableSpeedPositions[0].collateralAddress as Address
                 ),
                 resolveAllChainedMarkets(
                     claimableChainedPositions,
                     false,
                     { networkId, client: walletClient.data },
                     isBiconomy,
-                    collateralAddress
+                    claimableChainedPositions[0].collateralAddress as Address
                 ),
             ]);
         }
@@ -298,11 +319,20 @@ const UserActivePositions: React.FC<UserActivePositionsProps> = ({
 
     const getClaimAllButton = () => (
         <Button disabled={isSubmitting} additionalStyles={additionalButtonStyle} fontSize="13px" onClick={handleSubmit}>
-            {`${
-                isSubmitting
-                    ? t('speed-markets.user-positions.claim-all-progress')
-                    : t('speed-markets.user-positions.claim-all')
-            } ${formatCurrencyWithSign(USD_SIGN, claimableChainedPositionsSum + claimableSpeedPositionsSum, 2)}`}
+            {`${t(
+                `speed-markets.user-positions.claim-all${isClaimInOver ? '-in' : ''}${isSubmitting ? '-progress' : ''}`
+            )} ${
+                isClaimInOver
+                    ? formatCurrencyWithSign(`$${CRYPTO_CURRENCY_MAP.OVER} `, claimableAllPositionsPayout)
+                    : formatCurrencyWithSign(USD_SIGN, claimableAllPositionsPayout)
+            }`}
+            <Tooltip
+                overlay={
+                    !isMobile && !isAllClaimablePositionsInSameCollateral
+                        ? t('speed-markets.tooltips.claim-all-except-over')
+                        : ''
+                }
+            />
         </Button>
     );
 
@@ -334,27 +364,38 @@ const UserActivePositions: React.FC<UserActivePositionsProps> = ({
                             </Filters>
                         )}
                         {hasClaimableSpeedPositions && (
-                            <ButtonWrapper>
-                                {isMultiCollateralSupported && (
-                                    <CollateralSelectorContainer>
-                                        <ClaimAll>
-                                            {isMobile
-                                                ? t('speed-markets.user-positions.claim-all-in')
-                                                : t('speed-markets.user-positions.claim-all-win-in')}
-                                            :
-                                        </ClaimAll>
-                                        <CollateralSelector
-                                            collateralArray={[getDefaultCollateral(networkId)]}
-                                            selectedItem={0}
-                                            onChangeCollateral={() => {}}
-                                            disabled
-                                            isIconHidden
-                                            invertCollors
-                                        />
-                                    </CollateralSelectorContainer>
+                            <>
+                                <ClaimAllWrapper>
+                                    {isMultiCollateralSupported && (
+                                        <CollateralSelectorContainer>
+                                            <ClaimAll>
+                                                {isMobile
+                                                    ? t('speed-markets.user-positions.claim-all-in')
+                                                    : t('speed-markets.user-positions.claim-all-win-in')}
+                                                :
+                                            </ClaimAll>
+                                            <CollateralSelector
+                                                collateralArray={[
+                                                    isClaimInOver
+                                                        ? (CRYPTO_CURRENCY_MAP.OVER as Coins)
+                                                        : getDefaultCollateral(networkId),
+                                                ]}
+                                                selectedItem={0}
+                                                onChangeCollateral={() => {}}
+                                                preventPaymentCollateralChange
+                                                isIconHidden
+                                                invertCollors
+                                            />
+                                        </CollateralSelectorContainer>
+                                    )}
+                                    <ButtonWrapper>{getClaimAllButton()}</ButtonWrapper>
+                                </ClaimAllWrapper>
+                                {isMobile && !isAllClaimablePositionsInSameCollateral && (
+                                    <FlexDivRow>
+                                        <InfoText>{`* ${t('speed-markets.tooltips.claim-all-except-over')}`}</InfoText>
+                                    </FlexDivRow>
                                 )}
-                                {getClaimAllButton()}
-                            </ButtonWrapper>
+                            </>
                         )}
                     </PositionsControl>
                 )}
@@ -387,11 +428,12 @@ const Container = styled.div`
     position: relative;
     display: flex;
     flex-direction: column;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        gap: 15px;
+    }
 `;
 
-const Header = styled(FlexDivColumn)`
-    gap: 15px;
-`;
+const Header = styled(FlexDivColumn)``;
 
 const Filters = styled(FlexDivStart)`
     gap: 10px;
@@ -434,14 +476,20 @@ const PositionsWrapper = styled.div<{ $noPositions?: boolean }>`
     }
 `;
 
-const ButtonWrapper = styled(FlexDivEnd)`
-    gap: 70px;
-    padding-right: 84px;
+const ClaimAllWrapper = styled(FlexDivCentered)`
+    gap: 30px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         justify-content: space-between;
         gap: unset;
+    }
+`;
+
+const ButtonWrapper = styled(FlexDivCentered)`
+    width: 360px;
+    padding-right: 60px;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        width: min-content;
         padding-right: 0;
-        margin-bottom: 13px;
     }
 `;
 
@@ -456,6 +504,12 @@ const ClaimAll = styled.span`
     line-height: 100%;
     text-align: center;
     color: ${(props) => props.theme.textColor.primary};
+`;
+
+const InfoText = styled.span`
+    font-size: 13px;
+    line-height: 100%;
+    color: ${(props) => props.theme.textColor.secondary};
 `;
 
 const NoPositionsText = styled.span`

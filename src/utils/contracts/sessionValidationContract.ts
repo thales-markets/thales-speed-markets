@@ -5,10 +5,10 @@ import { Address } from 'viem';
 const sessionValidationContract = {
     addresses: {
         [NetworkId.OptimismMainnet]: '0x78D089FCD2308011E87B9a5b85cD309d29e9cF1e' as Address,
-        [NetworkId.OptimismSepolia]: ZERO_ADDRESS,
-        [NetworkId.PolygonMainnet]: '0x0Cfff1E16E8956439DD33d8350949ca669dBD371' as Address,
         [NetworkId.Arbitrum]: '0x94d06B770D41D9b3A3bb2E636F3F93F69909099f' as Address,
         [NetworkId.Base]: '0x1E82dbfb6BefF4b4799a1a688d09B259eb173F64' as Address,
+        [NetworkId.PolygonMainnet]: '0x0Cfff1E16E8956439DD33d8350949ca669dBD371' as Address,
+        [NetworkId.OptimismSepolia]: ZERO_ADDRESS,
     },
     abi: [
         {

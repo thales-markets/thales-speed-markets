@@ -1,18 +1,18 @@
 import CollateralSelector from 'components/CollateralSelector';
-import { USD_SIGN } from 'constants/currency';
+import { CRYPTO_CURRENCY_MAP, USD_SIGN } from 'constants/currency';
 import { secondsToMilliseconds } from 'date-fns';
 import { Positions } from 'enums/market';
 import useInterval from 'hooks/useInterval';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
-import { getSelectedCollateralIndex } from 'redux/modules/wallet';
+import { useDispatch, useSelector } from 'react-redux';
+import { getSelectedClaimCollateralIndex, setSelectedClaimCollateralIndex } from 'redux/modules/wallet';
 import styled, { useTheme } from 'styled-components';
 import { FlexDivCentered, FlexDivColumn } from 'styles/common';
-import { formatCurrencyWithSign } from 'thales-utils';
+import { Coins, formatCurrencyWithSign } from 'thales-utils';
 import { UserChainedPosition } from 'types/market';
-import { RootState, ThemeInterface } from 'types/ui';
-import { getCollaterals } from 'utils/currency';
+import { ThemeInterface } from 'types/ui';
+import { getOfframpCollaterals } from 'utils/currency';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import { getHistoryStatus } from 'utils/position';
 import { getStatusColor } from 'utils/style';
@@ -44,13 +44,17 @@ const CardChainedPosition: React.FC<CardChainedPositionProps> = ({
 }) => {
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
+    const dispatch = useDispatch();
 
     const networkId = useChainId();
-    const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
+    const selectedClaimCollateralIndex = useSelector(getSelectedClaimCollateralIndex);
 
     const [isMatured, setIsMatured] = useState(Date.now() > position.maturityDate);
     const [resolveIndex, setResolveindex] = useState(position.resolveIndex);
     const [isActionInProgress, setIsActionInProgress] = useState(false);
+
+    const claimCollateralArray = useMemo(() => getOfframpCollaterals(networkId), [networkId]);
+    const isClaimInOver = !position.isDefaultCollateral;
 
     useInterval(() => {
         if (Date.now() > position.maturityDate) {
@@ -182,9 +186,12 @@ const CardChainedPosition: React.FC<CardChainedPositionProps> = ({
                         <InfoRow>
                             <Label>{t('speed-markets.user-positions.claim-in')}:</Label>
                             <CollateralSelector
-                                collateralArray={getCollaterals(networkId)}
-                                selectedItem={selectedCollateralIndex}
-                                onChangeCollateral={() => {}}
+                                collateralArray={
+                                    isClaimInOver ? [CRYPTO_CURRENCY_MAP.OVER as Coins] : claimCollateralArray
+                                }
+                                selectedItem={isClaimInOver ? 0 : selectedClaimCollateralIndex}
+                                onChangeCollateral={(index) => dispatch(setSelectedClaimCollateralIndex(index))}
+                                preventPaymentCollateralChange
                                 disabled={isActionInProgress}
                                 isIconHidden
                                 additionalStyles={{ margin: '0' }}

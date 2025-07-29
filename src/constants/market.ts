@@ -10,6 +10,8 @@ export const SIDE_TO_POSITION_MAP: Record<number, Positions> = {
     1: Positions.DOWN,
 };
 
+export const OVER_CONTRACT_RATE_KEY = 'OVER-CONTRACT';
+
 export const MARKET_DURATION_IN_DAYS = 90;
 
 export const ONE_HUNDRED_AND_THREE_PERCENT = 1.03;
