@@ -35,6 +35,7 @@ const chainedSpeedMarketsAMMContract = {
         {
             anonymous: false,
             inputs: [
+                { indexed: false, internalType: 'address', name: '_collateral', type: 'address' },
                 { indexed: false, internalType: 'address', name: '_destination', type: 'address' },
                 { indexed: false, internalType: 'uint256', name: '_amount', type: 'uint256' },
             ],
@@ -374,6 +375,7 @@ const chainedSpeedMarketsAMMContract = {
             inputs: [
                 { internalType: 'address', name: '_market', type: 'address' },
                 { internalType: 'int64[]', name: '_finalPrices', type: 'int64[]' },
+                { internalType: 'bool', name: '_isManually', type: 'bool' },
             ],
             name: 'resolveMarketWithPrices',
             outputs: [],
@@ -448,6 +450,7 @@ const chainedSpeedMarketsAMMContract = {
         },
         {
             inputs: [
+                { internalType: 'address', name: '_collateral', type: 'address' },
                 { internalType: 'address', name: '_destination', type: 'address' },
                 { internalType: 'uint256', name: '_amount', type: 'uint256' },
             ],
