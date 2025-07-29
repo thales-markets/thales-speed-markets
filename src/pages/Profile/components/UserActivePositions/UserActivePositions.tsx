@@ -243,7 +243,7 @@ const UserActivePositions: React.FC<UserActivePositionsProps> = ({
     const claimableSpeedPositionsSum = claimableSpeedPositions.reduce((acc, pos) => acc + pos.payout, 0);
 
     const isSpeedClaimInOver =
-        isFilterSingleSelected &&
+        !isFilterChainedSelected &&
         isClaimableSpeedPositionsInSameCollateral &&
         !!claimableSpeedPositions.length &&
         !claimableSpeedPositions[0].isDefaultCollateral;
@@ -260,17 +260,31 @@ const UserActivePositions: React.FC<UserActivePositionsProps> = ({
     const claimableChainedPositionsSum = claimableChainedPositions.reduce((acc, pos) => acc + pos.payout, 0);
 
     const isChainedClaimInOver =
-        isFilterChainedSelected &&
+        !isFilterSingleSelected &&
         isClaimableChainedPositionsInSameCollateral &&
         !!claimableChainedPositions.length &&
         !claimableChainedPositions[0].isDefaultCollateral;
 
-    const claimableAllPositionsPayout = claimableChainedPositionsSum + claimableSpeedPositionsSum;
+    // ALL
+
     const isAllClaimablePositionsInSameCollateral =
         (isFilterChainedSelected && isClaimableChainedPositionsInSameCollateral) ||
         (isFilterSingleSelected && isClaimableSpeedPositionsInSameCollateral) ||
-        (isClaimableChainedPositionsInSameCollateral && isClaimableSpeedPositionsInSameCollateral);
-    const isClaimInOver = isSpeedClaimInOver || isChainedClaimInOver;
+        (isClaimableChainedPositionsInSameCollateral &&
+            isClaimableSpeedPositionsInSameCollateral &&
+            isSpeedClaimInOver === isChainedClaimInOver);
+
+    const isClaimAllInOver =
+        (isFilterChainedSelected && isChainedClaimInOver) ||
+        (isFilterSingleSelected && isSpeedClaimInOver) ||
+        (isChainedClaimInOver && isSpeedClaimInOver);
+
+    const claimableAllPositionsPayout = isFilterChainedSelected
+        ? claimableChainedPositionsSum
+        : isFilterSingleSelected
+        ? claimableSpeedPositionsSum
+        : (isSpeedClaimInOver === isClaimAllInOver ? claimableSpeedPositionsSum : 0) +
+          (isChainedClaimInOver === isClaimAllInOver ? claimableChainedPositionsSum : 0);
 
     const hasClaimableSpeedPositions = isFilterChainedSelected
         ? !!claimableChainedPositions.length
@@ -297,22 +311,30 @@ const UserActivePositions: React.FC<UserActivePositionsProps> = ({
                 claimableSpeedPositions[0].collateralAddress as Address
             );
         } else {
-            await Promise.all([
-                resolveAllSpeedPositions(
-                    claimableSpeedPositions,
-                    false,
-                    { networkId, client: walletClient.data },
-                    isBiconomy,
-                    claimableSpeedPositions[0].collateralAddress as Address
-                ),
-                resolveAllChainedMarkets(
-                    claimableChainedPositions,
-                    false,
-                    { networkId, client: walletClient.data },
-                    isBiconomy,
-                    claimableChainedPositions[0].collateralAddress as Address
-                ),
-            ]);
+            const promises = [];
+            if (!!claimableSpeedPositions.length && isSpeedClaimInOver === isClaimAllInOver) {
+                promises.push(() =>
+                    resolveAllSpeedPositions(
+                        claimableSpeedPositions,
+                        false,
+                        { networkId, client: walletClient.data },
+                        isBiconomy,
+                        claimableSpeedPositions[0].collateralAddress as Address
+                    )
+                );
+            }
+            if (!!claimableChainedPositions.length && isChainedClaimInOver === isClaimAllInOver) {
+                promises.push(() =>
+                    resolveAllChainedMarkets(
+                        claimableChainedPositions,
+                        false,
+                        { networkId, client: walletClient.data },
+                        isBiconomy,
+                        claimableChainedPositions[0].collateralAddress as Address
+                    )
+                );
+            }
+            await Promise.all(promises.map((promise) => promise()));
         }
         setIsSubmitting(false);
     };
@@ -320,9 +342,11 @@ const UserActivePositions: React.FC<UserActivePositionsProps> = ({
     const getClaimAllButton = () => (
         <Button disabled={isSubmitting} additionalStyles={additionalButtonStyle} fontSize="13px" onClick={handleSubmit}>
             {`${t(
-                `speed-markets.user-positions.claim-all${isClaimInOver ? '-in' : ''}${isSubmitting ? '-progress' : ''}`
+                `speed-markets.user-positions.claim-all${isClaimAllInOver ? '-in' : ''}${
+                    isSubmitting ? '-progress' : ''
+                }`
             )} ${
-                isClaimInOver
+                isClaimAllInOver
                     ? formatCurrencyWithSign(`$${CRYPTO_CURRENCY_MAP.OVER} `, claimableAllPositionsPayout)
                     : formatCurrencyWithSign(USD_SIGN, claimableAllPositionsPayout)
             }`}
@@ -376,7 +400,7 @@ const UserActivePositions: React.FC<UserActivePositionsProps> = ({
                                             </ClaimAll>
                                             <CollateralSelector
                                                 collateralArray={[
-                                                    isClaimInOver
+                                                    isClaimAllInOver
                                                         ? (CRYPTO_CURRENCY_MAP.OVER as Coins)
                                                         : getDefaultCollateral(networkId),
                                                 ]}
