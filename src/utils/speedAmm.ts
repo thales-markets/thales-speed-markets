@@ -16,7 +16,7 @@ import { UserChainedPosition, UserPosition } from 'types/market';
 import { QueryConfig, SupportedNetwork } from 'types/network';
 import { ViemContract } from 'types/viem';
 import { getPriceConnection, getPriceId, priceParser } from 'utils/pyth';
-import { refetchActiveSpeedMarkets, refetchUserSpeedMarkets } from 'utils/queryConnector';
+import { refetchActiveSpeedMarkets, refetchBalances, refetchUserSpeedMarkets } from 'utils/queryConnector';
 import { delay } from 'utils/timer';
 import { Client, getContract } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
@@ -294,6 +294,7 @@ export const resolveAllSpeedPositions = async (
                     : (queryConfig.client as Client)?.account?.address;
                 if (walletAddress) {
                     refetchUserSpeedMarkets(false, queryConfig.networkId, walletAddress);
+                    refetchBalances(walletAddress, queryConfig.networkId);
                 }
                 refetchActiveSpeedMarkets(false, queryConfig.networkId);
             } else {
@@ -443,6 +444,7 @@ export const resolveAllChainedMarkets = async (
                     : (queryConfig.client as Client)?.account?.address;
                 if (walletAddress) {
                     refetchUserSpeedMarkets(true, queryConfig.networkId, walletAddress);
+                    refetchBalances(walletAddress, queryConfig.networkId);
                 }
                 refetchActiveSpeedMarkets(true, queryConfig.networkId);
             } else {
