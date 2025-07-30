@@ -8,9 +8,9 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsMobile } from 'redux/modules/ui';
 import { FlexDivCentered } from 'styles/common';
-import { formatCurrencyWithKey, formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
+import { Coins, formatCurrencyWithKey, formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
 import { RootState } from 'types/ui';
-import { getDefaultCollateral } from 'utils/currency';
+import { getDefaultCollateral, isOverCurrency } from 'utils/currency';
 import { useChainId } from 'wagmi';
 import { Cotainer, Footer, PositionText, Text, TextFooter, TextLabel, TextValue } from './styled-components';
 
@@ -26,8 +26,8 @@ type TradingDetailsSentenceProps = {
     isFetchingQuote: boolean;
     profit: number;
     paidAmount: number;
-    deltaTimeSec?: number;
-    hasCollateralConversion?: boolean;
+    deltaTimeSec: number;
+    selectedCollateral: Coins;
 };
 
 const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
@@ -37,7 +37,7 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
     profit,
     paidAmount,
     deltaTimeSec,
-    hasCollateralConversion,
+    selectedCollateral,
 }) => {
     const { t } = useTranslation();
 
@@ -45,6 +45,9 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
     const [dateFromDelta, setDateFromDelta] = useState(0);
+
+    const isOver = isOverCurrency(selectedCollateral);
+    const hasCollateralConversion = selectedCollateral !== getDefaultCollateral(networkId) && !isOver;
 
     useEffect(() => {
         if (deltaTimeSec) {
@@ -61,7 +64,7 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
 
     const potentialWinFormatted = isFetchingQuote
         ? '...'
-        : `${formatCurrencyWithKey(getDefaultCollateral(networkId), profit * paidAmount)}`;
+        : `${formatCurrencyWithKey(`${isOver ? '$' : ''}${selectedCollateral}`, profit * paidAmount)}`;
 
     const positionTypeFormatted =
         market.positionType === Positions.UP

@@ -759,7 +759,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                         isFetchingQuote={false}
                         profit={potentialProfit}
                         paidAmount={convertToStable(paidAmount)}
-                        hasCollateralConversion={selectedCollateral !== defaultCollateral}
+                        selectedCollateral={selectedCollateral}
                     />
                     {!isChained && (
                         <ShareWrapper>
