@@ -46,6 +46,7 @@ import {
     localStore,
     LONG_CURRENCY_DECIMALS,
     NetworkId,
+    roundNumberToDecimals,
     truncToDecimals,
 } from 'thales-utils';
 import { AmmChainedSpeedMarketsLimits, AmmSpeedMarketsLimits } from 'types/market';
@@ -894,7 +895,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                 <ColumnSpaceBetween>
                     <QuoteContainer>
                         <QuoteLabel>{t('speed-markets.potential-profit')}</QuoteLabel>
-                        <QuoteText>{potentialProfit ? `${truncToDecimals(potentialProfit)}x` : '-'}</QuoteText>
+                        <QuoteText>{potentialProfit ? `${roundNumberToDecimals(potentialProfit)}x` : '-'}</QuoteText>
                     </QuoteContainer>
                     {isMobile && getTradingDetails()}
                     <ButtonWrapper>
