@@ -210,9 +210,7 @@ const UserHistoricalPositions: React.FC<UserHistoricalPositionsProps> = ({
     const userResolvedChainedSpeedMarketsDataQuery = useUserResolvedChainedSpeedMarketsQuery(
         { networkId, client },
         searchAddress ? searchAddress : isBiconomy ? biconomyConnector.address : walletAddress || '',
-        {
-            enabled: isAppReady && isConnected,
-        }
+        { enabled: isAppReady && isConnected }
     );
 
     const userResolvedChainedSpeedMarketsData = useMemo(
