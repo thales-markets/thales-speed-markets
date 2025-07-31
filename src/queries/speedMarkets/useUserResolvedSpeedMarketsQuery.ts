@@ -1,23 +1,21 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
-import { SYNTHS_MAP } from 'constants/currency';
 import {
     BATCH_NUMBER_OF_SPEED_MARKETS,
     MAX_NUMBER_OF_SPEED_MARKETS_TO_FETCH,
     MIN_MATURITY,
     SIDE_TO_POSITION_MAP,
-    SPEED_MARKETS_QUOTE,
 } from 'constants/market';
 import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
-import { bigNumberFormatter, coinFormatter, Coins, parseBytes32String } from 'thales-utils';
+import { bigNumberFormatter, coinFormatter, parseBytes32String } from 'thales-utils';
 import { UserPosition } from 'types/market';
 import { QueryConfig } from 'types/network';
 import { ViemContract } from 'types/viem';
 import { getContractAbi } from 'utils/contracts/abi';
 import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
 import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
-import { isOldMarketWithSusdCollateral } from 'utils/currency';
+import { getCollateralByAddress } from 'utils/currency';
 import { getFeesFromHistory } from 'utils/speedAmm';
 import { getContract } from 'viem';
 
@@ -93,16 +91,11 @@ const useUserResolvedSpeedMarketsQuery = (
                             : getFeesFromHistory(createdAt).safeBoxImpact;
                     const fees = lpFee + safeBoxImpact;
 
-                    const marketBuyinAmount = coinFormatter(
-                        marketData.buyinAmount,
-                        queryConfig.networkId,
-                        isOldMarketWithSusdCollateral(queryConfig.networkId, createdAt)
-                            ? (SYNTHS_MAP.sUSD as Coins)
-                            : undefined
-                    );
+                    const collateral = getCollateralByAddress(marketData.collateral, queryConfig.networkId);
+                    const marketBuyinAmount = coinFormatter(marketData.buyinAmount, queryConfig.networkId, collateral);
 
                     const paid = marketBuyinAmount * (1 + fees);
-                    const payout = marketBuyinAmount * SPEED_MARKETS_QUOTE;
+                    const payout = coinFormatter(marketData.payout, queryConfig.networkId, collateral);
 
                     const userData: UserPosition = {
                         user: marketData.user,
@@ -113,6 +106,8 @@ const useUserResolvedSpeedMarketsQuery = (
                         maturityDate: secondsToMilliseconds(Number(marketData.strikeTime)),
                         paid,
                         payout,
+                        collateralAddress: marketData.collateral,
+                        isDefaultCollateral: marketData.isDefaultCollateral,
                         currentPrice: 0,
                         finalPrice: bigNumberFormatter(marketData.finalPrice, PYTH_CURRENCY_DECIMALS),
                         isClaimable: false,

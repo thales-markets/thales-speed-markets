@@ -19,8 +19,9 @@ import {
     Value,
     Wrapper,
 } from 'pages/SpeedMarkets/components/UserOpenPositions/components/TablePositions/TablePositions';
-import { formatCurrencyWithSign, localStore } from 'thales-utils';
+import { formatCurrencyWithKey, formatCurrencyWithSign, localStore } from 'thales-utils';
 import { UserChainedPosition, UserPosition } from 'types/market';
+import { getCollateralByAddress, isOverCurrency } from 'utils/currency';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import { getChainedEndTime, tableSortByEndTime, tableSortByStatus } from 'utils/position';
 
@@ -153,21 +154,39 @@ const TableActivePositions: React.FC<{ data: (UserPosition | UserChainedPosition
         {
             header: <Header>{t('speed-markets.user-positions.paid')}</Header>,
             accessorKey: 'paid',
-            cell: (cellProps: any) => (
-                <Wrapper>
-                    <Value>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())}</Value>
-                </Wrapper>
-            ),
+            cell: (cellProps: any) => {
+                const position = cellProps.row.original;
+                const collateralByAddress = getCollateralByAddress(position.collateralAddress, position.networkId);
+                const collateral = `${isOverCurrency(collateralByAddress) ? '$' : ''}${collateralByAddress}`;
+                return (
+                    <Wrapper>
+                        <Value>
+                            {position.isDefaultCollateral
+                                ? formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())
+                                : formatCurrencyWithKey(collateral, cellProps.cell.getValue())}
+                        </Value>
+                    </Wrapper>
+                );
+            },
             size: 90,
         },
         {
             header: <Header>{t('speed-markets.user-positions.payout')}</Header>,
             accessorKey: 'payout',
-            cell: (cellProps: any) => (
-                <Wrapper>
-                    <Value>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())}</Value>
-                </Wrapper>
-            ),
+            cell: (cellProps: any) => {
+                const position = cellProps.row.original;
+                const collateralByAddress = getCollateralByAddress(position.collateralAddress, position.networkId);
+                const collateral = `${isOverCurrency(collateralByAddress) ? '$' : ''}${collateralByAddress}`;
+                return (
+                    <Wrapper>
+                        <Value>
+                            {position.isDefaultCollateral
+                                ? formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())
+                                : formatCurrencyWithKey(collateral, cellProps.cell.getValue())}
+                        </Value>
+                    </Wrapper>
+                );
+            },
             size: 100,
         },
         {

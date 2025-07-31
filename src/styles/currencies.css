@@ -58,6 +58,10 @@
     content: '\005A';
 }
 
+.currency-icon--over::before {
+    content: '\005B';
+}
+
 .currency-icon--xau::before {
     content: '\0062';
 }

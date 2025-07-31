@@ -1,7 +1,15 @@
-import { COLLATERALS, STABLE_COINS, SYNTHS_MAP, currencyKeyToNameMap } from 'constants/currency';
+import {
+    COLLATERALS,
+    CRYPTO_CURRENCY_MAP,
+    OFFRAMP_UNSUPPORTED_COLLATERALS,
+    STABLE_COINS,
+    SYNTHS_MAP,
+    currencyKeyToNameMap,
+} from 'constants/currency';
 import { COLLATERAL_DECIMALS, Coins, NetworkId } from 'thales-utils';
 import { CollateralsBalance } from 'types/collateral';
 import { SupportedNetwork } from 'types/network';
+import multipleCollateral from './contracts/multipleCollateralContract';
 
 // TODO: replace this with a more robust logic (like checking the asset field)
 const synthToAsset = (currencyKey: string) => currencyKey.replace(/^(i|s)/i, '');
@@ -15,17 +23,42 @@ export const getSynthAsset = (currencyKey: string) =>
 export const getDefaultCollateral = (networkId: SupportedNetwork) =>
     COLLATERALS[networkId] ? COLLATERALS[networkId][0] : COLLATERALS[NetworkId.OptimismMainnet][0];
 
-export const getCollateral = (networkId: SupportedNetwork, index: number) =>
-    index < COLLATERALS[networkId]?.length ? COLLATERALS[networkId][index] : getDefaultCollateral(networkId);
+export const getCollateral = (networkId: SupportedNetwork, index: number, collaterals?: Coins[]) => {
+    const collats = collaterals || COLLATERALS[networkId];
+    return index < collats.length ? collats[index] : collats[0];
+};
 
 export const getCollaterals = (networkId: SupportedNetwork) =>
     COLLATERALS[networkId] || COLLATERALS[NetworkId.OptimismMainnet];
 
+export const getOfframpCollaterals = (networkId: SupportedNetwork) =>
+    getCollaterals(networkId).filter((collateral) => !OFFRAMP_UNSUPPORTED_COLLATERALS[networkId].includes(collateral));
+
 export const getCollateralIndexForNetwork = (networkId: SupportedNetwork, currencyKey: Coins) =>
     Math.max(0, getCollaterals(networkId).indexOf(currencyKey));
 
+export const getCollateralAddress = (networkId: SupportedNetwork, index: number, collaterals?: Coins[]) =>
+    multipleCollateral[getCollateral(networkId, index, collaterals)]?.addresses[networkId];
+
+export const getCollateralByAddress = (collateralAddress: string, networkId: number) => {
+    let collateral = getDefaultCollateral(networkId);
+    Object.keys(multipleCollateral).forEach((collateralKey: string) => {
+        Object.values(multipleCollateral[collateralKey as Coins].addresses).forEach((address: string) => {
+            if (collateralAddress.toLowerCase() === address.toLowerCase()) {
+                collateral = collateralKey as Coins;
+            }
+        });
+    });
+
+    return collateral;
+};
+
 export const isStableCurrency = (currencyKey: Coins) => {
     return STABLE_COINS.includes(currencyKey);
+};
+
+export const isOverCurrency = (currencyKey: Coins) => {
+    return currencyKey === CRYPTO_CURRENCY_MAP.OVER;
 };
 
 export const getMinBalanceThreshold = (coin: Coins): number => (isStableCurrency(coin) ? 1 : 0);

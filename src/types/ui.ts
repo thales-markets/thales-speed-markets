@@ -10,6 +10,7 @@ export type UserSliceState = {
 
 export type WalletSliceState = {
     selectedCollateralIndex: number;
+    selectedClaimCollateralIndex: number;
     isBiconomy?: boolean;
     walletConnectModal: {
         visibility: boolean;

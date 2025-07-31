@@ -124,12 +124,7 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
         selectedCollateral,
     ]);
 
-    const exchangeRatesMarketDataQuery = useExchangeRatesQuery(
-        { networkId, client },
-        {
-            enabled: isAppReady,
-        }
-    );
+    const exchangeRatesMarketDataQuery = useExchangeRatesQuery({ networkId, client }, { enabled: isAppReady });
     const exchangeRates: Rates | null =
         exchangeRatesMarketDataQuery.isSuccess && exchangeRatesMarketDataQuery.data
             ? exchangeRatesMarketDataQuery.data
@@ -250,7 +245,8 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
         let errorMessageKey = '';
 
         if (buyinAmount !== '') {
-            const buyinAmountWithGas = isBiconomy ? Number(buyinAmount) + buyinGasFee : Number(buyinAmount);
+            const buyinGasFeeInCollateral = convertFromStable(buyinGasFee);
+            const buyinAmountWithGas = isBiconomy ? Number(buyinAmount) + buyinGasFeeInCollateral : Number(buyinAmount);
             if ((isConnected && buyinAmountWithGas > collateralBalance) || collateralBalance === 0) {
                 errorMessageKey = 'common.errors.insufficient-balance-wallet';
             }

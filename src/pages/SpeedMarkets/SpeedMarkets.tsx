@@ -1,9 +1,7 @@
 import BannerCarousel from 'components/BannerCarousel';
 import Modal from 'components/Modal';
-import PageLinkBanner from 'components/PageLinkBanner';
 import SPAAnchor from 'components/SPAAnchor/SPAAnchor';
 import SimpleLoader from 'components/SimpleLoader';
-import { LINKS } from 'constants/links';
 import { SUPPORTED_ASSETS } from 'constants/pyth';
 import ROUTES from 'constants/routes';
 import { secondsToMilliseconds } from 'date-fns';
@@ -293,7 +291,6 @@ const SpeedMarkets: React.FC = () => {
                         resetData={resetData}
                         hasError={hasError}
                     />
-                    <PageLinkBanner link={LINKS.Markets.Thales} />
                     {isConnected && (
                         <UserOpenPositions
                             isChained={isChained}

@@ -11,6 +11,8 @@ export type UserHistoryPosition = {
     paid: number;
     payout: number;
     payoutMultiplier: number;
+    collateralAddress: string;
+    isDefaultCollateral: boolean;
     currentPrice: number;
     finalPrices: number[];
     canResolve: boolean;

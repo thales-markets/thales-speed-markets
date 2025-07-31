@@ -1,18 +1,19 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query';
+import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
 import {
     MAX_BUYIN_COLLATERAL_CONVERSION_BUFFER_PERCENTAGE,
     MIN_BUYIN_COLLATERAL_CONVERSION_BUFFER_PERCENTAGE,
     SIDE_TO_POSITION_MAP,
 } from 'constants/market';
-import { ZERO_ADDRESS } from 'constants/network';
+import { TBD_ADDRESS, ZERO_ADDRESS } from 'constants/network';
 import QUERY_KEYS from 'constants/queryKeys';
-import { bigNumberFormatter, coinFormatter } from 'thales-utils';
+import { bigNumberFormatter, coinFormatter, Coins } from 'thales-utils';
 import { AmmSpeedMarketsLimits } from 'types/market';
 import { QueryConfig } from 'types/network';
 import { ViemContract } from 'types/viem';
 import { getContractAbi } from 'utils/contracts/abi';
 import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
+import { getCollateralAddress, getCollateralIndexForNetwork } from 'utils/currency';
 import { getContract, stringToHex } from 'viem';
 
 const useAmmSpeedMarketsLimitsQuery = (
@@ -38,6 +39,22 @@ const useAmmSpeedMarketsLimitsQuery = (
                 maxSkewImpact: 0,
                 safeBoxImpact: 0,
                 whitelistedAddress: false,
+                bonusPerCollateral: {
+                    DAI: 0,
+                    USDCe: 0,
+                    USDbC: 0,
+                    USDC: 0,
+                    USDT: 0,
+                    OP: 0,
+                    WETH: 0,
+                    ETH: 0,
+                    ARB: 0,
+                    THALES: 0,
+                    sTHALES: 0,
+                    OVER: 0,
+                    cbBTC: 0,
+                    wBTC: 0,
+                },
             };
 
             try {
@@ -47,12 +64,29 @@ const useAmmSpeedMarketsLimitsQuery = (
                     client: queryConfig.client,
                 }) as ViemContract;
 
+                const definedCollaterals = Object.keys(ammSpeedMarketsLimits.bonusPerCollateral).filter(
+                    (collateral) => {
+                        const address = getCollateralAddress(
+                            queryConfig.networkId,
+                            getCollateralIndexForNetwork(queryConfig.networkId, collateral as Coins)
+                        );
+                        return !!address && address !== TBD_ADDRESS;
+                    }
+                );
+                const collateralAddresses = definedCollaterals.map((collateral) =>
+                    getCollateralAddress(
+                        queryConfig.networkId,
+                        getCollateralIndexForNetwork(queryConfig.networkId, collateral as Coins)
+                    )
+                );
+
                 const [
                     ammParams,
                     riskForETH,
                     riskForBTC,
                     directionalRiskForETH,
                     directionalRiskForBTC,
+                    bonuses,
                 ] = await Promise.all([
                     speedMarketsDataContractLocal.read.getSpeedMarketsAMMParameters([walletAddress || ZERO_ADDRESS]),
                     speedMarketsDataContractLocal.read.getRiskPerAsset([
@@ -67,6 +101,7 @@ const useAmmSpeedMarketsLimitsQuery = (
                     speedMarketsDataContractLocal.read.getDirectionalRiskPerAsset([
                         stringToHex(CRYPTO_CURRENCY_MAP.BTC, { size: 32 }),
                     ]),
+                    speedMarketsDataContractLocal.read.getBonusesPerCollateral([collateralAddresses]),
                 ]);
 
                 ammSpeedMarketsLimits.minBuyinAmount =
@@ -115,6 +150,10 @@ const useAmmSpeedMarketsLimitsQuery = (
                 ammSpeedMarketsLimits.maxSkewImpact = bigNumberFormatter(ammParams.maxSkewImpact);
                 ammSpeedMarketsLimits.safeBoxImpact = bigNumberFormatter(ammParams.safeBoxImpact);
                 ammSpeedMarketsLimits.whitelistedAddress = ammParams.isAddressWhitelisted;
+
+                definedCollaterals.forEach((collateral, i) => {
+                    ammSpeedMarketsLimits.bonusPerCollateral[collateral as Coins] = bigNumberFormatter(bonuses[i]);
+                });
             } catch (e) {
                 console.log(e);
             }

@@ -14,6 +14,7 @@ type CollateralSelectorProps = {
     collateralArray: Array<Coins>;
     selectedItem: number;
     onChangeCollateral: (index: number) => void;
+    preventPaymentCollateralChange?: boolean;
     disabled?: boolean;
     isDetailedView?: boolean;
     isIconHidden?: boolean;
@@ -28,6 +29,7 @@ const CollateralSelector: React.FC<CollateralSelectorProps> = ({
     collateralArray,
     selectedItem,
     onChangeCollateral,
+    preventPaymentCollateralChange,
     disabled,
     isDetailedView,
     isIconHidden,
@@ -60,7 +62,7 @@ const CollateralSelector: React.FC<CollateralSelectorProps> = ({
 
     disabled = disabled || collateralArray.length === 1;
 
-    if (selectedItem > collateralArray.length - 1) {
+    if (!preventPaymentCollateralChange && selectedItem > collateralArray.length - 1) {
         dispatch(setSelectedCollateralIndex(0));
         selectedItem = 0;
     }
@@ -97,7 +99,9 @@ const CollateralSelector: React.FC<CollateralSelectorProps> = ({
                                           key={i}
                                           onClick={() => {
                                               onChangeCollateral(collateral.index);
-                                              dispatch(setSelectedCollateralIndex(collateral.index));
+                                              if (!preventPaymentCollateralChange) {
+                                                  dispatch(setSelectedCollateralIndex(collateral.index));
+                                              }
                                           }}
                                           invertCollors={invertCollors}
                                       >
@@ -121,7 +125,7 @@ const CollateralSelector: React.FC<CollateralSelectorProps> = ({
                                               <TextCollateral invertCollors={invertCollors} fontWeight="800">
                                                   {!exchangeRates?.[collateral.name] &&
                                                   !isStableCurrency(collateral.name)
-                                                      ? '...'
+                                                      ? ' ($...)'
                                                       : ` (${formatCurrencyWithSign(
                                                             USD_SIGN,
                                                             getUSDForCollateral(collateral.name)
@@ -141,7 +145,9 @@ const CollateralSelector: React.FC<CollateralSelectorProps> = ({
                                           key={index}
                                           onClick={() => {
                                               onChangeCollateral(index);
-                                              dispatch(setSelectedCollateralIndex(index));
+                                              if (!preventPaymentCollateralChange) {
+                                                  dispatch(setSelectedCollateralIndex(index));
+                                              }
                                           }}
                                           invertCollors={invertCollors}
                                       >

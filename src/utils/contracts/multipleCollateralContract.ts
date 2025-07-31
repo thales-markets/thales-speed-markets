@@ -1,265 +1,7 @@
 import { TBD_ADDRESS, ZERO_ADDRESS } from 'constants/network';
-import { NetworkId } from 'thales-utils';
+import { Coins, NetworkId } from 'thales-utils';
+import { ContractData } from 'types/viem';
 import { Address } from 'viem';
-
-const SUSD_ABI = [
-    {
-        inputs: [{ internalType: 'address', name: '_owner', type: 'address' }],
-        payable: false,
-        stateMutability: 'nonpayable',
-        type: 'constructor',
-    },
-    {
-        anonymous: false,
-        inputs: [
-            {
-                indexed: true,
-                internalType: 'address',
-                name: 'owner',
-                type: 'address',
-            },
-            {
-                indexed: true,
-                internalType: 'address',
-                name: 'spender',
-                type: 'address',
-            },
-            {
-                indexed: false,
-                internalType: 'uint256',
-                name: 'value',
-                type: 'uint256',
-            },
-        ],
-        name: 'Approval',
-        type: 'event',
-    },
-    {
-        anonymous: false,
-        inputs: [
-            {
-                indexed: false,
-                internalType: 'address',
-                name: 'oldOwner',
-                type: 'address',
-            },
-            {
-                indexed: false,
-                internalType: 'address',
-                name: 'newOwner',
-                type: 'address',
-            },
-        ],
-        name: 'OwnerChanged',
-        type: 'event',
-    },
-    {
-        anonymous: false,
-        inputs: [
-            {
-                indexed: false,
-                internalType: 'address',
-                name: 'newOwner',
-                type: 'address',
-            },
-        ],
-        name: 'OwnerNominated',
-        type: 'event',
-    },
-    {
-        anonymous: false,
-        inputs: [
-            {
-                indexed: false,
-                internalType: 'contract Proxyable',
-                name: 'newTarget',
-                type: 'address',
-            },
-        ],
-        name: 'TargetUpdated',
-        type: 'event',
-    },
-    {
-        anonymous: false,
-        inputs: [
-            { indexed: true, internalType: 'address', name: 'from', type: 'address' },
-            { indexed: true, internalType: 'address', name: 'to', type: 'address' },
-            {
-                indexed: false,
-                internalType: 'uint256',
-                name: 'value',
-                type: 'uint256',
-            },
-        ],
-        name: 'Transfer',
-        type: 'event',
-    },
-    { payable: true, stateMutability: 'payable', type: 'fallback' },
-    {
-        constant: false,
-        inputs: [
-            { internalType: 'bytes', name: 'callData', type: 'bytes' },
-            { internalType: 'uint256', name: 'numTopics', type: 'uint256' },
-            { internalType: 'bytes32', name: 'topic1', type: 'bytes32' },
-            { internalType: 'bytes32', name: 'topic2', type: 'bytes32' },
-            { internalType: 'bytes32', name: 'topic3', type: 'bytes32' },
-            { internalType: 'bytes32', name: 'topic4', type: 'bytes32' },
-        ],
-        name: '_emit',
-        outputs: [],
-        payable: false,
-        stateMutability: 'nonpayable',
-        type: 'function',
-    },
-    {
-        constant: false,
-        inputs: [],
-        name: 'acceptOwnership',
-        outputs: [],
-        payable: false,
-        stateMutability: 'nonpayable',
-        type: 'function',
-    },
-    {
-        constant: true,
-        inputs: [
-            { internalType: 'address', name: 'owner', type: 'address' },
-            { internalType: 'address', name: 'spender', type: 'address' },
-        ],
-        name: 'allowance',
-        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-        payable: false,
-        stateMutability: 'view',
-        type: 'function',
-    },
-    {
-        constant: false,
-        inputs: [
-            { internalType: 'address', name: 'spender', type: 'address' },
-            { internalType: 'uint256', name: 'value', type: 'uint256' },
-        ],
-        name: 'approve',
-        outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
-        payable: false,
-        stateMutability: 'nonpayable',
-        type: 'function',
-    },
-    {
-        constant: true,
-        inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
-        name: 'balanceOf',
-        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-        payable: false,
-        stateMutability: 'view',
-        type: 'function',
-    },
-    {
-        constant: true,
-        inputs: [],
-        name: 'decimals',
-        outputs: [{ internalType: 'uint8', name: '', type: 'uint8' }],
-        payable: false,
-        stateMutability: 'view',
-        type: 'function',
-    },
-    {
-        constant: true,
-        inputs: [],
-        name: 'name',
-        outputs: [{ internalType: 'string', name: '', type: 'string' }],
-        payable: false,
-        stateMutability: 'view',
-        type: 'function',
-    },
-    {
-        constant: false,
-        inputs: [{ internalType: 'address', name: '_owner', type: 'address' }],
-        name: 'nominateNewOwner',
-        outputs: [],
-        payable: false,
-        stateMutability: 'nonpayable',
-        type: 'function',
-    },
-    {
-        constant: true,
-        inputs: [],
-        name: 'nominatedOwner',
-        outputs: [{ internalType: 'address', name: '', type: 'address' }],
-        payable: false,
-        stateMutability: 'view',
-        type: 'function',
-    },
-    {
-        constant: true,
-        inputs: [],
-        name: 'owner',
-        outputs: [{ internalType: 'address', name: '', type: 'address' }],
-        payable: false,
-        stateMutability: 'view',
-        type: 'function',
-    },
-    {
-        constant: false,
-        inputs: [{ internalType: 'contract Proxyable', name: '_target', type: 'address' }],
-        name: 'setTarget',
-        outputs: [],
-        payable: false,
-        stateMutability: 'nonpayable',
-        type: 'function',
-    },
-    {
-        constant: true,
-        inputs: [],
-        name: 'symbol',
-        outputs: [{ internalType: 'string', name: '', type: 'string' }],
-        payable: false,
-        stateMutability: 'view',
-        type: 'function',
-    },
-    {
-        constant: true,
-        inputs: [],
-        name: 'target',
-        outputs: [{ internalType: 'contract Proxyable', name: '', type: 'address' }],
-        payable: false,
-        stateMutability: 'view',
-        type: 'function',
-    },
-    {
-        constant: true,
-        inputs: [],
-        name: 'totalSupply',
-        outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
-        payable: false,
-        stateMutability: 'view',
-        type: 'function',
-    },
-    {
-        constant: false,
-        inputs: [
-            { internalType: 'address', name: 'to', type: 'address' },
-            { internalType: 'uint256', name: 'value', type: 'uint256' },
-        ],
-        name: 'transfer',
-        outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
-        payable: false,
-        stateMutability: 'nonpayable',
-        type: 'function',
-    },
-    {
-        constant: false,
-        inputs: [
-            { internalType: 'address', name: 'from', type: 'address' },
-            { internalType: 'address', name: 'to', type: 'address' },
-            { internalType: 'uint256', name: 'value', type: 'uint256' },
-        ],
-        name: 'transferFrom',
-        outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
-        payable: false,
-        stateMutability: 'nonpayable',
-        type: 'function',
-    },
-];
 
 const DAI_ABI = [
     { inputs: [], stateMutability: 'nonpayable', type: 'constructor' },
@@ -1257,104 +999,144 @@ const abi = [
     },
 ];
 
-const multipleCollateral = {
-    sUSD: {
-        addresses: {
-            [NetworkId.OptimismMainnet]: '0x8c6f28f2F1A3C87F0f938b96d27520d9751ec8d9' as Address, // sUSD
-            [NetworkId.OptimismSepolia]: '0xc4fa91b895fb66e8aafff9791f1018c2053db71f' as Address, // exoticSUSD
-            [NetworkId.PolygonMainnet]: TBD_ADDRESS,
-            [NetworkId.Arbitrum]: TBD_ADDRESS,
-            [NetworkId.Base]: TBD_ADDRESS,
-        },
-        abi: SUSD_ABI,
-    },
+const multipleCollateral: Record<Coins, ContractData> = {
     DAI: {
         addresses: {
             [NetworkId.OptimismMainnet]: '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1' as Address,
-            [NetworkId.OptimismSepolia]: '0x0091f4e75a03C11cB9be8E3717219005eb780D89' as Address,
-            [NetworkId.PolygonMainnet]: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063' as Address,
             [NetworkId.Arbitrum]: '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1' as Address,
             [NetworkId.Base]: TBD_ADDRESS,
+            [NetworkId.PolygonMainnet]: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063' as Address,
+            [NetworkId.OptimismSepolia]: '0x0091f4e75a03C11cB9be8E3717219005eb780D89' as Address,
         },
         abi: DAI_ABI,
     },
     USDCe: {
         addresses: {
             [NetworkId.OptimismMainnet]: '0x7F5c764cBc14f9669B88837ca1490cCa17c31607' as Address,
-            [NetworkId.OptimismSepolia]: TBD_ADDRESS,
-            [NetworkId.PolygonMainnet]: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174' as Address,
             [NetworkId.Arbitrum]: '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8' as Address,
             [NetworkId.Base]: TBD_ADDRESS,
+            [NetworkId.PolygonMainnet]: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174' as Address,
+            [NetworkId.OptimismSepolia]: TBD_ADDRESS,
         },
         abi,
     },
     USDbC: {
         addresses: {
             [NetworkId.OptimismMainnet]: TBD_ADDRESS,
-            [NetworkId.OptimismSepolia]: TBD_ADDRESS,
-            [NetworkId.PolygonMainnet]: TBD_ADDRESS,
             [NetworkId.Arbitrum]: TBD_ADDRESS,
             [NetworkId.Base]: '0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA' as Address,
+            [NetworkId.PolygonMainnet]: TBD_ADDRESS,
+            [NetworkId.OptimismSepolia]: TBD_ADDRESS,
         },
         abi,
     },
     USDC: {
         addresses: {
             [NetworkId.OptimismMainnet]: '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85' as Address,
-            [NetworkId.OptimismSepolia]: '0xff6535c1F971245435429A915aB9eB1713beC1C1' as Address, // exoticUSDC
-            [NetworkId.PolygonMainnet]: TBD_ADDRESS,
             [NetworkId.Arbitrum]: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831' as Address,
             [NetworkId.Base]: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' as Address,
+            [NetworkId.PolygonMainnet]: TBD_ADDRESS,
+            [NetworkId.OptimismSepolia]: '0xff6535c1F971245435429A915aB9eB1713beC1C1' as Address, // exoticUSDC
         },
         abi,
     },
     USDT: {
         addresses: {
             [NetworkId.OptimismMainnet]: '0x94b008aA00579c1307B0EF2c499aD98a8ce58e58' as Address,
-            [NetworkId.OptimismSepolia]: TBD_ADDRESS,
-            [NetworkId.PolygonMainnet]: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f' as Address,
             [NetworkId.Arbitrum]: '0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9' as Address,
             [NetworkId.Base]: TBD_ADDRESS,
+            [NetworkId.PolygonMainnet]: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f' as Address,
+            [NetworkId.OptimismSepolia]: TBD_ADDRESS,
         },
         abi,
     },
     OP: {
         addresses: {
             [NetworkId.OptimismMainnet]: '0x4200000000000000000000000000000000000042' as Address,
-            [NetworkId.OptimismSepolia]: TBD_ADDRESS,
-            [NetworkId.PolygonMainnet]: TBD_ADDRESS,
             [NetworkId.Arbitrum]: TBD_ADDRESS,
             [NetworkId.Base]: TBD_ADDRESS,
+            [NetworkId.PolygonMainnet]: TBD_ADDRESS,
+            [NetworkId.OptimismSepolia]: TBD_ADDRESS,
         },
         abi,
     },
     ARB: {
         addresses: {
             [NetworkId.OptimismMainnet]: TBD_ADDRESS,
-            [NetworkId.OptimismSepolia]: TBD_ADDRESS,
-            [NetworkId.PolygonMainnet]: TBD_ADDRESS,
             [NetworkId.Arbitrum]: '0x912CE59144191C1204E64559FE8253a0e49E6548' as Address,
             [NetworkId.Base]: TBD_ADDRESS,
+            [NetworkId.PolygonMainnet]: TBD_ADDRESS,
+            [NetworkId.OptimismSepolia]: TBD_ADDRESS,
         },
         abi,
     },
     WETH: {
         addresses: {
             [NetworkId.OptimismMainnet]: '0x4200000000000000000000000000000000000006' as Address,
-            [NetworkId.OptimismSepolia]: TBD_ADDRESS,
-            [NetworkId.PolygonMainnet]: TBD_ADDRESS,
             [NetworkId.Arbitrum]: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1' as Address,
             [NetworkId.Base]: '0x4200000000000000000000000000000000000006' as Address,
+            [NetworkId.PolygonMainnet]: TBD_ADDRESS,
+            [NetworkId.OptimismSepolia]: TBD_ADDRESS,
         },
         abi: WETH_ABI,
     },
     ETH: {
         addresses: {
             [NetworkId.OptimismMainnet]: ZERO_ADDRESS,
-            [NetworkId.OptimismSepolia]: ZERO_ADDRESS,
-            [NetworkId.PolygonMainnet]: ZERO_ADDRESS,
             [NetworkId.Arbitrum]: ZERO_ADDRESS,
             [NetworkId.Base]: ZERO_ADDRESS,
+            [NetworkId.PolygonMainnet]: ZERO_ADDRESS,
+            [NetworkId.OptimismSepolia]: ZERO_ADDRESS,
+        },
+        abi,
+    },
+    THALES: {
+        addresses: {
+            [NetworkId.OptimismMainnet]: '0x217d47011b23bb961eb6d93ca9945b7501a5bb11' as Address,
+            [NetworkId.Arbitrum]: '0xe85b662fe97e8562f4099d8a1d5a92d4b453bf30' as Address,
+            [NetworkId.Base]: TBD_ADDRESS,
+            [NetworkId.PolygonMainnet]: TBD_ADDRESS,
+            [NetworkId.OptimismSepolia]: '0xeC60249ee888FFdE5Ee09920C9644A904D4f49de' as Address,
+        },
+        abi,
+    },
+    sTHALES: {
+        addresses: {
+            [NetworkId.OptimismMainnet]: '0x217d47011b23bb961eb6d93ca9945b7501a5bb11' as Address,
+            [NetworkId.Arbitrum]: '0xe85b662fe97e8562f4099d8a1d5a92d4b453bf30' as Address,
+            [NetworkId.Base]: TBD_ADDRESS,
+            [NetworkId.PolygonMainnet]: TBD_ADDRESS,
+            [NetworkId.OptimismSepolia]: '0xeC60249ee888FFdE5Ee09920C9644A904D4f49de' as Address,
+        },
+        abi,
+    },
+    OVER: {
+        addresses: {
+            [NetworkId.OptimismMainnet]: '0xedf38688b27036816a50185caa430d5479e1c63e' as Address,
+            [NetworkId.Arbitrum]: '0x5829d6fe7528bc8e92c4e81cc8f20a528820b51a' as Address,
+            [NetworkId.Base]: '0x7750c092e284e2c7366f50c8306f43c7eb2e82a2' as Address,
+            [NetworkId.PolygonMainnet]: TBD_ADDRESS,
+            [NetworkId.OptimismSepolia]: '0xeC60249ee888FFdE5Ee09920C9644A904D4f49de' as Address,
+        },
+        abi,
+    },
+    cbBTC: {
+        addresses: {
+            [NetworkId.OptimismMainnet]: TBD_ADDRESS,
+            [NetworkId.Arbitrum]: TBD_ADDRESS,
+            [NetworkId.Base]: '0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf' as Address,
+            [NetworkId.PolygonMainnet]: TBD_ADDRESS,
+            [NetworkId.OptimismSepolia]: TBD_ADDRESS,
+        },
+        abi,
+    },
+    wBTC: {
+        addresses: {
+            [NetworkId.OptimismMainnet]: TBD_ADDRESS,
+            [NetworkId.Arbitrum]: '0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f' as Address,
+            [NetworkId.Base]: TBD_ADDRESS,
+            [NetworkId.PolygonMainnet]: TBD_ADDRESS,
+            [NetworkId.OptimismSepolia]: TBD_ADDRESS,
         },
         abi,
     },

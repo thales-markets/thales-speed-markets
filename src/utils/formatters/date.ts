@@ -92,7 +92,7 @@ export const formattedDurationFull = (duration: Duration, delimiter = ' ', first
         duration?.months && duration.months > 0
             ? formatted.push(`${duration.months}${defaultDateTimeTranslationMap['months-short']}`)
             : '';
-        duration?.months && duration.months > 0
+        duration?.days && duration.days > 0
             ? formatted.push(`${duration.days}${defaultDateTimeTranslationMap['days-short']}`)
             : '';
         duration?.hours && duration.hours > 0

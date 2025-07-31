@@ -1,11 +1,12 @@
-import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
-import QUERY_KEYS from 'constants/queryKeys';
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
+import { CRYPTO_CURRENCY_MAP } from 'constants/currency';
+import { OVER_CONTRACT_RATE_KEY } from 'constants/market';
+import QUERY_KEYS from 'constants/queryKeys';
 import { bigNumberFormatter, parseBytes32String } from 'thales-utils';
-import priceFeedContract from 'utils/contracts/priceFeedContract';
-import { getContract } from 'viem';
 import { QueryConfig } from 'types/network';
 import { ViemContract } from 'types/viem';
+import priceFeedContract from 'utils/contracts/priceFeedContract';
+import { getContract } from 'viem';
 export type Rates = Record<string, number>;
 
 const useExchangeRatesQuery = (
@@ -31,14 +32,19 @@ const useExchangeRatesQuery = (
                 currencies.forEach((currency: string, idx: number) => {
                     const currencyName = parseBytes32String(currency);
                     exchangeRates[currencyName] = bigNumberFormatter(rates[idx]);
-                    if (currencyName === 'SUSD') {
-                        exchangeRates[`sUSD`] = bigNumberFormatter(rates[idx]);
-                    } else {
-                        exchangeRates[`s${currencyName}`] = bigNumberFormatter(rates[idx]);
+
+                    if (currencyName === CRYPTO_CURRENCY_MAP.USDC) {
+                        exchangeRates[`${currencyName}e`] = bigNumberFormatter(rates[idx]);
                     }
                     if (currencyName === CRYPTO_CURRENCY_MAP.ETH) {
                         exchangeRates[`W${currencyName}`] = bigNumberFormatter(rates[idx]);
                     }
+                    if (currencyName === CRYPTO_CURRENCY_MAP.BTC) {
+                        exchangeRates[`cb${currencyName}`] = bigNumberFormatter(rates[idx]);
+                        exchangeRates[`w${currencyName}`] = bigNumberFormatter(rates[idx]);
+                    }
+
+                    exchangeRates[OVER_CONTRACT_RATE_KEY] = exchangeRates[CRYPTO_CURRENCY_MAP.OVER];
                 });
             }
 

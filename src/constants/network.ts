@@ -7,10 +7,10 @@ export const TBD_ADDRESS = '0xTBD' as Address;
 
 export const SUPPORTED_NETWORKS: Record<SupportedNetwork, string> = {
     [NetworkId.OptimismMainnet]: 'OPTIMISTIC',
-    [NetworkId.PolygonMainnet]: 'POLYGON-MAINNET',
-    [NetworkId.OptimismSepolia]: 'SEPOLIA-OPTIMISM',
     [NetworkId.Arbitrum]: 'ARBITRUM-ONE',
     [NetworkId.Base]: 'BASE',
+    [NetworkId.PolygonMainnet]: 'POLYGON-MAINNET',
+    [NetworkId.OptimismSepolia]: 'SEPOLIA-OPTIMISM',
 };
 
 export const TEST_NETWORKS = [NetworkId.OptimismSepolia];
@@ -24,17 +24,6 @@ export const SUPPORTED_NETWORKS_PARAMS: Record<number, NetworkParams> = {
         iconUrls: ['https://optimism.io/images/metamask_icon.svg', 'https://optimism.io/images/metamask_icon.png'],
         nativeCurrency: {
             symbol: 'ETH',
-            decimals: 18,
-        },
-    },
-    [NetworkId.PolygonMainnet]: {
-        chainId: '0x89',
-        chainName: 'Polygon Mainnet',
-        rpcUrls: ['https://polygon-rpc.com'],
-        blockExplorerUrls: ['https://polygonscan.com/'],
-        iconUrls: ['https://optimism.io/images/metamask_icon.svg', 'https://optimism.io/images/metamask_icon.png'],
-        nativeCurrency: {
-            symbol: 'POL',
             decimals: 18,
         },
     },
@@ -57,6 +46,17 @@ export const SUPPORTED_NETWORKS_PARAMS: Record<number, NetworkParams> = {
         iconUrls: ['https://optimism.io/images/metamask_icon.svg', 'https://optimism.io/images/metamask_icon.png'],
         nativeCurrency: {
             symbol: 'ETH',
+            decimals: 18,
+        },
+    },
+    [NetworkId.PolygonMainnet]: {
+        chainId: '0x89',
+        chainName: 'Polygon Mainnet',
+        rpcUrls: ['https://polygon-rpc.com'],
+        blockExplorerUrls: ['https://polygonscan.com/'],
+        iconUrls: ['https://optimism.io/images/metamask_icon.svg', 'https://optimism.io/images/metamask_icon.png'],
+        nativeCurrency: {
+            symbol: 'POL',
             decimals: 18,
         },
     },
