@@ -56,22 +56,22 @@ type DropdownNetwork = {
 };
 
 export const SUPPORTED_NETWORK_IDS_MAP: Record<number, DropdownNetwork> = {
-    // [NetworkId.OptimismMainnet]: {
-    //     name: 'Optimism',
-    //     icon: 'network-icon network-icon--op',
-    //     changeNetwork: async (networkId: number, callback: VoidFunction) => {
-    //         await changeNetwork(SUPPORTED_NETWORKS_PARAMS[networkId], callback);
-    //     },
-    //     order: 1,
-    // },
-    // [NetworkId.PolygonMainnet]: {
-    //     name: 'Polygon',
-    //     icon: 'network-icon network-icon--polygon',
-    //     changeNetwork: async (networkId: number, callback: VoidFunction) => {
-    //         await changeNetwork(SUPPORTED_NETWORKS_PARAMS[networkId], callback);
-    //     },
-    //     order: 4,
-    // },
+    [NetworkId.OptimismMainnet]: {
+        name: 'Optimism',
+        icon: 'network-icon network-icon--op',
+        changeNetwork: async (networkId: number, callback: VoidFunction) => {
+            await changeNetwork(SUPPORTED_NETWORKS_PARAMS[networkId], callback);
+        },
+        order: 1,
+    },
+    [NetworkId.PolygonMainnet]: {
+        name: 'Polygon',
+        icon: 'network-icon network-icon--polygon',
+        changeNetwork: async (networkId: number, callback: VoidFunction) => {
+            await changeNetwork(SUPPORTED_NETWORKS_PARAMS[networkId], callback);
+        },
+        order: 4,
+    },
     [NetworkId.Arbitrum]: {
         name: 'Arbitrum',
         icon: 'network-icon network-icon--arb',
@@ -80,14 +80,14 @@ export const SUPPORTED_NETWORK_IDS_MAP: Record<number, DropdownNetwork> = {
         },
         order: 2,
     },
-    // [NetworkId.Base]: {
-    //     name: 'Base',
-    //     icon: 'network-icon network-icon--base',
-    //     changeNetwork: async (networkId: number, callback: VoidFunction) => {
-    //         await changeNetwork(SUPPORTED_NETWORKS_PARAMS[networkId], callback);
-    //     },
-    //     order: 3,
-    // },
+    [NetworkId.Base]: {
+        name: 'Base',
+        icon: 'network-icon network-icon--base',
+        changeNetwork: async (networkId: number, callback: VoidFunction) => {
+            await changeNetwork(SUPPORTED_NETWORKS_PARAMS[networkId], callback);
+        },
+        order: 3,
+    },
 };
 
 export const getSupportedNetworksByRoute = (route: string): NetworkId[] => {
