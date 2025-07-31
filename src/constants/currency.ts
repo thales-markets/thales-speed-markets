@@ -62,7 +62,7 @@ export const currencyKeyToNameMap = {
 export const COLLATERALS: Record<SupportedNetwork, Coins[]> = {
     [NetworkId.OptimismMainnet]: [
         CRYPTO_CURRENCY_MAP.USDC as Coins,
-        // CRYPTO_CURRENCY_MAP.OVER as Coins,
+        CRYPTO_CURRENCY_MAP.OVER as Coins,
         CRYPTO_CURRENCY_MAP.USDCe as Coins,
         CRYPTO_CURRENCY_MAP.DAI as Coins,
         CRYPTO_CURRENCY_MAP.USDT as Coins,
@@ -72,7 +72,7 @@ export const COLLATERALS: Record<SupportedNetwork, Coins[]> = {
     ],
     [NetworkId.Arbitrum]: [
         CRYPTO_CURRENCY_MAP.USDC as Coins,
-        // CRYPTO_CURRENCY_MAP.OVER as Coins,
+        CRYPTO_CURRENCY_MAP.OVER as Coins,
         CRYPTO_CURRENCY_MAP.USDCe as Coins,
         CRYPTO_CURRENCY_MAP.DAI as Coins,
         CRYPTO_CURRENCY_MAP.USDT as Coins,
@@ -83,7 +83,7 @@ export const COLLATERALS: Record<SupportedNetwork, Coins[]> = {
     ],
     [NetworkId.Base]: [
         CRYPTO_CURRENCY_MAP.USDC as Coins,
-        // CRYPTO_CURRENCY_MAP.OVER as Coins,
+        CRYPTO_CURRENCY_MAP.OVER as Coins,
         CRYPTO_CURRENCY_MAP.USDbC as Coins,
         // CRYPTO_CURRENCY_MAP.DAI as Coins,
         // CRYPTO_CURRENCY_MAP.USDT as Coins,
