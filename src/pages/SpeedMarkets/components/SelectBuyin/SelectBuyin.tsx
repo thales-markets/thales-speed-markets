@@ -245,8 +245,12 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
         let errorMessageKey = '';
 
         if (buyinAmount !== '') {
-            const buyinAmountWithGas = isBiconomy ? Number(buyinAmount) + buyinGasFee : Number(buyinAmount);
-            if ((isConnected && buyinAmountWithGas > collateralBalance) || collateralBalance === 0) {
+            const convertedBuyinAmount = convertToStable(Number(buyinAmount));
+            const convertedBalanceAmount = convertToStable(Number(collateralBalance));
+            const buyinAmountWithGas = isBiconomy
+                ? Number(convertedBuyinAmount) + buyinGasFee
+                : Number(convertedBuyinAmount);
+            if ((isConnected && buyinAmountWithGas > convertedBalanceAmount) || collateralBalance === 0) {
                 errorMessageKey = 'common.errors.insufficient-balance-wallet';
             }
         }
