@@ -269,9 +269,7 @@ export const resolveAllSpeedPositions = async (
                       ])
                     : await speedMarketsAMMResolverContractWithSigner.write.resolveMarketsBatch(
                           [marketsToResolve, priceUpdateDataArray],
-                          {
-                              value: totalUpdateFee,
-                          }
+                          { value: totalUpdateFee }
                       );
             }
 
