@@ -1,5 +1,5 @@
 import Tooltip from 'components/Tooltip/Tooltip';
-import { USD_SIGN } from 'constants/currency';
+import { CRYPTO_CURRENCY_MAP, USD_SIGN } from 'constants/currency';
 import { secondsToHours, secondsToMilliseconds, secondsToMinutes } from 'date-fns';
 import { Positions } from 'enums/market';
 import useInterval from 'hooks/useInterval';
@@ -64,7 +64,10 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
 
     const potentialWinFormatted = isFetchingQuote
         ? '...'
-        : `${formatCurrencyWithKey(`${isOver ? '$' : ''}${selectedCollateral}`, profit * paidAmount)}`;
+        : `${formatCurrencyWithKey(
+              `${isOver ? `$${CRYPTO_CURRENCY_MAP.OVER}` : getDefaultCollateral(networkId)}`,
+              profit * paidAmount
+          )}`;
 
     const positionTypeFormatted =
         market.positionType === Positions.UP
