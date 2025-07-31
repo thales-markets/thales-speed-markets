@@ -4,8 +4,8 @@ import { Address } from 'viem';
 const speedMarketsAMMResolverContract = {
     addresses: {
         [NetworkId.OptimismMainnet]: '' as Address,
-        [NetworkId.Arbitrum]: '' as Address,
-        [NetworkId.Base]: '' as Address,
+        [NetworkId.Arbitrum]: '0x8e0e0d51d4bCbAeb17972AAbC4a437Ae92d24458' as Address,
+        [NetworkId.Base]: '0x629F065DFDD9141Dec49782E25Bf2B7E510585E6' as Address,
         [NetworkId.PolygonMainnet]: '' as Address,
         [NetworkId.OptimismSepolia]: '0x4a405D04D4954785ED5b356568f947346503da71' as Address,
     },
