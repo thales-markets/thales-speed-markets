@@ -7,9 +7,11 @@ import ChainedPosition from 'pages/SpeedMarkets/components/ChainedPosition';
 import ChainedPositionAction from 'pages/SpeedMarkets/components/ChainedPositionAction';
 import { DirectionIcon } from 'pages/SpeedMarkets/components/UserOpenPositions/components/TablePositions/TablePositions';
 import React from 'react';
-import { formatCurrencyWithSign } from 'thales-utils';
+import { formatCurrencyWithKey, formatCurrencyWithSign } from 'thales-utils';
 import { UserChainedPosition } from 'types/market';
+import { getCollateralByAddress, isOverCurrency } from 'utils/currency';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
+import { getChainedEndTime } from 'utils/position';
 import {
     AssetIcon,
     AssetName,
@@ -17,7 +19,6 @@ import {
     Value,
     Wrapper,
 } from '../../../OpenPositions/components/TablePositions/TablePositions';
-import { getChainedEndTime } from 'utils/position';
 
 type TablePositionsProps = {
     data: UserChainedPosition[];
@@ -118,21 +119,39 @@ const TableChainedPositions: React.FC<TablePositionsProps> = ({
         {
             header: <Header>{t('speed-markets.user-positions.paid')}</Header>,
             accessorKey: 'paid',
-            cell: (cellProps: any) => (
-                <Wrapper>
-                    <Value>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())}</Value>
-                </Wrapper>
-            ),
+            cell: (cellProps: any) => {
+                const position = cellProps.row.original;
+                const collateralByAddress = getCollateralByAddress(position.collateralAddress, position.networkId);
+                const collateral = `${isOverCurrency(collateralByAddress) ? '$' : ''}${collateralByAddress}`;
+                return (
+                    <Wrapper>
+                        <Value>
+                            {position.isDefaultCollateral
+                                ? formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())
+                                : formatCurrencyWithKey(collateral, cellProps.cell.getValue())}
+                        </Value>
+                    </Wrapper>
+                );
+            },
             size: 50,
         },
         {
             header: <Header>{t('speed-markets.user-positions.payout')}</Header>,
             accessorKey: 'payout',
-            cell: (cellProps: any) => (
-                <Wrapper>
-                    <Value>{formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())}</Value>
-                </Wrapper>
-            ),
+            cell: (cellProps: any) => {
+                const position = cellProps.row.original;
+                const collateralByAddress = getCollateralByAddress(position.collateralAddress, position.networkId);
+                const collateral = `${isOverCurrency(collateralByAddress) ? '$' : ''}${collateralByAddress}`;
+                return (
+                    <Wrapper>
+                        <Value>
+                            {position.isDefaultCollateral
+                                ? formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())
+                                : formatCurrencyWithKey(collateral, cellProps.cell.getValue())}
+                        </Value>
+                    </Wrapper>
+                );
+            },
             size: 60,
         },
         {
@@ -167,6 +186,7 @@ const TableChainedPositions: React.FC<TablePositionsProps> = ({
         <Table
             data={data}
             columns={columns as any}
+            columnsDeps={[isAdmin, isSubmittingBatch]}
             expandedRow={(row) => {
                 return <ChainedPosition position={row.original} />;
             }}

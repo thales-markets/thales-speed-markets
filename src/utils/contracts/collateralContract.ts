@@ -4,10 +4,10 @@ import { Address } from 'viem';
 const erc20Contract = {
     addresses: {
         [NetworkId.OptimismMainnet]: '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85' as Address, // USDC
-        [NetworkId.OptimismSepolia]: '0xff6535c1F971245435429A915aB9eB1713beC1C1' as Address, // exoticUSDC
-        [NetworkId.PolygonMainnet]: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174' as Address, // USDCe
         [NetworkId.Arbitrum]: '0xaf88d065e77c8cC2239327C5EDb3A432268e5831' as Address, // USDC
         [NetworkId.Base]: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' as Address, // USDC
+        [NetworkId.PolygonMainnet]: '0x2791bca1f2de4661ed88a30c99a7a9449aa84174' as Address, // USDCe
+        [NetworkId.OptimismSepolia]: '0xff6535c1F971245435429A915aB9eB1713beC1C1' as Address, // exoticUSDC
     },
     abi: [
         { inputs: [], stateMutability: 'nonpayable', type: 'constructor' },

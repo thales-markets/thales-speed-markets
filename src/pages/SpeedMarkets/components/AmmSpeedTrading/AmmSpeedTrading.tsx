@@ -41,9 +41,12 @@ import {
     ceilNumberToDecimals,
     coinParser,
     COLLATERAL_DECIMALS,
+    DEFAULT_CURRENCY_DECIMALS,
     formatCurrencyWithSign,
     localStore,
+    LONG_CURRENCY_DECIMALS,
     NetworkId,
+    roundNumberToDecimals,
     truncToDecimals,
 } from 'thales-utils';
 import { AmmChainedSpeedMarketsLimits, AmmSpeedMarketsLimits } from 'types/market';
@@ -63,6 +66,7 @@ import {
     convertFromStableToCollateral,
     getCollateral,
     getDefaultCollateral,
+    isOverCurrency,
     isStableCurrency,
 } from 'utils/currency';
 import { checkAllowance, getIsMultiCollateralSupported } from 'utils/network';
@@ -179,6 +183,8 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         networkId,
         selectedCollateralIndex,
     ]);
+    const isDefaultCollateral = selectedCollateral === defaultCollateral;
+    const isOver = isOverCurrency(selectedCollateral);
     const isEth = selectedCollateral === CRYPTO_CURRENCY_MAP.ETH;
     const collateralAddress = isMultiCollateralSupported
         ? isEth
@@ -291,11 +297,14 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         const totalFeeUp = getTotalFee(Positions.UP);
         const totalFeeDown = getTotalFee(Positions.DOWN);
 
+        const bonusPerCollateral = ammSpeedMarketsLimits?.bonusPerCollateral[selectedCollateral] || 0;
+        const quoteWithBonus = SPEED_MARKETS_QUOTE * (1 + bonusPerCollateral);
+
         return {
-            [Positions.UP]: totalFeeUp ? SPEED_MARKETS_QUOTE / (1 + totalFeeUp) : 0,
-            [Positions.DOWN]: totalFeeDown ? SPEED_MARKETS_QUOTE / (1 + totalFeeDown) : 0,
+            [Positions.UP]: totalFeeUp ? quoteWithBonus / (1 + totalFeeUp) : 0,
+            [Positions.DOWN]: totalFeeDown ? quoteWithBonus / (1 + totalFeeDown) : 0,
         };
-    }, [getTotalFee]);
+    }, [getTotalFee, selectedCollateral, ammSpeedMarketsLimits]);
 
     // Used for canceling asynchronous tasks
     const mountedRef = useRef(true);
@@ -306,19 +315,30 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     }, []);
 
     useEffect(() => {
-        if (selectedCollateral === defaultCollateral) {
+        if (isDefaultCollateral || isOver) {
             setBuyinAmount(paidAmount / (1 + totalFee));
         } else {
             setBuyinAmount(paidAmount);
         }
 
         if (totalFee) {
-            setPotentialProfit((isChained ? chainedQuote : SPEED_MARKETS_QUOTE) / (1 + totalFee));
+            const bonusPerCollateral = ammSpeedMarketsLimits?.bonusPerCollateral[selectedCollateral] || 0;
+            const quoteWithBonus = (isChained ? chainedQuote : SPEED_MARKETS_QUOTE) * (1 + bonusPerCollateral);
+            setPotentialProfit(quoteWithBonus / (1 + totalFee));
         } else {
             // initial value
             setPotentialProfit(0);
         }
-    }, [paidAmount, totalFee, selectedCollateral, defaultCollateral, isChained, chainedQuote]);
+    }, [
+        paidAmount,
+        totalFee,
+        isDefaultCollateral,
+        isOver,
+        isChained,
+        chainedQuote,
+        ammSpeedMarketsLimits?.bonusPerCollateral,
+        selectedCollateral,
+    ]);
 
     useEffect(() => {
         if (enteredBuyinAmount > 0) {
@@ -582,7 +602,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                     abi: multipleCollateral.WETH.abi,
                     address: multipleCollateral.WETH.addresses[networkId],
                     client: walletClient.data as Client,
-                });
+                }) as ViemContract;
                 const hash = await wethContractWithSigner.write.deposit([], { value: buyInAmountParam });
                 const txReceipt = await waitForTransactionReceipt(client as Client, { hash });
                 if (txReceipt.status !== 'success') {
@@ -738,8 +758,8 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                         }}
                         isFetchingQuote={false}
                         profit={potentialProfit}
-                        paidAmount={convertToStable(paidAmount)}
-                        hasCollateralConversion={selectedCollateral !== defaultCollateral}
+                        paidAmount={isOver ? paidAmount : convertToStable(paidAmount)}
+                        selectedCollateral={selectedCollateral}
                     />
                     {!isChained && (
                         <ShareWrapper>
@@ -760,6 +780,8 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                                     maturityDate: Date.now() + secondsToMilliseconds(deltaTimeSec || 100),
                                     paid: convertToStable(paidAmount),
                                     payout: potentialProfit * convertToStable(paidAmount),
+                                    collateralAddress,
+                                    isDefaultCollateral,
                                     currentPrice: currentPrice ?? 0,
                                     finalPrice: 0,
                                     isClaimable: false,
@@ -866,16 +888,14 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         setBuyinGasFee,
     ]);
 
-    const inputWrapperRef = useRef<HTMLDivElement>(null);
-
     return (
         <Container>
             {!isMobile && getTradingDetails()}
             <FinalizeTrade>
-                <ColumnSpaceBetween ref={inputWrapperRef}>
+                <ColumnSpaceBetween>
                     <QuoteContainer>
                         <QuoteLabel>{t('speed-markets.potential-profit')}</QuoteLabel>
-                        <QuoteText>{potentialProfit ? `${truncToDecimals(potentialProfit)}x` : '-'}</QuoteText>
+                        <QuoteText>{potentialProfit ? `${roundNumberToDecimals(potentialProfit)}x` : '-'}</QuoteText>
                     </QuoteContainer>
                     {isMobile && getTradingDetails()}
                     <ButtonWrapper>
@@ -894,12 +914,10 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
 
             {openApprovalModal && (
                 <ApprovalModal
-                    defaultAmount={
-                        ALLOWANCE_BUFFER_PERCENTAGE *
-                        (isStableCurrency(selectedCollateral)
-                            ? ceilNumberToDecimals(paidAmount)
-                            : ceilNumberToDecimals(paidAmount, COLLATERAL_DECIMALS[selectedCollateral]))
-                    }
+                    defaultAmount={ceilNumberToDecimals(
+                        ALLOWANCE_BUFFER_PERCENTAGE * paidAmount,
+                        isStableCurrency(selectedCollateral) ? DEFAULT_CURRENCY_DECIMALS : LONG_CURRENCY_DECIMALS
+                    )}
                     tokenSymbol={isEth ? CRYPTO_CURRENCY_MAP.WETH : selectedCollateral}
                     isAllowing={isAllowing}
                     onSubmit={handleAllowance}

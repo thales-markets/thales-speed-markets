@@ -63,7 +63,6 @@ export default defineConfig(({ mode }) => {
                     manualChunks: {
                         rainbowkit: ['@rainbow-me/rainbowkit'],
                         lightweightCharts: ['lightweight-charts'],
-                        lottie: ['lottie-react'],
                         router: ['react-router-dom'],
                         pyth: ['@pythnetwork/hermes-client'],
                         reduxToolkit: ['@reduxjs/toolkit'],

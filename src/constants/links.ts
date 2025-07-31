@@ -1,8 +1,6 @@
 export const LINKS = {
     API: 'https://api.overtime.io',
     Markets: {
-        Sport: 'https://overtimemarkets.xyz/',
-        Thales: 'https://thalesmarket.io/markets',
         Speed: 'https://speedmarkets.xyz/speed-markets',
         ChainedSpeed: 'https://speedmarkets.xyz/speed-markets?isChained=true',
     },

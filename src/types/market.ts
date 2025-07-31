@@ -1,4 +1,5 @@
 import { Positions } from 'enums/market';
+import { Coins } from 'thales-utils';
 
 export type UserPosition = {
     user: string;
@@ -9,6 +10,8 @@ export type UserPosition = {
     maturityDate: number;
     paid: number;
     payout: number;
+    collateralAddress: string;
+    isDefaultCollateral: boolean;
     currentPrice: number;
     finalPrice: number;
     isClaimable: boolean;
@@ -27,6 +30,8 @@ export type UserChainedPosition = {
     paid: number;
     payout: number;
     payoutMultiplier: number;
+    collateralAddress: string;
+    isDefaultCollateral: boolean;
     currentPrice: number;
     finalPrices: number[];
     canResolve: boolean;
@@ -57,6 +62,7 @@ export type AmmSpeedMarketsLimits = {
     maxSkewImpact: number;
     safeBoxImpact: number;
     whitelistedAddress: boolean;
+    bonusPerCollateral: Record<Coins, number>;
 };
 
 export type AmmChainedSpeedMarketsLimits = {

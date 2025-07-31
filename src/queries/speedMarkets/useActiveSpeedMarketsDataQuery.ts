@@ -1,5 +1,5 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query';
-import { SIDE_TO_POSITION_MAP, SPEED_MARKETS_QUOTE } from 'constants/market';
+import { SIDE_TO_POSITION_MAP } from 'constants/market';
 import { ZERO_ADDRESS } from 'constants/network';
 import { PYTH_CURRENCY_DECIMALS, SUPPORTED_ASSETS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
@@ -11,6 +11,7 @@ import { ViemContract } from 'types/viem';
 import { getContractAbi } from 'utils/contracts/abi';
 import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
 import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
+import { getCollateralByAddress } from 'utils/currency';
 import { getCurrentPrices, getPriceConnection, getPriceId } from 'utils/pyth';
 import { getFeesFromHistory } from 'utils/speedAmm';
 import { getContract } from 'viem';
@@ -57,7 +58,7 @@ const useActiveSpeedMarketsDataQuery = (
                 for (let i = 0; i < maturedMarkets.length; i++) {
                     const marketData = maturedMarkets[i];
                     const side = SIDE_TO_POSITION_MAP[marketData.direction];
-                    const payout = coinFormatter(marketData.buyinAmount, queryConfig.networkId) * SPEED_MARKETS_QUOTE;
+                    const collateral = getCollateralByAddress(marketData.collateral, queryConfig.networkId);
 
                     const maturityDate = secondsToMilliseconds(Number(marketData.strikeTime));
                     const createdAt =
@@ -81,8 +82,10 @@ const useActiveSpeedMarketsDataQuery = (
                         side,
                         strikePrice: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS),
                         maturityDate,
-                        paid: coinFormatter(marketData.buyinAmount, queryConfig.networkId) * (1 + fees),
-                        payout: payout,
+                        paid: coinFormatter(marketData.buyinAmount, queryConfig.networkId, collateral) * (1 + fees),
+                        payout: coinFormatter(marketData.payout, queryConfig.networkId, collateral),
+                        collateralAddress: marketData.collateral,
+                        isDefaultCollateral: marketData.isDefaultCollateral,
                         currentPrice: 0,
                         finalPrice: 0,
                         isClaimable: false,
@@ -106,7 +109,7 @@ const useActiveSpeedMarketsDataQuery = (
                     const marketData = openMarkets[i];
                     const currencyKey = parseBytes32String(marketData.asset);
                     const side = SIDE_TO_POSITION_MAP[marketData.direction];
-                    const payout = coinFormatter(marketData.buyinAmount, queryConfig.networkId) * SPEED_MARKETS_QUOTE;
+                    const collateral = getCollateralByAddress(marketData.collateral, queryConfig.networkId);
                     const maturityDate = secondsToMilliseconds(Number(marketData.strikeTime));
 
                     const createdAt =
@@ -130,8 +133,10 @@ const useActiveSpeedMarketsDataQuery = (
                         side,
                         strikePrice: bigNumberFormatter(marketData.strikePrice, PYTH_CURRENCY_DECIMALS),
                         maturityDate,
-                        paid: coinFormatter(marketData.buyinAmount, queryConfig.networkId) * (1 + fees),
-                        payout: payout,
+                        paid: coinFormatter(marketData.buyinAmount, queryConfig.networkId, collateral) * (1 + fees),
+                        payout: coinFormatter(marketData.payout, queryConfig.networkId, collateral),
+                        collateralAddress: marketData.collateral,
+                        isDefaultCollateral: marketData.isDefaultCollateral,
                         currentPrice: prices[currencyKey],
                         finalPrice: 0,
                         isClaimable: false,

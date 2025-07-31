@@ -1,7 +1,7 @@
+import { HistoryStatus } from 'enums/market';
 import { UserChainedPosition, UserPosition } from 'types/market';
 import { UserHistoryPosition } from 'types/profile';
 import { isUserWinner } from './speedAmm';
-import { HistoryStatus } from 'enums/market';
 
 export const mapUserPositionToHistory = (userPosition: UserPosition): UserHistoryPosition => {
     const isMatured = userPosition.maturityDate < Date.now();
@@ -17,6 +17,8 @@ export const mapUserPositionToHistory = (userPosition: UserPosition): UserHistor
         paid: userPosition.paid,
         payout: userPosition.payout,
         payoutMultiplier: 0,
+        collateralAddress: userPosition.collateralAddress,
+        isDefaultCollateral: userPosition.isDefaultCollateral,
         currentPrice: userPosition.currentPrice,
         finalPrices: [userPosition.finalPrice],
         canResolve: userPosition.isResolved ? false : isMatured && userPosition.finalPrice,
@@ -38,6 +40,8 @@ export const mapUserHistoryToPosition = (userHistory: UserHistoryPosition): User
         maturityDate: userHistory.maturityDate,
         paid: userHistory.paid,
         payout: userHistory.payout,
+        collateralAddress: userHistory.collateralAddress,
+        isDefaultCollateral: userHistory.isDefaultCollateral,
         currentPrice: userHistory.currentPrice,
         finalPrice: userHistory.finalPrices[0],
         isMatured: userHistory.isMatured,
