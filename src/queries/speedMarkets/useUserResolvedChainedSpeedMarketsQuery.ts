@@ -124,7 +124,7 @@ const useUserResolvedChainedSpeedMarketsQuery = (
                         currentPrice: 0,
                         finalPrices,
                         canResolve: false,
-                        resolveIndex: finalPrices.length - 1,
+                        resolveIndex: (!finalPrices.length ? sides.length : finalPrices.length) - 1,
                         isMatured: true,
                         isClaimable: false,
                         isUserWinner: marketData.isUserWinner,
