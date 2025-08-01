@@ -85,6 +85,8 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
                   ? secondsToHours(deltaTimeSec) === 1
                       ? t('common.time-remaining.hour')
                       : t('common.time-remaining.hours')
+                  : secondsToMinutes(deltaTimeSec) === 1
+                  ? t('common.time-remaining.minute')
                   : t('common.time-remaining.minutes')
           }`
         : `( ${t('speed-markets.amm-trading.choose-time')} ) ${t('common.time-remaining.minutes')}`;
