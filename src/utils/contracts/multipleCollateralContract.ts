@@ -1004,7 +1004,7 @@ const multipleCollateral: Record<Coins, ContractData> = {
         addresses: {
             [NetworkId.OptimismMainnet]: '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1' as Address,
             [NetworkId.Arbitrum]: '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1' as Address,
-            [NetworkId.Base]: TBD_ADDRESS,
+            [NetworkId.Base]: '0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb' as Address,
             [NetworkId.PolygonMainnet]: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063' as Address,
             [NetworkId.OptimismSepolia]: '0x0091f4e75a03C11cB9be8E3717219005eb780D89' as Address,
         },
@@ -1044,7 +1044,7 @@ const multipleCollateral: Record<Coins, ContractData> = {
         addresses: {
             [NetworkId.OptimismMainnet]: '0x94b008aA00579c1307B0EF2c499aD98a8ce58e58' as Address,
             [NetworkId.Arbitrum]: '0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9' as Address,
-            [NetworkId.Base]: TBD_ADDRESS,
+            [NetworkId.Base]: '0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2' as Address,
             [NetworkId.PolygonMainnet]: '0xc2132d05d31c914a87c6611c10748aeb04b58e8f' as Address,
             [NetworkId.OptimismSepolia]: TBD_ADDRESS,
         },
