@@ -66,7 +66,7 @@ import {
     convertFromStableToCollateral,
     getCollateral,
     getDefaultCollateral,
-    isOverCurrency,
+    isLpSupported,
     isStableCurrency,
 } from 'utils/currency';
 import { checkAllowance, getIsMultiCollateralSupported } from 'utils/network';
@@ -183,8 +183,8 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         networkId,
         selectedCollateralIndex,
     ]);
+    const collateralHasLp = isLpSupported(selectedCollateral);
     const isDefaultCollateral = selectedCollateral === defaultCollateral;
-    const isOver = isOverCurrency(selectedCollateral);
     const isEth = selectedCollateral === CRYPTO_CURRENCY_MAP.ETH;
     const collateralAddress = isMultiCollateralSupported
         ? isEth
@@ -314,8 +314,9 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         };
     }, []);
 
+    // set buyin without fees if it is native collateral
     useEffect(() => {
-        if (isDefaultCollateral || isOver) {
+        if (collateralHasLp) {
             setBuyinAmount(paidAmount / (1 + totalFee));
         } else {
             setBuyinAmount(paidAmount);
@@ -332,8 +333,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     }, [
         paidAmount,
         totalFee,
-        isDefaultCollateral,
-        isOver,
+        collateralHasLp,
         isChained,
         chainedQuote,
         ammSpeedMarketsLimits?.bonusPerCollateral,
@@ -757,8 +757,11 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                             chainedPositions: isChained ? chainedPositions : undefined,
                         }}
                         isFetchingQuote={false}
-                        profit={potentialProfit}
-                        paidAmount={isOver ? paidAmount : convertToStable(paidAmount)}
+                        payout={
+                            isDefaultCollateral || !collateralHasLp
+                                ? convertToStable(potentialProfit * paidAmount)
+                                : potentialProfit * paidAmount
+                        }
                         selectedCollateral={selectedCollateral}
                     />
                     {!isChained && (

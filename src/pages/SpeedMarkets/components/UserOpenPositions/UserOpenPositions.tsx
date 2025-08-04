@@ -2,7 +2,7 @@ import Button from 'components/Button';
 import CollateralSelector from 'components/CollateralSelector';
 import SimpleLoader from 'components/SimpleLoader/SimpleLoader';
 import Tooltip from 'components/Tooltip';
-import { CRYPTO_CURRENCY_MAP, USD_SIGN } from 'constants/currency';
+import { USD_SIGN } from 'constants/currency';
 import { millisecondsToSeconds } from 'date-fns';
 import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
@@ -19,12 +19,18 @@ import { getIsMobile } from 'redux/modules/ui';
 import { getIsBiconomy } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDiv, FlexDivCentered, FlexDivColumn, FlexDivRow } from 'styles/common';
-import { Coins, formatCurrencyWithSign } from 'thales-utils';
+import { formatCurrencyWithSign } from 'thales-utils';
 import { UserChainedPosition, UserPosition } from 'types/market';
 import { SupportedNetwork } from 'types/network';
 import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
-import { getCollateralAddress, getDefaultCollateral } from 'utils/currency';
+import {
+    getCollateralAddress,
+    getCollateralByAddress,
+    getDefaultCollateral,
+    getNativeCollateralsText,
+    isOverCurrency,
+} from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
 import { sortSpeedMarkets } from 'utils/position';
 import { getPriceId } from 'utils/pyth';
@@ -215,17 +221,32 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
     const claimableSelectedPositions = isChainedSelected ? claimableChainedPositions : claimableSpeedPositions;
     const isAllClaimablePositionsInSameCollateral =
         claimableSelectedPositions.every((marketData) => marketData.isDefaultCollateral) ||
-        claimableSelectedPositions.every((marketData) => !marketData.isDefaultCollateral);
+        claimableSelectedPositions.every(
+            (marketData) =>
+                !marketData.isDefaultCollateral &&
+                !!positions.length &&
+                positions[0].collateralAddress === marketData.collateralAddress
+        );
 
-    const claimableAllPositions = isAllClaimablePositionsInSameCollateral
-        ? claimableSelectedPositions
-        : claimableSelectedPositions.filter((marketData) => marketData.isDefaultCollateral);
+    const hasPositionsDefaultCollateral = claimableSelectedPositions.some(
+        (marketData) => marketData.isDefaultCollateral
+    );
+
+    const nativeCollateralAddress = claimableSelectedPositions.find(
+        (marketData) => !hasPositionsDefaultCollateral && !marketData.isDefaultCollateral
+    )?.collateralAddress;
+
+    const nativeCollateral = nativeCollateralAddress
+        ? getCollateralByAddress(nativeCollateralAddress, networkId)
+        : null;
+
+    const claimableAllPositions = claimableSelectedPositions.filter((marketData) =>
+        nativeCollateralAddress
+            ? nativeCollateralAddress === marketData.collateralAddress
+            : marketData.isDefaultCollateral
+    );
 
     const claimableAllPositionsPayout = claimableAllPositions.reduce((acc, pos) => acc + pos.payout, 0);
-    const isClaimInOver =
-        isAllClaimablePositionsInSameCollateral &&
-        !!claimableSelectedPositions.length &&
-        !claimableSelectedPositions[0].isDefaultCollateral;
 
     // Table tab selection to follow choosen direction(s)
     useEffect(() => {
@@ -259,17 +280,29 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
 
     const getClaimAllButton = () => (
         <Button disabled={isSubmitting} additionalStyles={additionalButtonStyle} fontSize="13px" onClick={handleSubmit}>
-            {`${t(
-                `speed-markets.user-positions.claim-all${isClaimInOver ? '-in' : ''}${isSubmitting ? '-progress' : ''}`
-            )} ${
-                isClaimInOver
-                    ? formatCurrencyWithSign(`$${CRYPTO_CURRENCY_MAP.OVER} `, claimableAllPositionsPayout)
-                    : formatCurrencyWithSign(USD_SIGN, claimableAllPositionsPayout)
-            }`}
+            <>
+                {t(
+                    `speed-markets.user-positions.claim-all${nativeCollateral ? '-in' : ''}${
+                        isSubmitting ? '-progress' : ''
+                    }`
+                )}
+                <CollateralText>
+                    {` ${
+                        nativeCollateral
+                            ? formatCurrencyWithSign(
+                                  `${isOverCurrency(nativeCollateral) ? '$' : ''}${nativeCollateral} `,
+                                  claimableAllPositionsPayout
+                              )
+                            : formatCurrencyWithSign(USD_SIGN, claimableAllPositionsPayout)
+                    }`}
+                </CollateralText>
+            </>
             <Tooltip
                 overlay={
                     !isMobile && !isAllClaimablePositionsInSameCollateral
-                        ? t('speed-markets.tooltips.claim-all-except-over')
+                        ? t('speed-markets.tooltips.claim-all-except-native', {
+                              collaterals: getNativeCollateralsText(networkId, nativeCollateral),
+                          })
                         : ''
                 }
             />
@@ -330,8 +363,8 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
                                             </ClaimAll>
                                             <CollateralSelector
                                                 collateralArray={[
-                                                    isClaimInOver
-                                                        ? (CRYPTO_CURRENCY_MAP.OVER as Coins)
+                                                    nativeCollateral
+                                                        ? nativeCollateral
                                                         : getDefaultCollateral(networkId),
                                                 ]}
                                                 selectedItem={0}
@@ -346,7 +379,9 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
                                 </ClaimAllWrapper>
                                 {isMobile && !isAllClaimablePositionsInSameCollateral && (
                                     <FlexDivRow>
-                                        <InfoText>{`* ${t('speed-markets.tooltips.claim-all-except-over')}`}</InfoText>
+                                        <InfoText>{`* ${t('speed-markets.tooltips.claim-all-except-native', {
+                                            collaterals: getNativeCollateralsText(networkId, nativeCollateral),
+                                        })}`}</InfoText>
                                     </FlexDivRow>
                                 )}
                             </>
@@ -520,6 +555,10 @@ const InfoText = styled.span`
     font-size: 13px;
     line-height: 100%;
     color: ${(props) => props.theme.textColor.secondary};
+`;
+
+const CollateralText = styled.span`
+    text-transform: none;
 `;
 
 const NoPositionsText = styled.span`

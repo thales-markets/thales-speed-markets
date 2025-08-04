@@ -1,5 +1,5 @@
 import Tooltip from 'components/Tooltip/Tooltip';
-import { CRYPTO_CURRENCY_MAP, USD_SIGN } from 'constants/currency';
+import { USD_SIGN } from 'constants/currency';
 import { secondsToHours, secondsToMilliseconds, secondsToMinutes } from 'date-fns';
 import { Positions } from 'enums/market';
 import useInterval from 'hooks/useInterval';
@@ -8,9 +8,16 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsMobile } from 'redux/modules/ui';
 import { FlexDivCentered } from 'styles/common';
-import { Coins, formatCurrencyWithKey, formatCurrencyWithSign, formatShortDateWithTime } from 'thales-utils';
+import {
+    Coins,
+    formatCurrencyWithKey,
+    formatCurrencyWithSign,
+    formatShortDateWithTime,
+    LONG_CURRENCY_DECIMALS,
+    SHORT_CURRENCY_DECIMALS,
+} from 'thales-utils';
 import { RootState } from 'types/ui';
-import { getDefaultCollateral, isOverCurrency } from 'utils/currency';
+import { getDefaultCollateral, isLpSupported, isStableCurrency } from 'utils/currency';
 import { useChainId } from 'wagmi';
 import { Cotainer, Footer, PositionText, Text, TextFooter, TextLabel, TextValue } from './styled-components';
 
@@ -24,8 +31,7 @@ type TradingDetailsSentenceProps = {
     currencyKey: string;
     market: SpeedMarketsTrade;
     isFetchingQuote: boolean;
-    profit: number;
-    paidAmount: number;
+    payout: number;
     deltaTimeSec: number;
     selectedCollateral: Coins;
 };
@@ -34,8 +40,7 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
     currencyKey,
     market,
     isFetchingQuote,
-    profit,
-    paidAmount,
+    payout,
     deltaTimeSec,
     selectedCollateral,
 }) => {
@@ -46,8 +51,8 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
 
     const [dateFromDelta, setDateFromDelta] = useState(0);
 
-    const isOver = isOverCurrency(selectedCollateral);
-    const hasCollateralConversion = selectedCollateral !== getDefaultCollateral(networkId) && !isOver;
+    const isDefaultCollateral = selectedCollateral === getDefaultCollateral(networkId);
+    const collateralHasLp = isLpSupported(selectedCollateral);
 
     useEffect(() => {
         if (deltaTimeSec) {
@@ -64,10 +69,13 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
 
     const potentialWinFormatted = isFetchingQuote
         ? '...'
-        : `${formatCurrencyWithKey(
-              `${isOver ? `$${CRYPTO_CURRENCY_MAP.OVER}` : getDefaultCollateral(networkId)}`,
-              profit * paidAmount
-          )}`;
+        : isDefaultCollateral || !collateralHasLp
+        ? formatCurrencyWithSign(USD_SIGN, payout)
+        : formatCurrencyWithKey(
+              `$${selectedCollateral}`,
+              payout,
+              isStableCurrency(selectedCollateral) ? SHORT_CURRENCY_DECIMALS : LONG_CURRENCY_DECIMALS
+          );
 
     const positionTypeFormatted =
         market.positionType === Positions.UP
@@ -170,14 +178,12 @@ const TradingDetailsSentence: React.FC<TradingDetailsSentenceProps> = ({
             <FlexDivCentered>
                 <Text>
                     <TextLabel>{t('speed-markets.amm-trading.you-win')}</TextLabel>
-                    {hasCollateralConversion && <TextLabel>{` ${t('speed-markets.amm-trading.at-least')}`}</TextLabel>}
+                    {!collateralHasLp && <TextLabel>{` ${t('speed-markets.amm-trading.at-least')}`}</TextLabel>}
                     <TextValue $isProfit>
                         {' '}
-                        {profit > 0 && paidAmount > 0
-                            ? potentialWinFormatted
-                            : '( ' + t('speed-markets.amm-trading.based-amount') + ' )'}
+                        {payout > 0 ? potentialWinFormatted : '( ' + t('speed-markets.amm-trading.based-amount') + ' )'}
                     </TextValue>
-                    {hasCollateralConversion && profit > 0 && paidAmount > 0 && (
+                    {!collateralHasLp && payout > 0 && (
                         <Tooltip overlay={t('speed-markets.tooltips.payout-conversion')} />
                     )}
                 </Text>

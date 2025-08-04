@@ -10,7 +10,7 @@ import {
     getSuccessToastOptions,
 } from 'components/ToastMessage/ToastMessage';
 import Tooltip from 'components/Tooltip/Tooltip';
-import { CRYPTO_CURRENCY_MAP, USD_SIGN } from 'constants/currency';
+import { USD_SIGN } from 'constants/currency';
 import { ZERO_ADDRESS } from 'constants/network';
 import { PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
 import { differenceInSeconds, millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
@@ -34,7 +34,14 @@ import { getContractAbi } from 'utils/contracts/abi';
 import erc20Contract from 'utils/contracts/collateralContract';
 import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
 import speedMarketsAMMResolverContract from 'utils/contracts/speedMarketsAMMResolverContract';
-import { getCollateral, getCollateralAddress, getDefaultCollateral, getOfframpCollaterals } from 'utils/currency';
+import {
+    getCollateral,
+    getCollateralAddress,
+    getCollateralByAddress,
+    getDefaultCollateral,
+    getOfframpCollaterals,
+    isOverCurrency,
+} from 'utils/currency';
 import { checkAllowance, getIsMultiCollateralSupported } from 'utils/network';
 import { getPriceConnection, getPriceId, priceParser } from 'utils/pyth';
 import {
@@ -102,8 +109,13 @@ const PositionAction: React.FC<PositionActionProps> = ({
         [networkId, selectedClaimCollateralIndex, claimCollateralArray]
     );
     const isClaimDefaultCollateral = claimCollateral === defaultCollateral;
-    const isClaimInOver = !position.isDefaultCollateral;
-    const isOfframp = !isClaimDefaultCollateral && !isClaimInOver;
+    const isClaimInNative = !position.isDefaultCollateral;
+    const isOfframp = !isClaimDefaultCollateral && !isClaimInNative;
+
+    const nativeCollateralAddress = isClaimInNative ? position.collateralAddress : null;
+    const nativeCollateral = nativeCollateralAddress
+        ? getCollateralByAddress(nativeCollateralAddress, networkId)
+        : null;
 
     // Update action in progress status
     useEffect(() => {
@@ -413,15 +425,25 @@ const PositionAction: React.FC<PositionActionProps> = ({
             disabled={isSubmitting}
             onClick={() => (hasAllowance || !isOfframp ? handleResolve() : setOpenApprovalModal(true))}
         >
-            {hasAllowance || !isOfframp
-                ? `${t(`speed-markets.user-positions.claim-win${isSubmitting ? '-progress' : ''}`)} ${
-                      isClaimInOver
-                          ? formatCurrencyWithKey(`$${CRYPTO_CURRENCY_MAP.OVER}`, position.payout)
-                          : formatCurrencyWithSign(USD_SIGN, position.payout)
-                  }`
-                : isAllowing
-                ? `${t('common.enable-wallet-access.approve-progress')} ${defaultCollateral}...`
-                : t('common.enable-wallet-access.approve-swap', { currencyKey: claimCollateral })}
+            {hasAllowance || !isOfframp ? (
+                <>
+                    {t(`speed-markets.user-positions.claim-win${isSubmitting ? '-progress' : ''}`)}
+                    <CollateralText>
+                        {` ${
+                            nativeCollateral
+                                ? formatCurrencyWithKey(
+                                      `${isOverCurrency(nativeCollateral) ? '$' : ''}${nativeCollateral}`,
+                                      position.payout
+                                  )
+                                : formatCurrencyWithSign(USD_SIGN, position.payout)
+                        }`}
+                    </CollateralText>
+                </>
+            ) : isAllowing ? (
+                `${t('common.enable-wallet-access.approve-progress')} ${defaultCollateral}...`
+            ) : (
+                t('common.enable-wallet-access.approve-swap', { currencyKey: claimCollateral })
+            )}
         </Button>
     );
 
@@ -496,9 +518,9 @@ const PositionAction: React.FC<PositionActionProps> = ({
                     !isCollateralHidden &&
                     isMultiCollateralSupported &&
                     position.isClaimable &&
-                    !isClaimInOver && (
+                    !isClaimInNative && (
                         <CollateralSelector
-                            collateralArray={isClaimInOver ? [] : claimCollateralArray}
+                            collateralArray={isClaimInNative ? [] : claimCollateralArray}
                             selectedItem={selectedClaimCollateralIndex}
                             onChangeCollateral={(index) => dispatch(setSelectedClaimCollateralIndex(index))}
                             preventPaymentCollateralChange
@@ -575,6 +597,10 @@ export const Value = styled.span<{ $color?: string; $isUpperCase?: boolean }>`
 export const CollateralSelectorContainer = styled(FlexDivCentered)`
     line-height: 15px;
     padding-right: 2px;
+    text-transform: none;
+`;
+
+export const CollateralText = styled.span`
     text-transform: none;
 `;
 

@@ -10,12 +10,13 @@ import {
     getSuccessToastOptions,
 } from 'components/ToastMessage/ToastMessage';
 import Tooltip from 'components/Tooltip';
-import { CRYPTO_CURRENCY_MAP, USD_SIGN } from 'constants/currency';
+import { USD_SIGN } from 'constants/currency';
 import { ONE_HUNDRED_AND_THREE_PERCENT } from 'constants/market';
 import { ZERO_ADDRESS } from 'constants/network';
 import { PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
 import { differenceInSeconds, millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
 import {
+    CollateralText,
     Container,
     Label,
     ResultsContainer,
@@ -32,7 +33,14 @@ import { useTheme } from 'styled-components';
 import { coinParser, formatCurrencyWithKey, formatCurrencyWithSign, roundNumberToDecimals } from 'thales-utils';
 import { UserChainedPosition } from 'types/market';
 import { RootState, ThemeInterface } from 'types/ui';
-import { getCollateral, getCollateralAddress, getDefaultCollateral, getOfframpCollaterals } from 'utils/currency';
+import {
+    getCollateral,
+    getCollateralAddress,
+    getCollateralByAddress,
+    getDefaultCollateral,
+    getOfframpCollaterals,
+    isOverCurrency,
+} from 'utils/currency';
 import { checkAllowance, getIsMultiCollateralSupported } from 'utils/network';
 import { getPriceConnection, getPriceId, priceParser } from 'utils/pyth';
 import {
@@ -107,8 +115,13 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
         [networkId, selectedClaimCollateralIndex, claimCollateralArray]
     );
     const isClaimDefaultCollateral = claimCollateral === defaultCollateral;
-    const isClaimInOver = !position.isDefaultCollateral;
-    const isOfframp = !isClaimDefaultCollateral && !isClaimInOver;
+    const isClaimInNative = !position.isDefaultCollateral;
+    const isOfframp = !isClaimDefaultCollateral && !isClaimInNative;
+
+    const nativeCollateralAddress = isClaimInNative ? position.collateralAddress : null;
+    const nativeCollateral = nativeCollateralAddress
+        ? getCollateralByAddress(nativeCollateralAddress, networkId)
+        : null;
 
     useEffect(() => {
         isSubmittingBatch !== undefined && setIsSubmitting(isSubmittingBatch);
@@ -382,31 +395,37 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 additionalStyles={additionalButtonStyle}
                 onClick={() => (hasAllowance || !isOfframp ? handleResolve() : setOpenApprovalModal(true))}
             >
-                {hasAllowance || !isOfframp
-                    ? `${
-                          isSubmitting
-                              ? isOverview
-                                  ? isSubmittingBatch
-                                      ? t('speed-markets.overview.resolve')
-                                      : t(`speed-markets.overview.resolve-progress`)
-                                  : t('speed-markets.user-positions.claim-win-progress')
-                              : isOverview
-                              ? isAdmin
-                                  ? `${t('common.admin')} ${t('speed-markets.overview.resolve')}`
-                                  : t('speed-markets.overview.resolve')
-                              : t('speed-markets.user-positions.claim-win')
-                      }${
-                          isOverview
-                              ? ''
-                              : ` ${
-                                    isClaimInOver
-                                        ? formatCurrencyWithKey(`$${CRYPTO_CURRENCY_MAP.OVER}`, position.payout)
-                                        : formatCurrencyWithSign(USD_SIGN, position.payout)
-                                }`
-                      }`
-                    : isAllowing
-                    ? `${t('common.enable-wallet-access.approve-progress')} ${defaultCollateral}...`
-                    : t('common.enable-wallet-access.approve-swap', { currencyKey: claimCollateral })}
+                {hasAllowance || !isOfframp ? (
+                    <>
+                        {isSubmitting
+                            ? isOverview
+                                ? isSubmittingBatch
+                                    ? t('speed-markets.overview.resolve')
+                                    : t(`speed-markets.overview.resolve-progress`)
+                                : t('speed-markets.user-positions.claim-win-progress')
+                            : isOverview
+                            ? isAdmin
+                                ? `${t('common.admin')} ${t('speed-markets.overview.resolve')}`
+                                : t('speed-markets.overview.resolve')
+                            : t('speed-markets.user-positions.claim-win')}
+                        <CollateralText>
+                            {isOverview
+                                ? ''
+                                : ` ${
+                                      nativeCollateral
+                                          ? formatCurrencyWithKey(
+                                                `${isOverCurrency(nativeCollateral) ? '$' : ''}${nativeCollateral}`,
+                                                position.payout
+                                            )
+                                          : formatCurrencyWithSign(USD_SIGN, position.payout)
+                                  }`}
+                        </CollateralText>
+                    </>
+                ) : isAllowing ? (
+                    `${t('common.enable-wallet-access.approve-progress')} ${defaultCollateral}...`
+                ) : (
+                    t('common.enable-wallet-access.approve-swap', { currencyKey: claimCollateral })
+                )}
             </Button>
         );
     };
@@ -488,7 +507,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                     !isCollateralHidden &&
                     isMultiCollateralSupported &&
                     position.isClaimable &&
-                    !isClaimInOver && (
+                    !isClaimInNative && (
                         <CollateralSelector
                             collateralArray={claimCollateralArray}
                             selectedItem={selectedClaimCollateralIndex}

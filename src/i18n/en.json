@@ -238,7 +238,7 @@
             "bonus-info": "Bonus return for {{bonusDirection}} is +{{bonusPerc}}",
             "slippage": "Your trade will revert if the live price changes more than this percentage from your chosen Strike Price during trade execution.",
             "eth-to-weth": "Your ETH will be wrapped to WETH before executing the trade.",
-            "claim-all-except-over": "Claim all markets except those with $OVER collateral"
+            "claim-all-except-native": "Claim all positions except those with {{collaterals}} collateral(s)."
         },
         "overview": {
             "title": "Overview",

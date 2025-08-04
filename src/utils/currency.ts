@@ -1,11 +1,12 @@
 import {
     COLLATERALS,
     CRYPTO_CURRENCY_MAP,
-    OFFRAMP_UNSUPPORTED_COLLATERALS,
+    NATIVE_COLLATERALS,
     STABLE_COINS,
     SYNTHS_MAP,
     currencyKeyToNameMap,
 } from 'constants/currency';
+import { t } from 'i18next';
 import { COLLATERAL_DECIMALS, Coins, NetworkId } from 'thales-utils';
 import { CollateralsBalance } from 'types/collateral';
 import { SupportedNetwork } from 'types/network';
@@ -32,7 +33,9 @@ export const getCollaterals = (networkId: SupportedNetwork) =>
     COLLATERALS[networkId] || COLLATERALS[NetworkId.OptimismMainnet];
 
 export const getOfframpCollaterals = (networkId: SupportedNetwork) =>
-    getCollaterals(networkId).filter((collateral) => !OFFRAMP_UNSUPPORTED_COLLATERALS[networkId].includes(collateral));
+    getCollaterals(networkId).filter(
+        (collateral) => !isLpSupported(collateral) || collateral === getDefaultCollateral(networkId)
+    );
 
 export const getCollateralIndexForNetwork = (networkId: SupportedNetwork, currencyKey: Coins) =>
     Math.max(0, getCollaterals(networkId).indexOf(currencyKey));
@@ -59,6 +62,24 @@ export const isStableCurrency = (currencyKey: Coins) => {
 
 export const isOverCurrency = (currencyKey: Coins) => {
     return currencyKey === CRYPTO_CURRENCY_MAP.OVER;
+};
+
+export const isLpSupported = (currencyKey: Coins) => {
+    return (
+        currencyKey === CRYPTO_CURRENCY_MAP.USDC ||
+        currencyKey === CRYPTO_CURRENCY_MAP.cbBTC ||
+        currencyKey === CRYPTO_CURRENCY_MAP.wBTC ||
+        currencyKey === CRYPTO_CURRENCY_MAP.OVER
+    );
+};
+
+export const getNativeCollateralsText = (networkId: SupportedNetwork, excludeCollateral: Coins | null) => {
+    const collaterals = NATIVE_COLLATERALS[networkId]
+        .filter((collateral) => collateral !== excludeCollateral)
+        .map((collateral) => (isOverCurrency(collateral) ? `$${collateral}` : collateral));
+    return collaterals.length > 1
+        ? `${collaterals.slice(0, -1).join(', ')} ${t('common.and')} ${collaterals.slice(-1)}`
+        : collaterals[0];
 };
 
 export const getMinBalanceThreshold = (coin: Coins): number => (isStableCurrency(coin) ? 1 : 0);
