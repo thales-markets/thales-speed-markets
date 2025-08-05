@@ -50,7 +50,7 @@ const TablePositions: React.FC<TablePositionsProps> = ({ data }) => {
                     />
                 </Wrapper>
             ),
-            size: 110,
+            size: 90,
         },
         {
             header: <Header>{t('speed-markets.user-positions.price')}</Header>,
@@ -62,6 +62,7 @@ const TablePositions: React.FC<TablePositionsProps> = ({ data }) => {
                     </Value>
                 </Wrapper>
             ),
+            size: 130,
         },
         {
             header: <Header>{t('speed-markets.user-positions.end-time')}</Header>,
@@ -71,7 +72,7 @@ const TablePositions: React.FC<TablePositionsProps> = ({ data }) => {
                     <Value>{formatShortDateWithFullTime(cellProps.cell.getValue())}</Value>
                 </Wrapper>
             ),
-            size: 180,
+            size: 160,
             enableSorting: true,
             sortDescFirst: false,
             sortingFn: 'datetime',
@@ -93,7 +94,7 @@ const TablePositions: React.FC<TablePositionsProps> = ({ data }) => {
                     </Wrapper>
                 );
             },
-            size: 100,
+            size: 130,
         },
         {
             header: <Header>{t('speed-markets.user-positions.payout')}</Header>,
@@ -112,13 +113,13 @@ const TablePositions: React.FC<TablePositionsProps> = ({ data }) => {
                     </Wrapper>
                 );
             },
-            size: 120,
+            size: 130,
         },
         {
             header: <Header>{t('speed-markets.user-positions.status')}</Header>,
             accessorKey: 'action',
             cell: (cellProps: any) => (
-                <Wrapper>
+                <Wrapper isAlignEnd>
                     <PositionAction position={cellProps.row.original} />
                 </Wrapper>
             ),
@@ -137,7 +138,7 @@ const TablePositions: React.FC<TablePositionsProps> = ({ data }) => {
                     </ShareWrapper>
                 </Wrapper>
             ),
-            size: 40,
+            size: 60,
         },
     ];
 
@@ -168,9 +169,9 @@ export const Header = styled.p`
     font-weight: 700;
 `;
 
-export const Wrapper = styled.div<{ isAlignStart?: boolean }>`
+export const Wrapper = styled.div<{ isAlignStart?: boolean; isAlignEnd?: boolean }>`
     display: flex;
-    justify-content: ${(props) => (props.isAlignStart ? 'flex-start' : 'center')};
+    justify-content: ${(props) => (props.isAlignStart ? 'flex-start' : props.isAlignEnd ? 'flex-end' : 'center')};
     align-items: center;
     gap: 4px;
     width: 100%;

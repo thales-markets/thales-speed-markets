@@ -19,7 +19,7 @@ import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
 import { getIsBiconomy } from 'redux/modules/wallet';
 import styled from 'styled-components';
-import { FlexDiv, FlexDivCentered, FlexDivColumn, FlexDivRow } from 'styles/common';
+import { FlexDiv, FlexDivCentered, FlexDivColumn, FlexDivEnd, FlexDivRow } from 'styles/common';
 import { formatCurrencyWithSign } from 'thales-utils';
 import { UserChainedPosition, UserPosition } from 'types/market';
 import { SupportedNetwork } from 'types/network';
@@ -201,6 +201,7 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
 
     const sortedUserOpenChainedMarketsData = sortSpeedMarkets(allUserOpenChainedMarketsData) as UserChainedPosition[];
 
+    // ALL
     const isLoading =
         userChainedSpeedMarketsDataQuery.isLoading ||
         userActiveSpeedMarketsDataQuery.isLoading ||
@@ -284,7 +285,12 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
     };
 
     const getClaimAllButton = () => (
-        <Button disabled={isSubmitting} additionalStyles={additionalButtonStyle} fontSize="13px" onClick={handleSubmit}>
+        <Button
+            disabled={isSubmitting}
+            additionalStyles={getAdditionalButtonStyle(isMobile)}
+            fontSize="13px"
+            onClick={handleSubmit}
+        >
             <>
                 {t(
                     `speed-markets.user-positions.claim-all${nativeCollateral ? '-in' : ''}${
@@ -384,7 +390,7 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
                                             />
                                         </CollateralSelectorContainer>
                                     )}
-                                    <ButtonWrapper $isChained={isChainedSelected}>{getClaimAllButton()}</ButtonWrapper>
+                                    <ButtonWrapper>{getClaimAllButton()}</ButtonWrapper>
                                 </ClaimAllWrapper>
                                 {isMobile && !isAllClaimablePositionsInSameCollateral && (
                                     <FlexDivRow>
@@ -535,26 +541,27 @@ const PositionsWrapper = styled.div<{ $noPositions?: boolean }>`
 `;
 
 const ClaimAllWrapper = styled(FlexDivCentered)`
-    gap: 30px;
+    gap: 10px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         justify-content: space-between;
         gap: unset;
     }
 `;
 
-const ButtonWrapper = styled(FlexDivCentered)<{ $isChained: boolean }>`
-    width: ${(props) => (props.$isChained ? '360' : '340')}px;
-    padding-right: ${(props) => (props.$isChained ? '60' : '40')}px;
+const ButtonWrapper = styled(FlexDivEnd)`
+    width: 360px;
+    padding-right: 60px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
         width: min-content;
         padding-right: 0;
     }
 `;
 
-const additionalButtonStyle: CSSProperties = {
+const getAdditionalButtonStyle = (isMobile: boolean): CSSProperties => ({
     lineHeight: '100%',
     border: 'none',
-};
+    minWidth: !isMobile ? '236px' : '',
+});
 
 const ClaimAll = styled.span`
     font-size: 13px;

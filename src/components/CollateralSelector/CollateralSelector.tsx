@@ -174,6 +174,7 @@ const Text = styled.span<{ fontWeight?: string }>`
     font-size: 13px;
     line-height: 20px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        font-size: 12px;
         line-height: 13px;
     }
 `;
@@ -181,7 +182,7 @@ const Text = styled.span<{ fontWeight?: string }>`
 const TextCollateral = styled(Text)<{ invertCollors?: boolean }>`
     color: ${(props) =>
         props.invertCollors ? props.theme.dropDown.textColor.secondary : props.theme.dropDown.textColor.primary};
-    font-weight: 700;
+    font-weight: 800;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;

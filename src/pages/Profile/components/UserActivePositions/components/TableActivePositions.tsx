@@ -196,7 +196,7 @@ const TableActivePositions: React.FC<{ data: (UserPosition | UserChainedPosition
                 const isChained = (cellProps.row.original as UserChainedPosition).sides !== undefined;
 
                 return (
-                    <Wrapper>
+                    <Wrapper isAlignEnd>
                         {isChained ? (
                             <ChainedPositionAction position={cellProps.row.original} />
                         ) : (

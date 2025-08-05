@@ -19,7 +19,7 @@ import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
 import { getIsBiconomy } from 'redux/modules/wallet';
 import styled from 'styled-components';
-import { FlexDiv, FlexDivCentered, FlexDivColumn, FlexDivRow, FlexDivStart } from 'styles/common';
+import { FlexDiv, FlexDivCentered, FlexDivColumn, FlexDivEnd, FlexDivRow, FlexDivStart } from 'styles/common';
 import { formatCurrencyWithSign } from 'thales-utils';
 import { UserChainedPosition, UserPosition } from 'types/market';
 import biconomyConnector from 'utils/biconomyWallet';
@@ -397,7 +397,12 @@ const UserActivePositions: React.FC<UserActivePositionsProps> = ({
     };
 
     const getClaimAllButton = () => (
-        <Button disabled={isSubmitting} additionalStyles={additionalButtonStyle} fontSize="13px" onClick={handleSubmit}>
+        <Button
+            disabled={isSubmitting}
+            additionalStyles={getAdditionalButtonStyle(isMobile)}
+            fontSize="13px"
+            onClick={handleSubmit}
+        >
             <>
                 {t(
                     `speed-markets.user-positions.claim-all${isClaimAllInNative ? '-in' : ''}${
@@ -585,7 +590,7 @@ const ClaimAllWrapper = styled(FlexDivCentered)`
     }
 `;
 
-const ButtonWrapper = styled(FlexDivCentered)`
+const ButtonWrapper = styled(FlexDivEnd)`
     width: 360px;
     padding-right: 60px;
     @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
@@ -594,10 +599,11 @@ const ButtonWrapper = styled(FlexDivCentered)`
     }
 `;
 
-const additionalButtonStyle: CSSProperties = {
+const getAdditionalButtonStyle = (isMobile: boolean): CSSProperties => ({
     lineHeight: '100%',
     border: 'none',
-};
+    minWidth: !isMobile ? '236px' : '',
+});
 
 const ClaimAll = styled.span`
     font-size: 13px;
