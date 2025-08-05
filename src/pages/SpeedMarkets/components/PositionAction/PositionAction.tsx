@@ -249,6 +249,7 @@ const PositionAction: React.FC<PositionActionProps> = ({
             const priceUpdateData = priceFeedUpdate.binary.data.map((vaa: string) => '0x' + vaa);
             const updateFee = await pythContract.read.getUpdateFee([priceUpdateData]);
 
+            const collateralAddress = nativeCollateralAddress || claimCollateralAddress;
             const isEth = claimCollateralAddress === ZERO_ADDRESS;
 
             const speedMarketsAMMResolverContractWithSigner = getContract({
@@ -262,16 +263,16 @@ const PositionAction: React.FC<PositionActionProps> = ({
                 hash = isOfframp
                     ? await executeBiconomyTransaction(
                           networkId,
-                          claimCollateralAddress,
+                          collateralAddress,
                           speedMarketsAMMResolverContractWithSigner,
                           'resolveMarketWithOfframp',
-                          [position.market, priceUpdateData, claimCollateralAddress, isEth],
+                          [position.market, priceUpdateData, collateralAddress, isEth],
                           undefined,
                           isEth
                       )
                     : await executeBiconomyTransaction(
                           networkId,
-                          claimCollateralAddress,
+                          collateralAddress,
                           speedMarketsAMMResolverContractWithSigner,
                           'resolveMarket',
                           [position.market, priceUpdateData]
@@ -279,7 +280,7 @@ const PositionAction: React.FC<PositionActionProps> = ({
             } else {
                 hash = isOfframp
                     ? await speedMarketsAMMResolverContractWithSigner.write.resolveMarketWithOfframp(
-                          [position.market, priceUpdateData, claimCollateralAddress, isEth],
+                          [position.market, priceUpdateData, collateralAddress, isEth],
                           { value: updateFee }
                       )
                     : await speedMarketsAMMResolverContractWithSigner.write.resolveMarket(
@@ -339,7 +340,7 @@ const PositionAction: React.FC<PositionActionProps> = ({
                 if (isBiconomy) {
                     hash = await executeBiconomyTransaction(
                         networkId,
-                        claimCollateralAddress,
+                        position.collateralAddress,
                         speedMarketsAMMResolverContractWithSigner,
                         'resolveMarketManually',
                         [position.market, Number(priceParser(position.finalPrice || 0))]
@@ -383,7 +384,7 @@ const PositionAction: React.FC<PositionActionProps> = ({
                 if (isBiconomy) {
                     hash = await executeBiconomyTransaction(
                         networkId,
-                        claimCollateralAddress,
+                        position.collateralAddress,
                         speedMarketsAMMResolverContractWithSigner,
                         'resolveMarket',
                         [position.market, priceUpdateData]
@@ -391,9 +392,7 @@ const PositionAction: React.FC<PositionActionProps> = ({
                 } else {
                     hash = await speedMarketsAMMResolverContractWithSigner.write.resolveMarket(
                         [position.market, priceUpdateData],
-                        {
-                            value: updateFee,
-                        }
+                        { value: updateFee }
                     );
                 }
             }

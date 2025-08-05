@@ -6,6 +6,7 @@ import { USD_SIGN } from 'constants/currency';
 import { millisecondsToSeconds } from 'date-fns';
 import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
+import { uniq } from 'lodash';
 import { Tab, Tabs } from 'pages/Profile/styled-components';
 import { CollateralSelectorContainer } from 'pages/SpeedMarkets/components/PositionAction/PositionAction';
 import usePythPriceQueries from 'queries/prices/usePythPriceQueries';
@@ -248,6 +249,10 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
 
     const claimableAllPositionsPayout = claimableAllPositions.reduce((acc, pos) => acc + pos.payout, 0);
 
+    const allPositionsCollaterals = uniq(
+        positions.map((position) => getCollateralByAddress(position.collateralAddress, networkId))
+    );
+
     // Table tab selection to follow choosen direction(s)
     useEffect(() => {
         setIsChainedSelected(isChained);
@@ -301,7 +306,11 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
                 overlay={
                     !isMobile && !isAllClaimablePositionsInSameCollateral
                         ? t('speed-markets.tooltips.claim-all-except-native', {
-                              collaterals: getNativeCollateralsText(networkId, nativeCollateral),
+                              collaterals: getNativeCollateralsText(
+                                  allPositionsCollaterals,
+                                  nativeCollateral,
+                                  networkId
+                              ),
                           })
                         : ''
                 }
@@ -380,7 +389,11 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
                                 {isMobile && !isAllClaimablePositionsInSameCollateral && (
                                     <FlexDivRow>
                                         <InfoText>{`* ${t('speed-markets.tooltips.claim-all-except-native', {
-                                            collaterals: getNativeCollateralsText(networkId, nativeCollateral),
+                                            collaterals: getNativeCollateralsText(
+                                                allPositionsCollaterals,
+                                                nativeCollateral,
+                                                networkId
+                                            ),
                                         })}`}</InfoText>
                                     </FlexDivRow>
                                 )}

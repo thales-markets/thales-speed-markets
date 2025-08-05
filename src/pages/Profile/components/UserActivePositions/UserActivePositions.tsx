@@ -5,6 +5,7 @@ import Tooltip from 'components/Tooltip';
 import { USD_SIGN } from 'constants/currency';
 import { millisecondsToSeconds } from 'date-fns';
 import { ScreenSizeBreakpoint } from 'enums/ui';
+import { uniq } from 'lodash';
 import CardPositions from 'pages/SpeedMarkets/components/CardPositions';
 import { CollateralSelectorContainer } from 'pages/SpeedMarkets/components/PositionAction/PositionAction';
 import { getDummyPositions } from 'pages/SpeedMarkets/components/UserOpenPositions/UserOpenPositions';
@@ -302,16 +303,19 @@ const UserActivePositions: React.FC<UserActivePositionsProps> = ({
             isClaimableSpeedPositionsInSameCollateral &&
             speedPositionsNativeCollateral === chainedPositionsNativeCollateral);
 
+    const hasAllPositionsDefaultCollateral = hasChainedPositionsDefaultCollateral || hasSpeedPositionsDefaultCollateral;
+
     const isClaimAllInNative =
         (isFilterChainedSelected && chainedPositionsNativeCollateral) ||
         (isFilterSingleSelected && speedPositionsNativeCollateral) ||
-        chainedPositionsNativeCollateral ||
-        speedPositionsNativeCollateral;
+        !hasAllPositionsDefaultCollateral;
 
     const claimAllNativeCollateral = isFilterChainedSelected
         ? chainedPositionsNativeCollateral
         : isFilterSingleSelected
         ? speedPositionsNativeCollateral
+        : hasAllPositionsDefaultCollateral
+        ? null
         : speedPositionsNativeCollateral || chainedPositionsNativeCollateral;
 
     const claimableAllPositionsPayout = isFilterChainedSelected
@@ -326,6 +330,24 @@ const UserActivePositions: React.FC<UserActivePositionsProps> = ({
         : isFilterSingleSelected
         ? !!claimableSpeedPositions.length
         : !!claimableChainedPositions.length || !!claimableSpeedPositions.length;
+
+    const allPositionsCollaterals = uniq(
+        isFilterChainedSelected
+            ? claimableUserChainedPositions.map((position) =>
+                  getCollateralByAddress(position.collateralAddress, networkId)
+              )
+            : isFilterSingleSelected
+            ? claimableUserSinglePositions.map((position) =>
+                  getCollateralByAddress(position.collateralAddress, networkId)
+              )
+            : claimableUserChainedPositions
+                  .map((position) => getCollateralByAddress(position.collateralAddress, networkId))
+                  .concat(
+                      claimableUserSinglePositions.map((position) =>
+                          getCollateralByAddress(position.collateralAddress, networkId)
+                      )
+                  )
+    );
 
     const handleSubmit = async () => {
         setIsSubmitting(true);
@@ -397,7 +419,11 @@ const UserActivePositions: React.FC<UserActivePositionsProps> = ({
                 overlay={
                     !isMobile && !isAllClaimablePositionsInSameCollateral
                         ? t('speed-markets.tooltips.claim-all-except-native', {
-                              collaterals: getNativeCollateralsText(networkId, speedPositionsNativeCollateral),
+                              collaterals: getNativeCollateralsText(
+                                  allPositionsCollaterals,
+                                  claimAllNativeCollateral,
+                                  networkId
+                              ),
                           })
                         : ''
                 }
@@ -463,8 +489,9 @@ const UserActivePositions: React.FC<UserActivePositionsProps> = ({
                                     <FlexDivRow>
                                         <InfoText>{`* ${t('speed-markets.tooltips.claim-all-except-native', {
                                             collaterals: getNativeCollateralsText(
-                                                networkId,
-                                                speedPositionsNativeCollateral
+                                                allPositionsCollaterals,
+                                                speedPositionsNativeCollateral,
+                                                networkId
                                             ),
                                         })}`}</InfoText>
                                     </FlexDivRow>

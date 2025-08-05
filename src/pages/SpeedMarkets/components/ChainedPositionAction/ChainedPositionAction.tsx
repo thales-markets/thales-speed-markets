@@ -244,7 +244,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 if (isBiconomy) {
                     hash = executeBiconomyTransaction(
                         networkId,
-                        claimCollateralAddress,
+                        position.collateralAddress,
                         speedMarketsAMMResolverContractWithSigner,
                         'resolveChainedMarketManually',
                         [position.market, manualFinalPrices]
@@ -306,22 +306,23 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 const updateFees = await Promise.all(promises);
                 const totalUpdateFee = updateFees.reduce((a: bigint, b: bigint) => a + b, BigInt(0));
 
+                const collateralAddress = nativeCollateralAddress || claimCollateralAddress;
                 const isEth = claimCollateralAddress === ZERO_ADDRESS;
 
                 if (isBiconomy) {
                     hash = isOfframp
                         ? await executeBiconomyTransaction(
                               networkId,
-                              claimCollateralAddress,
+                              collateralAddress,
                               speedMarketsAMMResolverContractWithSigner,
                               'resolveChainedMarketWithOfframp',
-                              [position.market, priceUpdateDataArray, claimCollateralAddress, isEth],
+                              [position.market, priceUpdateDataArray, collateralAddress, isEth],
                               undefined,
                               isEth
                           )
                         : await executeBiconomyTransaction(
                               networkId,
-                              claimCollateralAddress,
+                              collateralAddress,
                               speedMarketsAMMResolverContractWithSigner,
                               'resolveChainedMarket',
                               [position.market, priceUpdateDataArray]
@@ -329,7 +330,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 } else {
                     hash = isOfframp
                         ? await speedMarketsAMMResolverContractWithSigner.write.resolveChainedMarketWithOfframp(
-                              [position.market, priceUpdateDataArray, claimCollateralAddress, isEth],
+                              [position.market, priceUpdateDataArray, collateralAddress, isEth],
                               { value: totalUpdateFee }
                           )
                         : await speedMarketsAMMResolverContractWithSigner.write.resolveChainedMarket(

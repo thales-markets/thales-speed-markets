@@ -1,11 +1,4 @@
-import {
-    COLLATERALS,
-    CRYPTO_CURRENCY_MAP,
-    NATIVE_COLLATERALS,
-    STABLE_COINS,
-    SYNTHS_MAP,
-    currencyKeyToNameMap,
-} from 'constants/currency';
+import { COLLATERALS, CRYPTO_CURRENCY_MAP, STABLE_COINS, SYNTHS_MAP, currencyKeyToNameMap } from 'constants/currency';
 import { t } from 'i18next';
 import { COLLATERAL_DECIMALS, Coins, NetworkId } from 'thales-utils';
 import { CollateralsBalance } from 'types/collateral';
@@ -73,9 +66,13 @@ export const isLpSupported = (currencyKey: Coins) => {
     );
 };
 
-export const getNativeCollateralsText = (networkId: SupportedNetwork, excludeCollateral: Coins | null) => {
-    const collaterals = NATIVE_COLLATERALS[networkId]
-        .filter((collateral) => collateral !== excludeCollateral)
+export const getNativeCollateralsText = (
+    nativeCollaterals: Coins[],
+    excludeCollateral: Coins | null,
+    networkId: SupportedNetwork
+) => {
+    const collaterals = nativeCollaterals
+        .filter((collateral) => collateral !== excludeCollateral && collateral !== getDefaultCollateral(networkId))
         .map((collateral) => (isOverCurrency(collateral) ? `$${collateral}` : collateral));
     return collaterals.length > 1
         ? `${collaterals.slice(0, -1).join(', ')} ${t('common.and')} ${collaterals.slice(-1)}`

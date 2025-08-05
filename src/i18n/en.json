@@ -9,6 +9,7 @@
             "confirmation-message": "Successfully bought - market created"
         },
         "or": "or",
+        "and": "and",
         "enter-amount": "Enter amount",
         "enter-minutes": "Enter minutes",
         "enter-hours": "Enter hours",

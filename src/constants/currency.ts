@@ -100,11 +100,3 @@ export const COLLATERALS: Record<SupportedNetwork, Coins[]> = {
         CRYPTO_CURRENCY_MAP.ETH as Coins,
     ],
 };
-
-export const NATIVE_COLLATERALS: Record<SupportedNetwork, Coins[]> = {
-    [NetworkId.OptimismMainnet]: [CRYPTO_CURRENCY_MAP.OVER as Coins],
-    [NetworkId.Arbitrum]: [CRYPTO_CURRENCY_MAP.OVER as Coins, CRYPTO_CURRENCY_MAP.wBTC as Coins],
-    [NetworkId.Base]: [CRYPTO_CURRENCY_MAP.OVER as Coins, CRYPTO_CURRENCY_MAP.cbBTC as Coins],
-    [NetworkId.PolygonMainnet]: [],
-    [NetworkId.OptimismSepolia]: [CRYPTO_CURRENCY_MAP.OVER as Coins],
-};
