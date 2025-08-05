@@ -85,7 +85,7 @@
             "approve-progress": "Approving",
             "approve-all-label": "Approve all",
             "custom-amount-label": "Approve amount of",
-            "approve-swap": "Approve swap to {{currencyKey}}"
+            "approve-swap": "Approve swap to <currency>{{currencyKey}}</currency>"
         },
         "header": {
             "get-started": "Get started",

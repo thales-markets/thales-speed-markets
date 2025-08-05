@@ -16,7 +16,7 @@ import { PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
 import { differenceInSeconds, millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import React, { useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsMobile } from 'redux/modules/ui';
@@ -441,7 +441,11 @@ const PositionAction: React.FC<PositionActionProps> = ({
             ) : isAllowing ? (
                 `${t('common.enable-wallet-access.approve-progress')} ${defaultCollateral}...`
             ) : (
-                t('common.enable-wallet-access.approve-swap', { currencyKey: claimCollateral })
+                <Trans
+                    i18nKey="common.enable-wallet-access.approve-swap"
+                    values={{ currencyKey: claimCollateral }}
+                    components={{ currency: <CollateralText /> }}
+                />
             )}
         </Button>
     );

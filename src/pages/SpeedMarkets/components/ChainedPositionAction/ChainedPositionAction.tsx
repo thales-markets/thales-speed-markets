@@ -25,7 +25,7 @@ import {
     getDefaultButtonProps,
 } from 'pages/SpeedMarkets/components/PositionAction/PositionAction';
 import { CSSProperties, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsBiconomy, getSelectedClaimCollateralIndex, setSelectedClaimCollateralIndex } from 'redux/modules/wallet';
@@ -425,7 +425,11 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                 ) : isAllowing ? (
                     `${t('common.enable-wallet-access.approve-progress')} ${defaultCollateral}...`
                 ) : (
-                    t('common.enable-wallet-access.approve-swap', { currencyKey: claimCollateral })
+                    <Trans
+                        i18nKey="common.enable-wallet-access.approve-swap"
+                        values={{ currencyKey: claimCollateral }}
+                        components={{ currency: <CollateralText /> }}
+                    />
                 )}
             </Button>
         );
