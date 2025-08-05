@@ -194,13 +194,16 @@ const TableActivePositions: React.FC<{ data: (UserPosition | UserChainedPosition
             accessorKey: 'status',
             cell: (cellProps: any) => {
                 const isChained = (cellProps.row.original as UserChainedPosition).sides !== undefined;
+                const position = isChained
+                    ? (cellProps.row.original as UserChainedPosition)
+                    : (cellProps.row.original as UserPosition);
 
                 return (
-                    <Wrapper isAlignEnd>
+                    <Wrapper isAlignEnd={position.isClaimable}>
                         {isChained ? (
-                            <ChainedPositionAction position={cellProps.row.original} />
+                            <ChainedPositionAction position={position as UserChainedPosition} />
                         ) : (
-                            <PositionAction position={cellProps.row.original} />
+                            <PositionAction position={position as UserPosition} />
                         )}
                     </Wrapper>
                 );

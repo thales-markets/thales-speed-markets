@@ -119,7 +119,7 @@ const TablePositions: React.FC<TablePositionsProps> = ({ data }) => {
             header: <Header>{t('speed-markets.user-positions.status')}</Header>,
             accessorKey: 'action',
             cell: (cellProps: any) => (
-                <Wrapper isAlignEnd>
+                <Wrapper isAlignEnd={(cellProps.row.original as UserPosition).isClaimable}>
                     <PositionAction position={cellProps.row.original} />
                 </Wrapper>
             ),
