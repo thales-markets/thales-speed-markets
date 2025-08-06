@@ -156,7 +156,7 @@ const TableChainedPositions: React.FC<{ data: UserChainedPosition[] }> = ({ data
             header: <Header>{t('speed-markets.user-positions.status')}</Header>,
             accessorKey: 'action',
             cell: (cellProps: any) => (
-                <Wrapper>
+                <Wrapper isAlignEnd={(cellProps.row.original as UserChainedPosition).isClaimable}>
                     <ChainedPositionAction position={cellProps.row.original} />
                 </Wrapper>
             ),

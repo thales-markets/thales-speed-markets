@@ -1,5 +1,5 @@
 import CollateralSelector from 'components/CollateralSelector';
-import { CRYPTO_CURRENCY_MAP, USD_SIGN } from 'constants/currency';
+import { USD_SIGN } from 'constants/currency';
 import { secondsToMilliseconds } from 'date-fns';
 import useInterval from 'hooks/useInterval';
 import PositionAction from 'pages/SpeedMarkets/components/PositionAction';
@@ -9,10 +9,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getSelectedClaimCollateralIndex, setSelectedClaimCollateralIndex } from 'redux/modules/wallet';
 import styled, { useTheme } from 'styled-components';
 import { FlexDivColumn, FlexDivRow, FlexDivSpaceBetween, FlexDivStart } from 'styles/common';
-import { Coins, formatCurrencyWithSign } from 'thales-utils';
+import { formatCurrencyWithSign } from 'thales-utils';
 import { UserPosition } from 'types/market';
 import { ThemeInterface } from 'types/ui';
-import { getOfframpCollaterals } from 'utils/currency';
+import { getCollateralByAddress, getOfframpCollaterals } from 'utils/currency';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import { getHistoryStatus, mapUserPositionToHistory } from 'utils/position';
 import { getColorPerPosition, getStatusColor } from 'utils/style';
@@ -50,7 +50,10 @@ const CardPosition: React.FC<CardPositionProps> = ({
     const [isActionInProgress, setIsActionInProgress] = useState(false);
 
     const claimCollateralArray = useMemo(() => getOfframpCollaterals(networkId), [networkId]);
-    const isClaimInOver = !position.isDefaultCollateral;
+
+    const nativeCollateral = !position.isDefaultCollateral
+        ? getCollateralByAddress(position.collateralAddress, networkId)
+        : null;
 
     useInterval(() => {
         if (Date.now() > position.maturityDate) {
@@ -141,10 +144,8 @@ const CardPosition: React.FC<CardPositionProps> = ({
                         <InfoRow>
                             <Label>{t('speed-markets.user-positions.claim-in')}:</Label>
                             <CollateralSelector
-                                collateralArray={
-                                    isClaimInOver ? [CRYPTO_CURRENCY_MAP.OVER as Coins] : claimCollateralArray
-                                }
-                                selectedItem={isClaimInOver ? 0 : selectedClaimCollateralIndex}
+                                collateralArray={nativeCollateral ? [nativeCollateral] : claimCollateralArray}
+                                selectedItem={nativeCollateral ? 0 : selectedClaimCollateralIndex}
                                 onChangeCollateral={(index) => dispatch(setSelectedClaimCollateralIndex(index))}
                                 preventPaymentCollateralChange
                                 disabled={isActionInProgress}
@@ -206,7 +207,7 @@ export const InfoColumn = styled(FlexDivColumn)<{ $isChainedHistory?: boolean }>
     gap: ${(props) => (props.$isChainedHistory ? '5px' : '6px')};
 
     &:first-child {
-        min-width: 214px;
+        min-width: 200px;
     }
 `;
 
@@ -224,7 +225,7 @@ export const Action = styled(FlexDivSpaceBetween)``;
 
 export const Text = styled.span`
     color: ${(props) => props.theme.textColor.secondary};
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 800;
     line-height: 13px;
 `;

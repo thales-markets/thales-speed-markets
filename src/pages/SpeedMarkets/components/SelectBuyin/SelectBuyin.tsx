@@ -1,7 +1,7 @@
 import CollateralSelector from 'components/CollateralSelector';
 import NumericInput from 'components/fields/NumericInput';
 import { USD_SIGN } from 'constants/currency';
-import { BICONOMY_MAX_FEE_PERCENTAGE } from 'constants/market';
+import { BICONOMY_MAX_FEE_PERCENTAGE, OVER_CONTRACT_RATE_KEY } from 'constants/market';
 import { Positions } from 'enums/market';
 import useDebouncedEffect from 'hooks/useDebouncedEffect';
 import { t } from 'i18next';
@@ -29,6 +29,7 @@ import {
     getCollateral,
     getCollaterals,
     getDefaultCollateral,
+    isOverCurrency,
     isStableCurrency,
 } from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
@@ -215,7 +216,8 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
     );
     const convertFromStable = useCallback(
         (value: number) => {
-            const rate = exchangeRates?.[selectedCollateral] || 0;
+            const rate =
+                exchangeRates?.[isOverCurrency(selectedCollateral) ? OVER_CONTRACT_RATE_KEY : selectedCollateral] || 0;
             return convertFromStableToCollateral(selectedCollateral, value, rate);
         },
         [selectedCollateral, exchangeRates]
@@ -252,11 +254,9 @@ const SelectBuyin: React.FC<SelectBuyinProps> = ({
             }
         }
         if (buyinAmount !== '') {
-            const convertedBuyinAmount = convertToStable(Number(buyinAmount));
-
-            if (convertedBuyinAmount < minBuyinAmount) {
+            if (Number(buyinAmount) < convertFromStable(minBuyinAmount)) {
                 errorMessageKey = 'speed-markets.errors.min-buyin';
-            } else if (convertedBuyinAmount > maxBuyinAmount) {
+            } else if (Number(buyinAmount) > convertFromStable(maxBuyinAmount)) {
                 errorMessageKey = 'speed-markets.errors.max-buyin';
             }
         }

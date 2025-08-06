@@ -13,14 +13,9 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getIsAppReady } from 'redux/modules/app';
 import { getIsMobile } from 'redux/modules/ui';
-import { getIsBiconomy, getSelectedCollateralIndex } from 'redux/modules/wallet';
+import { getIsBiconomy } from 'redux/modules/wallet';
 import { UserPosition } from 'types/market';
-import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
-import erc20Contract from 'utils/contracts/collateralContract';
-import multipleCollateral from 'utils/contracts/multipleCollateralContract';
-import { getCollateral } from 'utils/currency';
-import { getIsMultiCollateralSupported } from 'utils/network';
 import { getCurrentPrices, getPriceConnection, getPriceId, getSupportedAssetsAsObject } from 'utils/pyth';
 import { refetchActiveSpeedMarkets, refetchPythPrice } from 'utils/queryConnector';
 import { isUserWinner, resolveAllSpeedPositions } from 'utils/speedAmm';
@@ -45,24 +40,14 @@ const OpenPositions: React.FC = () => {
     const walletClient = useWalletClient();
     const { isConnected, address: walletAddress } = useAccount();
 
-    const isAppReady = useSelector((state: RootState) => getIsAppReady(state));
-    const isMobile = useSelector((state: RootState) => getIsMobile(state));
-    const isBiconomy = useSelector((state: RootState) => getIsBiconomy(state));
-    const selectedCollateralIndex = useSelector((state: RootState) => getSelectedCollateralIndex(state));
+    const isAppReady = useSelector(getIsAppReady);
+    const isMobile = useSelector(getIsMobile);
+    const isBiconomy = useSelector(getIsBiconomy);
 
     const [currentPrices, setCurrentPrices] = useState<{ [key: string]: number }>(getSupportedAssetsAsObject());
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSubmittingSection, setIsSubmittingSection] = useState('');
     const [isLoadingEnabled, setIsLoadingEnabled] = useState(true);
-
-    const isMultiCollateralSupported = getIsMultiCollateralSupported(networkId);
-    const selectedCollateral = useMemo(() => getCollateral(networkId, selectedCollateralIndex), [
-        networkId,
-        selectedCollateralIndex,
-    ]);
-    const collateralAddress = isMultiCollateralSupported
-        ? multipleCollateral[selectedCollateral].addresses[networkId]
-        : erc20Contract.addresses[networkId];
 
     const ammSpeedMarketsLimitsQuery = useAmmSpeedMarketsLimitsQuery(
         { networkId, client },
@@ -173,14 +158,21 @@ const OpenPositions: React.FC = () => {
 
     const handleResolveAll = async (positions: UserPosition[], isAdmin: boolean) => {
         setIsSubmitting(true);
-        await resolveAllSpeedPositions(
-            positions,
-            isAdmin,
-            { networkId, client: walletClient.data },
-            isBiconomy,
-            collateralAddress,
-            true
+        const collateralAddress = positions[0].collateralAddress;
+        const isPositionsWithSameCollateral = positions.every(
+            (position) => position.collateralAddress === collateralAddress
         );
+
+        if (!isBiconomy || isPositionsWithSameCollateral) {
+            await resolveAllSpeedPositions(
+                positions,
+                isAdmin,
+                { networkId, client: walletClient.data },
+                isBiconomy,
+                collateralAddress,
+                true
+            );
+        }
         setIsSubmitting(false);
         setIsSubmittingSection('');
     };
@@ -190,11 +182,20 @@ const OpenPositions: React.FC = () => {
         sectionName: typeof SECTIONS[keyof typeof SECTIONS],
         isAdmin: boolean
     ) => {
+        const isPositionsWithSameCollateral = positions.every(
+            (position) => position.collateralAddress === positions[0].collateralAddress
+        );
+
         return (
             !isLoading &&
             !!positions.length && (
                 <Button
-                    disabled={isSubmitting || !positions.length || !isConnected}
+                    disabled={
+                        isSubmitting ||
+                        !positions.length ||
+                        !isConnected ||
+                        (isBiconomy && !isPositionsWithSameCollateral)
+                    }
                     onClick={() => {
                         setIsSubmittingSection(sectionName);
                         handleResolveAll(positions, isAdmin);

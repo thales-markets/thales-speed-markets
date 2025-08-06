@@ -10,13 +10,13 @@ import {
     getSuccessToastOptions,
 } from 'components/ToastMessage/ToastMessage';
 import Tooltip from 'components/Tooltip/Tooltip';
-import { CRYPTO_CURRENCY_MAP, USD_SIGN } from 'constants/currency';
+import { USD_SIGN } from 'constants/currency';
 import { ZERO_ADDRESS } from 'constants/network';
 import { PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
 import { differenceInSeconds, millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import React, { useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsMobile } from 'redux/modules/ui';
@@ -34,7 +34,14 @@ import { getContractAbi } from 'utils/contracts/abi';
 import erc20Contract from 'utils/contracts/collateralContract';
 import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
 import speedMarketsAMMResolverContract from 'utils/contracts/speedMarketsAMMResolverContract';
-import { getCollateral, getCollateralAddress, getDefaultCollateral, getOfframpCollaterals } from 'utils/currency';
+import {
+    getCollateral,
+    getCollateralAddress,
+    getCollateralByAddress,
+    getDefaultCollateral,
+    getOfframpCollaterals,
+    isOverCurrency,
+} from 'utils/currency';
 import { checkAllowance, getIsMultiCollateralSupported } from 'utils/network';
 import { getPriceConnection, getPriceId, priceParser } from 'utils/pyth';
 import {
@@ -102,8 +109,13 @@ const PositionAction: React.FC<PositionActionProps> = ({
         [networkId, selectedClaimCollateralIndex, claimCollateralArray]
     );
     const isClaimDefaultCollateral = claimCollateral === defaultCollateral;
-    const isClaimInOver = !position.isDefaultCollateral;
-    const isOfframp = !isClaimDefaultCollateral && !isClaimInOver;
+    const isClaimInNative = !position.isDefaultCollateral;
+    const isOfframp = !isClaimDefaultCollateral && !isClaimInNative;
+
+    const nativeCollateralAddress = isClaimInNative ? position.collateralAddress : null;
+    const nativeCollateral = nativeCollateralAddress
+        ? getCollateralByAddress(nativeCollateralAddress, networkId)
+        : null;
 
     // Update action in progress status
     useEffect(() => {
@@ -184,20 +196,23 @@ const PositionAction: React.FC<PositionActionProps> = ({
             } else {
                 hash = await erc20Instance.write.approve([addressToApprove, approveAmount]);
             }
-            setOpenApprovalModal(false);
             const txReceipt = await waitForTransactionReceipt(client as Client, {
                 hash,
             });
             if (txReceipt.status === 'success') {
                 toast.update(id, getSuccessToastOptions(t(`common.transaction.successful`), id));
+                setOpenApprovalModal(false);
                 setAllowance(true);
+                setIsAllowing(false);
+            } else {
+                console.log('Transaction status', txReceipt.status);
+                toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
                 setIsAllowing(false);
             }
         } catch (e) {
             console.log(e);
             toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
             setIsAllowing(false);
-            setOpenApprovalModal(false);
         }
     };
 
@@ -237,6 +252,7 @@ const PositionAction: React.FC<PositionActionProps> = ({
             const priceUpdateData = priceFeedUpdate.binary.data.map((vaa: string) => '0x' + vaa);
             const updateFee = await pythContract.read.getUpdateFee([priceUpdateData]);
 
+            const collateralAddress = nativeCollateralAddress || claimCollateralAddress;
             const isEth = claimCollateralAddress === ZERO_ADDRESS;
 
             const speedMarketsAMMResolverContractWithSigner = getContract({
@@ -250,16 +266,16 @@ const PositionAction: React.FC<PositionActionProps> = ({
                 hash = isOfframp
                     ? await executeBiconomyTransaction(
                           networkId,
-                          claimCollateralAddress,
+                          collateralAddress,
                           speedMarketsAMMResolverContractWithSigner,
                           'resolveMarketWithOfframp',
-                          [position.market, priceUpdateData, claimCollateralAddress, isEth],
+                          [position.market, priceUpdateData, collateralAddress, isEth],
                           undefined,
                           isEth
                       )
                     : await executeBiconomyTransaction(
                           networkId,
-                          claimCollateralAddress,
+                          collateralAddress,
                           speedMarketsAMMResolverContractWithSigner,
                           'resolveMarket',
                           [position.market, priceUpdateData]
@@ -267,7 +283,7 @@ const PositionAction: React.FC<PositionActionProps> = ({
             } else {
                 hash = isOfframp
                     ? await speedMarketsAMMResolverContractWithSigner.write.resolveMarketWithOfframp(
-                          [position.market, priceUpdateData, claimCollateralAddress, isEth],
+                          [position.market, priceUpdateData, collateralAddress, isEth],
                           { value: updateFee }
                       )
                     : await speedMarketsAMMResolverContractWithSigner.write.resolveMarket(
@@ -327,7 +343,7 @@ const PositionAction: React.FC<PositionActionProps> = ({
                 if (isBiconomy) {
                     hash = await executeBiconomyTransaction(
                         networkId,
-                        claimCollateralAddress,
+                        position.collateralAddress,
                         speedMarketsAMMResolverContractWithSigner,
                         'resolveMarketManually',
                         [position.market, Number(priceParser(position.finalPrice || 0))]
@@ -371,7 +387,7 @@ const PositionAction: React.FC<PositionActionProps> = ({
                 if (isBiconomy) {
                     hash = await executeBiconomyTransaction(
                         networkId,
-                        claimCollateralAddress,
+                        position.collateralAddress,
                         speedMarketsAMMResolverContractWithSigner,
                         'resolveMarket',
                         [position.market, priceUpdateData]
@@ -379,9 +395,7 @@ const PositionAction: React.FC<PositionActionProps> = ({
                 } else {
                     hash = await speedMarketsAMMResolverContractWithSigner.write.resolveMarket(
                         [position.market, priceUpdateData],
-                        {
-                            value: updateFee,
-                        }
+                        { value: updateFee }
                     );
                 }
             }
@@ -413,15 +427,29 @@ const PositionAction: React.FC<PositionActionProps> = ({
             disabled={isSubmitting}
             onClick={() => (hasAllowance || !isOfframp ? handleResolve() : setOpenApprovalModal(true))}
         >
-            {hasAllowance || !isOfframp
-                ? `${t(`speed-markets.user-positions.claim-win${isSubmitting ? '-progress' : ''}`)} ${
-                      isClaimInOver
-                          ? formatCurrencyWithKey(`$${CRYPTO_CURRENCY_MAP.OVER}`, position.payout)
-                          : formatCurrencyWithSign(USD_SIGN, position.payout)
-                  }`
-                : isAllowing
-                ? `${t('common.enable-wallet-access.approve-progress')} ${defaultCollateral}...`
-                : t('common.enable-wallet-access.approve-swap', { currencyKey: claimCollateral })}
+            {hasAllowance || !isOfframp ? (
+                <>
+                    {t(`speed-markets.user-positions.claim-win${isSubmitting ? '-progress' : ''}`)}
+                    <CollateralText>
+                        {` ${
+                            nativeCollateral
+                                ? formatCurrencyWithKey(
+                                      `${isOverCurrency(nativeCollateral) ? '$' : ''}${nativeCollateral}`,
+                                      position.payout
+                                  )
+                                : formatCurrencyWithSign(USD_SIGN, position.payout)
+                        }`}
+                    </CollateralText>
+                </>
+            ) : isAllowing ? (
+                `${t('common.enable-wallet-access.approve-progress')} ${defaultCollateral}...`
+            ) : (
+                <Trans
+                    i18nKey="common.enable-wallet-access.approve-swap"
+                    values={{ currencyKey: claimCollateral }}
+                    components={{ currency: <CollateralText /> }}
+                />
+            )}
         </Button>
     );
 
@@ -496,9 +524,9 @@ const PositionAction: React.FC<PositionActionProps> = ({
                     !isCollateralHidden &&
                     isMultiCollateralSupported &&
                     position.isClaimable &&
-                    !isClaimInOver && (
+                    !isClaimInNative && (
                         <CollateralSelector
-                            collateralArray={isClaimInOver ? [] : claimCollateralArray}
+                            collateralArray={isClaimInNative ? [] : claimCollateralArray}
                             selectedItem={selectedClaimCollateralIndex}
                             onChangeCollateral={(index) => dispatch(setSelectedClaimCollateralIndex(index))}
                             preventPaymentCollateralChange
@@ -536,7 +564,7 @@ export const Container = styled(FlexDivCentered)<{
 `;
 
 export const getDefaultButtonProps = (isMobile: boolean) => ({
-    minWidth: isMobile ? '282px' : '180px',
+    minWidth: isMobile ? '282px' : '240px',
     height: '30px',
     fontSize: '13px',
 });
@@ -575,6 +603,10 @@ export const Value = styled.span<{ $color?: string; $isUpperCase?: boolean }>`
 export const CollateralSelectorContainer = styled(FlexDivCentered)`
     line-height: 15px;
     padding-right: 2px;
+    text-transform: none;
+`;
+
+export const CollateralText = styled.span`
     text-transform: none;
 `;
 
