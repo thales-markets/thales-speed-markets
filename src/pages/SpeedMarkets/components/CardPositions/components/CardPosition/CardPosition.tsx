@@ -9,10 +9,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getSelectedClaimCollateralIndex, setSelectedClaimCollateralIndex } from 'redux/modules/wallet';
 import styled, { useTheme } from 'styled-components';
 import { FlexDivColumn, FlexDivRow, FlexDivSpaceBetween, FlexDivStart } from 'styles/common';
-import { formatCurrencyWithSign } from 'thales-utils';
+import { formatCurrencyWithKey, formatCurrencyWithSign } from 'thales-utils';
 import { UserPosition } from 'types/market';
 import { ThemeInterface } from 'types/ui';
-import { getCollateralByAddress, getOfframpCollaterals } from 'utils/currency';
+import { getCollateralByAddress, getOfframpCollaterals, isOverCurrency } from 'utils/currency';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import { getHistoryStatus, mapUserPositionToHistory } from 'utils/position';
 import { getColorPerPosition, getStatusColor } from 'utils/style';
@@ -134,11 +134,25 @@ const CardPosition: React.FC<CardPositionProps> = ({
                 <InfoColumn>
                     <InfoRow>
                         <Label>{t('speed-markets.user-positions.paid')}:</Label>
-                        <Value>{formatCurrencyWithSign(USD_SIGN, position.paid)}</Value>
+                        <Value>
+                            {nativeCollateral
+                                ? formatCurrencyWithKey(
+                                      `${isOverCurrency(nativeCollateral) ? '$' : ''}${nativeCollateral}`,
+                                      position.paid
+                                  )
+                                : formatCurrencyWithSign(USD_SIGN, position.paid)}
+                        </Value>
                     </InfoRow>
                     <InfoRow>
                         <Label>{t('speed-markets.user-positions.payout')}:</Label>
-                        <Value>{formatCurrencyWithSign(USD_SIGN, position.payout)}</Value>
+                        <Value>
+                            {nativeCollateral
+                                ? formatCurrencyWithKey(
+                                      `${isOverCurrency(nativeCollateral) ? '$' : ''}${nativeCollateral}`,
+                                      position.payout
+                                  )
+                                : formatCurrencyWithSign(USD_SIGN, position.payout)}
+                        </Value>
                     </InfoRow>
                     {position.isClaimable && !isOverview && (
                         <InfoRow>
@@ -207,7 +221,7 @@ export const InfoColumn = styled(FlexDivColumn)<{ $isChainedHistory?: boolean }>
     gap: ${(props) => (props.$isChainedHistory ? '5px' : '6px')};
 
     &:first-child {
-        min-width: 200px;
+        min-width: 175px;
     }
 `;
 
@@ -225,7 +239,7 @@ export const Action = styled(FlexDivSpaceBetween)``;
 
 export const Text = styled.span`
     color: ${(props) => props.theme.textColor.secondary};
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 800;
     line-height: 13px;
 `;

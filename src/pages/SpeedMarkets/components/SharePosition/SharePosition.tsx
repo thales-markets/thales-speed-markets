@@ -1,5 +1,4 @@
-import { intervalToDuration, secondsToMilliseconds } from 'date-fns';
-import useInterval from 'hooks/useInterval';
+import { intervalToDuration } from 'date-fns';
 import React, { useEffect, useState } from 'react';
 import styled, { useTheme } from 'styled-components';
 import { UserChainedPosition, UserPosition } from 'types/market';
@@ -20,22 +19,7 @@ const SharePosition: React.FC<{
 }> = ({ position, isDisabled, isOpen, isChained, onClose }) => {
     const theme: ThemeInterface = useTheme();
 
-    const [isMatured, setIsMatured] = useState(Date.now() > position.maturityDate);
     const [openTwitterShareModal, setOpenTwitterShareModal] = useState(isOpen);
-
-    useInterval(() => {
-        // when becomes matured
-        if (Date.now() > position.maturityDate) {
-            if (!isMatured) {
-                setIsMatured(true);
-            }
-        }
-    }, secondsToMilliseconds(10));
-
-    // when new position is added, refresh maturity status
-    useEffect(() => {
-        setIsMatured(Date.now() > position.maturityDate);
-    }, [position.maturityDate]);
 
     useEffect(() => {
         if (isOpen) {
