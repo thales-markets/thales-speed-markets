@@ -1,5 +1,5 @@
 import CollateralSelector from 'components/CollateralSelector';
-import { CRYPTO_CURRENCY_MAP, USD_SIGN } from 'constants/currency';
+import { USD_SIGN } from 'constants/currency';
 import { secondsToMilliseconds } from 'date-fns';
 import { Positions } from 'enums/market';
 import useInterval from 'hooks/useInterval';
@@ -9,10 +9,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getSelectedClaimCollateralIndex, setSelectedClaimCollateralIndex } from 'redux/modules/wallet';
 import styled, { useTheme } from 'styled-components';
 import { FlexDivCentered, FlexDivColumn } from 'styles/common';
-import { Coins, formatCurrencyWithSign } from 'thales-utils';
+import { formatCurrencyWithSign } from 'thales-utils';
 import { UserChainedPosition } from 'types/market';
 import { ThemeInterface } from 'types/ui';
-import { getOfframpCollaterals } from 'utils/currency';
+import { getCollateralByAddress, getOfframpCollaterals } from 'utils/currency';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import { getHistoryStatus } from 'utils/position';
 import { getStatusColor } from 'utils/style';
@@ -54,7 +54,10 @@ const CardChainedPosition: React.FC<CardChainedPositionProps> = ({
     const [isActionInProgress, setIsActionInProgress] = useState(false);
 
     const claimCollateralArray = useMemo(() => getOfframpCollaterals(networkId), [networkId]);
-    const isClaimInOver = !position.isDefaultCollateral;
+
+    const nativeCollateral = !position.isDefaultCollateral
+        ? getCollateralByAddress(position.collateralAddress, networkId)
+        : null;
 
     useInterval(() => {
         if (Date.now() > position.maturityDate) {
@@ -186,10 +189,8 @@ const CardChainedPosition: React.FC<CardChainedPositionProps> = ({
                         <InfoRow>
                             <Label>{t('speed-markets.user-positions.claim-in')}:</Label>
                             <CollateralSelector
-                                collateralArray={
-                                    isClaimInOver ? [CRYPTO_CURRENCY_MAP.OVER as Coins] : claimCollateralArray
-                                }
-                                selectedItem={isClaimInOver ? 0 : selectedClaimCollateralIndex}
+                                collateralArray={nativeCollateral ? [nativeCollateral] : claimCollateralArray}
+                                selectedItem={nativeCollateral ? 0 : selectedClaimCollateralIndex}
                                 onChangeCollateral={(index) => dispatch(setSelectedClaimCollateralIndex(index))}
                                 preventPaymentCollateralChange
                                 disabled={isActionInProgress}

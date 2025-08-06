@@ -51,6 +51,7 @@ export default defineConfig(({ mode }) => {
     return {
         define: {
             'process.env': env,
+            __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false',
         },
         plugins: plugins(mode),
         server: {
