@@ -196,20 +196,23 @@ const PositionAction: React.FC<PositionActionProps> = ({
             } else {
                 hash = await erc20Instance.write.approve([addressToApprove, approveAmount]);
             }
-            setOpenApprovalModal(false);
             const txReceipt = await waitForTransactionReceipt(client as Client, {
                 hash,
             });
             if (txReceipt.status === 'success') {
                 toast.update(id, getSuccessToastOptions(t(`common.transaction.successful`), id));
+                setOpenApprovalModal(false);
                 setAllowance(true);
+                setIsAllowing(false);
+            } else {
+                console.log('Transaction status', txReceipt.status);
+                toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
                 setIsAllowing(false);
             }
         } catch (e) {
             console.log(e);
             toast.update(id, getErrorToastOptions(t('common.errors.unknown-error-try-again'), id));
             setIsAllowing(false);
-            setOpenApprovalModal(false);
         }
     };
 
