@@ -10,7 +10,6 @@ import {
     getSuccessToastOptions,
 } from 'components/ToastMessage/ToastMessage';
 import Tooltip from 'components/Tooltip/Tooltip';
-import { USD_SIGN } from 'constants/currency';
 import { ZERO_ADDRESS } from 'constants/network';
 import { PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
 import { differenceInSeconds, millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
@@ -23,7 +22,7 @@ import { getIsMobile } from 'redux/modules/ui';
 import { getIsBiconomy, getSelectedClaimCollateralIndex, setSelectedClaimCollateralIndex } from 'redux/modules/wallet';
 import styled, { CSSProperties, useTheme } from 'styled-components';
 import { FlexDivCentered } from 'styles/common';
-import { coinParser, formatCurrencyWithKey, formatCurrencyWithSign, roundNumberToDecimals } from 'thales-utils';
+import { coinParser, roundNumberToDecimals } from 'thales-utils';
 import { UserPosition } from 'types/market';
 import { SupportedNetwork } from 'types/network';
 import { ThemeInterface } from 'types/ui';
@@ -35,12 +34,12 @@ import erc20Contract from 'utils/contracts/collateralContract';
 import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
 import speedMarketsAMMResolverContract from 'utils/contracts/speedMarketsAMMResolverContract';
 import {
+    formatValueWithCollateral,
     getCollateral,
     getCollateralAddress,
     getCollateralByAddress,
     getDefaultCollateral,
     getOfframpCollaterals,
-    isOverCurrency,
 } from 'utils/currency';
 import { checkAllowance, getIsMultiCollateralSupported } from 'utils/network';
 import { getPriceConnection, getPriceId, priceParser } from 'utils/pyth';
@@ -431,14 +430,7 @@ const PositionAction: React.FC<PositionActionProps> = ({
                 <>
                     {t(`speed-markets.user-positions.claim-win${isSubmitting ? '-progress' : ''}`)}
                     <CollateralText>
-                        {` ${
-                            nativeCollateral
-                                ? formatCurrencyWithKey(
-                                      `${isOverCurrency(nativeCollateral) ? '$' : ''}${nativeCollateral}`,
-                                      position.payout
-                                  )
-                                : formatCurrencyWithSign(USD_SIGN, position.payout)
-                        }`}
+                        {` ${formatValueWithCollateral(position.payout, nativeCollateral, networkId)}`}
                     </CollateralText>
                 </>
             ) : isAllowing ? (

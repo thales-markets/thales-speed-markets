@@ -11,7 +11,9 @@ import { FlexDivCentered, FlexDivColumn, FlexDivColumnCentered, FlexDivRow } fro
 import { formatCurrencyWithSign, truncToDecimals } from 'thales-utils';
 import { SharePositionData } from 'types/flexCards';
 import { RootState, ThemeInterface } from 'types/ui';
+import { formatValueWithCollateral } from 'utils/currency';
 import { isUserWinner } from 'utils/speedAmm';
+import { useChainId } from 'wagmi';
 import {
     ContainerBorder,
     LogoIcon,
@@ -30,9 +32,12 @@ const ChainedSpeedMarketFlexCard: React.FC<SharePositionData> = ({
     finalPrices,
     buyIn,
     payout,
+    collateral,
 }) => {
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
+
+    const networkId = useChainId();
 
     const isMobile = useSelector((state: RootState) => getIsMobile(state));
 
@@ -56,7 +61,9 @@ const ChainedSpeedMarketFlexCard: React.FC<SharePositionData> = ({
                     {isWonType && (
                         <StatusContainer>
                             <StatusHeading color={textColor}>{t('common.flex-card.won')}</StatusHeading>
-                            <Status color={textColor}>{formatCurrencyWithSign(USD_SIGN, payout ?? 0)}</Status>
+                            <Status color={textColor}>
+                                {formatValueWithCollateral(payout, collateral, networkId)}
+                            </Status>
                         </StatusContainer>
                     )}
                 </FlexDivColumn>
@@ -119,7 +126,11 @@ const ChainedSpeedMarketFlexCard: React.FC<SharePositionData> = ({
                     })}
                     <FlexDivRow>
                         <Text color={textColor} $isBold>
-                            {`${t('common.flex-card.buy-in')}: ${formatCurrencyWithSign(USD_SIGN, buyIn)}`}
+                            {`${t('common.flex-card.buy-in')}: ${formatValueWithCollateral(
+                                buyIn,
+                                collateral,
+                                networkId
+                            )}`}
                         </Text>
                         <Text color={textColor} $isBold>{`${
                             isWonType ? t('speed-markets.profit') : t('speed-markets.potential-profit')
