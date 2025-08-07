@@ -38,6 +38,7 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
     finalPrices,
     buyIn,
     payout,
+    collateral,
     marketDuration,
     onClose,
 }) => {
@@ -273,6 +274,7 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
                         finalPrices={finalPrices}
                         buyIn={buyIn}
                         payout={payout}
+                        collateral={collateral}
                     />
                 ) : (
                     <SpeedMarketFlexCard
@@ -282,6 +284,7 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
                         strikePrices={strikePrices}
                         buyIn={buyIn}
                         payout={payout}
+                        collateral={collateral}
                         marketDuration={marketDuration}
                     />
                 )}

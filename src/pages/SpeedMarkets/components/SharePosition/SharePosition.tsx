@@ -4,10 +4,12 @@ import styled, { useTheme } from 'styled-components';
 import { UserChainedPosition, UserPosition } from 'types/market';
 import { UserHistoryPosition } from 'types/profile';
 import { ThemeInterface } from 'types/ui';
+import { getCollateralByAddress } from 'utils/currency';
 import { formattedDurationFull } from 'utils/formatters/date';
 import { getHistoryStatus, mapUserPositionToHistory } from 'utils/position';
 import { isUserWinner } from 'utils/speedAmm';
 import { getStatusColor } from 'utils/style';
+import { useChainId } from 'wagmi';
 import SharePositionModal from '../SharePositionModal';
 
 const SharePosition: React.FC<{
@@ -18,6 +20,8 @@ const SharePosition: React.FC<{
     onClose?: React.Dispatch<void>;
 }> = ({ position, isDisabled, isOpen, isChained, onClose }) => {
     const theme: ThemeInterface = useTheme();
+
+    const networkId = useChainId();
 
     const [openTwitterShareModal, setOpenTwitterShareModal] = useState(isOpen);
 
@@ -70,6 +74,7 @@ const SharePosition: React.FC<{
                         finalPrices={(position as UserChainedPosition).finalPrices}
                         buyIn={position.paid}
                         payout={position.payout}
+                        collateral={getCollateralByAddress(position.collateralAddress, networkId)}
                         onClose={() => setOpenTwitterShareModal(false)}
                     />
                 ) : (
@@ -86,6 +91,7 @@ const SharePosition: React.FC<{
                         strikePrices={[(position as UserPosition).strikePrice]}
                         buyIn={position.paid}
                         payout={position.payout}
+                        collateral={getCollateralByAddress(position.collateralAddress, networkId)}
                         marketDuration={formattedDurationFull(
                             intervalToDuration({ start: position.createdAt, end: position.maturityDate })
                         )}

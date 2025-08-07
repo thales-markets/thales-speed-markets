@@ -16,7 +16,8 @@ import {
 import { formatCurrencyWithSign } from 'thales-utils';
 import { SharePositionData, SharePositionType } from 'types/flexCards';
 import { ThemeInterface } from 'types/ui';
-import { getSynthName } from 'utils/currency';
+import { formatValueWithCollateral, getSynthName } from 'utils/currency';
+import { useChainId } from 'wagmi';
 
 const SpeedMarketFlexCard: React.FC<SharePositionData> = ({
     type,
@@ -25,10 +26,13 @@ const SpeedMarketFlexCard: React.FC<SharePositionData> = ({
     strikePrices,
     buyIn,
     payout,
+    collateral,
     marketDuration,
 }) => {
     const { t } = useTranslation();
     const theme: ThemeInterface = useTheme();
+
+    const networkId = useChainId();
 
     const strikePrice = formatCurrencyWithSign(USD_SIGN, strikePrices ? strikePrices[0] : 0);
 
@@ -55,7 +59,9 @@ const SpeedMarketFlexCard: React.FC<SharePositionData> = ({
                                     ? t('common.flex-card.potential-win')
                                     : t('common.flex-card.won')}
                             </StatusHeading>
-                            <Status color={textColor}>{formatCurrencyWithSign(USD_SIGN, payout ?? 0)}</Status>
+                            <Status color={textColor}>
+                                {formatValueWithCollateral(payout, collateral, networkId)}
+                            </Status>
                         </StatusContainer>
                     )}
                 </FlexDivColumn>
@@ -81,7 +87,7 @@ const SpeedMarketFlexCard: React.FC<SharePositionData> = ({
                         </FlexDivRowCentered>
                         <FlexDivRowCentered>
                             <ItemName color={textColor}>{t('common.flex-card.buy-in')}</ItemName>
-                            <Value color={textColor}>{formatCurrencyWithSign(USD_SIGN, buyIn)}</Value>
+                            <Value color={textColor}>{formatValueWithCollateral(buyIn, collateral, networkId)}</Value>
                         </FlexDivRowCentered>
                     </MarketDetailsContainer>
                 </FlexDivRow>
@@ -131,7 +137,7 @@ export const ContainerBorder = styled.div<{ $isWon: boolean }>`
 `;
 
 const MarketDetailsContainer = styled(FlexDivColumn)`
-    max-width: 185px;
+    max-width: 190px;
     gap: 5px;
 `;
 
@@ -199,6 +205,9 @@ const CurrencyIcon = styled.i<{ color: string }>`
     font-size: 40px;
     margin-right: 5px;
     color: ${(props) => props.color};
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        font-size: 36px;
+    }
 `;
 
 const Asset = styled(FlexDivColumn)`
@@ -208,16 +217,22 @@ const Asset = styled(FlexDivColumn)`
 const AssetName = styled.span<{ color: string }>`
     color: ${(props) => props.color};
     font-family: ${(props) => props.theme.fontFamily.secondary};
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 400;
     text-transform: capitalize;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        font-size: 15px;
+    }
 `;
 
 const Position = styled.span<{ color: string }>`
     font-family: ${(props) => props.theme.fontFamily.secondary};
     color: ${(props) => props.color};
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
+    @media (max-width: ${ScreenSizeBreakpoint.SMALL}px) {
+        font-size: 15px;
+    }
 `;
 
 const Footer = styled(FlexDivCentered)<{ color: string }>`

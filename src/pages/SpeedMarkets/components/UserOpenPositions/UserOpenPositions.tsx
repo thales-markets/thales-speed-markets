@@ -2,7 +2,6 @@ import Button from 'components/Button';
 import CollateralSelector from 'components/CollateralSelector';
 import SimpleLoader from 'components/SimpleLoader/SimpleLoader';
 import Tooltip from 'components/Tooltip';
-import { USD_SIGN } from 'constants/currency';
 import { millisecondsToSeconds } from 'date-fns';
 import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
@@ -20,17 +19,16 @@ import { getIsMobile } from 'redux/modules/ui';
 import { getIsBiconomy } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDiv, FlexDivCentered, FlexDivColumn, FlexDivEnd, FlexDivRow } from 'styles/common';
-import { formatCurrencyWithSign } from 'thales-utils';
 import { UserChainedPosition, UserPosition } from 'types/market';
 import { SupportedNetwork } from 'types/network';
 import { RootState } from 'types/ui';
 import biconomyConnector from 'utils/biconomyWallet';
 import {
+    formatValueWithCollateral,
     getCollateralAddress,
     getCollateralByAddress,
     getDefaultCollateral,
     getNativeCollateralsText,
-    isOverCurrency,
 } from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
 import { sortSpeedMarkets } from 'utils/position';
@@ -298,14 +296,7 @@ const UserOpenPositions: React.FC<UserOpenPositionsProps> = ({ isChained, curren
                     }`
                 )}
                 <CollateralText>
-                    {` ${
-                        nativeCollateral
-                            ? formatCurrencyWithSign(
-                                  `${isOverCurrency(nativeCollateral) ? '$' : ''}${nativeCollateral} `,
-                                  claimableAllPositionsPayout
-                              )
-                            : formatCurrencyWithSign(USD_SIGN, claimableAllPositionsPayout)
-                    }`}
+                    {` ${formatValueWithCollateral(claimableAllPositionsPayout, nativeCollateral, networkId)}`}
                 </CollateralText>
             </>
             <Tooltip

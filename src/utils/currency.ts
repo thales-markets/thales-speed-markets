@@ -1,6 +1,13 @@
-import { COLLATERALS, CRYPTO_CURRENCY_MAP, STABLE_COINS, SYNTHS_MAP, currencyKeyToNameMap } from 'constants/currency';
+import {
+    COLLATERALS,
+    CRYPTO_CURRENCY_MAP,
+    STABLE_COINS,
+    SYNTHS_MAP,
+    USD_SIGN,
+    currencyKeyToNameMap,
+} from 'constants/currency';
 import { t } from 'i18next';
-import { COLLATERAL_DECIMALS, Coins, NetworkId } from 'thales-utils';
+import { COLLATERAL_DECIMALS, Coins, NetworkId, formatCurrencyWithKey, formatCurrencyWithSign } from 'thales-utils';
 import { CollateralsBalance } from 'types/collateral';
 import { SupportedNetwork } from 'types/network';
 import multipleCollateral from './contracts/multipleCollateralContract';
@@ -78,6 +85,11 @@ export const getNativeCollateralsText = (
         ? `${collaterals.slice(0, -1).join(', ')} ${t('common.and')} ${collaterals.slice(-1)}`
         : collaterals[0];
 };
+
+export const formatValueWithCollateral = (value: number, collateral: Coins | null, networkId: SupportedNetwork) =>
+    collateral && collateral !== getDefaultCollateral(networkId)
+        ? formatCurrencyWithKey(`${isOverCurrency(collateral) ? '$' : ''}${collateral}`, value)
+        : formatCurrencyWithSign(USD_SIGN, value);
 
 export const getMinBalanceThreshold = (coin: Coins): number => (isStableCurrency(coin) ? 1 : 0);
 
