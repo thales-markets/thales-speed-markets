@@ -2,7 +2,6 @@ import Button from 'components/Button';
 import CollateralSelector from 'components/CollateralSelector';
 import SimpleLoader from 'components/SimpleLoader/SimpleLoader';
 import Tooltip from 'components/Tooltip';
-import { USD_SIGN } from 'constants/currency';
 import { millisecondsToSeconds } from 'date-fns';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import { uniq } from 'lodash';
@@ -20,10 +19,14 @@ import { getIsMobile } from 'redux/modules/ui';
 import { getIsBiconomy } from 'redux/modules/wallet';
 import styled from 'styled-components';
 import { FlexDiv, FlexDivCentered, FlexDivColumn, FlexDivEnd, FlexDivRow, FlexDivStart } from 'styles/common';
-import { formatCurrencyWithSign } from 'thales-utils';
 import { UserChainedPosition, UserPosition } from 'types/market';
 import biconomyConnector from 'utils/biconomyWallet';
-import { getCollateralByAddress, getDefaultCollateral, getNativeCollateralsText, isOverCurrency } from 'utils/currency';
+import {
+    formatValueWithCollateral,
+    getCollateralByAddress,
+    getDefaultCollateral,
+    getNativeCollateralsText,
+} from 'utils/currency';
 import { getIsMultiCollateralSupported } from 'utils/network';
 import { sortSpeedMarkets } from 'utils/position';
 import { getPriceId } from 'utils/pyth';
@@ -410,14 +413,7 @@ const UserActivePositions: React.FC<UserActivePositionsProps> = ({
                     }`
                 )}
                 <CollateralText>
-                    {` ${
-                        claimAllNativeCollateral
-                            ? formatCurrencyWithSign(
-                                  `${isOverCurrency(claimAllNativeCollateral) ? '$' : ''}${claimAllNativeCollateral} `,
-                                  claimableAllPositionsPayout
-                              )
-                            : formatCurrencyWithSign(USD_SIGN, claimableAllPositionsPayout)
-                    }`}
+                    {` ${formatValueWithCollateral(claimableAllPositionsPayout, claimAllNativeCollateral, networkId)}`}
                 </CollateralText>
             </>
             <Tooltip

@@ -10,7 +10,6 @@ import {
     getSuccessToastOptions,
 } from 'components/ToastMessage/ToastMessage';
 import Tooltip from 'components/Tooltip';
-import { USD_SIGN } from 'constants/currency';
 import { ONE_HUNDRED_AND_THREE_PERCENT } from 'constants/market';
 import { ZERO_ADDRESS } from 'constants/network';
 import { PYTH_CONTRACT_ADDRESS } from 'constants/pyth';
@@ -30,16 +29,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { getIsBiconomy, getSelectedClaimCollateralIndex, setSelectedClaimCollateralIndex } from 'redux/modules/wallet';
 import { useTheme } from 'styled-components';
-import { coinParser, formatCurrencyWithKey, formatCurrencyWithSign, roundNumberToDecimals } from 'thales-utils';
+import { coinParser, roundNumberToDecimals } from 'thales-utils';
 import { UserChainedPosition } from 'types/market';
 import { RootState, ThemeInterface } from 'types/ui';
 import {
+    formatValueWithCollateral,
     getCollateral,
     getCollateralAddress,
     getCollateralByAddress,
     getDefaultCollateral,
     getOfframpCollaterals,
-    isOverCurrency,
 } from 'utils/currency';
 import { checkAllowance, getIsMultiCollateralSupported } from 'utils/network';
 import { getPriceConnection, getPriceId, priceParser } from 'utils/pyth';
@@ -410,14 +409,7 @@ const ChainedPositionAction: React.FC<ChainedPositionActionProps> = ({
                         <CollateralText>
                             {isOverview
                                 ? ''
-                                : ` ${
-                                      nativeCollateral
-                                          ? formatCurrencyWithKey(
-                                                `${isOverCurrency(nativeCollateral) ? '$' : ''}${nativeCollateral}`,
-                                                position.payout
-                                            )
-                                          : formatCurrencyWithSign(USD_SIGN, position.payout)
-                                  }`}
+                                : ` ${formatValueWithCollateral(position.payout, nativeCollateral, networkId)}`}
                         </CollateralText>
                     </>
                 ) : isAllowing ? (

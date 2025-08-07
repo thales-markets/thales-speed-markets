@@ -1,4 +1,5 @@
 import { Positions } from 'enums/market';
+import { Coins } from 'thales-utils';
 
 export type SharePositionType =
     | 'speed-potential'
@@ -15,5 +16,6 @@ export type SharePositionData = {
     finalPrices?: number[];
     buyIn: number;
     payout: number;
+    collateral: Coins;
     marketDuration?: string;
 };

@@ -1,5 +1,4 @@
 import CollateralSelector from 'components/CollateralSelector';
-import { USD_SIGN } from 'constants/currency';
 import { secondsToMilliseconds } from 'date-fns';
 import { Positions } from 'enums/market';
 import useInterval from 'hooks/useInterval';
@@ -9,10 +8,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getSelectedClaimCollateralIndex, setSelectedClaimCollateralIndex } from 'redux/modules/wallet';
 import styled, { useTheme } from 'styled-components';
 import { FlexDivCentered, FlexDivColumn } from 'styles/common';
-import { formatCurrencyWithKey, formatCurrencyWithSign } from 'thales-utils';
 import { UserChainedPosition } from 'types/market';
 import { ThemeInterface } from 'types/ui';
-import { getCollateralByAddress, getOfframpCollaterals, isOverCurrency } from 'utils/currency';
+import { formatValueWithCollateral, getCollateralByAddress, getOfframpCollaterals } from 'utils/currency';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import { getHistoryStatus } from 'utils/position';
 import { getStatusColor } from 'utils/style';
@@ -179,25 +177,11 @@ const CardChainedPosition: React.FC<CardChainedPositionProps> = ({
                 <InfoColumn $isChainedHistory={isHistory}>
                     <InfoRow>
                         <Label>{t('speed-markets.user-positions.paid')}:</Label>
-                        <Value>
-                            {nativeCollateral
-                                ? formatCurrencyWithKey(
-                                      `${isOverCurrency(nativeCollateral) ? '$' : ''}${nativeCollateral}`,
-                                      position.paid
-                                  )
-                                : formatCurrencyWithSign(USD_SIGN, position.paid)}
-                        </Value>
+                        <Value>{formatValueWithCollateral(position.paid, nativeCollateral, networkId)}</Value>
                     </InfoRow>
                     <InfoRow>
                         <Label>{t('speed-markets.user-positions.payout')}:</Label>
-                        <Value>
-                            {nativeCollateral
-                                ? formatCurrencyWithKey(
-                                      `${isOverCurrency(nativeCollateral) ? '$' : ''}${nativeCollateral}`,
-                                      position.payout
-                                  )
-                                : formatCurrencyWithSign(USD_SIGN, position.payout)}
-                        </Value>
+                        <Value>{formatValueWithCollateral(position.payout, nativeCollateral, networkId)}</Value>
                     </InfoRow>
                     {position.isClaimable && (
                         <InfoRow>
