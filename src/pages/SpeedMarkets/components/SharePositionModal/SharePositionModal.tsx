@@ -7,7 +7,7 @@ import {
 import { LINKS } from 'constants/links';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import { toPng } from 'html-to-image';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactModal from 'react-modal';
 import { useSelector } from 'react-redux';
@@ -15,7 +15,7 @@ import { toast } from 'react-toastify';
 import { getIsMobile } from 'redux/modules/ui';
 import styled, { useTheme } from 'styled-components';
 import { FlexDivCentered, FlexDivColumnCentered } from 'styles/common';
-import { isFirefox, isIos, isMetamask } from 'thales-utils';
+import { isIos } from 'thales-utils';
 import { SharePositionData } from 'types/flexCards';
 import { RootState, ThemeInterface } from 'types/ui';
 import ChainedSpeedMarketFlexCard from './components/ChainedSpeedMarketFlexCard';
@@ -49,7 +49,6 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
 
     const [isLoading, setIsLoading] = useState(false);
     const [toastId, setToastId] = useState<string | number>(0);
-    const [isMetamaskBrowser, setIsMetamaskBrowser] = useState(false);
 
     const isChainedMarkets = ['chained-speed-won', 'chained-speed-loss'].includes(type);
 
@@ -76,17 +75,8 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
         },
     };
 
-    useEffect(() => {
-        const checkMetamaskBrowser = async () => {
-            const isMMBrowser = (await isMetamask()) && isMobile;
-            setIsMetamaskBrowser(isMMBrowser);
-        };
-        checkMetamaskBrowser().catch((e) => console.log(e));
-    }, [isMobile]);
-
     // Download image mobile: clipboard.write is not supported by all browsers
-    // Download image desktop: clipboard.write not supported/enabled in Firefox
-    const useDownloadImage = isMobile || isFirefox();
+    const useDownloadImage = isMobile;
 
     const saveImageAndOpenTwitter = useCallback(
         async (toastIdParam: string | number) => {
@@ -209,23 +199,18 @@ const SharePositionModal: React.FC<SharePositionModalProps> = ({
 
     const onTwitterShareClick = () => {
         if (!isLoading) {
-            if (isMetamaskBrowser) {
-                // Metamask dosn't support image download neither clipboard.write
-                toast.error(t('market.toast-message.metamask-not-supported'), getDeafultToastOptions());
-            } else {
-                const id = toast.loading(
-                    useDownloadImage ? t('common.flex-card.download-image') : t('common.flex-card.save-image'),
-                    getLoadingToastOptions()
-                );
-                setToastId(id);
-                setIsLoading(true);
+            const id = toast.loading(
+                useDownloadImage ? t('common.flex-card.download-image') : t('common.flex-card.save-image'),
+                getLoadingToastOptions()
+            );
+            setToastId(id);
+            setIsLoading(true);
 
-                // If image creation is not postponed with timeout toaster is not displayed immediately, it is rendered in parallel with toPng() execution.
-                // Function toPng is causing UI to freez for couple of seconds and there is no notification message during that time, so it confuses user.
-                setTimeout(() => {
-                    saveImageAndOpenTwitter(id);
-                }, 300);
-            }
+            // If image creation is not postponed with timeout toaster is not displayed immediately, it is rendered in parallel with toPng() execution.
+            // Function toPng is causing UI to freez for couple of seconds and there is no notification message during that time, so it confuses user.
+            setTimeout(() => {
+                saveImageAndOpenTwitter(id);
+            }, 300);
         }
     };
 
