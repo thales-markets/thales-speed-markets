@@ -133,3 +133,11 @@
 .currency-icon--bonk::before {
     content: '\0074';
 }
+
+.currency-icon--cbbtc::before {
+    content: '\0076';
+}
+
+.currency-icon--wbtc::before {
+    content: '\0076';
+}
