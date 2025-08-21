@@ -63,6 +63,7 @@ export const SUPPORTED_NETWORKS_PARAMS: Record<number, NetworkParams> = {
 };
 
 const INFURA_PROJECT_ID = import.meta.env.VITE_APP_INFURA_PROJECT_ID;
+const DRPC_PROJECT_ID = import.meta.env.VITE_APP_DRPC_PROJECT_ID;
 
 export const RPC_LIST = {
     INFURA: {
@@ -71,5 +72,22 @@ export const RPC_LIST = {
         [NetworkId.Base]: `https://base-mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
         [NetworkId.PolygonMainnet]: `https://polygon-mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
         [NetworkId.OptimismSepolia]: `https://optimism-sepolia.infura.io/v3/${INFURA_PROJECT_ID}`,
+    },
+    DRPC: {
+        [NetworkId.OptimismMainnet]: {
+            http: `https://lb.drpc.org/optimism/${DRPC_PROJECT_ID}`,
+        },
+        [NetworkId.Arbitrum]: {
+            http: `https://lb.drpc.org/arbitrum/${DRPC_PROJECT_ID}`,
+        },
+        [NetworkId.Base]: {
+            http: `https://lb.drpc.org/base/${DRPC_PROJECT_ID}`,
+        },
+        [NetworkId.PolygonMainnet]: {
+            http: `https://lb.drpc.org/polygon/${DRPC_PROJECT_ID}`,
+        },
+        [NetworkId.OptimismSepolia]: {
+            http: `https://lb.drpc.org/optimism-sepolia/${DRPC_PROJECT_ID}`,
+        },
     },
 };
