@@ -516,7 +516,8 @@ const PositionAction: React.FC<PositionActionProps> = ({
                     !isCollateralHidden &&
                     isMultiCollateralSupported &&
                     position.isClaimable &&
-                    !isClaimInNative && (
+                    !isClaimInNative &&
+                    !position.isFreeBet && (
                         <CollateralSelector
                             collateralArray={isClaimInNative ? [] : claimCollateralArray}
                             selectedItem={selectedClaimCollateralIndex}
