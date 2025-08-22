@@ -41,8 +41,7 @@
         "page": "Page",
         "free-bet": {
             "claim": "Claim amount will be reduced by paid amount.",
-            "resolve": "Resolve amount will be reduced by paid amount.",
-            "history": "Amount is reduced by paid amount."
+            "resolve": "Resolve amount will be reduced by paid amount."
         },
         "time-remaining": {
             "years": "years",
