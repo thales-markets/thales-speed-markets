@@ -350,6 +350,10 @@
     content: '\005C';
 }
 
+.icon--gift:before {
+    content: '\005D';
+}
+
 .icon--external:before {
     content: '\0061';
 }

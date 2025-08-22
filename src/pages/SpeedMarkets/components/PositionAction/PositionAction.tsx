@@ -556,7 +556,7 @@ export const Container = styled(FlexDivCentered)<{
 `;
 
 export const getDefaultButtonProps = (isMobile: boolean) => ({
-    minWidth: isMobile ? '282px' : '240px',
+    minWidth: isMobile ? '274px' : '240px',
     height: '30px',
     fontSize: '13px',
 });

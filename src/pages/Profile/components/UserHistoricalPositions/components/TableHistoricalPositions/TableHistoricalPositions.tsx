@@ -1,5 +1,6 @@
 import Table from 'components/Table';
 import { PAGINATION_SIZE } from 'components/Table/Table';
+import Tooltip from 'components/Tooltip';
 import { USD_SIGN } from 'constants/currency';
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 import { Positions } from 'enums/market';
@@ -12,6 +13,7 @@ import {
     AssetIcon,
     AssetName,
     DirectionIcon,
+    FreeBetIcon,
     Header,
     ShareWrapper,
     Value,
@@ -32,9 +34,12 @@ import {
     tableSortByStatus,
 } from 'utils/position';
 import { getStatusColor } from 'utils/style';
+import { useChainId } from 'wagmi';
 
 const TableHistoricalPositions: React.FC<{ data: UserHistoryPosition[] }> = ({ data }) => {
     const theme: ThemeInterface = useTheme();
+
+    const networkId = useChainId();
 
     const columns = [
         {
@@ -175,7 +180,7 @@ const TableHistoricalPositions: React.FC<{ data: UserHistoryPosition[] }> = ({ d
             accessorKey: 'paid',
             cell: (cellProps: any) => {
                 const position = cellProps.row.original;
-                const collateralByAddress = getCollateralByAddress(position.collateralAddress, position.networkId);
+                const collateralByAddress = getCollateralByAddress(position.collateralAddress, networkId);
                 const collateral = `${isOverCurrency(collateralByAddress) ? '$' : ''}${collateralByAddress}`;
                 return (
                     <Wrapper>
@@ -194,10 +199,15 @@ const TableHistoricalPositions: React.FC<{ data: UserHistoryPosition[] }> = ({ d
             accessorKey: 'payout',
             cell: (cellProps: any) => {
                 const position = cellProps.row.original;
-                const collateralByAddress = getCollateralByAddress(position.collateralAddress, position.networkId);
+                const collateralByAddress = getCollateralByAddress(position.collateralAddress, networkId);
                 const collateral = `${isOverCurrency(collateralByAddress) ? '$' : ''}${collateralByAddress}`;
                 return (
                     <Wrapper>
+                        {position.isFreeBet && (
+                            <Tooltip overlay={t('common.free-bet.history')}>
+                                <FreeBetIcon className={'icon icon--gift'} />
+                            </Tooltip>
+                        )}
                         <Value>
                             {position.isDefaultCollateral
                                 ? formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())

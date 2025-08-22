@@ -75,8 +75,10 @@ const useActiveSpeedMarketsDataQuery = (
                             : getFeesFromHistory(createdAt).safeBoxImpact;
                     const fees = lpFee + safeBoxImpact;
 
+                    const isFreeBet = marketData.freeBetUser !== ZERO_ADDRESS;
+
                     const userData: UserPosition = {
-                        user: marketData.user,
+                        user: isFreeBet ? marketData.freeBetUser : marketData.user,
                         market: marketData.market,
                         currencyKey: parseBytes32String(marketData.asset),
                         side,
@@ -86,6 +88,7 @@ const useActiveSpeedMarketsDataQuery = (
                         payout: coinFormatter(marketData.payout, queryConfig.networkId, collateral),
                         collateralAddress: marketData.collateral,
                         isDefaultCollateral: marketData.isDefaultCollateral,
+                        isFreeBet,
                         currentPrice: 0,
                         finalPrice: 0,
                         isClaimable: false,
@@ -126,8 +129,10 @@ const useActiveSpeedMarketsDataQuery = (
                             : getFeesFromHistory(createdAt).safeBoxImpact;
                     const fees = lpFee + safeBoxImpact;
 
+                    const isFreeBet = marketData.freeBetUser !== ZERO_ADDRESS;
+
                     const userData: UserPosition = {
-                        user: marketData.user,
+                        user: isFreeBet ? marketData.freeBetUser : marketData.user,
                         market: marketData.market,
                         currencyKey: currencyKey,
                         side,
@@ -137,6 +142,7 @@ const useActiveSpeedMarketsDataQuery = (
                         payout: coinFormatter(marketData.payout, queryConfig.networkId, collateral),
                         collateralAddress: marketData.collateral,
                         isDefaultCollateral: marketData.isDefaultCollateral,
+                        isFreeBet,
                         currentPrice: prices[currencyKey],
                         finalPrice: 0,
                         isClaimable: false,

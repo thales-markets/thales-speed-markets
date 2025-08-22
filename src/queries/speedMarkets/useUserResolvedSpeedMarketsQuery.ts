@@ -5,6 +5,7 @@ import {
     MIN_MATURITY,
     SIDE_TO_POSITION_MAP,
 } from 'constants/market';
+import { ZERO_ADDRESS } from 'constants/network';
 import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
@@ -13,6 +14,7 @@ import { UserPosition } from 'types/market';
 import { QueryConfig } from 'types/network';
 import { ViemContract } from 'types/viem';
 import { getContractAbi } from 'utils/contracts/abi';
+import freeBetHolderContract from 'utils/contracts/freeBetHolderContract';
 import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
 import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
 import { getCollateralByAddress } from 'utils/currency';
@@ -42,6 +44,12 @@ const useUserResolvedSpeedMarketsQuery = (
                     client: queryConfig.client,
                 }) as ViemContract;
 
+                const freeBetHolderContractLocal = getContract({
+                    abi: getContractAbi(freeBetHolderContract, queryConfig.networkId),
+                    address: freeBetHolderContract.addresses[queryConfig.networkId],
+                    client: queryConfig.client,
+                }) as ViemContract;
+
                 const ammParams = await speedMarketsDataContractLocal.read.getSpeedMarketsAMMParameters([
                     walletAddress,
                 ]);
@@ -51,11 +59,30 @@ const useUserResolvedSpeedMarketsQuery = (
                     MAX_NUMBER_OF_SPEED_MARKETS_TO_FETCH
                 );
                 const index = Number(ammParams.numMaturedMarketsPerUser) - pageSize;
-                const resolvedMarkets = await speedMarketsAMMContractLocal.read.maturedMarketsPerUser([
+                const resolvedMarketsPerUser = await speedMarketsAMMContractLocal.read.maturedMarketsPerUser([
                     index,
                     pageSize,
                     walletAddress,
                 ]);
+
+                // Free Bet
+                const freeBetPageSize = Math.min(
+                    Number(ammParams.numFreeBetMaturedMarketsPerUser),
+                    MAX_NUMBER_OF_SPEED_MARKETS_TO_FETCH
+                );
+                const freeBetIndex = Number(ammParams.numFreeBetMaturedMarketsPerUser) - freeBetPageSize;
+                const freeBetResolvedMarketsPerUser = await freeBetHolderContractLocal?.read.getResolvedSpeedMarketsPerUser(
+                    [freeBetIndex, freeBetPageSize, walletAddress]
+                );
+
+                const resolvedMarkets = (Array.isArray(resolvedMarketsPerUser)
+                    ? resolvedMarketsPerUser
+                    : [resolvedMarketsPerUser]
+                ).concat(
+                    Array.isArray(freeBetResolvedMarketsPerUser)
+                        ? freeBetResolvedMarketsPerUser
+                        : [freeBetResolvedMarketsPerUser]
+                );
 
                 const promises = [];
                 for (let i = 0; i < Math.ceil(resolvedMarkets.length / BATCH_NUMBER_OF_SPEED_MARKETS); i++) {
@@ -96,9 +123,10 @@ const useUserResolvedSpeedMarketsQuery = (
 
                     const paid = marketBuyinAmount * (1 + fees);
                     const payout = coinFormatter(marketData.payout, queryConfig.networkId, collateral);
+                    const isFreeBet = marketData.freeBetUser !== ZERO_ADDRESS;
 
                     const userData: UserPosition = {
-                        user: marketData.user,
+                        user: isFreeBet ? marketData.freeBetUser : marketData.user,
                         market: marketData.market,
                         currencyKey: parseBytes32String(marketData.asset),
                         side: SIDE_TO_POSITION_MAP[marketData.direction],
@@ -108,6 +136,7 @@ const useUserResolvedSpeedMarketsQuery = (
                         payout,
                         collateralAddress: marketData.collateral,
                         isDefaultCollateral: marketData.isDefaultCollateral,
+                        isFreeBet,
                         currentPrice: 0,
                         finalPrice: bigNumberFormatter(marketData.finalPrice, PYTH_CURRENCY_DECIMALS),
                         isClaimable: false,

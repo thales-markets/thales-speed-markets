@@ -12,6 +12,7 @@ import { UserChainedPosition } from 'types/market';
 import { getCollateralByAddress, isOverCurrency } from 'utils/currency';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import { getChainedEndTime } from 'utils/position';
+import { useChainId } from 'wagmi';
 import {
     AssetIcon,
     AssetName,
@@ -33,13 +34,15 @@ const TableChainedPositions: React.FC<TablePositionsProps> = ({
     isAdmin,
     isSubmittingBatch,
 }) => {
+    const networkId = useChainId();
+
     const columns = [
         {
             header: <Header>{t('speed-markets.user-positions.asset')}</Header>,
             accessorKey: 'currencyKey',
             cell: (cellProps: any) => {
                 return (
-                    <Wrapper first>
+                    <Wrapper isFirst>
                         <AssetIcon
                             className={`currency-icon currency-icon--${cellProps.cell.getValue().toLowerCase()}`}
                         />
@@ -121,7 +124,7 @@ const TableChainedPositions: React.FC<TablePositionsProps> = ({
             accessorKey: 'paid',
             cell: (cellProps: any) => {
                 const position = cellProps.row.original;
-                const collateralByAddress = getCollateralByAddress(position.collateralAddress, position.networkId);
+                const collateralByAddress = getCollateralByAddress(position.collateralAddress, networkId);
                 const collateral = `${isOverCurrency(collateralByAddress) ? '$' : ''}${collateralByAddress}`;
                 return (
                     <Wrapper>
@@ -140,7 +143,7 @@ const TableChainedPositions: React.FC<TablePositionsProps> = ({
             accessorKey: 'payout',
             cell: (cellProps: any) => {
                 const position = cellProps.row.original;
-                const collateralByAddress = getCollateralByAddress(position.collateralAddress, position.networkId);
+                const collateralByAddress = getCollateralByAddress(position.collateralAddress, networkId);
                 const collateral = `${isOverCurrency(collateralByAddress) ? '$' : ''}${collateralByAddress}`;
                 return (
                     <Wrapper>

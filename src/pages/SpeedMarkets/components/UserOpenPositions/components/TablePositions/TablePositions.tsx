@@ -1,5 +1,6 @@
 import Table from 'components/Table';
 import { PAGINATION_SIZE } from 'components/Table/Table';
+import Tooltip from 'components/Tooltip';
 import { USD_SIGN } from 'constants/currency';
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
 import { t } from 'i18next';
@@ -11,6 +12,7 @@ import { UserPosition } from 'types/market';
 import { getCollateralByAddress, isOverCurrency } from 'utils/currency';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import { tableSortByStatus } from 'utils/position';
+import { useChainId } from 'wagmi';
 import MarketPrice from '../../../MarketPrice';
 import { Icon } from '../../../SelectPosition/styled-components';
 import SharePosition from '../../../SharePosition';
@@ -20,6 +22,8 @@ type TablePositionsProps = {
 };
 
 const TablePositions: React.FC<TablePositionsProps> = ({ data }) => {
+    const networkId = useChainId();
+
     const columns = [
         {
             header: <Header>{t('speed-markets.user-positions.asset')}</Header>,
@@ -82,7 +86,7 @@ const TablePositions: React.FC<TablePositionsProps> = ({ data }) => {
             accessorKey: 'paid',
             cell: (cellProps: any) => {
                 const position = cellProps.row.original;
-                const collateralByAddress = getCollateralByAddress(position.collateralAddress, position.networkId);
+                const collateralByAddress = getCollateralByAddress(position.collateralAddress, networkId);
                 const collateral = `${isOverCurrency(collateralByAddress) ? '$' : ''}${collateralByAddress}`;
                 return (
                     <Wrapper>
@@ -101,10 +105,15 @@ const TablePositions: React.FC<TablePositionsProps> = ({ data }) => {
             accessorKey: 'payout',
             cell: (cellProps: any) => {
                 const position = cellProps.row.original;
-                const collateralByAddress = getCollateralByAddress(position.collateralAddress, position.networkId);
+                const collateralByAddress = getCollateralByAddress(position.collateralAddress, networkId);
                 const collateral = `${isOverCurrency(collateralByAddress) ? '$' : ''}${collateralByAddress}`;
                 return (
                     <Wrapper>
+                        {position.isFreeBet && (
+                            <Tooltip overlay={t('common.free-bet.claim')}>
+                                <FreeBetIcon className={'icon icon--gift'} />
+                            </Tooltip>
+                        )}
                         <Value>
                             {position.isDefaultCollateral
                                 ? formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())
@@ -189,6 +198,14 @@ export const AssetIcon = styled.i`
 export const DirectionIcon = styled(Icon)<{ $alignUp?: boolean; $alignEmptyUp?: boolean }>`
     color: ${(props) => props.theme.icon.textColor.primary};
     ${(props) => (props.$alignUp ? 'margin-bottom: -4px;' : props.$alignEmptyUp ? 'margin-bottom: 2px;' : '')}
+`;
+
+export const FreeBetIcon = styled.i`
+    font-size: 20px;
+    line-height: 100%;
+    color: ${(props) => props.theme.icon.textColor.primary};
+    cursor: pointer;
+    margin-right: 3px;
 `;
 
 export const Value = styled.span<{ $color?: string }>`

@@ -12,6 +12,7 @@ export type UserPosition = {
     payout: number;
     collateralAddress: string;
     isDefaultCollateral: boolean;
+    isFreeBet: boolean;
     currentPrice: number;
     finalPrice: number;
     isClaimable: boolean;
@@ -32,6 +33,7 @@ export type UserChainedPosition = {
     payoutMultiplier: number;
     collateralAddress: string;
     isDefaultCollateral: boolean;
+    isFreeBet: boolean;
     currentPrice: number;
     finalPrices: number[];
     canResolve: boolean;
