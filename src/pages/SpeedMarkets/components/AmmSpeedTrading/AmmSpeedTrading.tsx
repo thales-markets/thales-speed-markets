@@ -784,6 +784,7 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
                                     payout: potentialProfit * convertToStable(paidAmount),
                                     collateralAddress,
                                     isDefaultCollateral,
+                                    isFreeBet: false,
                                     currentPrice: currentPrice ?? 0,
                                     finalPrice: 0,
                                     isClaimable: false,

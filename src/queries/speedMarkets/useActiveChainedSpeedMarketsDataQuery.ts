@@ -79,9 +79,10 @@ const useActiveChainedSpeedMarketsDataQuery = (
                     strikePrices[0] = bigNumberFormatter(marketData.initialStrikePrice, PYTH_CURRENCY_DECIMALS);
                     const fee = bigNumberFormatter(marketData.safeBoxImpact);
                     const collateral = getCollateralByAddress(marketData.collateral, queryConfig.networkId);
+                    const isFreeBet = marketData.freeBetUser !== ZERO_ADDRESS;
 
                     const chainedData: UserChainedPosition = {
-                        user: marketData.user,
+                        user: isFreeBet ? marketData.freeBetUser : marketData.user,
                         market: marketData.market,
                         currencyKey,
                         sides,
@@ -93,6 +94,7 @@ const useActiveChainedSpeedMarketsDataQuery = (
                         payoutMultiplier: bigNumberFormatter(marketData.payoutMultiplier),
                         collateralAddress: marketData.collateral,
                         isDefaultCollateral: marketData.isDefaultCollateral,
+                        isFreeBet,
                         currentPrice: prices[currencyKey],
                         finalPrices: Array(sides.length).fill(0),
                         canResolve: false,

@@ -516,7 +516,8 @@ const PositionAction: React.FC<PositionActionProps> = ({
                     !isCollateralHidden &&
                     isMultiCollateralSupported &&
                     position.isClaimable &&
-                    !isClaimInNative && (
+                    !isClaimInNative &&
+                    !position.isFreeBet && (
                         <CollateralSelector
                             collateralArray={isClaimInNative ? [] : claimCollateralArray}
                             selectedItem={selectedClaimCollateralIndex}
@@ -556,7 +557,7 @@ export const Container = styled(FlexDivCentered)<{
 `;
 
 export const getDefaultButtonProps = (isMobile: boolean) => ({
-    minWidth: isMobile ? '282px' : '240px',
+    minWidth: isMobile ? '274px' : '240px',
     height: '30px',
     fontSize: '13px',
 });

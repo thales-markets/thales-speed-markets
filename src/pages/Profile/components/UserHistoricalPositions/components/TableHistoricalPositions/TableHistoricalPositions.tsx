@@ -12,6 +12,7 @@ import {
     AssetIcon,
     AssetName,
     DirectionIcon,
+    FreeBetIcon,
     Header,
     ShareWrapper,
     Value,
@@ -32,9 +33,12 @@ import {
     tableSortByStatus,
 } from 'utils/position';
 import { getStatusColor } from 'utils/style';
+import { useChainId } from 'wagmi';
 
 const TableHistoricalPositions: React.FC<{ data: UserHistoryPosition[] }> = ({ data }) => {
     const theme: ThemeInterface = useTheme();
+
+    const networkId = useChainId();
 
     const columns = [
         {
@@ -175,7 +179,7 @@ const TableHistoricalPositions: React.FC<{ data: UserHistoryPosition[] }> = ({ d
             accessorKey: 'paid',
             cell: (cellProps: any) => {
                 const position = cellProps.row.original;
-                const collateralByAddress = getCollateralByAddress(position.collateralAddress, position.networkId);
+                const collateralByAddress = getCollateralByAddress(position.collateralAddress, networkId);
                 const collateral = `${isOverCurrency(collateralByAddress) ? '$' : ''}${collateralByAddress}`;
                 return (
                     <Wrapper>
@@ -194,10 +198,11 @@ const TableHistoricalPositions: React.FC<{ data: UserHistoryPosition[] }> = ({ d
             accessorKey: 'payout',
             cell: (cellProps: any) => {
                 const position = cellProps.row.original;
-                const collateralByAddress = getCollateralByAddress(position.collateralAddress, position.networkId);
+                const collateralByAddress = getCollateralByAddress(position.collateralAddress, networkId);
                 const collateral = `${isOverCurrency(collateralByAddress) ? '$' : ''}${collateralByAddress}`;
                 return (
                     <Wrapper>
+                        {position.isFreeBet && <FreeBetIcon className={'icon icon--gift'} />}
                         <Value>
                             {position.isDefaultCollateral
                                 ? formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())

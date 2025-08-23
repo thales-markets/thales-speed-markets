@@ -1,4 +1,5 @@
 import Table from 'components/Table';
+import Tooltip from 'components/Tooltip';
 import { USD_SIGN } from 'constants/currency';
 import { t } from 'i18next';
 import MarketPrice from 'pages/SpeedMarkets/components/MarketPrice';
@@ -10,6 +11,7 @@ import { formatCurrencyWithKey, formatCurrencyWithSign } from 'thales-utils';
 import { UserPosition } from 'types/market';
 import { getCollateralByAddress, isOverCurrency } from 'utils/currency';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
+import { useChainId } from 'wagmi';
 
 type TablePositionsProps = {
     data: UserPosition[];
@@ -24,13 +26,15 @@ const TablePositions: React.FC<TablePositionsProps> = ({
     isAdmin,
     isSubmittingBatch,
 }) => {
+    const networkId = useChainId();
+
     const columns = [
         {
             header: <Header>{t('speed-markets.user-positions.asset')}</Header>,
             accessorKey: 'currencyKey',
             cell: (cellProps: any) => {
                 return (
-                    <Wrapper first>
+                    <Wrapper isFirst>
                         <AssetIcon
                             className={`currency-icon currency-icon--${cellProps.cell.getValue().toLowerCase()}`}
                         />
@@ -79,15 +83,16 @@ const TablePositions: React.FC<TablePositionsProps> = ({
             header: <Header>{t('speed-markets.user-positions.paid')}</Header>,
             accessorKey: 'paid',
             cell: (cellProps: any) => {
-                const position = cellProps.row.original;
-                const collateralByAddress = getCollateralByAddress(position.collateralAddress, position.networkId);
+                const paid = cellProps.cell.getValue();
+                const position = cellProps.row.original as UserPosition;
+                const collateralByAddress = getCollateralByAddress(position.collateralAddress, networkId);
                 const collateral = `${isOverCurrency(collateralByAddress) ? '$' : ''}${collateralByAddress}`;
                 return (
                     <Wrapper>
                         <Value>
                             {position.isDefaultCollateral
-                                ? formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())
-                                : formatCurrencyWithKey(collateral, cellProps.cell.getValue())}
+                                ? formatCurrencyWithSign(USD_SIGN, paid)
+                                : formatCurrencyWithKey(collateral, paid)}
                         </Value>
                     </Wrapper>
                 );
@@ -98,15 +103,21 @@ const TablePositions: React.FC<TablePositionsProps> = ({
             header: <Header>{t('speed-markets.user-positions.payout')}</Header>,
             accessorKey: 'payout',
             cell: (cellProps: any) => {
-                const position = cellProps.row.original;
-                const collateralByAddress = getCollateralByAddress(position.collateralAddress, position.networkId);
+                const payout = cellProps.cell.getValue();
+                const position = cellProps.row.original as UserPosition;
+                const collateralByAddress = getCollateralByAddress(position.collateralAddress, networkId);
                 const collateral = `${isOverCurrency(collateralByAddress) ? '$' : ''}${collateralByAddress}`;
                 return (
                     <Wrapper>
+                        {position.isFreeBet && (
+                            <Tooltip overlay={t('common.free-bet.resolve')}>
+                                <FreeBetIcon className={'icon icon--gift'} />
+                            </Tooltip>
+                        )}
                         <Value>
                             {position.isDefaultCollateral
-                                ? formatCurrencyWithSign(USD_SIGN, cellProps.cell.getValue())
-                                : formatCurrencyWithKey(collateral, cellProps.cell.getValue())}
+                                ? formatCurrencyWithSign(USD_SIGN, payout)
+                                : formatCurrencyWithKey(collateral, payout)}
                         </Value>
                     </Wrapper>
                 );
@@ -150,9 +161,9 @@ export const Header = styled.p`
     font-weight: 700;
 `;
 
-export const Wrapper = styled.div<{ first?: boolean }>`
+export const Wrapper = styled.div<{ isFirst?: boolean }>`
     display: flex;
-    justify-content: ${(props) => (props.first ? 'flex-start' : 'center')};
+    justify-content: ${(props) => (props.isFirst ? 'flex-start' : 'center')};
     align-items: center;
     gap: 4px;
     width: 100%;
@@ -165,6 +176,14 @@ export const AssetIcon = styled.i`
     background: ${(props) => props.theme.icon.background.primary};
     color: ${(props) => props.theme.icon.textColor.tertiary};
     border-radius: 50%;
+`;
+
+export const FreeBetIcon = styled.i`
+    font-size: 20px;
+    line-height: 100%;
+    color: ${(props) => props.theme.icon.textColor.primary};
+    cursor: pointer;
+    margin-right: 3px;
 `;
 
 export const Value = styled.span`

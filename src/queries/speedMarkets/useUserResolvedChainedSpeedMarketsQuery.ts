@@ -5,6 +5,7 @@ import {
     MIN_MATURITY,
     SIDE_TO_POSITION_MAP,
 } from 'constants/market';
+import { ZERO_ADDRESS } from 'constants/network';
 import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
@@ -107,9 +108,10 @@ const useUserResolvedChainedSpeedMarketsQuery = (
 
                     const paid = buyinAmount * (1 + fee);
                     const payout = coinFormatter(marketData.payout, queryConfig.networkId, collateral);
+                    const isFreeBet = marketData.freeBetUser !== ZERO_ADDRESS;
 
                     const chainedData: UserChainedPosition = {
-                        user: marketData.user,
+                        user: isFreeBet ? marketData.freeBetUser : marketData.user,
                         market: marketData.market,
                         currencyKey,
                         sides,
@@ -121,6 +123,7 @@ const useUserResolvedChainedSpeedMarketsQuery = (
                         payoutMultiplier: bigNumberFormatter(marketData.payoutMultiplier),
                         collateralAddress: marketData.collateral,
                         isDefaultCollateral: marketData.isDefaultCollateral,
+                        isFreeBet,
                         currentPrice: 0,
                         finalPrices,
                         canResolve: false,

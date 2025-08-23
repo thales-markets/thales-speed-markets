@@ -12,6 +12,7 @@ import { UserChainedPosition } from 'types/market';
 import { getCollateralByAddress, isOverCurrency } from 'utils/currency';
 import { formatShortDateWithFullTime } from 'utils/formatters/date';
 import { getChainedEndTime, tableSortByEndTime, tableSortByStatus } from 'utils/position';
+import { useChainId } from 'wagmi';
 import ChainedMarketPrice from '../../../ChainedMarketPrice';
 import SharePosition from '../../../SharePosition';
 import {
@@ -25,6 +26,8 @@ import {
 } from '../TablePositions/TablePositions';
 
 const TableChainedPositions: React.FC<{ data: UserChainedPosition[] }> = ({ data }) => {
+    const networkId = useChainId();
+
     const columns = [
         {
             header: <Header>{t('speed-markets.user-positions.asset')}</Header>,
@@ -119,7 +122,7 @@ const TableChainedPositions: React.FC<{ data: UserChainedPosition[] }> = ({ data
             accessorKey: 'paid',
             cell: (cellProps: any) => {
                 const position = cellProps.row.original;
-                const collateralByAddress = getCollateralByAddress(position.collateralAddress, position.networkId);
+                const collateralByAddress = getCollateralByAddress(position.collateralAddress, networkId);
                 const collateral = `${isOverCurrency(collateralByAddress) ? '$' : ''}${collateralByAddress}`;
                 return (
                     <Wrapper>
@@ -138,7 +141,7 @@ const TableChainedPositions: React.FC<{ data: UserChainedPosition[] }> = ({ data
             accessorKey: 'payout',
             cell: (cellProps: any) => {
                 const position = cellProps.row.original;
-                const collateralByAddress = getCollateralByAddress(position.collateralAddress, position.networkId);
+                const collateralByAddress = getCollateralByAddress(position.collateralAddress, networkId);
                 const collateral = `${isOverCurrency(collateralByAddress) ? '$' : ''}${collateralByAddress}`;
                 return (
                     <Wrapper>

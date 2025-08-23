@@ -168,6 +168,7 @@ const CardPosition: React.FC<CardPositionProps> = ({
                     <Value
                         $alignCenter
                         $hasShare={position.isClaimable || !isMatured}
+                        $hasFreeBet={position.isFreeBet}
                         $color={getStatusColor(historyStatus, theme)}
                     >
                         {historyStatus}
@@ -183,8 +184,10 @@ const CardPosition: React.FC<CardPositionProps> = ({
                         setIsActionInProgress={setIsActionInProgress}
                     />
                 )}
+                {position.isFreeBet && <FreeBetIcon className={'icon icon--gift'} />}
                 {!isOverview && <SharePosition position={position} />}
             </Action>
+            {position.isFreeBet && !isOverview && !isHistory && <Text>* {t('common.free-bet.claim')}</Text>}
         </Container>
     );
 };
@@ -196,18 +199,19 @@ const Container = styled(FlexDivColumn)<{ $borderColor?: string }>`
     min-height: 123px;
     border: 1px solid ${(props) => (props.$borderColor ? props.$borderColor : props.theme.borderColor.primary)};
     border-radius: 8px;
-    padding: 14px 10px;
+    padding: 10px;
 `;
 
-export const Info = styled(FlexDivRow)`
-    height: 100%;
-`;
+export const Info = styled(FlexDivRow)``;
 
 export const InfoColumn = styled(FlexDivColumn)<{ $isChainedHistory?: boolean }>`
     gap: ${(props) => (props.$isChainedHistory ? '5px' : '6px')};
 
     &:first-child {
         min-width: 175px;
+    }
+    &:nth-child(2) div {
+        justify-content: end;
     }
 `;
 
@@ -240,15 +244,23 @@ export const Value = styled(Text)<{
     $color?: string;
     $alignCenter?: boolean;
     $hasShare?: boolean;
+    $hasFreeBet?: boolean;
     $hideText?: boolean;
 }>`
     ${(props) => (props.$color ? `color: ${props.$color};` : '')}
-    ${(props) => (props.$alignCenter ? 'width: 100%;;' : '')}
+    ${(props) => (props.$hasFreeBet ? 'width: calc(100% - 60px);' : props.$alignCenter ? 'width: 100%;' : '')}
     ${(props) => (props.$alignCenter ? 'text-align: center;' : '')}
     ${(props) => (props.$alignCenter ? 'text-align: center;' : '')}
-    ${(props) => (props.$hasShare ? 'padding-left: 20px;' : '')}
+    ${(props) => (props.$hasFreeBet ? 'padding-left: 60px;' : props.$hasShare ? 'padding-left: 20px;' : '')}
     ${(props) => (props.$hideText ? 'overflow: hidden;' : '')}
     ${(props) => (props.$hideText ? 'text-overflow: ellipsis;' : '')}
+`;
+
+export const FreeBetIcon = styled.i`
+    font-size: 16px;
+    line-height: 100%;
+    color: ${(props) => props.theme.icon.textColor.primary};
+    cursor: pointer;
 `;
 
 export default CardPosition;

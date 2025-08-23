@@ -1,5 +1,6 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { SIDE_TO_POSITION_MAP } from 'constants/market';
+import { ZERO_ADDRESS } from 'constants/network';
 import { PYTH_CURRENCY_DECIMALS, SUPPORTED_ASSETS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { hoursToMilliseconds, secondsToMilliseconds } from 'date-fns';
@@ -8,6 +9,7 @@ import { UserPosition } from 'types/market';
 import { QueryConfig } from 'types/network';
 import { ViemContract } from 'types/viem';
 import { getContractAbi } from 'utils/contracts/abi';
+import freeBetHolderContract from 'utils/contracts/freeBetHolderContract';
 import speedMarketsAMMContract from 'utils/contracts/speedMarketsAMMContract';
 import speedMarketsDataContract from 'utils/contracts/speedMarketsAMMDataContract';
 import { getCollateralByAddress } from 'utils/currency';
@@ -38,18 +40,41 @@ const useUserActiveSpeedMarketsDataQuery = (
                     client: queryConfig.client,
                 }) as ViemContract;
 
+                const freeBetHolderContractLocal = getContract({
+                    abi: getContractAbi(freeBetHolderContract, queryConfig.networkId),
+                    address: freeBetHolderContract.addresses[queryConfig.networkId],
+                    client: queryConfig.client,
+                }) as ViemContract;
+
                 const ammParams = await speedMarketsDataContractLocal.read.getSpeedMarketsAMMParameters([
                     walletAddress,
                 ]);
 
-                const activeMarkets = await speedMarketsAMMContractLocal.read.activeMarketsPerUser([
+                const activeMarketsPerUser = await speedMarketsAMMContractLocal.read.activeMarketsPerUser([
                     0,
                     ammParams.numActiveMarketsPerUser,
                     walletAddress,
                 ]);
-                const marketsDataArray = activeMarkets.length
+
+                // Free Bet
+                const freeBetActiveMarketsPerUser = await freeBetHolderContractLocal?.read.getActiveSpeedMarketsPerUser(
+                    [0, ammParams.numFreeBetActiveMarketsPerUser, walletAddress]
+                );
+
+                const activeMarkets = (Array.isArray(activeMarketsPerUser)
+                    ? activeMarketsPerUser
+                    : [activeMarketsPerUser]
+                ).concat(
+                    Array.isArray(freeBetActiveMarketsPerUser)
+                        ? freeBetActiveMarketsPerUser
+                        : [freeBetActiveMarketsPerUser]
+                );
+
+                const marketsData = activeMarkets.length
                     ? await speedMarketsDataContractLocal.read.getMarketsData([activeMarkets])
                     : [];
+                const marketsDataArray = Array.isArray(marketsData) ? marketsData : [marketsData];
+
                 const userActiveMarkets = marketsDataArray.map((marketData: any, index: number) => ({
                     ...marketData,
                     market: activeMarkets[index],
@@ -89,8 +114,10 @@ const useUserActiveSpeedMarketsDataQuery = (
                             : getFeesFromHistory(createdAt).safeBoxImpact;
                     const fees = lpFee + safeBoxImpact;
 
+                    const isFreeBet = marketData.freeBetUser !== ZERO_ADDRESS;
+
                     const userData: UserPosition = {
-                        user: marketData.user,
+                        user: isFreeBet ? marketData.freeBetUser : marketData.user,
                         market: marketData.market,
                         currencyKey: parseBytes32String(marketData.asset),
                         side,
@@ -100,6 +127,7 @@ const useUserActiveSpeedMarketsDataQuery = (
                         payout: coinFormatter(marketData.payout, queryConfig.networkId, collateral),
                         collateralAddress: marketData.collateral,
                         isDefaultCollateral: marketData.isDefaultCollateral,
+                        isFreeBet,
                         currentPrice: prices[currencyKey],
                         finalPrice: 0,
                         isClaimable: false,

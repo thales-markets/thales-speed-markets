@@ -1,5 +1,6 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query';
 import { SIDE_TO_POSITION_MAP } from 'constants/market';
+import { ZERO_ADDRESS } from 'constants/network';
 import { PYTH_CURRENCY_DECIMALS, SUPPORTED_ASSETS } from 'constants/pyth';
 import QUERY_KEYS from 'constants/queryKeys';
 import { secondsToMilliseconds } from 'date-fns';
@@ -84,9 +85,10 @@ const useUserActiveChainedSpeedMarketsDataQuery = (
                     strikePrices[0] = bigNumberFormatter(marketData.initialStrikePrice, PYTH_CURRENCY_DECIMALS);
                     const fee = bigNumberFormatter(marketData.safeBoxImpact);
                     const collateral = getCollateralByAddress(marketData.collateral, queryConfig.networkId);
+                    const isFreeBet = marketData.freeBetUser !== ZERO_ADDRESS;
 
                     const userData: UserChainedPosition = {
-                        user: marketData.user,
+                        user: isFreeBet ? marketData.freeBetUser : marketData.user,
                         market: marketData.market,
                         currencyKey: parseBytes32String(marketData.asset),
                         sides,
@@ -98,6 +100,7 @@ const useUserActiveChainedSpeedMarketsDataQuery = (
                         payoutMultiplier: bigNumberFormatter(marketData.payoutMultiplier),
                         collateralAddress: marketData.collateral,
                         isDefaultCollateral: marketData.isDefaultCollateral,
+                        isFreeBet,
                         currentPrice: prices[currencyKey],
                         finalPrices: Array(sides.length).fill(0),
                         canResolve: false,

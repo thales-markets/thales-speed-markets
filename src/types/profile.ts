@@ -13,6 +13,7 @@ export type UserHistoryPosition = {
     payoutMultiplier: number;
     collateralAddress: string;
     isDefaultCollateral: boolean;
+    isFreeBet: boolean;
     currentPrice: number;
     finalPrices: number[];
     canResolve: boolean;
