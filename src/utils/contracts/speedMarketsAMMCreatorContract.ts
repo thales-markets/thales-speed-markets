@@ -7,7 +7,7 @@ const speedMarketsAMMCreatorContract = {
         [NetworkId.Arbitrum]: '0x905D1732F7639a402B1E0Ffcc2CeD2270Fc16812' as Address,
         [NetworkId.Base]: '0x6B5FE966Ea9B05d8E628E772B0b745734D069983' as Address,
         [NetworkId.PolygonMainnet]: '0xfC7105DA51017F2D990B9Fe68db343ae38060c3b' as Address,
-        [NetworkId.OptimismSepolia]: '0xE114677AaBf957d5EeE55f73C6b93fdEDfC849C3' as Address,
+        [NetworkId.OptimismSepolia]: '0xF87B4F9b594aF1104502A44C8CC2227D284a715b' as Address,
     },
     abi: [
         {
@@ -70,6 +70,12 @@ const speedMarketsAMMCreatorContract = {
                     internalType: 'struct SpeedMarketsAMMCreator.PendingChainedSpeedMarket',
                     name: '_pendingChainedSpeedMarket',
                     type: 'tuple',
+                },
+                {
+                    indexed: false,
+                    internalType: 'bytes32',
+                    name: '_requestId',
+                    type: 'bytes32',
                 },
             ],
             name: 'AddChainedSpeedMarket',
@@ -145,6 +151,12 @@ const speedMarketsAMMCreatorContract = {
                     internalType: 'struct SpeedMarketsAMMCreator.PendingSpeedMarket',
                     name: '_pendingSpeedMarket',
                     type: 'tuple',
+                },
+                {
+                    indexed: false,
+                    internalType: 'bytes32',
+                    name: '_requestId',
+                    type: 'bytes32',
                 },
             ],
             name: 'AddSpeedMarket',
@@ -328,6 +340,31 @@ const speedMarketsAMMCreatorContract = {
                 },
             ],
             name: 'LogChainedErrorData',
+            type: 'event',
+        },
+        {
+            anonymous: false,
+            inputs: [
+                {
+                    indexed: false,
+                    internalType: 'address',
+                    name: '_speedMarketAddress',
+                    type: 'address',
+                },
+                {
+                    indexed: false,
+                    internalType: 'address',
+                    name: '_freeBetsHolder',
+                    type: 'address',
+                },
+                {
+                    indexed: false,
+                    internalType: 'address',
+                    name: '_user',
+                    type: 'address',
+                },
+            ],
+            name: 'LogCreatedSpeedMarket',
             type: 'event',
         },
         {
@@ -621,7 +658,13 @@ const speedMarketsAMMCreatorContract = {
                 },
             ],
             name: 'addPendingChainedSpeedMarket',
-            outputs: [],
+            outputs: [
+                {
+                    internalType: 'bytes32',
+                    name: 'requestId',
+                    type: 'bytes32',
+                },
+            ],
             stateMutability: 'nonpayable',
             type: 'function',
         },
@@ -686,7 +729,13 @@ const speedMarketsAMMCreatorContract = {
                 },
             ],
             name: 'addPendingSpeedMarket',
-            outputs: [],
+            outputs: [
+                {
+                    internalType: 'bytes32',
+                    name: 'requestId',
+                    type: 'bytes32',
+                },
+            ],
             stateMutability: 'nonpayable',
             type: 'function',
         },
@@ -875,6 +924,24 @@ const speedMarketsAMMCreatorContract = {
             name: 'createSpeedMarket',
             outputs: [],
             stateMutability: 'payable',
+            type: 'function',
+        },
+        {
+            inputs: [],
+            name: 'getChainedAndSpeedMarketsAMMAddresses',
+            outputs: [
+                {
+                    internalType: 'address',
+                    name: 'chainedSpeedMarketsAMM',
+                    type: 'address',
+                },
+                {
+                    internalType: 'address',
+                    name: 'speedMarketsAMM',
+                    type: 'address',
+                },
+            ],
+            stateMutability: 'view',
             type: 'function',
         },
         {
@@ -1134,6 +1201,25 @@ const speedMarketsAMMCreatorContract = {
                     internalType: 'uint256',
                     name: 'createdAt',
                     type: 'uint256',
+                },
+            ],
+            stateMutability: 'view',
+            type: 'function',
+        },
+        {
+            inputs: [
+                {
+                    internalType: 'bytes32',
+                    name: '',
+                    type: 'bytes32',
+                },
+            ],
+            name: 'requestIdToMarket',
+            outputs: [
+                {
+                    internalType: 'address',
+                    name: '',
+                    type: 'address',
                 },
             ],
             stateMutability: 'view',

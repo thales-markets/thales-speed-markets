@@ -18,13 +18,39 @@ import { ViemContract } from 'types/viem';
 import { getPriceConnection, getPriceId, priceParser } from 'utils/pyth';
 import { refetchActiveSpeedMarkets, refetchBalances, refetchUserSpeedMarkets } from 'utils/queryConnector';
 import { delay } from 'utils/timer';
-import { Client, getContract } from 'viem';
+import { Client, decodeEventLog, getContract } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
 import { executeBiconomyTransaction } from './biconomy';
 import biconomyConnector from './biconomyWallet';
 import { getContractAbi } from './contracts/abi';
 import erc20Contract from './contracts/collateralContract';
+import freeBetHolderContract from './contracts/freeBetHolderContract';
+import speedMarketsAMMCreatorContract from './contracts/speedMarketsAMMCreatorContract';
 import speedMarketsAMMResolverContract from './contracts/speedMarketsAMMResolverContract';
+
+export const getRequestId = (txLogs: any, isFreeBet: boolean) => {
+    const requestIdEvent = txLogs
+        .map((log: any) => {
+            try {
+                const decoded = decodeEventLog({
+                    abi: isFreeBet ? freeBetHolderContract.abi : speedMarketsAMMCreatorContract.abi,
+                    data: log.data,
+                    topics: log.topics,
+                });
+
+                if (decoded?.eventName == 'AddSpeedMarket') {
+                    const args = (decoded as any)?.args;
+                    args.requestId = args?.requestId || args?._requestId;
+                    return args;
+                }
+            } catch (e) {
+                return;
+            }
+        })
+        .filter((event: any) => event);
+
+    return requestIdEvent[0]?.requestId ? requestIdEvent[0]?.requestId : undefined;
+};
 
 export const getTransactionForSpeedAMM = async (
     creatorContractWithSigner: any,

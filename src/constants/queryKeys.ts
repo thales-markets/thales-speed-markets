@@ -31,7 +31,6 @@ const QUERY_KEYS = {
         ],
     },
     Markets: {
-        SpeedMarketsCreator: (networkId: NetworkId) => ['speedMarketsCreator', networkId],
         SpeedMarketsLimits: (networkId: NetworkId, walletAddress?: string) => [
             'speedMarketsLimits',
             networkId,

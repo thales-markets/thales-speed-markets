@@ -1,4 +1,3 @@
-import { getPublicClient } from '@wagmi/core';
 import ApprovalModal from 'components/ApprovalModal';
 import Button from 'components/Button';
 import {
@@ -13,20 +12,19 @@ import { CRYPTO_CURRENCY_MAP, USD_SIGN } from 'constants/currency';
 import {
     ALLOWANCE_BUFFER_PERCENTAGE,
     DEFAULT_PRICE_SLIPPAGES_PERCENTAGE,
+    MAX_CREATION_DELAY_TIME_SEC,
     POSITIONS_TO_SIDE_MAP,
     SPEED_MARKETS_QUOTE,
 } from 'constants/market';
-import { ZERO_ADDRESS } from 'constants/network';
+import { DEAD_ADDRESS, ZERO_ADDRESS } from 'constants/network';
 import { PYTH_CURRENCY_DECIMALS } from 'constants/pyth';
 import { LOCAL_STORAGE_KEYS } from 'constants/storage';
-import { secondsToMilliseconds } from 'date-fns';
+import { millisecondsToSeconds, secondsToMilliseconds } from 'date-fns';
 import { Positions } from 'enums/market';
 import { ScreenSizeBreakpoint } from 'enums/ui';
 import useDebouncedEffect from 'hooks/useDebouncedEffect';
-import { wagmiConfig } from 'pages/Root/wagmiConfig';
 import TradingDetailsSentence from 'pages/SpeedMarkets/components/TradingDetailsSentence';
 import useExchangeRatesQuery, { Rates } from 'queries/rates/useExchangeRatesQuery';
-import useAmmSpeedMarketsCreatorQuery from 'queries/speedMarkets/useAmmSpeedMarketsCreatorQuery';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
@@ -78,7 +76,7 @@ import {
     refetchUserSpeedMarkets,
 } from 'utils/queryConnector';
 import { getReferralWallet } from 'utils/referral';
-import { getFeeByTimeThreshold, getTransactionForSpeedAMM } from 'utils/speedAmm';
+import { getFeeByTimeThreshold, getRequestId, getTransactionForSpeedAMM } from 'utils/speedAmm';
 import { delay } from 'utils/timer';
 import { Client, getContract, parseUnits, stringToHex } from 'viem';
 import { waitForTransactionReceipt } from 'viem/actions';
@@ -105,8 +103,6 @@ type AmmSpeedTradingProps = {
     resetData: React.Dispatch<void>;
     hasError: boolean;
 };
-
-const DEFAULT_MAX_CREATOR_DELAY_TIME_SEC = 15;
 
 const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
     isChained,
@@ -224,17 +220,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
         },
         [selectedCollateral, exchangeRates]
     );
-
-    const ammSpeedMarketsCreatorQuery = useAmmSpeedMarketsCreatorQuery(
-        { networkId, client },
-        {
-            enabled: isAppReady,
-        }
-    );
-
-    const ammSpeedMarketsCreatorData = useMemo(() => {
-        return ammSpeedMarketsCreatorQuery.isSuccess ? ammSpeedMarketsCreatorQuery.data : null;
-    }, [ammSpeedMarketsCreatorQuery]);
 
     const skewImpact = useMemo(() => {
         const skewPerPosition = { [Positions.UP]: 0, [Positions.DOWN]: 0 };
@@ -537,32 +522,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             client: walletClient.data as Client,
         });
 
-        const ammContract = isChained ? chainedSpeedMarketsAMMContract : speedMarketsAMMContract;
-
-        const speedMarketsAMMContractWithClient = getContract({
-            abi: getContractAbi(ammContract, networkId),
-            address: ammContract.addresses[networkId],
-            client,
-        }) as ViemContract;
-
-        const numOfActiveUserMarketsBefore = Number(
-            (await speedMarketsAMMContractWithClient.read.getLengths([userAddress]))[2]
-        );
-
-        const publicClient = getPublicClient(wagmiConfig, { chainId: networkId });
-        let isMarketCreated = false;
-
-        const unwatch = publicClient.watchContractEvent({
-            address: ammContract.addresses[networkId],
-            abi: getContractAbi(ammContract, networkId),
-            eventName: isChained ? 'MarketCreated' : 'MarketCreatedWithFees',
-            args: { [isChained ? 'user' : '_user']: userAddress },
-            onLogs: () => {
-                isMarketCreated = true;
-                onMarketCreated(id);
-            },
-        });
-
         try {
             const priceConnection = getPriceConnection(networkId);
             const priceId = getPriceId(networkId, currencyKey);
@@ -628,25 +587,27 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             const txReceipt = await waitForTransactionReceipt(client as Client, { hash });
 
             if (txReceipt.status === 'success') {
-                // if creator didn't created market for max time then check for total number of markets
-                const maxCreationTime = secondsToMilliseconds(
-                    ammSpeedMarketsCreatorData?.maxCreationDelay || DEFAULT_MAX_CREATOR_DELAY_TIME_SEC
-                );
-                let checkDelay = 2000; // check on every 2s is market created
-                while (!isMarketCreated && checkDelay < maxCreationTime) {
-                    await delay(checkDelay);
+                const requestId = getRequestId(txReceipt.logs, false);
 
-                    const numOfActiveUserMarketsAfter = Number(
-                        (await speedMarketsAMMContractWithClient.read.getLengths([userAddress]))[2]
-                    );
+                let isMarketCreationPending = true;
+                let isMarketCreated = false;
+                const startTime = Date.now();
+                const CHECK_DEALY = 500; // check on every 0.5s is market created
+                while (isMarketCreationPending) {
+                    await delay(CHECK_DEALY);
 
-                    if (!isMarketCreated && numOfActiveUserMarketsAfter - numOfActiveUserMarketsBefore > 0) {
-                        unwatch();
-                        isMarketCreated = true;
+                    const marketAddress = await speedMarketsCreatorContractWithSigner?.read.requestIdToMarket([
+                        requestId,
+                    ]);
+
+                    const timePassedSec = millisecondsToSeconds(Date.now() - startTime);
+                    isMarketCreationPending =
+                        marketAddress === ZERO_ADDRESS && timePassedSec < MAX_CREATION_DELAY_TIME_SEC;
+                    isMarketCreated = marketAddress !== ZERO_ADDRESS && marketAddress !== DEAD_ADDRESS;
+
+                    if (isMarketCreated) {
                         onMarketCreated(id);
                     }
-
-                    checkDelay += checkDelay;
                 }
                 if (!isMarketCreated) {
                     toast.update(id, getErrorToastOptions(t('common.errors.buy-failed'), id));
@@ -678,7 +639,6 @@ const AmmSpeedTrading: React.FC<AmmSpeedTradingProps> = ({
             setSubmittedStrikePrice(0);
             setIsSubmitting(false);
         }
-        unwatch();
     };
 
     const getSubmitButton = () => {

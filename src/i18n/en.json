@@ -82,7 +82,7 @@
             "insufficient-balance-wallet": "Please ensure your wallet has sufficient {{currencyKey}}",
             "something-went-wrong": "Something went wrong!",
             "unexpected": "Please help us about this issue by writing to help-and-questions",
-            "buy-failed": "Failed to create market or creation event not received! Please check your open markets."
+            "buy-failed": "Failed to create position! Increase slippage and try again."
         },
         "enable-wallet-access": {
             "approve": "Approve",
